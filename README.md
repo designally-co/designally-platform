@@ -19,13 +19,12 @@ that drives the kick-off.
 | Stack | Next.js 14 App Router · TypeScript · Tailwind · Drizzle |
 | Database | Neon Postgres |
 | Login | Google OAuth, designally.co only |
-| Survey links | `designally.co/s/<token>` and `/c/<token>` |
+| Survey links | `s.designally.co/s/<token>` and `/c/<token>` |
 | Hosting | Vercel |
 | Analysis | Anthropic API, server-side |
 
 ## What is not decided
 
-- Whether the main site can route `/s/*` and `/c/*` to the platform. **Check this before milestone 1** — it affects how tokens are issued.
 - Anthropic API account and key. Not needed until milestone 3.
 
 ## Repository contents
@@ -96,6 +95,22 @@ Neon gives you two connection strings for the same database:
 The pooler runs in transaction mode, which is why `postgres-js` is configured with `prepare: false` and why migrations use the direct string instead.
 
 Two things to know about the local fallback. It takes **one process at a time**, so stop the dev server before `db:inspect` or `db:seed`. And it is **disposable**: `Ctrl+C` shuts it down cleanly, but a hard kill leaves an unrecoverable checkpoint — run `npm run db:reset` and carry on.
+
+## Domains
+
+Two hostnames, one Vercel project.
+
+| Host | Serves | Who sees it |
+|---|---|---|
+| `s.designally.co` | client questionnaires at `/s/<token>` and `/c/<token>` | clients, no login |
+| the Vercel project domain | the team app | Designally staff, behind Google OAuth |
+
+`s.designally.co` is a **CNAME to Vercel**. The main site is WordPress and is never in the path —
+see `CLAUDE.md` for why proxying `/s/*` through it was rejected.
+
+Set `SURVEY_ORIGIN=https://s.designally.co` in Vercel so the link the team copies is the branded
+one. With it unset the app uses whatever host is serving it, so the link always resolves. Changing
+domain later is an environment variable; tokens are stored on their own and keep working.
 
 ## Signing in
 

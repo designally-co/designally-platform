@@ -15,10 +15,27 @@ Read `PRODUCT.md` for users, purpose and design principles. Read `DESIGN.md` for
 - Vercel deployment
 - Anthropic API for analysis (server-side only, never exposed to the client)
 
-**Survey links live at `designally.co/s/<token>`** and the content survey at `designally.co/c/<token>`.
-Deploy the platform to Vercel and route those two paths to it from the main site — the client-facing link
-must read as Designally's own domain. Confirm what the main site runs on before milestone 1;
-if it is not on Vercel, a reverse proxy or DNS-level rewrite is needed. Decide this before tokens are issued.
+**Survey links live at `s.designally.co/s/<token>`** and the content survey at `s.designally.co/c/<token>`.
+
+**Decided 10 August 2026 — a subdomain, not a path on the main site.** The original plan was
+`designally.co/s/<token>`, routed from the main site. The main site turned out to run on
+WordPress, which makes that the wrong shape:
+
+- It needs **two** prefixes proxied, not one. The survey saves drafts to `/api/s/<token>/draft`
+  as the client types. Proxy `/s/*` and forget `/api/s/*` and the questionnaire looks fine while
+  silently saving nothing.
+- `mod_proxy` is disabled on most shared hosting and blocked by most managed WordPress hosts.
+- It puts a PHP stack in the path of a twenty-minute questionnaire answered on a phone on a poor
+  connection. Every timeout and buffering quirk lands on the client, who does not report it —
+  they simply stop answering.
+- A plugin update or host migration can change rewrite behaviour with nobody watching.
+
+`s.designally.co` is a CNAME to Vercel. WordPress is never in the path, and Vercel issues the
+certificate. `docs/first-session-brief.md` listed this option first.
+
+The host is never hardcoded. `SURVEY_ORIGIN` sets it, and with it unset the app uses whatever host
+is serving it, so the link the team copies is always a link that resolves. Changing domain later
+is an environment variable — tokens are stored on their own and keep working.
 
 The database host supplies a connection string and nothing else. Auth is Google OAuth in the
 Next.js app — one identity source, and it dies with the Workspace account. No hosted-auth,
