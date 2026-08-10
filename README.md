@@ -17,7 +17,7 @@ that drives the kick-off.
 | | |
 |---|---|
 | Stack | Next.js 14 App Router · TypeScript · Tailwind · Drizzle |
-| Database | Supabase Postgres |
+| Database | Neon Postgres |
 | Login | Google OAuth, designally.co only |
 | Survey links | `designally.co/s/<token>` and `/c/<token>` |
 | Hosting | Vercel |
@@ -78,13 +78,22 @@ production bundle and still refuses every other domain.
 |---|---|
 | `npm run dev` | the app on http://localhost:3000 |
 | `npm run db:migrate` | apply `drizzle/*.sql` |
-| `npm run db:seed` | import `seed/question-blocks.json`, create an example survey |
+| `npm run db:seed` | import `seed/question-blocks.json` (plus an example survey, on the local database only) |
 | `npm run db:inspect` | print what a survey has collected |
 | `npm run db:reset` | throw the local database away and rebuild it |
 | `npm run db:generate` | regenerate SQL after a schema change |
 | `npm run dev:backdate -- <token> <days>` | move a survey back in time, to see the quiet-survey prompt without waiting five days |
 
-**The database.** With `DATABASE_URL` set, everything runs on Supabase Postgres through postgres-js — that is what Vercel runs. Without it, the app falls back to [PGlite](https://pglite.dev), real Postgres compiled to WASM, kept in `.pglite/`. Same schema, same migrations, no credentials needed to work on the survey.
+**The database.** With `DATABASE_URL` set, everything runs on Neon Postgres through postgres-js — that is what Vercel runs. Without it, the app falls back to [PGlite](https://pglite.dev), real Postgres compiled to WASM, kept in `.pglite/`. Same schema, same migrations, no credentials needed to work on the survey. In production the fallback is refused outright: a serverless instance's `.pglite/` is discarded with the instance, and a client's answers would go nowhere.
+
+Neon gives you two connection strings for the same database:
+
+| For | Which | Host |
+|---|---|---|
+| The app, on Vercel | **Pooled** | contains `-pooler` |
+| `db:migrate` and `db:seed` from a laptop | **Direct** | no `-pooler` |
+
+The pooler runs in transaction mode, which is why `postgres-js` is configured with `prepare: false` and why migrations use the direct string instead.
 
 Two things to know about the local fallback. It takes **one process at a time**, so stop the dev server before `db:inspect` or `db:seed`. And it is **disposable**: `Ctrl+C` shuts it down cleanly, but a hard kill leaves an unrecoverable checkpoint — run `npm run db:reset` and carry on.
 

@@ -10,7 +10,7 @@ Read `PRODUCT.md` for users, purpose and design principles. Read `DESIGN.md` for
 
 - Next.js 14+ (App Router), TypeScript, `src/` directory
 - Tailwind CSS
-- Drizzle ORM + **Supabase Postgres**
+- Drizzle ORM + **Neon Postgres**
 - **Google OAuth, restricted to the designally.co domain** — no other sign-in method
 - Vercel deployment
 - Anthropic API for analysis (server-side only, never exposed to the client)
@@ -20,8 +20,23 @@ Deploy the platform to Vercel and route those two paths to it from the main site
 must read as Designally's own domain. Confirm what the main site runs on before milestone 1;
 if it is not on Vercel, a reverse proxy or DNS-level rewrite is needed. Decide this before tokens are issued.
 
-Use Supabase for Postgres only. Auth is Google OAuth in the Next.js app, not Supabase Auth —
-one identity source, and it dies with the Workspace account.
+The database host supplies a connection string and nothing else. Auth is Google OAuth in the
+Next.js app — one identity source, and it dies with the Workspace account. No hosted-auth,
+storage or client library from the database vendor; the app talks to it through `postgres-js`
+against `DATABASE_URL`, so the host is a one-line change.
+
+**Decided 10 August 2026 — Neon, not Supabase.** Two reasons, in order of weight:
+
+1. **A free Supabase project pauses after 7 quiet days and has to be restored by hand.** This
+   product's rhythm is sporadic — a client opens their questionnaire a week or two after it is
+   sent. A paused database means a dead link, and the client does not report it as broken, they
+   simply never answer. Neon suspends the same way but resumes on the next connection in a
+   fraction of a second, so nobody sees it.
+2. Supabase's free plan allows two projects per account, and both were already in use.
+
+`docs/first-session-brief.md` recommended Neon at the outset for a third reason — it is the
+cleanest fit with Vercel and Drizzle. Nothing about the schema, the migrations or the driver
+changes; only `DATABASE_URL`.
 
 **Do not import theme, tokens, or components from Knowledge Hub or Content Generator.** Those projects share the stack but not the design system, and neither has a settled one. This project defines its own in `DESIGN.md` and is the reference going forward.
 

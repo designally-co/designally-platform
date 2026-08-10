@@ -1,7 +1,7 @@
 /**
  * One database, two drivers.
  *
- * `DATABASE_URL` set   → postgres-js against Supabase Postgres. This is what
+ * `DATABASE_URL` set   → postgres-js against Neon Postgres. This is what
  *                        Vercel runs.
  * `DATABASE_URL` unset → PGlite, real Postgres compiled to WASM, stored in
  *                        `.pglite/`. Same SQL, same migrations, no credentials
@@ -51,7 +51,7 @@ function reclaimLocalDir(dir: string) {
     if (owner && owner !== process.pid && isAlive(owner)) {
       throw new Error(
         `The local development database in ${dir} is open in process ${owner}. ` +
-          `Stop it first, or set DATABASE_URL to use Supabase instead.`,
+          `Stop it first, or set DATABASE_URL to use Neon instead.`,
       );
     }
     rmSync(pidFile, { force: true });
@@ -96,16 +96,16 @@ async function create() {
    */
   if (!url && process.env.NODE_ENV === 'production') {
     throw new Error(
-      'DATABASE_URL is not set. Production must run on Supabase Postgres — the local ' +
+      'DATABASE_URL is not set. Production must run on Neon Postgres — the local ' +
         'PGlite fallback is per-instance and ephemeral, and answers written to it would ' +
-        'be lost. Set DATABASE_URL to the pooled Supabase connection string.',
+        'be lost. Set DATABASE_URL to the pooled Neon connection string.',
     );
   }
 
   if (url) {
     const { drizzle } = await import('drizzle-orm/postgres-js');
     const postgres = (await import('postgres')).default;
-    // Supabase's pooler does not support prepared statements.
+    // The pooler runs in transaction mode and cannot hold prepared statements.
     const client = postgres(url, { prepare: false });
     return drizzle(client, { schema });
   }
