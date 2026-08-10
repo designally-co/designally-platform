@@ -1,26 +1,665 @@
 @import "tailwindcss";
 
+/* ============================================================
+   Tokens — DESIGN.md §1–3.
+   One accent. It means "a person is needed here". Nothing
+   decorative uses it. There are no shadows in this product;
+   the focus ring is the single exception.
+   ============================================================ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* action */
+  --primary: #0066cc;
+  --primary-focus: #0071e3;
+  --primary-on-dark: #2997ff;
+  --primary-tint: #e8f1fb;
+  --primary-deep: #004f9e;
+
+  /* ink */
+  --ink: #1d1d1f;
+  --ink-2: #333333;
+  /* DESIGN.md names #7a7a7a here and says it meets 4.5:1. It does not — 3.94:1
+     on parchment and 4.29:1 on white. This is Apple's own secondary label
+     colour, which clears 4.5:1 on both (4.66 / 5.07). See DESIGN.md §1. */
+  --ink-3: #6e6e73;
+  --on-dark: #ffffff;
+  --body-muted: #cccccc;
+
+  /* surface */
+  --canvas: #ffffff;
+  --parchment: #f5f5f7;
+  --pearl: #fafafc;
+  --tile: #272729;
+
+  /* line */
+  --hairline: #e0e0e0;
+  --divider: #f0f0f0;
+
+  /* semantic — text and thin tints only, never fills, never buttons */
+  --affirm: #248a3d;
+  --caution: #c93400;
+  --critical: #d70015;
+  --affirm-tint: #eef7f1;
+  --caution-tint: #fdf1ec;
+  --critical-tint: #fdeff0;
+
+  /* space — 8px base, DESIGN.md §3. md is 17px and that is not a mistake. */
+  --sp-xxs: 4px;
+  --sp-xs: 8px;
+  --sp-sm: 12px;
+  --sp-md: 17px;
+  --sp-lg: 24px;
+  --sp-xl: 32px;
+  --sp-xxl: 48px;
+  --sp-section: 80px;
+
+  /* radii — 8, 11, 18, pill. Nothing between. */
+  --r-sm: 8px;
+  --r-md: 11px;
+  --r-lg: 18px;
+  --r-pill: 9999px;
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Latin runs in Inter or genuine SF Pro; Thai codepoints fall through to
+     Noto Sans Thai per glyph. Never split a bilingual string across elements. */
+  --font: var(--font-inter), system-ui, -apple-system, "SF Pro Text",
+    var(--font-noto-thai), "Noto Sans Thai", sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font);
+  background: var(--parchment);
+  color: var(--ink);
+  font-size: 17px;
+  line-height: 1.44;
+  letter-spacing: -0.374px;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+textarea {
+  font-family: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--primary-focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================
+   Buttons — DESIGN.md §5. Pill radius is the action signal.
+   Weights are 300 / 400 / 600 / 700. 500 is absent.
+   ============================================================ */
+.btn {
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 400;
+  letter-spacing: -0.374px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: var(--r-pill);
+  padding: 11px 22px;
+  min-height: 44px;
+  white-space: nowrap;
+  transition:
+    background 0.2s var(--ease),
+    border-color 0.2s var(--ease),
+    transform 0.16s var(--ease),
+    color 0.2s;
+}
+.btn:active {
+  transform: scale(0.95);
+}
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: var(--primary-deep);
+}
+.btn-ink {
+  background: var(--ink);
+  color: #fff;
+}
+.btn-ink:hover {
+  background: #000;
+}
+.btn-quiet {
+  background: transparent;
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.btn-quiet:hover {
+  background: var(--primary-tint);
+}
+.btn[disabled] {
+  opacity: 0.5;
+  cursor: default;
+}
+.btn[disabled]:active {
+  transform: none;
+}
+
+/* ============================================================
+   Inputs — DESIGN.md §5. Single line pills at 44px; a textarea
+   cannot be a pill, so it takes lg.
+   ============================================================ */
+.input {
+  width: 100%;
+  font-size: 17px;
+  letter-spacing: -0.374px;
+  color: var(--ink);
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-pill);
+  padding: 12px 20px;
+  height: 44px;
+}
+.textarea {
+  width: 100%;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--ink);
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-lg);
+  padding: 14px 18px;
+  min-height: 96px;
+  resize: vertical;
+}
+.input:focus,
+.textarea:focus {
+  outline: 2px solid var(--primary-focus);
+  outline-offset: 2px;
+  border-color: var(--hairline);
+}
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--ink-3);
+}
+
+label.f {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.224px;
+  margin-bottom: 7px;
+}
+label.f span {
+  font-weight: 400;
+}
+
+/* ============================================================
+   Client survey — ported from reference/designally-app.html.
+   Marketing volume: 80px rhythm at welcome and completion,
+   one question group per screenful.
+   ============================================================ */
+.survey-shell {
+  min-height: 100dvh;
+  background: var(--parchment);
+}
+
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  height: 3px;
+  background: var(--divider);
+}
+.bar i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--primary);
+  transition: width 0.55s var(--ease);
+}
+
+.sform {
+  max-width: 660px;
+  margin: 0 auto;
+  padding: 44px 26px 90px;
+}
+.sform .head {
+  display: flex;
+  align-items: baseline;
+  gap: 11px;
+  margin-bottom: 38px;
+  flex-wrap: wrap;
+}
+.wordmark {
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: -0.374px;
+  white-space: nowrap;
+}
+.wordmark em {
+  font-style: normal;
+  font-weight: 400;
+  color: inherit;
+}
+.sform .head .proj {
+  font-size: 13px;
+  color: var(--ink-3);
+  border-left: 1px solid var(--hairline);
+  padding-left: 11px;
+}
+
+.step {
+  animation: rise 0.45s var(--ease);
+}
+.step h1 {
+  font-size: clamp(1.9rem, 5vw, 2.7rem);
+  line-height: 1.14;
+  font-weight: 600;
+  letter-spacing: -0.024em;
+  text-wrap: balance;
+  margin-bottom: 10px;
+}
+.step h1 em {
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.step h2 {
+  font-size: clamp(1.4rem, 3.6vw, 1.85rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.22;
+  text-wrap: balance;
+}
+.stepno {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary-deep);
+  margin-bottom: 7px;
+}
+.th {
+  color: var(--ink-2);
+  font-size: 15px;
+}
+.intro {
+  font-size: 16.5px;
+  max-width: 58ch;
+  margin-bottom: 8px;
+  text-wrap: pretty;
+}
+.facts {
+  display: flex;
+  gap: 26px;
+  flex-wrap: wrap;
+  margin: 30px 0 34px;
+  font-size: 13.5px;
+  color: var(--ink-3);
+}
+.facts b {
+  display: block;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 600;
+}
+/* heading block — the gap below it does not depend on there being a description */
+.stephead {
+  margin-bottom: 30px;
+}
+.desc {
+  color: var(--ink-2);
+  margin: 8px 0 0;
+  max-width: 60ch;
+  text-wrap: pretty;
+}
+
+/* a question */
+.sq {
+  margin-bottom: 28px;
+}
+.sq .qq {
+  display: block;
+  font-weight: 600;
+  font-size: 15.5px;
+  line-height: 1.45;
+  margin-bottom: 2px;
+}
+.sq .qth {
+  display: block;
+  color: var(--ink-3);
+  font-size: 13.5px;
+  margin-bottom: 9px;
+}
+.sq .qn {
+  color: inherit;
+  font-weight: 600;
+  margin-right: 6px;
+}
+.sq .qhelp {
+  display: block;
+  color: var(--ink-3);
+  font-size: 13.5px;
+  margin-bottom: 9px;
+}
+/* a required question that was left blank, after the respondent tried to move on */
+.sq .qwarn {
+  display: block;
+  font-size: 13.5px;
+  color: var(--caution);
+  margin-top: 8px;
+}
+
+/* radio cards */
+.pick {
+  display: grid;
+  gap: 9px;
+}
+.pickone {
+  display: flex;
+  gap: 11px;
+  align-items: flex-start;
+  cursor: pointer;
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-lg);
+  padding: 13px 15px;
+  min-height: 44px;
+  transition:
+    border-color 0.18s,
+    background 0.18s;
+}
+.pickone input {
+  margin-top: 5px;
+  accent-color: var(--primary);
+  flex-shrink: 0;
+}
+.pickone.sel {
+  border-color: var(--primary);
+  background: var(--primary-tint);
+}
+.pickone b {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+}
+.pickone span.pth {
+  display: block;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+/* linear scale */
+.scale {
+  border-top: 1px solid var(--divider);
+  padding: 17px 0 13px;
+}
+.scale:last-of-type {
+  border-bottom: 1px solid var(--divider);
+  margin-bottom: 6px;
+}
+.poles {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14.5px;
+  font-weight: 600;
+  margin-bottom: 11px;
+}
+.poles small {
+  display: block;
+  font-size: 12px;
+  color: var(--ink-3);
+  font-weight: 400;
+  line-height: 1.7;
+}
+.poles > span:last-child {
+  text-align: right;
+}
+.pts {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 400px;
+  margin: 0 auto;
+}
+/* the tap target is 44px; the visible dot inside it is smaller */
+.pts button {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  border-radius: 50%;
+}
+.pts button i {
+  display: block;
+  border-radius: 50%;
+  border: 1.5px solid var(--hairline);
+  background: var(--canvas);
+  width: 32px;
+  height: 32px;
+  transition:
+    transform 0.18s var(--ease),
+    border-color 0.18s,
+    background 0.18s;
+}
+.pts button:nth-child(3) i {
+  width: 24px;
+  height: 24px;
+}
+.pts button:nth-child(2) i,
+.pts button:nth-child(4) i {
+  width: 28px;
+  height: 28px;
+}
+.pts button:hover i {
+  border-color: var(--primary);
+}
+.pts button[aria-pressed="true"] i {
+  background: var(--primary);
+  border-color: var(--primary);
+  transform: scale(1.14);
+}
+
+/* word chips — selection is border weight, not fill (DESIGN.md §5) */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.chip {
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: -0.224px;
+  cursor: pointer;
+  background: var(--canvas);
+  color: var(--ink);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-pill);
+  padding: 12px 16px;
+  min-height: 44px;
+  transition:
+    border-color 0.18s,
+    background 0.18s;
+}
+.chip:hover {
+  border-color: var(--primary);
+}
+.chip[aria-pressed="true"] {
+  border: 2px solid var(--primary-focus);
+  padding: 11px 15px;
+}
+.chipn {
+  margin-top: 11px;
+  font-size: 13.5px;
+  color: var(--ink-3);
+}
+
+/* checkbox rows for the shorter checkbox questions */
+.checks {
+  display: grid;
+  gap: 9px;
+}
+
+.otherwrap {
+  margin-top: 9px;
+}
+
+/* step navigation */
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 42px;
+}
+.nav .of {
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.done-mark {
+  font-size: 52px;
+  line-height: 1;
+  margin-bottom: 20px;
+}
+
+/* the one place a saved-draft state is reported */
+.saved {
+  font-size: 13px;
+  color: var(--ink-3);
+  margin-top: 18px;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .sform {
+    padding: 32px 20px 72px;
+  }
+  .facts {
+    gap: 16px;
+  }
+  /* Bilingual labels are long. On a phone a button wraps rather than
+     pushing the page sideways. */
+  .btn {
+    white-space: normal;
+    max-width: 100%;
+    text-wrap: balance;
+  }
+}
+@media (max-width: 419px) {
+  .step h1 {
+    font-size: 2.125rem;
+  }
+}
+
+/* ============================================================
+   Holding page for the team app. Milestone 2 replaces it.
+   ============================================================ */
+.holding {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 44px 28px;
+}
+.holding h1 {
+  font-size: clamp(1.75rem, 4.2vw, 2.5rem);
+  line-height: 1.1;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  margin-bottom: 10px;
+}
+.holding p {
+  color: var(--ink-2);
+  max-width: 60ch;
+  margin-bottom: var(--sp-md);
+}
+.holding .card {
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-lg);
+  padding: var(--sp-lg);
+  margin-top: var(--sp-xxl);
+}
+.holding .card h2 {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.holding code {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 14px;
+}
+
+/* ============================================================
+   The Thai leading rule — DESIGN.md §2, overrides Apple.
+   Last in the file deliberately: these override the component
+   rules above, and `.client-surface *` ties them on specificity.
+   Thai stacks four levels: base glyph, upper vowel, tone mark,
+   lower vowel. Latin-tuned leading clips it.
+   Almost every client-facing string is bilingual, so the client
+   surface runs at 1.6 by default and Thai paragraphs at 1.7.
+   ============================================================ */
+.client-surface,
+.client-surface p,
+.client-surface label,
+.client-surface button,
+.client-surface input,
+.client-surface textarea {
+  line-height: 1.6;
+}
+
+.client-surface .th,
+.client-surface .qth,
+.client-surface .poles small {
+  line-height: 1.7;
+}
+
+/**
+ * Negative tracking collapses Thai tone marks into the glyph above, and
+ * DESIGN.md sets -0.02em as the floor for any line containing Thai. Almost
+ * every string here is bilingual and any of them can carry a Thai name, so the
+ * client surface runs untracked and only the display headings take the floor
+ * value. The Latin tracking stays in the team app.
+ */
+.client-surface,
+.client-surface * {
+  letter-spacing: 0;
+}
+.client-surface .step h1,
+.client-surface .step h2 {
+  letter-spacing: -0.02em;
+}
+.client-surface .wordmark {
+  letter-spacing: -0.01em;
 }

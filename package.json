@@ -10,7 +10,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx scripts/migrate.ts",
     "db:seed": "tsx scripts/seed.ts",
-    "db:reset": "rm -rf .pglite && npm run db:migrate && npm run db:seed"
+    "db:reset": "rm -rf .pglite && npm run db:migrate && npm run db:seed",
+    "db:inspect": "tsx scripts/inspect.ts"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.4",

@@ -23,7 +23,7 @@ Adopted from the source almost unchanged. One accent, no gradients, no decorativ
 /* ink */
 --ink              #1d1d1f   /* headlines, body, dark buttons */
 --ink-muted-80     #333333   /* secondary text */
---ink-muted-48     #7a7a7a   /* meta, disabled, fine print */
+--ink-muted-48     #6e6e73   /* meta, disabled, fine print */
 --on-dark          #ffffff
 --body-muted       #cccccc   /* secondary text on dark */
 
@@ -42,6 +42,8 @@ Adopted from the source almost unchanged. One accent, no gradients, no decorativ
 **The parchment inversion.** The page is `--canvas-parchment` (#f5f5f7) and raised surfaces are pure white. This is the single most important structural borrowing: *surface change is the hierarchy*. Cards lift off the page because they are lighter, not because they have a shadow.
 
 **Action Blue is the only accent, and it means "a person is needed here."** Every interactive element uses it; nothing decorative does. This survives unchanged from the previous system and matches Apple's own rule exactly.
+
+**Correction, milestone 1.** `--ink-muted-48` was `#7a7a7a`, described below as meeting 4.5:1. Measured, it does not: **3.94:1 on parchment and 4.29:1 on white**. Since the meta colour carries the Thai sub-line under every question, that failed the WCAG 2.2 AA baseline in `PRODUCT.md` for exactly the readers who most need it. It is now `#6e6e73` — Apple's own secondary label colour — which measures **4.66:1 on parchment and 5.07:1 on white**. Do not lighten it, and note that any grey checked only against white will fail on the parchment page.
 
 ### Semantic tones — the one addition
 
@@ -124,6 +126,10 @@ Thai stacks four levels vertically: base glyph, upper vowel, tone mark, lower vo
 This overrides the table above wherever the two conflict. In practice: `body` is 1.44 for Latin-only strings and 1.6 for bilingual ones. Because almost every client-facing string is bilingual, **set 1.6 as the default on client surfaces** and use the tighter Latin values only in the team app where a line is English-only.
 
 Never tighten tracking below `-0.02em` on a line containing Thai — negative tracking collapses tone marks into the glyph above.
+
+**In practice, milestone 1.** The table's body tracking of `-0.374px` is `-0.022em` at 17px — just past that floor — and on a client surface *any* line can carry Thai, including a heading holding a respondent's name ("Thank you, คุณสมชาย ใจดี"). Chasing this string by string does not hold up. So the client surface runs **untracked throughout**, and only `step h1` and `step h2` take the floor value of `-0.02em`. The Latin tracking in the table stays in force in the team app, where lines are English-only.
+
+`--ink-muted-48` also carries the Thai sub-line under every question, which is why the contrast correction in §1 matters more here than the number alone suggests.
 
 ---
 
@@ -257,7 +263,7 @@ Multi-line textareas use `lg` radius (18px) — a pill cannot hold three lines.
 
 Focus: `outline: 2px solid --primary-focus`, offset 2px. No border-colour change, no ring shadow.
 
-Placeholder `--ink-muted-48` — meets 4.5:1, do not lighten.
+Placeholder `--ink-muted-48` — at the corrected `#6e6e73` this meets 4.5:1 on both white and parchment. Do not lighten.
 
 ### Option chips
 

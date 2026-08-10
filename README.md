@@ -64,6 +64,37 @@ These are product decisions, not preferences.
 7. No percentages or sentiment scores — "2 of 3" is honest
 8. Internal facilitation notes never render on a client-facing surface
 
+## Running it
+
+```bash
+npm install && npm run db:migrate && npm run db:seed && npm run dev
+```
+
+The seed prints a survey link — open it, or find it listed on `/`.
+
+| Command | |
+|---|---|
+| `npm run dev` | the app on http://localhost:3000 |
+| `npm run db:migrate` | apply `drizzle/*.sql` |
+| `npm run db:seed` | import `seed/question-blocks.json`, create an example survey |
+| `npm run db:inspect` | print what a survey has collected |
+| `npm run db:reset` | throw the local database away and rebuild it |
+| `npm run db:generate` | regenerate SQL after a schema change |
+
+**The database.** With `DATABASE_URL` set, everything runs on Supabase Postgres through postgres-js — that is what Vercel runs. Without it, the app falls back to [PGlite](https://pglite.dev), real Postgres compiled to WASM, kept in `.pglite/`. Same schema, same migrations, no credentials needed to work on the survey.
+
+Two things to know about the local fallback. It takes **one process at a time**, so stop the dev server before `db:inspect` or `db:seed`. And it is **disposable**: `Ctrl+C` shuts it down cleanly, but a hard kill leaves an unrecoverable checkpoint — run `npm run db:reset` and carry on.
+
+## Where the build has got to
+
+**Milestone 1 is done.** A public bilingual questionnaire at `/s/<token>`, saving to Postgres. No auth, no team app — milestone 2 brings those.
+
+- All six question blocks seeded from `seed/question-blocks.json` — 60 questions, versioned
+- The branding questionnaire in the five steps from `reference/designally-app.html`
+- All five question types, including the ten personality scales and the 6–10 word chips
+- Progress saved to localStorage **and** a server draft, so a cleared browser or a second device still picks up where it left off
+- One response row and its answer rows on submit; a blank answer is stored as absent, which is what the analysis reads as a clarity gap
+
 ## First move
 
 **Read `SETUP.md`.** It walks through installing Node, creating the Next.js app, adding these files
