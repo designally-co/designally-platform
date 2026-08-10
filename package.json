@@ -11,12 +11,14 @@
     "db:migrate": "tsx scripts/migrate.ts",
     "db:seed": "tsx scripts/seed.ts",
     "db:reset": "rm -rf .pglite && npm run db:migrate && npm run db:seed",
-    "db:inspect": "tsx scripts/inspect.ts"
+    "db:inspect": "tsx scripts/inspect.ts",
+    "dev:backdate": "tsx scripts/dev-backdate.ts"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.4",
     "drizzle-orm": "^0.45.2",
     "next": "16.3.0",
+    "next-auth": "^5.0.0-beta.32",
     "postgres": "^3.4.9",
     "react": "19.2.8",
     "react-dom": "19.2.8"

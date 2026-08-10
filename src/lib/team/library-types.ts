@@ -1,0 +1,39 @@
+import type { BlockKey, QuestionType } from '@/lib/db/schema';
+
+/**
+ * The shapes and labels the question library is rendered from. Kept apart from
+ * library.ts, which opens a database connection — a client component importing
+ * one symbol from that module would drag the Postgres driver into the browser
+ * bundle.
+ */
+
+export type LibraryQuestion = {
+  order: number;
+  textEn: string;
+  textTh: string;
+  type: QuestionType;
+  /** the per-type settings, said in words — "24 choices · pick 6–10" */
+  settings: string | null;
+  version: number;
+};
+
+export type LibraryBlock = {
+  key: BlockKey;
+  nameEn: string;
+  nameTh: string;
+  usedBy: string;
+  questions: LibraryQuestion[];
+};
+
+export const QUESTION_TYPE_LABEL: Record<QuestionType, string> = {
+  paragraph: 'Paragraph',
+  short_text: 'Short text',
+  multiple_choice: 'Multiple choice',
+  checkboxes: 'Checkboxes',
+  linear_scale: 'Linear scale',
+};
+
+/** How many questions a package's blocks add up to. */
+export function countQuestions(library: LibraryBlock[], keys: readonly BlockKey[]) {
+  return library.filter((b) => keys.includes(b.key)).reduce((n, b) => n + b.questions.length, 0);
+}

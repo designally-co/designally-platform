@@ -70,7 +70,9 @@ These are product decisions, not preferences.
 npm install && npm run db:migrate && npm run db:seed && npm run dev
 ```
 
-The seed prints a survey link — open it, or find it listed on `/`.
+Open http://localhost:3000. Without a Google OAuth client configured, the sign-in page offers a
+development sign-in instead — any `@designally.co` address, no password. It is not built into a
+production bundle and still refuses every other domain.
 
 | Command | |
 |---|---|
@@ -80,20 +82,45 @@ The seed prints a survey link — open it, or find it listed on `/`.
 | `npm run db:inspect` | print what a survey has collected |
 | `npm run db:reset` | throw the local database away and rebuild it |
 | `npm run db:generate` | regenerate SQL after a schema change |
+| `npm run dev:backdate -- <token> <days>` | move a survey back in time, to see the quiet-survey prompt without waiting five days |
 
 **The database.** With `DATABASE_URL` set, everything runs on Supabase Postgres through postgres-js — that is what Vercel runs. Without it, the app falls back to [PGlite](https://pglite.dev), real Postgres compiled to WASM, kept in `.pglite/`. Same schema, same migrations, no credentials needed to work on the survey.
 
 Two things to know about the local fallback. It takes **one process at a time**, so stop the dev server before `db:inspect` or `db:seed`. And it is **disposable**: `Ctrl+C` shuts it down cleanly, but a hard kill leaves an unrecoverable checkpoint — run `npm run db:reset` and carry on.
 
+## Signing in
+
+Google OAuth, restricted to the designally.co Workspace. Create an OAuth client in Google Cloud
+Console, set the authorised redirect URI to `https://<your-domain>/api/auth/callback/google`, and
+put the id and secret in `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET`. See `.env.example`.
+
+The domain is checked three times, because each check alone can be worked around: `hd` on the
+authorisation request narrows the account picker, the `hd` claim on the returned profile is checked
+server-side, and the address itself must end in the domain and be verified. **A production build
+refuses to start without those two variables** — a deploy nobody can sign into is worth catching at
+build time.
+
 ## Where the build has got to
 
-**Milestone 1 is done.** A public bilingual questionnaire at `/s/<token>`, saving to Postgres. No auth, no team app — milestone 2 brings those.
+**Milestones 1 and 2 are done.**
+
+*Milestone 1 — the survey.* A public bilingual questionnaire at `/s/<token>`, saving to Postgres.
 
 - All six question blocks seeded from `seed/question-blocks.json` — 60 questions, versioned
 - The branding questionnaire in the five steps from `reference/designally-app.html`
 - All five question types, including the ten personality scales and the 6–10 word chips
 - Progress saved to localStorage **and** a server draft, so a cleared browser or a second device still picks up where it left off
 - One response row and its answer rows on submit; a blank answer is stored as absent, which is what the analysis reads as a clarity gap
+
+*Milestone 2 — the team can see it.* One page, behind Google OAuth.
+
+- **Needs you** — a survey that has gone quiet for five days is promoted here and asks whether there is enough to work with. It only ever asks
+- **All projects** — a real table; the segment meter follows the package, five stages for branding and seven for website
+- **New survey** — client, package, a generated link. No expected respondent count, and there never will be
+- **Project detail** — right now, the stage timeline, who answered, the link, and archive
+- Two of the four gates are live: closing collection and archiving, each recording who acted and when. Archiving is reversible; nothing is ever deleted
+
+The other two gates need a brief to exist, so they arrive with milestone 3.
 
 ## First move
 

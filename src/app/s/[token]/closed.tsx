@@ -19,8 +19,7 @@ export default function Closed({ clientName }: { clientName: string }) {
           </p>
           <p className="intro">
             The Designally team has everything they need and has moved on to the analysis. If you
-            think your perspective is missing, please contact your project lead — they can reopen
-            it.
+            think your perspective is missing, please contact your project lead.
           </p>
           <p className="th" style={{ maxWidth: '58ch' }}>
             ทีมงานได้ปิดรับคำตอบแล้ว หากคุณต้องการเพิ่มความเห็น กรุณาติดต่อผู้ดูแลโปรเจกต์
