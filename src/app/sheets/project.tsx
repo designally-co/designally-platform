@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react';
 
 import { archiveProject, closeCollection } from '@/lib/team/actions';
 import type { ProjectView } from '@/lib/team/projects';
+import { forDisplay } from '@/lib/survey/link';
 import Sheet from './sheet';
 
 /**
@@ -17,10 +18,12 @@ import Sheet from './sheet';
  */
 export default function ProjectSheet({
   project: p,
+  origin,
   onClose,
   onActed,
 }: {
   project: ProjectView;
+  origin: string;
   onClose: () => void;
   onActed: (message: string) => void;
 }) {
@@ -132,7 +135,7 @@ export default function ProjectSheet({
         <div className="pd-sec">
           <h3>The link</h3>
           <div className="linkbox">
-            <span>designally.co/s/{p.token}</span>
+            <span>{forDisplay(origin)}/s/{p.token}</span>
           </div>
           <p className="hintline">
             {p.closedOn

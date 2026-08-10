@@ -6,6 +6,7 @@ import type { Package } from '@/lib/db/schema';
 import { countQuestions, type LibraryBlock } from '@/lib/team/library-types';
 import { PACKAGE_BLOCKS } from '@/lib/survey/packages';
 import { createSurvey } from '@/lib/team/actions';
+import { forDisplay } from '@/lib/survey/link';
 import Sheet from './sheet';
 
 const OPTIONS: { key: Package; label: string }[] = [
@@ -16,10 +17,12 @@ const OPTIONS: { key: Package; label: string }[] = [
 
 export default function NewSurveySheet({
   library,
+  origin,
   onClose,
   onCreated,
 }: {
   library: LibraryBlock[];
+  origin: string;
   onClose: () => void;
   onCreated: (message: string) => void;
 }) {
@@ -46,7 +49,8 @@ export default function NewSurveySheet({
     });
   };
 
-  const full = link ? `designally.co${link}` : '';
+  // the copyable link must be the one that actually resolves
+  const full = link ? `${origin}${link}` : '';
 
   const copy = async () => {
     try {
@@ -112,7 +116,7 @@ export default function NewSurveySheet({
         <div className="field">
           <label className="f">Send this link to the client&apos;s main contact</label>
           <div className="linkbox">
-            <span>{full}</span>
+            <span>{forDisplay(full)}</span>
             <button className="btn btn-quiet btn-sm" style={{ marginLeft: 'auto' }} onClick={copy}>
               {copied ? 'Copied' : 'Copy'}
             </button>

@@ -20,12 +20,15 @@ export default function Today({
   live,
   archived,
   library,
+  origin,
   signOut,
 }: {
   today: string;
   live: ProjectView[];
   archived: ProjectView[];
   library: LibraryBlock[];
+  /** where a client's survey link points — see lib/survey/origin */
+  origin: string;
   signOut: () => Promise<void>;
 }) {
   const [panel, setPanel] = useState<Panel>(null);
@@ -222,6 +225,7 @@ export default function Today({
       {panel === 'new' && (
         <NewSurveySheet
           library={library}
+          origin={origin}
           onClose={() => setPanel(null)}
           onCreated={(msg) => toast.show(msg)}
         />
@@ -240,6 +244,7 @@ export default function Today({
       {project && (
         <ProjectSheet
           project={project}
+          origin={origin}
           onClose={() => setOpenProject(null)}
           onActed={(msg) => {
             setOpenProject(null);
