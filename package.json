@@ -8,11 +8,11 @@
     "start": "next start",
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "tsx scripts/migrate.ts",
-    "db:seed": "tsx scripts/seed.ts",
+    "db:migrate": "node --env-file-if-exists=.env.local --import tsx scripts/migrate.ts",
+    "db:seed": "node --env-file-if-exists=.env.local --import tsx scripts/seed.ts",
     "db:reset": "rm -rf .pglite && npm run db:migrate && npm run db:seed",
-    "db:inspect": "tsx scripts/inspect.ts",
-    "dev:backdate": "tsx scripts/dev-backdate.ts"
+    "db:inspect": "node --env-file-if-exists=.env.local --import tsx scripts/inspect.ts",
+    "dev:backdate": "node --env-file-if-exists=.env.local --import tsx scripts/dev-backdate.ts"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.4",
