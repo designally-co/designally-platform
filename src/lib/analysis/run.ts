@@ -3,8 +3,8 @@ import 'server-only';
 import Anthropic from '@anthropic-ai/sdk';
 import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod';
 
-import { BriefSchema, type Brief } from './schema';
-import { SYSTEM_PROMPT, buildUserPrompt } from './prompt';
+import { CreativeSchema, FindingsSchema, type Brief, type Creative, type Findings } from './schema';
+import { SYSTEM_PROMPT, buildUserPrompt, buildCreativePrompt } from './prompt';
 
 /**
  * The analysis. Server-side only — the key never reaches a client bundle,
@@ -12,6 +12,16 @@ import { SYSTEM_PROMPT, buildUserPrompt } from './prompt';
  */
 
 const MODEL = 'claude-opus-5';
+
+/**
+ * Effort is the latency and cost lever, and it matters here more than usual:
+ * the analysis runs inside a request, and a serverless function has a ceiling.
+ * At the default `high` the two passes took over five minutes, which exceeds
+ * what a Vercel function will allow. `medium` is the setting to beat — raise
+ * it if the briefs stop finding conflicts, and re-measure the wall clock when
+ * you do.
+ */
+const EFFORT = 'medium';
 
 export type AnalysisResult =
   | { ok: true; brief: Brief; usage: { input: number; output: number } }
@@ -33,17 +43,57 @@ export async function analyse(input: {
 
   const client = new Anthropic();
 
+  /**
+   * Two passes, because the whole brief is past the structured-output grammar
+   * limit however it is arranged (see schema.ts). Pass two is given pass one's
+   * findings, which is also the order docs/insight-engine-spec.md describes —
+   * the deck outline is generated from the settled and unsettled sections.
+   */
+  const first = await callPass(client, FindingsSchema, buildUserPrompt(input));
+  if (!first.ok) return first;
+
+  const second = await callPass(
+    client,
+    CreativeSchema,
+    buildCreativePrompt(input, first.value as Findings),
+  );
+  if (!second.ok) return second;
+
+  const brief = { ...(first.value as Findings), ...(second.value as Creative) } as Brief;
+
+  const violation = findForbiddenNumbers(brief);
+  if (violation) return { ok: false, error: violation };
+
+  return {
+    ok: true,
+    brief,
+    usage: {
+      input: first.usage.input + second.usage.input,
+      output: first.usage.output + second.usage.output,
+    },
+  };
+}
+
+type PassResult =
+  | { ok: true; value: unknown; usage: { input: number; output: number } }
+  | { ok: false; error: string };
+
+async function callPass(
+  client: Anthropic,
+  schema: typeof FindingsSchema | typeof CreativeSchema,
+  prompt: string,
+): Promise<PassResult> {
   try {
-    /* Streaming because a full brief is long and a non-streaming request at
-       this max_tokens risks an HTTP timeout. */
+    /* Streaming because a brief is long and a non-streaming request at this
+       max_tokens risks an HTTP timeout. */
     const stream = client.messages.stream({
       model: MODEL,
-      max_tokens: 32000,
+      max_tokens: 16000,
       system: SYSTEM_PROMPT,
-      /* Structured outputs, so the brief arrives as data. Rule: stored as
-         structured data, never as a blob of markdown. */
-      output_config: { format: zodOutputFormat(BriefSchema) },
-      messages: [{ role: 'user', content: buildUserPrompt(input) }],
+      /* Structured outputs, so the brief arrives as data rather than as
+         markdown to be parsed later. */
+      output_config: { format: zodOutputFormat(schema), effort: EFFORT },
+      messages: [{ role: 'user', content: prompt }],
     });
 
     const message = await stream.finalMessage();
@@ -66,11 +116,9 @@ export async function analyse(input: {
     }
 
     const text = message.content.find((b) => b.type === 'text');
-    if (!text || text.type !== 'text') {
-      return { ok: false, error: 'The model returned no brief.' };
-    }
+    if (!text || text.type !== 'text') return { ok: false, error: 'The model returned no brief.' };
 
-    const parsed = BriefSchema.safeParse(JSON.parse(text.text));
+    const parsed = schema.safeParse(JSON.parse(text.text));
     if (!parsed.success) {
       return {
         ok: false,
@@ -78,12 +126,9 @@ export async function analyse(input: {
       };
     }
 
-    const violation = findForbiddenNumbers(parsed.data);
-    if (violation) return { ok: false, error: violation };
-
     return {
       ok: true,
-      brief: parsed.data,
+      value: parsed.data,
       usage: { input: message.usage.input_tokens, output: message.usage.output_tokens },
     };
   } catch (err) {
@@ -100,16 +145,6 @@ export async function analyse(input: {
   }
 }
 
-/**
- * Rule 7 belt-and-braces. The schema has no numeric field, so a percentage can
- * only arrive inside prose — and prose is exactly where "roughly 67% of
- * respondents" would slip through. Refuse the brief rather than store one.
- *
- * Deliberately narrow: it matches a number bound to a proportion word, not any
- * number. "5 of 28 people" and "2 of 3" are honest and must pass; a client
- * quoting "we grew 40%" verbatim must also pass, which is why quotes are not
- * scanned.
- */
 function findForbiddenNumbers(brief: Brief): string | null {
   const FORBIDDEN = [
     /\b\d+(\.\d+)?\s*(%|percent|per cent)/i,
@@ -120,17 +155,22 @@ function findForbiddenNumbers(brief: Brief): string | null {
   /* Quotes are the client's own words and are reproduced verbatim by design —
      a client who says "40% of our revenue" keeps their sentence. */
   const prose: string[] = [
-    brief.readThisFirst.headline,
-    brief.readThisFirst.body,
+    brief.headline,
+    brief.headlineBody,
     ...brief.settled.map((s) => s.statement),
-    ...brief.unsettled.flatMap((c) => [c.question, c.severityReason, ...c.sides.map((s) => s.position)]),
+    ...brief.unsettled.flatMap((c) => [
+      c.question,
+      c.severityReason,
+      c.decisionMakerPosition,
+      ...c.sides.map((s) => s.position),
+    ]),
     ...brief.notDecidedYet.flatMap((g) => [g.topic, g.whatWasSeen, g.consequence]),
-    ...brief.forCreativeTeam.vocabulary.map((v) => v.note),
-    ...brief.forCreativeTeam.references.flatMap((r) => [...r.reasonsGiven, r.whatItMeans]),
-    ...brief.forCreativeTeam.scales.map((s) => s.reading),
-    ...brief.forCreativeTeam.notes.flatMap((n) => [n.heading, n.body]),
-    brief.signals.alignmentReason,
-    ...brief.signals.flags.map((f) => f.finding),
+    ...brief.vocabulary.map((v) => v.note),
+    ...brief.references.flatMap((r) => [...r.reasonsGiven, r.whatItMeans]),
+    ...brief.scales.map((s) => s.reading),
+    ...brief.creativeNotes.flatMap((n) => [n.heading, n.body]),
+    brief.alignmentReason,
+    ...brief.flags.map((f) => f.finding),
     ...brief.deckOutline.flatMap((d) => [d.title, d.purpose]),
     ...brief.howToRunTheRoom.flatMap((n) => [n.heading, n.body]),
   ];
@@ -139,7 +179,11 @@ function findForbiddenNumbers(brief: Brief): string | null {
     for (const pattern of FORBIDDEN) {
       const hit = line.match(pattern);
       if (hit) {
-        return `The brief contained "${hit[0]}". Percentages and scores are not honest with this few respondents (rule 7), so it was not saved. Run the analysis again.`;
+        /* Quote the sentence, not just the match — a bare "100%" tells whoever
+           reads this nothing about which line to look at. */
+        const at = hit.index ?? 0;
+        const sentence = line.slice(Math.max(0, at - 90), at + 90).trim();
+        return `The brief described the respondents as a proportion: "…${sentence}…". That is not honest with this few people (rule 7), so it was not saved. Run the analysis again.`;
       }
     }
   }

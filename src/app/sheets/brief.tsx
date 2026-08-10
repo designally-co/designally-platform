@@ -25,15 +25,14 @@ function outOf(some: number, all: number) {
   return `${some} of ${all}`;
 }
 
-function Quotes({ quotes }: { quotes: { text: string; respondent: string }[] }) {
+function Quotes({ quotes }: { quotes: string[] }) {
   if (!quotes.length) return null;
   return (
     <div className="quotes">
       {quotes.map((q, i) => (
+        /* the client's own words, in the language they wrote them */
         <blockquote key={i}>
-          {/* the client's own words, in the language they wrote them */}
-          <span className="qt">{q.text}</span>
-          <cite>{q.respondent}</cite>
+          <span className="qt">{q}</span>
         </blockquote>
       ))}
     </div>
@@ -54,13 +53,13 @@ export default function BriefSheet({
     <Sheet title={`${project.clientName} — survey analysis`} onClose={onClose}>
       <div className="brief">
         {/* 1 · read this first */}
-        <h1>{brief.readThisFirst.headline}</h1>
+        <h1>{brief.headline}</h1>
         <p className="lede">
           Written from the {people === 1 ? 'single answer' : `${people} answers`} collected before
           the team closed this survey
           {project.briefWrittenOn ? ` · ${project.briefWrittenOn}` : ''}
         </p>
-        <p className="firstpara">{brief.readThisFirst.body}</p>
+        <p className="firstpara">{brief.headlineBody}</p>
 
         {/* 2 · settled */}
         <section className="bsec">
@@ -74,7 +73,7 @@ export default function BriefSheet({
                   </span>
                   <span className="txt">
                     {a.statement}
-                    <Quotes quotes={a.evidence} />
+                    <Quotes quotes={a.quotes} />
                   </span>
                   <span className="n">{outOf(a.respondents.length, people)}</span>
                 </li>
@@ -106,16 +105,12 @@ export default function BriefSheet({
                       <span className="who">
                         {names(s.respondents)} · {outOf(s.respondents.length, people)}
                       </span>
-                      <Quotes quotes={s.evidence} />
+                      <Quotes quotes={s.quotes} />
                     </div>
                   ))}
                 </div>
                 <p className="why">{c.severityReason}</p>
-                <p className="plan">
-                  {c.decisionMakerPosition
-                    ? `The decision maker is on: ${c.decisionMakerPosition}`
-                    : 'No decision maker took a side on this.'}
-                </p>
+                <p className="plan">{c.decisionMakerPosition}</p>
               </article>
             ))
           ) : (
@@ -144,11 +139,11 @@ export default function BriefSheet({
         <section className="bsec">
           <h3>For the creative team</h3>
 
-          {brief.forCreativeTeam.vocabulary.length > 0 && (
+          {brief.vocabulary.length > 0 && (
             <>
               <h4>Their own words</h4>
               <ul className="vocab">
-                {brief.forCreativeTeam.vocabulary.map((v, i) => (
+                {brief.vocabulary.map((v, i) => (
                   <li key={i}>
                     <b>{v.phrase}</b>
                     <span className="who">{outOf(v.respondents.length, people)}</span>
@@ -159,11 +154,11 @@ export default function BriefSheet({
             </>
           )}
 
-          {brief.forCreativeTeam.references.length > 0 && (
+          {brief.references.length > 0 && (
             <>
               <h4>What the references actually mean</h4>
               <ul className="refs">
-                {brief.forCreativeTeam.references.map((r, i) => (
+                {brief.references.map((r, i) => (
                   <li key={i}>
                     <b>
                       {r.brand} <span className="tag">{r.admiredOrDisliked}</span>
@@ -176,11 +171,11 @@ export default function BriefSheet({
             </>
           )}
 
-          {brief.forCreativeTeam.scales.length > 0 && (
+          {brief.scales.length > 0 && (
             <>
               <h4>Personality — the splits are the finding</h4>
               <ul className="scales">
-                {brief.forCreativeTeam.scales.map((s, i) => (
+                {brief.scales.map((s, i) => (
                   <li key={i} className={s.split ? 'split' : ''}>
                     <b>{s.pair}</b>
                     <span>{s.reading}</span>
@@ -191,7 +186,7 @@ export default function BriefSheet({
             </>
           )}
 
-          {brief.forCreativeTeam.notes.map((n, i) => (
+          {brief.creativeNotes.map((n, i) => (
             <div key={i}>
               <h4>{n.heading}</h4>
               <p>{n.body}</p>
@@ -205,10 +200,10 @@ export default function BriefSheet({
           <div className="signal">
             <div className="lab">Internal alignment</div>
             <p>
-              <b>{brief.signals.alignment}</b> — {brief.signals.alignmentReason}
+              <b>{brief.alignment}</b> — {brief.alignmentReason}
             </p>
           </div>
-          {brief.signals.flags.map((f, i) => (
+          {brief.flags.map((f, i) => (
             <div className="signal" key={i}>
               <div className="lab">{f.label}</div>
               <p>{f.finding}</p>

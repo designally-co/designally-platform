@@ -47,7 +47,9 @@ A summary tells the team what the client said. You are not writing a summary. Ne
 
 These are product rules, not preferences.
 
-**Never a percentage, a proportion, or a sentiment score.** Three to twenty respondents cannot support them; a number implies a precision the sample does not have. Name the people instead — the interface counts them. "Khun A and Khun B" is honest; "67% positive sentiment" is not. This holds even where a percentage would be arithmetically correct.
+**Never a percentage, a proportion, or a sentiment score about the respondents.** Three to twenty people cannot support them; a number implies a precision the sample does not have. Name the people instead — the interface counts them. "Khun A and Khun B" is honest; "67% positive sentiment" and "most respondents" are not. This holds even where the arithmetic would be correct.
+
+This is about numbers *you* derive. A figure the client stated themselves — "we deliver on time 100%", "we grew 40% last year" — is their claim and stays exactly as they said it.
 
 **Never an estimated volume, count, or timeline the client did not state.** Do not calculate how many pages, how much content, or how long anything will take.
 
@@ -89,4 +91,50 @@ ${respondentCount} ${respondentCount === 1 ? 'person' : 'people'} answered.${sin
 Below is every answer, grouped by respondent. Questions they left blank are shown as "(left blank)" — those are data, not gaps in the export.
 
 ${transcript}`;
+}
+
+/**
+ * Pass two. The findings from pass one are given back so the creative notes,
+ * the deck outline and the facilitation notes are built on what was actually
+ * found — the spec's own order: the deck outline comes from the settled and
+ * unsettled sections.
+ */
+export function buildCreativePrompt(
+  input: { clientName: string; packageLabel: string; respondentCount: number; transcript: string },
+  findings: {
+    headline: string;
+    settled: { statement: string }[];
+    unsettled: { question: string; severity: string }[];
+    notDecidedYet: { topic: string }[];
+  },
+) {
+  const conflicts = findings.unsettled.length
+    ? findings.unsettled.map((c) => `- ${c.question} (${c.severity})`).join('\n')
+    : '- none found';
+  const agreed = findings.settled.length
+    ? findings.settled.map((s) => `- ${s.statement}`).join('\n')
+    : '- nothing settled';
+  const gaps = findings.notDecidedYet.length
+    ? findings.notDecidedYet.map((g) => `- ${g.topic}`).join('\n')
+    : '- none';
+
+  return `${buildUserPrompt(input)}
+
+---
+
+You have already read these answers once and found the following. Build on it — do not re-derive it, and do not contradict it.
+
+The single most consequential finding:
+${findings.headline}
+
+Settled:
+${agreed}
+
+Unsettled — these become the DECIDE slides, and they belong early in the deck:
+${conflicts}
+
+Not decided by the client yet:
+${gaps}
+
+Now write the rest: what the creative team needs, the kick-off deck outline, and the internal notes on running the room.`;
 }

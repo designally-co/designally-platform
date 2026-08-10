@@ -131,7 +131,9 @@ function buildAction(v: {
       kind: 'review-brief',
       say: `The survey is closed and the analysis is written.`,
       emphasis: found,
-      when: `Closed ${v.closedOn} with ${plural(v.answers, 'answer')} · kick-off not booked`,
+      when: v.closedOn
+        ? `Closed ${v.closedOn} with ${plural(v.answers, 'answer')} · kick-off not booked`
+        : `${plural(v.answers, 'answer')} · kick-off not booked`,
       label: 'Review brief',
     };
   }
