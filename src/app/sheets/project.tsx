@@ -19,11 +19,13 @@ import Sheet from './sheet';
 export default function ProjectSheet({
   project: p,
   origin,
+  onOpenBrief,
   onClose,
   onActed,
 }: {
   project: ProjectView;
   origin: string;
+  onOpenBrief: () => void;
   onClose: () => void;
   onActed: (message: string) => void;
 }) {
@@ -154,9 +156,23 @@ export default function ProjectSheet({
       {/* documents */}
       <div className="pd-sec">
         <h3>Documents</h3>
-        <p className="quiet">
-          Nothing produced yet — documents appear here as the project moves.
-        </p>
+        {p.brief ? (
+          <div className="pd-docs">
+            <button className="doc" onClick={onOpenBrief}>
+              Survey analysis
+              <small>
+                {p.answers} {p.answers === 1 ? 'answer' : 'answers'}
+                {p.briefWrittenOn ? ` · ${p.briefWrittenOn}` : ''}
+              </small>
+            </button>
+          </div>
+        ) : (
+          <p className="quiet">
+            {p.closedOn
+              ? 'Collection is closed but no brief was written. Run the analysis again from Needs you.'
+              : 'Nothing produced yet — documents appear here as the project moves.'}
+          </p>
+        )}
       </div>
 
       {error && <p className="formerror">{error}</p>}

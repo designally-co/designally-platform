@@ -144,7 +144,21 @@ build time.
 - **Project detail** — right now, the stage timeline, who answered, the link, and archive
 - Two of the four gates are live: closing collection and archiving, each recording who acted and when. Archiving is reversible; nothing is ever deleted
 
-The other two gates need a brief to exist, so they arrive with milestone 3.
+*Milestone 3 — the brief writes itself.* Closing collection runs the analysis.
+
+- Claude Opus 5, server-side, with **structured outputs** — the brief is stored as data, never as a blob of markdown
+- The schema has **no numeric field anywhere**: agreement and disagreement are arrays of respondent names, and every count the interface shows is that array's length. A percentage is structurally unrepresentable, and a second check refuses any that reach prose (rule 7)
+- Facilitation notes live in their own field rather than behind a flag, so a client-facing renderer cannot leak them by forgetting a boolean (rule 8)
+- The close is committed **before** the analysis and separately from it — a failed brief leaves a closed survey that can be analysed again, never a silently un-closed one
+- Re-running stores a new brief rather than overwriting: a confirmed brief records what a person approved
+
+Confirming the brief and the deck handoff are gates 2 and 3 — milestone 4.
+
+**Not yet validated.** `docs/first-session-brief.md` makes the real ARUN+ (28 responses,
+6 departments) and PCE-TH data the acceptance test: the brief must find the B2B/B2C split, the
+mutual-avoid tone contradiction and the clarity gaps without being prompted for them. That data is
+not in the repo, so the prompt in `src/lib/analysis/prompt.ts` is untuned. Expect the time to go
+there, not on the code around it.
 
 ## First move
 

@@ -8,8 +8,13 @@ import {
   surveys,
   users,
   STAGE_FLOW,
+  briefs,
   type Package,
 } from '@/lib/db/schema';
+
+import { PACKAGE_LABEL } from '@/lib/team/labels';
+
+export { PACKAGE_LABEL };
 
 /** Days of silence before the app suggests closing. It only suggests. */
 export const QUIET_LIMIT = 5;
@@ -63,7 +68,7 @@ export type Person = { name: string; role: string | null; decides: boolean };
 
 export type ProjectAction = {
   /** what the button does */
-  kind: 'close-collection';
+  kind: 'close-collection' | 'review-brief';
   say: string;
   emphasis?: string;
   when: string;
@@ -94,23 +99,43 @@ export type ProjectView = {
   people: Person[];
   decidedBy: string | null;
 
+  /** the most recent brief, if the analysis has run */
+  brief: import('@/lib/analysis/schema').Brief | null;
+  briefWrittenOn: string | null;
+  briefConfirmedOn: string | null;
+
   action: ProjectAction | null;
   /** the two lines of the Latest column */
   latest: [string, string];
 };
 
-export const PACKAGE_LABEL: Record<Package, string> = {
-  branding: 'Branding',
-  website: 'Website',
-  both: 'Branding + Website',
-};
 
 function buildAction(v: {
   closedOn: string | null;
   answers: number;
   quietDays: number | null;
   sentOn: string | null;
+  hasBrief: boolean;
+  briefConfirmedOn: string | null;
+  conflicts: number;
 }): ProjectAction | null {
+  /* A brief exists and nobody has read it. This is the only step in the flow
+     that cannot be skipped — the AI mistakes two wordings of one idea for a
+     disagreement, especially across Thai and English. */
+  if (v.hasBrief && !v.briefConfirmedOn) {
+    const found =
+      v.conflicts === 0
+        ? 'It found no conflicts.'
+        : `It found ${plural(v.conflicts, 'conflict')}.`;
+    return {
+      kind: 'review-brief',
+      say: `The survey is closed and the analysis is written.`,
+      emphasis: found,
+      when: `Closed ${v.closedOn} with ${plural(v.answers, 'answer')} · kick-off not booked`,
+      label: 'Review brief',
+    };
+  }
+
   /**
    * Milestone 2 can reach one of these. Reviewing a brief, recording decisions
    * and sending the content survey arrive in milestones 3, 4 and 5 — they are
@@ -194,6 +219,22 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
     peopleBySurvey.set(r.surveyId, list);
   }
 
+  /* the latest brief per project — newest wins; earlier runs are kept */
+  const briefRows = rows.length
+    ? await db
+        .select()
+        .from(briefs)
+        .where(
+          inArray(
+            briefs.projectId,
+            rows.map((r) => r.project.id),
+          ),
+        )
+        .orderBy(desc(briefs.generatedAt))
+    : [];
+  const briefByProject = new Map<string, (typeof briefRows)[number]>();
+  for (const b of briefRows) if (!briefByProject.has(b.projectId)) briefByProject.set(b.projectId, b);
+
   /* who acted on the gates */
   const actorIds = [
     ...new Set(
@@ -221,6 +262,9 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
     const people = survey ? (peopleBySurvey.get(survey.id) ?? []) : [];
     const decider = people.find((p) => p.decides) ?? null;
 
+    const briefRow = briefByProject.get(project.id) ?? null;
+    const brief = (briefRow?.content ?? null) as import('@/lib/analysis/schema').Brief | null;
+
     return {
       id: project.id,
       clientName: client.name,
@@ -245,7 +289,19 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
       people,
       decidedBy: decider?.name ?? null,
 
-      action: buildAction({ closedOn, answers, quietDays, sentOn }),
+      brief,
+      briefWrittenOn: formatDay(briefRow?.generatedAt ?? null),
+      briefConfirmedOn: formatDay(briefRow?.confirmedAt ?? null),
+
+      action: buildAction({
+        closedOn,
+        answers,
+        quietDays,
+        sentOn,
+        hasBrief: Boolean(brief),
+        briefConfirmedOn: formatDay(briefRow?.confirmedAt ?? null),
+        conflicts: brief?.unsettled.length ?? 0,
+      }),
       latest: buildLatest({ sentOn, closedOn, answers, quietDays }),
     };
   });

@@ -5,9 +5,10 @@ import { revalidatePath } from 'next/cache';
 
 import { auth } from '@/auth';
 import { getDb } from '@/lib/db';
-import { clients, projects, surveys, PACKAGES, type Package } from '@/lib/db/schema';
+import { briefs, clients, projects, surveys, PACKAGES, type Package } from '@/lib/db/schema';
 import { PACKAGE_BLOCKS } from '@/lib/survey/packages';
 import { makeToken } from '@/lib/survey/token';
+import { PACKAGE_LABEL } from '@/lib/team/labels';
 
 /**
  * Every gate records who acted. That is rule 2, and it is enforced here rather
@@ -19,7 +20,9 @@ async function actingUser() {
   return session.user.id;
 }
 
-export type ActionResult = { ok: true; link?: string } | { ok: false; error: string };
+export type ActionResult =
+  | { ok: true; link?: string; warning?: string }
+  | { ok: false; error: string };
 
 /** Stage indices into STAGE_FLOW — the same for every package at this end. */
 const STAGE_SURVEY = 2;
@@ -87,6 +90,93 @@ export async function closeCollection(surveyId: string): Promise<ActionResult> {
     .update(projects)
     .set({ stage: STAGE_ANALYSIS })
     .where(eq(projects.id, survey.projectId));
+
+  /**
+   * The close is committed before the analysis runs, and separately from it.
+   * The gate is the human act — it must survive the analysis failing, the API
+   * being down, or the key being unset. A failed brief leaves a closed survey
+   * that can be analysed again; it never silently un-closes.
+   */
+  const [client] = await db
+    .select({ name: clients.name, package: projects.package })
+    .from(projects)
+    .innerJoin(clients, eq(projects.clientId, clients.id))
+    .where(eq(projects.id, survey.projectId))
+    .limit(1);
+
+  const { buildTranscript } = await import('@/lib/analysis/transcript');
+  const { analyse } = await import('@/lib/analysis/run');
+
+  const { transcript, respondentCount } = await buildTranscript(survey.id);
+
+  if (respondentCount === 0) {
+    revalidatePath('/');
+    return {
+      ok: true,
+      warning: 'Collection is closed. Nobody answered, so there is nothing to analyse.',
+    };
+  }
+
+  const result = await analyse({
+    clientName: client.name,
+    packageLabel: PACKAGE_LABEL[client.package],
+    respondentCount,
+    transcript,
+  });
+
+  if (!result.ok) {
+    revalidatePath('/');
+    return { ok: true, warning: `Collection is closed, but the brief was not written. ${result.error}` };
+  }
+
+  await db.insert(briefs).values({
+    projectId: survey.projectId,
+    content: result.brief,
+  });
+
+  revalidatePath('/');
+  return { ok: true };
+}
+
+/**
+ * Runs the analysis again on an already-closed survey — after a failure, or
+ * after the prompt changed. Each run stores a new brief rather than
+ * overwriting: a confirmed brief is a record of what a person approved, and
+ * replacing it in place would rewrite that record.
+ */
+export async function reanalyse(projectId: string): Promise<ActionResult> {
+  await actingUser();
+  const db = await getDb();
+
+  const [row] = await db
+    .select({ survey: surveys, clientName: clients.name, package: projects.package })
+    .from(surveys)
+    .innerJoin(projects, eq(surveys.projectId, projects.id))
+    .innerJoin(clients, eq(projects.clientId, clients.id))
+    .where(and(eq(surveys.projectId, projectId), eq(surveys.kind, 'discovery')))
+    .limit(1);
+
+  if (!row) return { ok: false, error: 'No survey on this project.' };
+  if (!row.survey.closedAt) {
+    return { ok: false, error: 'Close collection first — the analysis reads a closed survey.' };
+  }
+
+  const { buildTranscript } = await import('@/lib/analysis/transcript');
+  const { analyse } = await import('@/lib/analysis/run');
+
+  const { transcript, respondentCount } = await buildTranscript(row.survey.id);
+  if (respondentCount === 0) return { ok: false, error: 'Nobody answered this survey.' };
+
+  const result = await analyse({
+    clientName: row.clientName,
+    packageLabel: PACKAGE_LABEL[row.package],
+    respondentCount,
+    transcript,
+  });
+
+  if (!result.ok) return { ok: false, error: result.error };
+
+  await db.insert(briefs).values({ projectId, content: result.brief });
 
   revalidatePath('/');
   return { ok: true };

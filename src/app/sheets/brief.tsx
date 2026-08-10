@@ -1,0 +1,256 @@
+'use client';
+
+import type { Brief } from '@/lib/analysis/schema';
+import type { ProjectView } from '@/lib/team/projects';
+import Sheet from './sheet';
+
+/**
+ * The brief, in the order of docs/insight-engine-spec.md — what a person needs
+ * first, not the order questions were asked. Ported from
+ * reference/brief-one-page.html.
+ *
+ * Every count on this page is `array.length`. Nothing is a percentage, because
+ * the schema has nowhere to put one.
+ */
+
+function names(list: string[]) {
+  if (!list.length) return 'nobody';
+  if (list.length === 1) return list[0];
+  if (list.length === 2) return `${list[0]} and ${list[1]}`;
+  return `${list.slice(0, -1).join(', ')} and ${list[list.length - 1]}`;
+}
+
+/** "3 of 5" is honest; a percentage is not. */
+function outOf(some: number, all: number) {
+  return `${some} of ${all}`;
+}
+
+function Quotes({ quotes }: { quotes: { text: string; respondent: string }[] }) {
+  if (!quotes.length) return null;
+  return (
+    <div className="quotes">
+      {quotes.map((q, i) => (
+        <blockquote key={i}>
+          {/* the client's own words, in the language they wrote them */}
+          <span className="qt">{q.text}</span>
+          <cite>{q.respondent}</cite>
+        </blockquote>
+      ))}
+    </div>
+  );
+}
+
+export default function BriefSheet({
+  project,
+  onClose,
+}: {
+  project: ProjectView;
+  onClose: () => void;
+}) {
+  const brief = project.brief as Brief;
+  const people = project.answers;
+
+  return (
+    <Sheet title={`${project.clientName} — survey analysis`} onClose={onClose}>
+      <div className="brief">
+        {/* 1 · read this first */}
+        <h1>{brief.readThisFirst.headline}</h1>
+        <p className="lede">
+          Written from the {people === 1 ? 'single answer' : `${people} answers`} collected before
+          the team closed this survey
+          {project.briefWrittenOn ? ` · ${project.briefWrittenOn}` : ''}
+        </p>
+        <p className="firstpara">{brief.readThisFirst.body}</p>
+
+        {/* 2 · settled */}
+        <section className="bsec">
+          <h3>Settled — design on this without asking</h3>
+          {brief.settled.length ? (
+            <ul className="agree">
+              {brief.settled.map((a, i) => (
+                <li key={i}>
+                  <span className="ck" aria-hidden="true">
+                    ✓
+                  </span>
+                  <span className="txt">
+                    {a.statement}
+                    <Quotes quotes={a.evidence} />
+                  </span>
+                  <span className="n">{outOf(a.respondents.length, people)}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="quiet">
+              Nothing was agreed independently by more than one person. That is itself the finding.
+            </p>
+          )}
+        </section>
+
+        {/* 3 · unsettled — these become the DECIDE slides */}
+        <section className="bsec">
+          <h3>Unsettled — resolve at the kick-off</h3>
+          {brief.unsettled.length ? (
+            brief.unsettled.map((c, i) => (
+              <article className="conflict" key={i}>
+                <div className="h">
+                  <b>{c.question}</b>
+                  <span className={`sev ${c.severity === 'high' ? 'hi' : c.severity === 'medium' ? 'md' : 'lo'}`}>
+                    {c.severity.toUpperCase()}
+                  </span>
+                </div>
+                <div className="sides">
+                  {c.sides.map((s, j) => (
+                    <div className="side" key={j}>
+                      <b>{s.position}</b>
+                      <span className="who">
+                        {names(s.respondents)} · {outOf(s.respondents.length, people)}
+                      </span>
+                      <Quotes quotes={s.evidence} />
+                    </div>
+                  ))}
+                </div>
+                <p className="why">{c.severityReason}</p>
+                <p className="plan">
+                  {c.decisionMakerPosition
+                    ? `The decision maker is on: ${c.decisionMakerPosition}`
+                    : 'No decision maker took a side on this.'}
+                </p>
+              </article>
+            ))
+          ) : (
+            <p className="quiet">No contradictions found. Worth a sceptical read — it is unusual.</p>
+          )}
+        </section>
+
+        {/* 4 · not decided by the client yet */}
+        <section className="bsec">
+          <h3>Not decided by the client yet</h3>
+          {brief.notDecidedYet.length ? (
+            <ul className="insights">
+              {brief.notDecidedYet.map((g, i) => (
+                <li key={i}>
+                  <b>{g.topic}</b> — {g.whatWasSeen}
+                  <span className="conseq">{g.consequence}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="quiet">Nothing obviously undecided.</p>
+          )}
+        </section>
+
+        {/* 5 · for the creative team */}
+        <section className="bsec">
+          <h3>For the creative team</h3>
+
+          {brief.forCreativeTeam.vocabulary.length > 0 && (
+            <>
+              <h4>Their own words</h4>
+              <ul className="vocab">
+                {brief.forCreativeTeam.vocabulary.map((v, i) => (
+                  <li key={i}>
+                    <b>{v.phrase}</b>
+                    <span className="who">{outOf(v.respondents.length, people)}</span>
+                    <span className="note">{v.note}</span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+
+          {brief.forCreativeTeam.references.length > 0 && (
+            <>
+              <h4>What the references actually mean</h4>
+              <ul className="refs">
+                {brief.forCreativeTeam.references.map((r, i) => (
+                  <li key={i}>
+                    <b>
+                      {r.brand} <span className="tag">{r.admiredOrDisliked}</span>
+                    </b>
+                    <span className="reasons">Reasons given: {r.reasonsGiven.join(' · ')}</span>
+                    <span className="note">{r.whatItMeans}</span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+
+          {brief.forCreativeTeam.scales.length > 0 && (
+            <>
+              <h4>Personality — the splits are the finding</h4>
+              <ul className="scales">
+                {brief.forCreativeTeam.scales.map((s, i) => (
+                  <li key={i} className={s.split ? 'split' : ''}>
+                    <b>{s.pair}</b>
+                    <span>{s.reading}</span>
+                    {s.split && <span className="tag">needs a decision</span>}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+
+          {brief.forCreativeTeam.notes.map((n, i) => (
+            <div key={i}>
+              <h4>{n.heading}</h4>
+              <p>{n.body}</p>
+            </div>
+          ))}
+        </section>
+
+        {/* 6 · signals */}
+        <section className="bsec">
+          <h3>Signals</h3>
+          <div className="signal">
+            <div className="lab">Internal alignment</div>
+            <p>
+              <b>{brief.signals.alignment}</b> — {brief.signals.alignmentReason}
+            </p>
+          </div>
+          {brief.signals.flags.map((f, i) => (
+            <div className="signal" key={i}>
+              <div className="lab">{f.label}</div>
+              <p>{f.finding}</p>
+            </div>
+          ))}
+        </section>
+
+        {/* 7 · deck outline */}
+        <section className="bsec">
+          <h3>Kick-off deck outline</h3>
+          <ul className="slides">
+            {brief.deckOutline.map((s, i) => (
+              <li key={i}>
+                <span className="sn">{i + 1}</span>
+                <span>
+                  {s.title}
+                  <span className="purpose">{s.purpose}</span>
+                </span>
+                {s.needsDecision && <span className="need">DECIDE</span>}
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {/* 8 · internal only — rule 8 */}
+        <section className="bsec">
+          <h3>How to run the room</h3>
+          <div className="internal">
+            <div className="lock">INTERNAL — NEVER SHOWN TO THE CLIENT</div>
+            {brief.howToRunTheRoom.map((n, i) => (
+              <p key={i}>
+                <b>{n.heading}</b> {n.body}
+              </p>
+            ))}
+          </div>
+        </section>
+
+        <p className="hintline">
+          Nothing here has reached the client. Confirming the brief and building the deck arrive in
+          milestone 4.
+        </p>
+      </div>
+    </Sheet>
+  );
+}

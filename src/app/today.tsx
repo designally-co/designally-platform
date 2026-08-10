@@ -6,6 +6,7 @@ import type { LibraryBlock } from '@/lib/team/library-types';
 import type { ProjectView } from '@/lib/team/projects';
 import NewSurveySheet from './sheets/new-survey';
 import ProjectSheet from './sheets/project';
+import BriefSheet from './sheets/brief';
 import TemplatesSheet from './sheets/templates';
 import PastSheet from './sheets/past';
 import ComingSheet from './sheets/coming';
@@ -33,6 +34,7 @@ export default function Today({
 }) {
   const [panel, setPanel] = useState<Panel>(null);
   const [openProject, setOpenProject] = useState<string | null>(null);
+  const [openBrief, setOpenBrief] = useState<string | null>(null);
   const toast = useToast();
 
   const needs = useMemo(() => live.filter((p) => p.action), [live]);
@@ -42,6 +44,7 @@ export default function Today({
   );
 
   const project = openProject ? live.find((p) => p.id === openProject) : null;
+  const briefProject = openBrief ? live.find((p) => p.id === openBrief) : null;
 
   /* An empty screen is success. Say so and let them close the laptop. */
   const heading =
@@ -108,7 +111,9 @@ export default function Today({
                 <div className="act">
                   <button
                     className="btn btn-primary btn-sm"
-                    onClick={() => setOpenProject(p.id)}
+                    onClick={() =>
+                      p.action!.kind === 'review-brief' ? setOpenBrief(p.id) : setOpenProject(p.id)
+                    }
                   >
                     {p.action!.label}
                   </button>
@@ -241,10 +246,17 @@ export default function Today({
         />
       )}
       {panel === 'coming' && <ComingSheet onClose={() => setPanel(null)} />}
+      {briefProject?.brief && (
+        <BriefSheet project={briefProject} onClose={() => setOpenBrief(null)} />
+      )}
       {project && (
         <ProjectSheet
           project={project}
           origin={origin}
+          onOpenBrief={() => {
+            setOpenProject(null);
+            setOpenBrief(project.id);
+          }}
           onClose={() => setOpenProject(null)}
           onActed={(msg) => {
             setOpenProject(null);
