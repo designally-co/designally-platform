@@ -149,11 +149,19 @@ async function main() {
 }
 
 /**
- * Milestone 1 has no team app, so there is no way to create a survey yet. This
- * makes one branding survey so there is a link to open. Milestone 2 replaces it
- * with the real "New survey" form.
+ * A throwaway project so there is something to click in development.
+ *
+ * It is never created against a real database — a fictional client sitting in
+ * the team's live project list on the first morning is not a good look, and
+ * the team app can create a real one in ten seconds. Set SEED_EXAMPLE=yes to
+ * force it.
  */
 async function seedExampleProject(db: Awaited<ReturnType<typeof getDb>>) {
+  if (!usingLocalDatabase() && process.env.SEED_EXAMPLE !== 'yes') {
+    console.log('\nSkipped the example project — this is not the local database.');
+    return;
+  }
+
   const existing = await db.select().from(surveys).limit(1);
   if (existing.length) {
     console.log(`\nExample survey already present: /s/${existing[0].token}`);
