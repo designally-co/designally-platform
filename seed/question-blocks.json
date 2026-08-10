@@ -1,0 +1,1390 @@
+{
+  "version": 1,
+  "updated": "2026-08-07",
+  "packages": {
+    "branding": [
+      "identity",
+      "core",
+      "branding"
+    ],
+    "website": [
+      "identity",
+      "core",
+      "website",
+      "ecommerce"
+    ],
+    "both": [
+      "identity",
+      "core",
+      "branding",
+      "website",
+      "ecommerce"
+    ],
+    "content": [
+      "content"
+    ]
+  },
+  "question_types": [
+    "paragraph",
+    "short_text",
+    "multiple_choice",
+    "checkboxes",
+    "linear_scale"
+  ],
+  "blocks": [
+    {
+      "key": "identity",
+      "name_en": "About you",
+      "name_th": "เกี่ยวกับคุณ",
+      "intro_en": "Anyone on your team can answer this — please pass the link to whoever should have a say.",
+      "intro_th": "ส่งลิงก์นี้ต่อให้ผู้ที่ควรมีส่วนร่วมได้เลย",
+      "used_by": [
+        "branding",
+        "website",
+        "both",
+        "content"
+      ],
+      "questions": [
+        {
+          "order": 1,
+          "type": "short_text",
+          "text_en": "Your name",
+          "text_th": "ชื่อของคุณ",
+          "required": true
+        },
+        {
+          "order": 2,
+          "type": "short_text",
+          "text_en": "Your role or position",
+          "text_th": "ตำแหน่งของคุณ",
+          "required": true
+        },
+        {
+          "order": 3,
+          "type": "multiple_choice",
+          "text_en": "Are you a final decision maker for this project?",
+          "text_th": "คุณเป็นผู้ตัดสินใจขั้นสุดท้ายของโปรเจกต์นี้หรือไม่?",
+          "required": true,
+          "config": {
+            "choices": [
+              {
+                "en": "Yes — final decisions come to me",
+                "th": "ใช่ ฉันเป็นผู้ตัดสินใจขั้นสุดท้าย"
+              },
+              {
+                "en": "Shared — we decide as a group",
+                "th": "ตัดสินใจร่วมกับผู้อื่น"
+              },
+              {
+                "en": "No — I contribute my perspective",
+                "th": "ไม่ ฉันให้มุมมองประกอบ"
+              }
+            ],
+            "maps_to": "decision_maker"
+          }
+        }
+      ]
+    },
+    {
+      "key": "core",
+      "name_en": "Your business",
+      "name_th": "ธุรกิจของคุณ",
+      "used_by": [
+        "branding",
+        "website",
+        "both"
+      ],
+      "note": "Shared spine. A Branding + Website client answers this block ONCE.",
+      "questions": [
+        {
+          "order": 1,
+          "type": "paragraph",
+          "text_en": "What is your main product or service?",
+          "text_th": "ผลิตภัณฑ์หรือบริการหลักของคุณคืออะไร?",
+          "required": true
+        },
+        {
+          "order": 2,
+          "type": "short_text",
+          "text_en": "Describe what you do in one short sentence.",
+          "text_th": "อธิบายสิ่งที่คุณทำด้วย 1 ประโยค",
+          "required": true,
+          "help_en": "Write the first thing that comes to mind."
+        },
+        {
+          "order": 3,
+          "type": "paragraph",
+          "text_en": "Who are your main competitors?",
+          "text_th": "ใครคือคู่แข่งหลักของคุณ",
+          "required": true
+        },
+        {
+          "order": 4,
+          "type": "paragraph",
+          "text_en": "What are you most proud of?",
+          "text_th": "สิ่งที่แบรนด์ภาคภูมิใจมากที่สุด",
+          "required": true,
+          "help_en": "One or two facts you take pride in as a founder or senior executive."
+        },
+        {
+          "order": 5,
+          "type": "paragraph",
+          "text_en": "Who is your target audience?",
+          "text_th": "กลุ่มเป้าหมายของคุณคือใคร?",
+          "required": true,
+          "help_en": "Think about both existing and potential customers, and employees."
+        },
+        {
+          "order": 6,
+          "type": "paragraph",
+          "text_en": "What is your unique selling point?",
+          "text_th": "จุดขายที่เป็นจุดเด่น หรือ เอกลักษณ์เฉพาะของคุณ คืออะไร?",
+          "required": true
+        },
+        {
+          "order": 7,
+          "type": "paragraph",
+          "text_en": "Have you got any existing brand guidelines or design directions we should follow?",
+          "text_th": "มีแนวทางการออกแบบ หรือ คู่มือแบรนด์เดิม ที่ต้องการให้เรายึดตามหรือไม่?",
+          "required": true
+        },
+        {
+          "order": 8,
+          "type": "short_text",
+          "text_en": "When people interact with your brand, how do you want them to feel?",
+          "text_th": "เมื่อผู้คนสื่อสารกับแบรนด์ คุณต้องการให้พวกเขารู้สึกอย่างไร",
+          "required": true,
+          "help_en": "3–4 adjectives."
+        },
+        {
+          "order": 9,
+          "type": "linear_scale",
+          "text_en": "Choose a position for each pair",
+          "text_th": "เลือกตำแหน่งที่ตรงกับแบรนด์ของคุณในแต่ละคู่",
+          "required": true,
+          "config": {
+            "points": 5,
+            "pairs": [
+              {
+                "left_en": "Traditional",
+                "left_th": "ดั้งเดิม",
+                "right_en": "Modern",
+                "right_th": "ทันสมัย"
+              },
+              {
+                "left_en": "Exclusive",
+                "left_th": "เฉพาะกลุ่ม",
+                "right_en": "Accessible",
+                "right_th": "เข้าถึงง่าย"
+              },
+              {
+                "left_en": "Serious",
+                "left_th": "จริงจัง",
+                "right_en": "Fun",
+                "right_th": "สนุก"
+              },
+              {
+                "left_en": "Corporate",
+                "left_th": "เป็นทางการ",
+                "right_en": "Friendly",
+                "right_th": "เป็นกันเอง"
+              },
+              {
+                "left_en": "Simple",
+                "left_th": "เรียบง่าย",
+                "right_en": "Sophisticated",
+                "right_th": "ซับซ้อนมีระดับ"
+              },
+              {
+                "left_en": "Subtle",
+                "left_th": "นุ่มนวล",
+                "right_en": "Bold",
+                "right_th": "โดดเด่น"
+              },
+              {
+                "left_en": "Cosmopolitan",
+                "left_th": "เมืองสากล",
+                "right_en": "Natural",
+                "right_th": "ธรรมชาติ"
+              },
+              {
+                "left_en": "Calm",
+                "left_th": "สงบ",
+                "right_en": "Dynamic",
+                "right_th": "มีพลัง"
+              },
+              {
+                "left_en": "Familiar",
+                "left_th": "คุ้นเคย",
+                "right_en": "Disruptive",
+                "right_th": "แหวกแนว"
+              },
+              {
+                "left_en": "Realistic",
+                "left_th": "สมจริง",
+                "right_en": "Idealistic",
+                "right_th": "อุดมคติ"
+              }
+            ]
+          }
+        },
+        {
+          "order": 10,
+          "type": "short_text",
+          "text_en": "Are there any qualities you want your brand to avoid?",
+          "text_th": "โปรดระบุคุณลักษณะ ที่คุณไม่ต้องการให้มีในแบรนด์",
+          "required": true,
+          "help_en": "One or two adjectives."
+        }
+      ]
+    },
+    {
+      "key": "branding",
+      "name_en": "Your brand",
+      "name_th": "แบรนด์ของคุณ",
+      "used_by": [
+        "branding",
+        "both"
+      ],
+      "questions": [
+        {
+          "order": 1,
+          "type": "paragraph",
+          "text_en": "How did your brand start?",
+          "text_th": "แบรนด์ของคุณเริ่มต้นขึ้นได้อย่างไร",
+          "required": true
+        },
+        {
+          "order": 2,
+          "type": "paragraph",
+          "text_en": "What do you believe in and stand for as a brand?",
+          "text_th": "สิ่งที่คุณเชื่อและยึดมั่นและอยากที่จะเล่าให้คนอื่นฟัง คืออะไร?",
+          "required": true
+        },
+        {
+          "order": 3,
+          "type": "paragraph",
+          "text_en": "What problems does your brand solve for its audience, and how?",
+          "text_th": "ปัญหา หรือ ความท้าทายที่คุณช่วยแก้ปัญหาให้กับกลุ่มเป้าหมายคืออะไร และ ช่วยแก้ไขอย่างไร?",
+          "required": true
+        },
+        {
+          "order": 4,
+          "type": "paragraph",
+          "text_en": "Name 1–2 brands that inspire you — and why.",
+          "text_th": "ยกตัวอย่างชื่อแบรนด์ 1-2 แบรนด์ที่สร้างแรงบันดาลใจให้คุณ เพราะอะไร?",
+          "required": true
+        },
+        {
+          "order": 5,
+          "type": "paragraph",
+          "text_en": "Name a competitor brand that you like — and why.",
+          "text_th": "บอกชื่อ \"แบรนด์คู่แข่ง\" ที่สร้างแรงบันดาลใจให้กับคุณ เพราะอะไร?",
+          "required": true
+        },
+        {
+          "order": 6,
+          "type": "paragraph",
+          "text_en": "Name a brand you don't like — and why.",
+          "text_th": "บอกชื่อแบรนด์ที่คุณ ไม่ชอบ เพราะอะไร?",
+          "required": true
+        },
+        {
+          "order": 7,
+          "type": "paragraph",
+          "text_en": "Any favourite design work we could refer to?",
+          "text_th": "ยกตัวอย่างงานออกแบบที่คุณชื่นชอบ",
+          "required": true
+        },
+        {
+          "order": 8,
+          "type": "paragraph",
+          "text_en": "Anything you don't want to see in the design?",
+          "text_th": "มีอะไรที่คุณไม่ชอบ หรือ ไม่อยากให้มี ในการออกแบบหรือไม่?",
+          "required": true
+        },
+        {
+          "order": 9,
+          "type": "paragraph",
+          "text_en": "If your brand were a famous person, who would it be — and why?",
+          "text_th": "ถ้าเปรียบแบรนด์คุณเป็นคนมีชื่อเสียงสักคนหนึ่ง เขาจะเป็นใคร? เพราะอะไร",
+          "required": true
+        },
+        {
+          "order": 10,
+          "type": "checkboxes",
+          "text_en": "Select 6–10 words your brand should project",
+          "text_th": "เลือกคำ 6–10 คำ ที่สะท้อนตัวตนของแบรนด์",
+          "required": true,
+          "config": {
+            "choices": [
+              {
+                "en": "Trustworthy",
+                "th": "เชื่อถือได้",
+                "label": "Trustworthy เชื่อถือได้"
+              },
+              {
+                "en": "Professional",
+                "th": "เป็นมืออาชีพ",
+                "label": "Professional เป็นมืออาชีพ"
+              },
+              {
+                "en": "Friendly",
+                "th": "เป็นกันเอง",
+                "label": "Friendly เป็นกันเอง"
+              },
+              {
+                "en": "Smart",
+                "th": "ปราดเปรื่อง",
+                "label": "Smart ปราดเปรื่อง"
+              },
+              {
+                "en": "Passionate",
+                "th": "น่าหลงใหล",
+                "label": "Passionate น่าหลงใหล"
+              },
+              {
+                "en": "Enthusiastic",
+                "th": "กระตือรือร้น",
+                "label": "Enthusiastic กระตือรือร้น"
+              },
+              {
+                "en": "Caring",
+                "th": "ห่วงใย",
+                "label": "Caring ห่วงใย"
+              },
+              {
+                "en": "Frank",
+                "th": "จริงใจ",
+                "label": "Frank จริงใจ"
+              },
+              {
+                "en": "Fun",
+                "th": "สนุก",
+                "label": "Fun สนุก"
+              },
+              {
+                "en": "Playful",
+                "th": "ขี้เล่น",
+                "label": "Playful ขี้เล่น"
+              },
+              {
+                "en": "Cheerful",
+                "th": "ร่าเริง",
+                "label": "Cheerful ร่าเริง"
+              },
+              {
+                "en": "Witty",
+                "th": "มีไหวพริบ",
+                "label": "Witty มีไหวพริบ"
+              },
+              {
+                "en": "Humourous",
+                "th": "มีอารมณ์ขัน",
+                "label": "Humourous มีอารมณ์ขัน"
+              },
+              {
+                "en": "Serious",
+                "th": "จริงจัง",
+                "label": "Serious จริงจัง"
+              },
+              {
+                "en": "Formal",
+                "th": "เป็นทางการ",
+                "label": "Formal เป็นทางการ"
+              },
+              {
+                "en": "Casual",
+                "th": "ไม่เป็นทางการ",
+                "label": "Casual ไม่เป็นทางการ"
+              },
+              {
+                "en": "Authoritative",
+                "th": "มีอำนาจ",
+                "label": "Authoritative มีอำนาจ"
+              },
+              {
+                "en": "Respectful",
+                "th": "น่าเคารพ",
+                "label": "Respectful น่าเคารพ"
+              },
+              {
+                "en": "Informative",
+                "th": "ให้ความรู้",
+                "label": "Informative ให้ความรู้"
+              },
+              {
+                "en": "Conversational",
+                "th": "ชอบพูดคุย",
+                "label": "Conversational ชอบพูดคุย"
+              },
+              {
+                "en": "Matter-of-fact",
+                "th": "ตรงไปตรงมา",
+                "label": "Matter-of-fact ตรงไปตรงมา"
+              },
+              {
+                "en": "Trendy",
+                "th": "ตามกระแส",
+                "label": "Trendy ตามกระแส"
+              },
+              {
+                "en": "Provocative",
+                "th": "เร้าใจ",
+                "label": "Provocative เร้าใจ"
+              },
+              {
+                "en": "Romantic",
+                "th": "โรแมนติก",
+                "label": "Romantic โรแมนติก"
+              }
+            ],
+            "min": 6,
+            "max": 10
+          }
+        },
+        {
+          "order": 11,
+          "type": "paragraph",
+          "text_en": "Any detailed design brief you'd like us to have before we start?",
+          "text_th": "รบกวนแจ้งรายละเอียดงานดีไซน์อย่างละเอียด (ถ้ามี) ที่ต้องการให้ทางทีมก่อนเริ่มงานจริง",
+          "required": false
+        }
+      ]
+    },
+    {
+      "key": "website",
+      "name_en": "Your website",
+      "name_th": "เว็บไซต์ของคุณ",
+      "used_by": [
+        "website",
+        "both"
+      ],
+      "note": "Reordered so the feasibility inputs (goal, budget, date, pages, languages, features) come first.",
+      "questions": [
+        {
+          "order": 1,
+          "type": "multiple_choice",
+          "text_en": "What is the main goal of the website?",
+          "text_th": "เป้าหมายหลักของเว็บไซต์คืออะไร?",
+          "required": true,
+          "config": {
+            "choices": [
+              {
+                "en": "Sell products online",
+                "th": "ขายสินค้าออนไลน์"
+              },
+              {
+                "en": "Generate enquiries and leads",
+                "th": "สร้างโอกาสทางการขาย"
+              },
+              {
+                "en": "Present the company and build credibility",
+                "th": "นำเสนอบริษัทและสร้างความน่าเชื่อถือ"
+              },
+              {
+                "en": "Showcase work or portfolio",
+                "th": "แสดงผลงาน"
+              },
+              {
+                "en": "Inform and educate",
+                "th": "ให้ข้อมูลและความรู้"
+              },
+              {
+                "en": "Support existing customers",
+                "th": "ดูแลลูกค้าปัจจุบัน"
+              }
+            ],
+            "other": true
+          }
+        },
+        {
+          "order": 2,
+          "type": "multiple_choice",
+          "text_en": "What is your estimated budget for the website project?",
+          "text_th": "งบประมาณโดยประมาณสำหรับโปรเจกต์นี้",
+          "required": true,
+          "config": {
+            "choices": [
+              {
+                "en": "Under ฿100,000",
+                "th": "ต่ำกว่า 100,000 บาท"
+              },
+              {
+                "en": "฿100,000–300,000",
+                "th": "100,000–300,000 บาท"
+              },
+              {
+                "en": "฿300,000–600,000",
+                "th": "300,000–600,000 บาท"
+              },
+              {
+                "en": "฿600,000–1,000,000",
+                "th": "600,000–1,000,000 บาท"
+              },
+              {
+                "en": "Over ฿1,000,000",
+                "th": "มากกว่า 1,000,000 บาท"
+              },
+              {
+                "en": "Not decided yet",
+                "th": "ยังไม่ได้กำหนด"
+              }
+            ]
+          }
+        },
+        {
+          "order": 3,
+          "type": "multiple_choice",
+          "text_en": "When do you want to launch the website?",
+          "text_th": "คุณต้องการเปิดตัวเว็บไซต์เมื่อไร?",
+          "required": true,
+          "config": {
+            "choices": [
+              {
+                "en": "Within 1 month",
+                "th": "ภายใน 1 เดือน"
+              },
+              {
+                "en": "1–2 months",
+                "th": "1–2 เดือน"
+              },
+              {
+                "en": "3–4 months",
+                "th": "3–4 เดือน"
+              },
+              {
+                "en": "5–6 months",
+                "th": "5–6 เดือน"
+              },
+              {
+                "en": "More than 6 months",
+                "th": "มากกว่า 6 เดือน"
+              },
+              {
+                "en": "No fixed date",
+                "th": "ยังไม่กำหนด"
+              }
+            ]
+          }
+        },
+        {
+          "order": 4,
+          "type": "multiple_choice",
+          "text_en": "Approximately how many pages?",
+          "text_th": "จำนวนหน้าโดยประมาณ",
+          "required": true,
+          "config": {
+            "choices": [
+              {
+                "en": "1–5",
+                "th": "1–5"
+              },
+              {
+                "en": "6–10",
+                "th": "6–10"
+              },
+              {
+                "en": "11–20",
+                "th": "11–20"
+              },
+              {
+                "en": "21–30",
+                "th": "21–30"
+              },
+              {
+                "en": "More than 30",
+                "th": "มากกว่า 30"
+              },
+              {
+                "en": "Not sure yet",
+                "th": "ยังไม่แน่ใจ"
+              }
+            ],
+            "maps_to": "pages"
+          }
+        },
+        {
+          "order": 5,
+          "type": "checkboxes",
+          "text_en": "Which languages should the website have?",
+          "text_th": "เว็บไซต์ต้องการภาษาใดบ้าง?",
+          "required": true,
+          "config": {
+            "choices": [
+              {
+                "en": "Thai",
+                "th": "ไทย"
+              },
+              {
+                "en": "English",
+                "th": "อังกฤษ"
+              },
+              {
+                "en": "Chinese",
+                "th": "จีน"
+              },
+              {
+                "en": "Japanese",
+                "th": "ญี่ปุ่น"
+              }
+            ],
+            "other": true,
+            "maps_to": "languages"
+          }
+        },
+        {
+          "order": 6,
+          "type": "checkboxes",
+          "text_en": "Which features or functions do you need?",
+          "text_th": "ต้องการฟังก์ชันใดบ้าง?",
+          "required": true,
+          "config": {
+            "choices": [
+              {
+                "en": "Contact form",
+                "th": "แบบฟอร์มติดต่อ"
+              },
+              {
+                "en": "Online shop and checkout",
+                "th": "ร้านค้าออนไลน์"
+              },
+              {
+                "en": "Booking or appointments",
+                "th": "ระบบจอง"
+              },
+              {
+                "en": "Blog or news",
+                "th": "บล็อกหรือข่าวสาร"
+              },
+              {
+                "en": "Member login",
+                "th": "ระบบสมาชิก"
+              },
+              {
+                "en": "Search",
+                "th": "ค้นหา"
+              },
+              {
+                "en": "Live chat or LINE",
+                "th": "แชทสด หรือ LINE"
+              },
+              {
+                "en": "Map and branch locator",
+                "th": "แผนที่และสาขา"
+              },
+              {
+                "en": "Newsletter signup",
+                "th": "สมัครรับข่าวสาร"
+              },
+              {
+                "en": "Downloads (PDF, catalogue)",
+                "th": "ดาวน์โหลดเอกสาร"
+              },
+              {
+                "en": "Multi-language switcher",
+                "th": "สลับภาษา"
+              }
+            ],
+            "other": true,
+            "triggers": {
+              "Online shop and checkout": "ecommerce"
+            }
+          }
+        },
+        {
+          "order": 7,
+          "type": "short_text",
+          "text_en": "Do you have an existing website? If yes, please give the URL.",
+          "text_th": "มีเว็บไซต์เดิมหรือไม่? หากมี โปรดระบุ URL",
+          "required": false
+        },
+        {
+          "order": 8,
+          "type": "paragraph",
+          "text_en": "What products or services should the website present?",
+          "text_th": "เว็บไซต์ควรนำเสนอสินค้าหรือบริการอะไรบ้าง?",
+          "required": true,
+          "help_en": "The full list — the earlier question asked only for your main one."
+        },
+        {
+          "order": 9,
+          "type": "paragraph",
+          "text_en": "Do you have sample product or service information we could use — descriptions, images, prices, conditions?",
+          "text_th": "มีตัวอย่างข้อมูลสินค้าหรือบริการที่ต้องการใช้บนเว็บไซต์หรือไม่",
+          "required": false
+        },
+        {
+          "order": 10,
+          "type": "paragraph",
+          "text_en": "Which websites do you find inspiring for the DESIGN? Please give URLs.",
+          "text_th": "เว็บไซต์ที่คุณชอบในด้าน \"การออกแบบ\" โปรดระบุ URL",
+          "required": false
+        },
+        {
+          "order": 11,
+          "type": "paragraph",
+          "text_en": "Which websites do you find inspiring for the FUNCTIONALITY? Please give URLs.",
+          "text_th": "เว็บไซต์ที่คุณชอบในด้าน \"การใช้งาน\" โปรดระบุ URL",
+          "required": false
+        },
+        {
+          "order": 12,
+          "type": "checkboxes",
+          "text_en": "What is the age range of your main website users?",
+          "text_th": "ช่วงอายุของกลุ่มผู้ใช้งานหลัก",
+          "required": true,
+          "config": {
+            "choices": [
+              {
+                "en": "Under 18",
+                "th": "ต่ำกว่า 18"
+              },
+              {
+                "en": "18–24",
+                "th": "18–24"
+              },
+              {
+                "en": "25–34",
+                "th": "25–34"
+              },
+              {
+                "en": "35–44",
+                "th": "35–44"
+              },
+              {
+                "en": "45–54",
+                "th": "45–54"
+              },
+              {
+                "en": "55–64",
+                "th": "55–64"
+              },
+              {
+                "en": "65+",
+                "th": "65 ขึ้นไป"
+              }
+            ]
+          }
+        },
+        {
+          "order": 13,
+          "type": "multiple_choice",
+          "text_en": "Which screen matters most to your customers?",
+          "text_th": "อุปกรณ์ใดสำคัญที่สุดสำหรับลูกค้าของคุณ",
+          "required": true,
+          "config": {
+            "choices": [
+              {
+                "en": "Mobile",
+                "th": "มือถือ"
+              },
+              {
+                "en": "Desktop",
+                "th": "คอมพิวเตอร์"
+              },
+              {
+                "en": "Tablet",
+                "th": "แท็บเล็ต"
+              },
+              {
+                "en": "Equally important",
+                "th": "สำคัญเท่ากัน"
+              }
+            ],
+            "other": true
+          }
+        },
+        {
+          "order": 14,
+          "type": "checkboxes",
+          "text_en": "Besides the website, are you looking for any other services?",
+          "text_th": "นอกจากเว็บไซต์ ต้องการบริการอื่นเพิ่มเติมหรือไม่?",
+          "required": false,
+          "config": {
+            "choices": [
+              {
+                "en": "Branding or rebranding",
+                "th": "ออกแบบแบรนด์"
+              },
+              {
+                "en": "Logo design",
+                "th": "ออกแบบโลโก้"
+              },
+              {
+                "en": "Content writing",
+                "th": "เขียนเนื้อหา"
+              },
+              {
+                "en": "Translation",
+                "th": "แปลภาษา"
+              },
+              {
+                "en": "Photography",
+                "th": "ถ่ายภาพ"
+              },
+              {
+                "en": "Video",
+                "th": "วิดีโอ"
+              },
+              {
+                "en": "SEO",
+                "th": "SEO"
+              },
+              {
+                "en": "Online advertising",
+                "th": "โฆษณาออนไลน์"
+              },
+              {
+                "en": "Social media",
+                "th": "โซเชียลมีเดีย"
+              }
+            ],
+            "other": true
+          }
+        },
+        {
+          "order": 15,
+          "type": "paragraph",
+          "text_en": "Anything else you'd like to tell us?",
+          "text_th": "มีอะไรอื่นที่อยากบอกเราหรือไม่?",
+          "required": false
+        }
+      ]
+    },
+    {
+      "key": "ecommerce",
+      "name_en": "Selling online",
+      "name_th": "การขายออนไลน์",
+      "used_by": [
+        "website",
+        "both"
+      ],
+      "shown_when": "website.q6 includes 'Online shop and checkout' OR website.q1 is 'Sell products online'",
+      "questions": [
+        {
+          "order": 1,
+          "type": "checkboxes",
+          "text_en": "What should each product page show?",
+          "text_th": "หน้าสินค้าแต่ละรายการควรแสดงอะไรบ้าง?",
+          "required": true,
+          "config": {
+            "choices": [
+              {
+                "en": "Photos",
+                "th": "รูปภาพ"
+              },
+              {
+                "en": "Description",
+                "th": "คำอธิบาย"
+              },
+              {
+                "en": "Price",
+                "th": "ราคา"
+              },
+              {
+                "en": "Variants (size, colour)",
+                "th": "ตัวเลือก (ขนาด สี)"
+              },
+              {
+                "en": "Stock level",
+                "th": "จำนวนคงเหลือ"
+              },
+              {
+                "en": "Reviews",
+                "th": "รีวิว"
+              },
+              {
+                "en": "Related products",
+                "th": "สินค้าที่เกี่ยวข้อง"
+              },
+              {
+                "en": "Downloadable spec sheet",
+                "th": "ดาวน์โหลดสเปก"
+              }
+            ],
+            "other": true
+          }
+        },
+        {
+          "order": 2,
+          "type": "short_text",
+          "text_en": "What is the general price range of your products?",
+          "text_th": "ช่วงราคาสินค้าโดยทั่วไป",
+          "required": true
+        },
+        {
+          "order": 3,
+          "type": "paragraph",
+          "text_en": "How many product categories, and what are they?",
+          "text_th": "มีสินค้ากี่หมวดหมู่ และหมวดใดบ้าง?",
+          "required": true
+        },
+        {
+          "order": 4,
+          "type": "multiple_choice",
+          "text_en": "How many products (SKUs) at launch?",
+          "text_th": "จำนวนสินค้า (SKU) ที่จะแสดงตอนเปิดตัว",
+          "required": true,
+          "config": {
+            "choices": [
+              {
+                "en": "Under 20",
+                "th": "ต่ำกว่า 20"
+              },
+              {
+                "en": "20–50",
+                "th": "20–50"
+              },
+              {
+                "en": "51–100",
+                "th": "51–100"
+              },
+              {
+                "en": "101–300",
+                "th": "101–300"
+              },
+              {
+                "en": "301–1,000",
+                "th": "301–1,000"
+              },
+              {
+                "en": "More than 1,000",
+                "th": "มากกว่า 1,000"
+              }
+            ],
+            "maps_to": "skus"
+          }
+        },
+        {
+          "order": 5,
+          "type": "multiple_choice",
+          "text_en": "Do you already hold your product data in a spreadsheet or system?",
+          "text_th": "คุณมีข้อมูลสินค้าในไฟล์ตารางหรือระบบอยู่แล้วหรือไม่?",
+          "required": true,
+          "config": {
+            "choices": [
+              {
+                "en": "Yes, complete and ready to export",
+                "th": "มีครบ พร้อมส่งออก"
+              },
+              {
+                "en": "Yes, but incomplete",
+                "th": "มีบางส่วน"
+              },
+              {
+                "en": "No, it's scattered or on paper",
+                "th": "ยังไม่มี กระจัดกระจาย"
+              },
+              {
+                "en": "Not sure",
+                "th": "ไม่แน่ใจ"
+              }
+            ]
+          }
+        },
+        {
+          "order": 6,
+          "type": "multiple_choice",
+          "text_en": "How many currencies should the site support?",
+          "text_th": "เว็บไซต์รองรับกี่สกุลเงิน?",
+          "required": true,
+          "config": {
+            "choices": [
+              {
+                "en": "Thai Baht only",
+                "th": "บาทเท่านั้น"
+              },
+              {
+                "en": "Two",
+                "th": "สองสกุล"
+              },
+              {
+                "en": "Three or more",
+                "th": "สามสกุลขึ้นไป"
+              }
+            ],
+            "other": true
+          }
+        },
+        {
+          "order": 7,
+          "type": "checkboxes",
+          "text_en": "Which payment methods do you want to accept?",
+          "text_th": "ต้องการรับชำระเงินด้วยวิธีใดบ้าง?",
+          "required": true,
+          "config": {
+            "choices": [
+              {
+                "en": "Credit and debit card",
+                "th": "บัตรเครดิต/เดบิต"
+              },
+              {
+                "en": "PromptPay",
+                "th": "พร้อมเพย์"
+              },
+              {
+                "en": "Bank transfer with slip upload",
+                "th": "โอนเงินพร้อมแนบสลิป"
+              },
+              {
+                "en": "TrueMoney",
+                "th": "ทรูมันนี่"
+              },
+              {
+                "en": "Cash on delivery",
+                "th": "เก็บเงินปลายทาง"
+              },
+              {
+                "en": "Instalments",
+                "th": "ผ่อนชำระ"
+              }
+            ]
+          }
+        },
+        {
+          "order": 8,
+          "type": "multiple_choice",
+          "text_en": "Do you have a preferred payment gateway?",
+          "text_th": "มีผู้ให้บริการรับชำระเงินที่ต้องการหรือไม่?",
+          "required": true,
+          "config": {
+            "choices": [
+              {
+                "en": "Omise",
+                "th": "Omise"
+              },
+              {
+                "en": "2C2P",
+                "th": "2C2P"
+              },
+              {
+                "en": "GB Prime Pay",
+                "th": "GB Prime Pay"
+              },
+              {
+                "en": "Stripe",
+                "th": "Stripe"
+              },
+              {
+                "en": "PayPal",
+                "th": "PayPal"
+              },
+              {
+                "en": "No preference",
+                "th": "ไม่มีข้อกำหนด"
+              }
+            ],
+            "other": true
+          }
+        },
+        {
+          "order": 9,
+          "type": "checkboxes",
+          "text_en": "Do you sell on any other online platforms?",
+          "text_th": "คุณขายสินค้าบนแพลตฟอร์มอื่นหรือไม่?",
+          "required": false,
+          "config": {
+            "choices": [
+              {
+                "en": "Lazada",
+                "th": "Lazada"
+              },
+              {
+                "en": "Shopee",
+                "th": "Shopee"
+              },
+              {
+                "en": "TikTok Shop",
+                "th": "TikTok Shop"
+              },
+              {
+                "en": "Facebook",
+                "th": "Facebook"
+              },
+              {
+                "en": "LINE Shopping",
+                "th": "LINE Shopping"
+              },
+              {
+                "en": "Own website only",
+                "th": "เว็บไซต์ของเราเท่านั้น"
+              },
+              {
+                "en": "None yet",
+                "th": "ยังไม่มี"
+              }
+            ],
+            "other": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "content",
+      "name_en": "Content and ownership",
+      "name_th": "เนื้อหาและผู้รับผิดชอบ",
+      "used_by": [
+        "content"
+      ],
+      "note": "SEPARATE follow-up survey, sent after kick-off decisions are recorded. Goes to one or two named people. NO content volume estimate is shown.",
+      "questions": [
+        {
+          "order": 1,
+          "type": "short_text",
+          "text_en": "Your name and role",
+          "text_th": "ชื่อและตำแหน่งของคุณ",
+          "required": true
+        },
+        {
+          "order": 2,
+          "type": "short_text",
+          "text_en": "Who is our single point of contact for website content?",
+          "text_th": "ใครคือผู้ประสานงานหลักด้านเนื้อหาเว็บไซต์?",
+          "required": true,
+          "help_en": "Name and email. One person we can ask when something is missing."
+        },
+        {
+          "order": 3,
+          "type": "multiple_choice",
+          "text_en": "Who will write the website text?",
+          "text_th": "ใครเป็นผู้เขียนเนื้อหาบนเว็บไซต์?",
+          "required": true,
+          "config": {
+            "choices": [
+              {
+                "en": "We write it ourselves",
+                "th": "เราเขียนเอง"
+              },
+              {
+                "en": "We'd like Designally to write it",
+                "th": "ต้องการให้ Designally เขียนให้"
+              },
+              {
+                "en": "A third party writes it",
+                "th": "มีผู้เขียนภายนอก"
+              },
+              {
+                "en": "Not decided yet",
+                "th": "ยังไม่ได้ตัดสินใจ"
+              }
+            ]
+          }
+        },
+        {
+          "order": 4,
+          "type": "multiple_choice",
+          "text_en": "How much of the text already exists?",
+          "text_th": "เนื้อหาพร้อมแล้วมากน้อยเพียงใด?",
+          "required": true,
+          "config": {
+            "choices": [
+              {
+                "en": "All of it is written",
+                "th": "เขียนครบแล้ว"
+              },
+              {
+                "en": "Some of it",
+                "th": "บางส่วน"
+              },
+              {
+                "en": "Nothing yet",
+                "th": "ยังไม่ได้เริ่ม"
+              }
+            ]
+          }
+        },
+        {
+          "order": 5,
+          "type": "paragraph",
+          "text_en": "Who produces the second language, and by when?",
+          "text_th": "ใครเป็นผู้จัดทำภาษาที่สอง และเสร็จเมื่อไร?",
+          "required": true,
+          "help_en": "The single highest-value question in the project."
+        },
+        {
+          "order": 6,
+          "type": "multiple_choice",
+          "text_en": "Realistically, when will the content be ready?",
+          "text_th": "ตามความเป็นจริง เนื้อหาจะพร้อมเมื่อไร?",
+          "required": true,
+          "config": {
+            "choices": [
+              {
+                "en": "Within 2 weeks",
+                "th": "ภายใน 2 สัปดาห์"
+              },
+              {
+                "en": "3–4 weeks",
+                "th": "3–4 สัปดาห์"
+              },
+              {
+                "en": "1–2 months",
+                "th": "1–2 เดือน"
+              },
+              {
+                "en": "More than 2 months",
+                "th": "มากกว่า 2 เดือน"
+              },
+              {
+                "en": "We don't know yet",
+                "th": "ยังไม่ทราบ"
+              }
+            ]
+          }
+        },
+        {
+          "order": 7,
+          "type": "multiple_choice",
+          "text_en": "Who supplies photography and video?",
+          "text_th": "ใครเป็นผู้จัดหาภาพถ่ายและวิดีโอ?",
+          "required": true,
+          "config": {
+            "choices": [
+              {
+                "en": "We have finished assets ready",
+                "th": "มีไฟล์พร้อมแล้ว"
+              },
+              {
+                "en": "We have some, and need more produced",
+                "th": "มีบางส่วน ต้องผลิตเพิ่ม"
+              },
+              {
+                "en": "We need everything produced",
+                "th": "ต้องผลิตใหม่ทั้งหมด"
+              },
+              {
+                "en": "We'll use stock images",
+                "th": "ใช้ภาพสำเร็จรูป"
+              },
+              {
+                "en": "Not decided yet",
+                "th": "ยังไม่ได้ตัดสินใจ"
+              }
+            ]
+          }
+        },
+        {
+          "order": 8,
+          "type": "multiple_choice",
+          "text_en": "Who writes the legal pages — privacy, cookies, terms, delivery, returns?",
+          "text_th": "ใครเป็นผู้จัดทำหน้าเอกสารทางกฎหมาย?",
+          "required": true,
+          "config": {
+            "choices": [
+              {
+                "en": "We already have them",
+                "th": "มีอยู่แล้ว"
+              },
+              {
+                "en": "Our legal team will write them",
+                "th": "ทีมกฎหมายของเราจัดทำ"
+              },
+              {
+                "en": "We'd like Designally to draft them",
+                "th": "ต้องการให้ Designally ร่างให้"
+              },
+              {
+                "en": "Not decided yet",
+                "th": "ยังไม่ได้ตัดสินใจ"
+              }
+            ]
+          }
+        },
+        {
+          "order": 9,
+          "type": "short_text",
+          "text_en": "Which email address should receive messages from the website forms?",
+          "text_th": "อีเมลใดที่จะรับข้อมูลจากฟอร์มบนเว็บไซต์?",
+          "required": true
+        },
+        {
+          "order": 10,
+          "type": "checkboxes",
+          "text_en": "Which of these accounts already exist?",
+          "text_th": "บัญชีใดที่มีอยู่แล้วบ้าง?",
+          "required": false,
+          "config": {
+            "choices": [
+              {
+                "en": "LINE Official Account",
+                "th": "LINE Official Account"
+              },
+              {
+                "en": "Google Business Profile (Maps)",
+                "th": "Google Business Profile"
+              },
+              {
+                "en": "Facebook",
+                "th": "Facebook"
+              },
+              {
+                "en": "Instagram",
+                "th": "Instagram"
+              },
+              {
+                "en": "TikTok",
+                "th": "TikTok"
+              },
+              {
+                "en": "Lazada",
+                "th": "Lazada"
+              },
+              {
+                "en": "Shopee",
+                "th": "Shopee"
+              },
+              {
+                "en": "Payment gateway",
+                "th": "ระบบรับชำระเงิน"
+              },
+              {
+                "en": "Google Analytics",
+                "th": "Google Analytics"
+              },
+              {
+                "en": "None yet",
+                "th": "ยังไม่มี"
+              }
+            ]
+          }
+        },
+        {
+          "order": 11,
+          "type": "short_text",
+          "text_en": "Who owns the domain name and hosting at the moment?",
+          "text_th": "ปัจจุบันใครเป็นเจ้าของโดเมนและโฮสติ้ง?",
+          "required": true,
+          "help_en": "If you're not sure, say so — we'll help you find out."
+        },
+        {
+          "order": 12,
+          "type": "multiple_choice",
+          "text_en": "Who will look after the website after launch, and will they need to edit content themselves?",
+          "text_th": "ใครดูแลเว็บไซต์หลังเปิดตัว และต้องแก้ไขเนื้อหาเองหรือไม่?",
+          "required": true,
+          "config": {
+            "choices": [
+              {
+                "en": "Our team will edit content ourselves",
+                "th": "ทีมเราแก้ไขเอง"
+              },
+              {
+                "en": "We'd like Designally to maintain it",
+                "th": "ต้องการให้ Designally ดูแล"
+              },
+              {
+                "en": "It rarely changes, no editing needed",
+                "th": "ไม่ค่อยเปลี่ยน ไม่ต้องแก้ไข"
+              },
+              {
+                "en": "Not decided yet",
+                "th": "ยังไม่ได้ตัดสินใจ"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

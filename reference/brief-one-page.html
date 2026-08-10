@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARUN+ — Survey analysis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:oklch(97.8% 0.004 280); --surface:oklch(100% 0 0);
+  --ink:oklch(21% 0.020 280); --ink-2:oklch(44% 0.016 280); --ink-3:oklch(54% 0.014 280);
+  --line:oklch(91.5% 0.005 280); --line-2:oklch(85% 0.007 280);
+  --accent:oklch(46% 0.190 277); --accent-deep:oklch(38% 0.165 277); --accent-soft:oklch(96% 0.022 277);
+  --amber:oklch(53% 0.130 62); --amber-soft:oklch(96.5% 0.030 70);
+  --green:oklch(47% 0.120 155); --green-soft:oklch(96% 0.028 155);
+  --red:oklch(48% 0.170 25); --red-soft:oklch(95.5% 0.032 25);
+  --r-sm:7px; --r-md:12px; --r-lg:16px;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{
+  font-family:'Anuphan',-apple-system,sans-serif; background:var(--bg); color:var(--ink);
+  font-size:15.5px; line-height:1.6; -webkit-font-smoothing:antialiased;
+}
+.serif{ font-family:'Instrument Serif',Georgia,serif; font-style:italic; font-weight:400; }
+.wrap{ max-width:760px; margin:0 auto; padding:40px 28px 80px; }
+
+/* header */
+.head{ display:flex; align-items:baseline; gap:11px; margin-bottom:30px; }
+.mark{ font-weight:700; font-size:16px; letter-spacing:-0.01em; }
+.mark em{ font-family:'Instrument Serif',Georgia,serif; font-style:italic; font-weight:400; font-size:18px; }
+.head .meta{ font-size:12.5px; color:var(--ink-3); border-left:1px solid var(--line-2); padding-left:11px; }
+
+h1{ font-size:clamp(1.6rem,4vw,2.15rem); font-weight:600; letter-spacing:-0.022em; line-height:1.16; text-wrap:balance; margin-bottom:6px; }
+h1 em{ font-family:'Instrument Serif',Georgia,serif; font-style:italic; font-weight:400; letter-spacing:0; }
+.sub{ color:var(--ink-2); font-size:14.5px; margin-bottom:30px; }
+
+/* read this first */
+.first{
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg);
+  padding:24px 26px; margin-bottom:34px;
+}
+.first .tag{ font-size:11.5px; font-weight:700; letter-spacing:.05em; color:var(--red); margin-bottom:9px; }
+.first p{ font-size:17px; line-height:1.5; text-wrap:pretty; }
+.first p b{ font-weight:600; }
+.first .quote{
+  margin-top:14px; padding-top:14px; border-top:1px solid var(--line);
+  font-size:14.5px; color:var(--ink-2);
+}
+.first .quote .th{ font-family:'Instrument Serif',Georgia,serif; font-style:italic; color:var(--ink); font-size:16px; }
+
+/* sections */
+section{ margin-bottom:32px; }
+h2{ font-size:13px; font-weight:600; color:var(--ink-3); margin-bottom:13px; }
+h2 .n{ color:var(--ink-3); font-weight:400; }
+
+/* settled */
+.settled{ list-style:none; }
+.settled li{ display:flex; gap:12px; align-items:baseline; padding:9px 0; border-bottom:1px solid var(--line); }
+.settled li:last-child{ border-bottom:0; }
+.settled .ck{ color:var(--green); font-weight:700; flex-shrink:0; }
+.settled .ev{ margin-left:auto; font-size:12.5px; color:var(--ink-3); white-space:nowrap; padding-left:12px; }
+
+/* unsettled */
+.conf{ border:1px solid var(--line); border-radius:var(--r-md); background:var(--surface); padding:17px 20px; margin-bottom:10px; }
+.conf .top{ display:flex; align-items:center; gap:10px; margin-bottom:9px; flex-wrap:wrap; }
+.conf .top b{ font-size:15.5px; }
+.sev{ font-size:10.5px; font-weight:700; letter-spacing:.04em; border-radius:999px; padding:3px 9px; }
+.sev.hi{ background:var(--red-soft); color:var(--red); }
+.sev.md{ background:var(--amber-soft); color:var(--amber); }
+.conf .vs{ font-size:14.5px; color:var(--ink-2); text-wrap:pretty; }
+.conf .vs b{ color:var(--ink); font-weight:600; }
+.conf .who{ font-size:12.5px; color:var(--ink-3); margin-top:5px; }
+
+/* clarity gaps */
+.gap{ background:var(--amber-soft); border-radius:var(--r-md); padding:18px 21px; }
+.gap p{ font-size:14.5px; text-wrap:pretty; margin-bottom:9px; }
+.gap p:last-child{ margin-bottom:0; }
+.gap b{ font-weight:600; }
+.gap .list{ font-size:14px; color:var(--ink-2); }
+
+/* creative */
+.ins{ counter-reset:i; list-style:none; }
+.ins li{ position:relative; padding:11px 0 11px 34px; border-bottom:1px solid var(--line); text-wrap:pretty; }
+.ins li:last-child{ border-bottom:0; }
+.ins li::before{
+  counter-increment:i; content:counter(i); position:absolute; left:0; top:12px;
+  width:23px; height:23px; border-radius:50%; background:var(--accent-soft); color:var(--accent-deep);
+  font-size:12px; font-weight:600; display:flex; align-items:center; justify-content:center;
+}
+.ins b{ font-weight:600; }
+
+/* signals */
+.sig{ display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr)); gap:10px; }
+.sigbox{ border:1px solid var(--line); border-radius:var(--r-md); background:var(--surface); padding:15px 17px; }
+.sigbox .lab{ font-size:12px; font-weight:600; color:var(--ink-3); margin-bottom:4px; }
+.sigbox .val{ font-size:15.5px; font-weight:600; margin-bottom:3px; }
+.sigbox .val.warn{ color:var(--amber); }
+.sigbox .val.bad{ color:var(--red); }
+.sigbox .say{ font-size:13px; color:var(--ink-2); text-wrap:pretty; }
+
+/* detail toggles */
+details{ border-top:1px solid var(--line); }
+details summary{
+  cursor:pointer; list-style:none; padding:12px 0; font-size:13.5px; font-weight:600;
+  color:var(--ink-3); display:flex; align-items:center; gap:8px; transition:color .18s;
+}
+details summary::-webkit-details-marker{ display:none; }
+details summary:hover{ color:var(--accent); }
+details summary::before{ content:'+'; font-size:15px; width:14px; }
+details[open] summary::before{ content:'–'; }
+details .inner{ padding:0 0 16px 22px; font-size:14px; color:var(--ink-2); text-wrap:pretty; }
+details .inner p{ margin-bottom:8px; }
+details .inner p:last-child{ margin-bottom:0; }
+
+/* internal */
+.internal{ background:oklch(94.5% 0.006 280); border-radius:var(--r-md); padding:17px 20px; font-size:14px; margin-top:8px; }
+.internal .lock{ font-size:11.5px; font-weight:700; letter-spacing:.04em; color:var(--ink-3); margin-bottom:8px; }
+.internal p{ margin-bottom:7px; text-wrap:pretty; }
+.internal p:last-child{ margin-bottom:0; }
+
+/* deck */
+.deck{ list-style:none; border:1px solid var(--line); border-radius:var(--r-md); background:var(--surface); overflow:hidden; }
+.deck li{ display:flex; gap:13px; align-items:baseline; padding:10px 17px; border-top:1px solid var(--line); font-size:14.5px; }
+.deck li:first-child{ border-top:0; }
+.deck .sn{ color:var(--ink-3); font-size:12.5px; width:14px; flex-shrink:0; }
+.deck .d{ margin-left:auto; font-size:10.5px; font-weight:700; letter-spacing:.04em; color:var(--accent-deep); background:var(--accent-soft); border-radius:999px; padding:3px 9px; white-space:nowrap; }
+
+.foot{
+  display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+  padding-top:22px; border-top:1px solid var(--line); margin-top:34px;
+  font-size:13px; color:var(--ink-3);
+}
+.btn{
+  font-family:inherit; font-size:13.5px; font-weight:600; cursor:pointer; border:1px solid transparent;
+  border-radius:999px; padding:9px 18px; transition:background .2s var(--ease), border-color .2s;
+}
+.btn-p{ background:var(--accent); color:#fff; } .btn-p:hover{ background:var(--accent-deep); }
+.btn-q{ background:transparent; border-color:var(--line-2); color:var(--ink); } .btn-q:hover{ border-color:var(--ink); }
+.foot .grp{ margin-left:auto; display:flex; gap:8px; }
+@media (prefers-reduced-motion: reduce){ *{ transition-duration:.01ms !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <span class="mark">Design<em>ally</em></span>
+    <span class="meta">ARUN+ · Branding · 28 answers from 6 departments</span>
+  </div>
+
+  <h1>The company doesn't yet <em>agree with itself</em>.</h1>
+  <p class="sub">Survey analysis · generated automatically · not yet reviewed by a person</p>
+
+  <!-- READ THIS FIRST -->
+  <div class="first">
+    <div class="tag">READ THIS FIRST</div>
+    <p>Twenty-eight people described <b>four different companies</b>. Before any design decision, ARUN+ has to settle who it sells to — and several employees cannot describe the product or name a competitor at all. <b>This is an alignment problem, not a design problem.</b></p>
+    <div class="quote">One respondent wrote it in the form themselves:<br><span class="th">"งงจัง ตกลงลูกค้าเราเป็น B2B หรือ B2C?"</span> — "I'm confused, are our customers B2B or B2C?"</div>
+  </div>
+
+  <!-- SETTLED -->
+  <section>
+    <h2>Settled — design on this without asking <span class="n">· 4 findings</span></h2>
+    <ul class="settled">
+      <li><span class="ck">✓</span><span>Trustworthy and professional is the core personality</span><span class="ev">20 and 19 of 28</span></li>
+      <li><span class="ck">✓</span><span>Modern, not traditional</span><span class="ev">26 of 28</span></li>
+      <li><span class="ck">✓</span><span>PTT Group backing is the biggest perceived strength</span><span class="ev">named by most</span></li>
+      <li><span class="ck">✓</span><span>Pride in being a Thai company building EV for Thai people</span><span class="ev">recurring theme</span></li>
+    </ul>
+  </section>
+
+  <!-- UNSETTLED -->
+  <section>
+    <h2>Unsettled — resolve at the kick-off <span class="n">· 3 conflicts</span></h2>
+
+    <div class="conf">
+      <div class="top"><b>Who is the customer?</b><span class="sev hi">HIGH</span></div>
+      <p class="vs"><b>B2B</b> — car brands and manufacturers who hire ARUN+ to build EVs &nbsp;·&nbsp; versus &nbsp;·&nbsp; <b>B2C</b> — the general public, Gen Y–Z, "everyone"</p>
+      <p class="who">Product &amp; Platform Development says B2B · Strategy, Finance and 2W&amp;Bus say B2C · nobody is marked as final decision maker</p>
+    </div>
+
+    <div class="conf">
+      <div class="top"><b>Fun or formal?</b><span class="sev hi">HIGH</span></div>
+      <p class="vs">One group asked for <b>Fun, Playful, Casual</b> and listed "formal, serious" as things to avoid. Another asked for <b>Formal, Serious, Authoritative</b> and listed "funny" as a thing to avoid.</p>
+      <p class="who">A direct contradiction — each group's wish is on the other group's avoid list</p>
+    </div>
+
+    <div class="conf">
+      <div class="top"><b>Parent brand or product brand?</b><span class="sev md">MEDIUM</span></div>
+      <p class="vs">The PR Manager says ARUN+ should stay a <b>corporate holding brand</b> with on-ion, EVme and Horizon Plus facing customers. Others describe ARUN+ as customer-facing itself.</p>
+      <p class="who">Decides the entire brand architecture — cheap to settle now, expensive to reverse</p>
+    </div>
+  </section>
+
+  <!-- CLARITY GAPS -->
+  <section>
+    <h2>Not decided by the client yet</h2>
+    <div class="gap">
+      <p><b>Several employees could not answer the basic questions.</b> Answers like "ยังไม่มี" (not yet), "ไม่มี" (none) and blanks appear on the product, competitor and belief questions — from people whose jobs are close to the business.</p>
+      <p class="list">Read individually these look like lazy answers. Read together they say the organisation has not decided these things, and design cannot decide them for it.</p>
+      <p><b>Recommendation:</b> bring an alignment workshop to the kick-off instead of a moodboard, and plan for an internal launch — this brand has to be sold inside the company before it is sold outside.</p>
+    </div>
+  </section>
+
+  <!-- FOR THE CREATIVE TEAM -->
+  <section>
+    <h2>For the creative team</h2>
+    <ol class="ins">
+      <li>The real tension is <b>state-enterprise credibility versus startup energy</b>. Stakeholders want the trust of PTT and the boldness of Tesla at once. The likely answer is a professional, modern base with controlled boldness — not playfulness.</li>
+      <li><b>Tesla was named by twelve people, but never for how it looks.</b> Every reason given was about speed, being a trend-setter, and communicating boldly. The reference means <i>behave like Tesla</i>, not <i>look like Tesla</i> — do not bring a minimal-white moodboard on that basis.</li>
+      <li>The famous-person answers split into two camps that match the tone conflict exactly: <b>Steve Jobs, Elon Musk, Nikola Tesla, Christopher Columbus</b> (innovator) against <b>Taylor Swift, Lisa, Justin Bieber</b> (performer). The same people who chose the performers chose the "Fun" adjectives.</li>
+      <li>On the ten personality scales, <b>eight are near-unanimous and only two are split</b> — Serious–Fun and Subtle–Bold. That makes the kick-off discussion a five-minute item, not an hour.</li>
+    </ol>
+  </section>
+
+  <!-- SIGNALS -->
+  <section>
+    <h2>Signals</h2>
+    <div class="sig">
+      <div class="sigbox">
+        <div class="lab">Internal alignment</div>
+        <div class="val bad">Fragmented</div>
+        <div class="say">Departments disagree on audience, product and tone. Expect more revision rounds than usual.</div>
+      </div>
+      <div class="sigbox">
+        <div class="lab">Decision maker</div>
+        <div class="val bad">Not identified</div>
+        <div class="say">No respondent holds final authority, so no conflict here can be settled without the right person at the kick-off.</div>
+      </div>
+      <div class="sigbox">
+        <div class="lab">Outlier</div>
+        <div class="val warn">1 respondent</div>
+        <div class="say">Head of EV Charger chose Conservative, Irreverent and "slow" — against all 27 others. Treat with care before quoting.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEPTH — collapsed by default -->
+  <section>
+    <h2>Detail — open only if you need it</h2>
+    <details>
+      <summary>All 28 respondents by department</summary>
+      <div class="inner"><p>Product &amp; Platform Development (7) · Strategy &amp; Corporate Support (7) · 2W &amp; Bus (6) · 4W (4) · Accounting &amp; Finance (3) · EV Charger (1). The two largest departments are also the two that disagree most about the audience.</p></div>
+    </details>
+    <details>
+      <summary>Every brand named, and the reason given</summary>
+      <div class="inner">
+        <p><b>Admired:</b> Tesla (speed, trend-setting, bold communication) · Apple (uniqueness, owning its audience) · BYD (speed of investment, long-term technology) · BMW (recognisable identity) · SpaceX (futuristic, brave) · Blackpink (authentic, natural, fun).</p>
+        <p><b>Disliked:</b> CP (perceived as dominating everything) · Tesla again by one respondent (for Elon Musk personally, not the brand) · a political party (for being boastful).</p>
+      </div>
+    </details>
+    <details>
+      <summary>Personality scales — all ten results</summary>
+      <div class="inner"><p>Near-unanimous toward: Modern · Accessible · Friendly · Simple · Dynamic · Cosmopolitan · Disruptive · Idealistic. Split: Serious–Fun and Subtle–Bold.</p></div>
+    </details>
+    <details>
+      <summary>Full adjective counts</summary>
+      <div class="inner"><p>Trustworthy 20 · Professional 19 · Smart 15 · Enthusiastic 13 · Trendy 11 · Friendly 10 · Fun 9 · Informative 8 · Caring 7 · Witty 6 · Passionate 6 · Cheerful 5 · Authoritative 4 · Frank 3 · Provocative 2 · Conservative 1.</p></div>
+    </details>
+  </section>
+
+  <!-- DECK -->
+  <section>
+    <h2>Kick-off deck outline</h2>
+    <ul class="deck">
+      <li><span class="sn">1</span>Welcome and project goals</li>
+      <li><span class="sn">2</span>What we heard — 28 voices, 6 departments</li>
+      <li><span class="sn">3</span>Where you already agree: trustworthy · professional · modern</li>
+      <li><span class="sn">4</span>Who is the customer — B2B or B2C?<span class="d">DECIDE</span></li>
+      <li><span class="sn">5</span>How should ARUN+ sound?<span class="d">DECIDE</span></li>
+      <li><span class="sn">6</span>Parent brand or product brand?<span class="d">DECIDE</span></li>
+      <li><span class="sn">7</span>What Tesla actually means to your team</li>
+      <li><span class="sn">8</span>Next steps and timeline</li>
+    </ul>
+  </section>
+
+  <!-- INTERNAL -->
+  <section>
+    <h2>How to run the room</h2>
+    <div class="internal">
+      <div class="lock">🔒 INTERNAL — never shown to the client</div>
+      <p><b>Open with the B2B/B2C question and do not move on until it is answered.</b> Everything else in the project depends on it, and the room will try to avoid it because it is uncomfortable.</p>
+      <p><b>Ask who decides, in the first five minutes.</b> Nobody claimed final authority in the survey. If that person is not in the meeting, book a second session rather than designing on an unresolved split.</p>
+      <p><b>Handle the tone conflict gently.</b> Both camps put the other's preference on their avoid list, so framing it as a spectrum with dots on a line will work better than asking people to argue for a side.</p>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>Generated in about 30 seconds from 28 responses</span>
+    <div class="grp">
+      <button class="btn btn-q">Send to Claude</button>
+      <button class="btn btn-p">Confirm</button>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

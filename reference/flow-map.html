@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Designally Platform — the complete flow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:oklch(97.8% 0.004 280); --surface:oklch(100% 0 0);
+  --ink:oklch(21% 0.020 280); --ink-2:oklch(44% 0.016 280); --ink-3:oklch(54% 0.014 280);
+  --line:oklch(91.5% 0.005 280); --line-2:oklch(85% 0.007 280);
+  --accent:oklch(46% 0.190 277); --accent-deep:oklch(38% 0.165 277); --accent-soft:oklch(96% 0.022 277);
+  --amber:oklch(53% 0.130 62); --amber-soft:oklch(96.5% 0.030 70);
+  --green:oklch(47% 0.120 155); --green-soft:oklch(96% 0.028 155);
+  --r-sm:7px; --r-md:12px; --r-lg:16px;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{ font-family:'Anuphan',-apple-system,sans-serif; background:var(--bg); color:var(--ink);
+  font-size:15.5px; line-height:1.6; -webkit-font-smoothing:antialiased; }
+.wrap{ max-width:920px; margin:0 auto; padding:44px 28px 90px; }
+.mark{ font-weight:700; font-size:16px; } .mark em{ font-family:'Instrument Serif',Georgia,serif; font-style:italic; font-weight:400; font-size:18px; }
+h1{ font-size:clamp(1.8rem,4.5vw,2.5rem); font-weight:600; letter-spacing:-0.022em; line-height:1.15; margin:26px 0 8px; text-wrap:balance; }
+h1 em{ font-family:'Instrument Serif',Georgia,serif; font-style:italic; font-weight:400; }
+.lede{ color:var(--ink-2); max-width:64ch; margin-bottom:36px; text-wrap:pretty; }
+
+/* legend */
+.legend{ display:flex; gap:22px; flex-wrap:wrap; padding:16px 20px; background:var(--surface);
+  border:1px solid var(--line); border-radius:var(--r-md); margin-bottom:40px; font-size:13.5px; }
+.legend span{ display:flex; align-items:center; gap:8px; }
+.legend i{ width:11px; height:11px; border-radius:3px; display:block; }
+.i-client{ background:var(--amber); } .i-team{ background:var(--accent); } .i-app{ background:var(--ink-3); }
+
+/* swimlane */
+.lanes{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:0 14px; position:relative; }
+.lanehead{ position:sticky; top:0; z-index:2; background:var(--bg); padding:10px 0 12px;
+  font-size:12.5px; font-weight:700; letter-spacing:.03em; color:var(--ink-3); text-align:center;
+  border-bottom:1px solid var(--line); margin-bottom:18px; }
+.step{ grid-column:var(--col); margin-bottom:14px; position:relative; }
+.box{ background:var(--surface); border:1px solid var(--line); border-radius:var(--r-md); padding:14px 16px; }
+.box.client{ border-color:oklch(88% 0.05 70); background:var(--amber-soft); }
+.box.team{ border-color:oklch(86% 0.05 277); background:var(--accent-soft); }
+.box.gate{ border-width:2px; border-color:var(--accent); background:var(--surface); }
+.n{ font-size:11px; font-weight:700; color:var(--ink-3); letter-spacing:.04em; margin-bottom:5px; }
+.box h3{ font-size:15px; font-weight:600; margin-bottom:3px; line-height:1.35; }
+.box p{ font-size:13px; color:var(--ink-2); text-wrap:pretty; }
+.box .time{ font-size:11.5px; color:var(--ink-3); margin-top:7px; }
+.gatetag{ display:inline-block; font-size:10px; font-weight:700; letter-spacing:.05em; color:var(--accent-deep);
+  background:var(--accent-soft); border-radius:999px; padding:2px 8px; margin-bottom:6px; }
+
+/* the connector spine */
+.spine{ grid-column:1/-1; height:16px; position:relative; margin:-8px 0; }
+.spine::before{ content:''; position:absolute; left:50%; top:0; bottom:0; width:2px; background:var(--line-2); transform:translateX(-50%); }
+
+/* split */
+.split{ grid-column:1/-1; display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:22px 0 14px; }
+.branch{ border:1px solid var(--line); border-radius:var(--r-md); background:var(--surface); padding:16px 18px; }
+.branch .bt{ font-size:12px; font-weight:700; letter-spacing:.03em; color:var(--accent-deep); margin-bottom:8px; }
+.branch ol{ list-style:none; counter-reset:s; }
+.branch li{ position:relative; padding:7px 0 7px 26px; font-size:13.5px; border-bottom:1px solid var(--line); }
+.branch li:last-child{ border-bottom:0; }
+.branch li::before{ counter-increment:s; content:counter(s); position:absolute; left:0; top:8px;
+  width:18px; height:18px; border-radius:50%; background:oklch(93% 0.006 280); color:var(--ink-3);
+  font-size:10.5px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+
+h2{ font-size:20px; font-weight:600; letter-spacing:-0.015em; margin:52px 0 6px; }
+h2 em{ font-family:'Instrument Serif',Georgia,serif; font-style:italic; font-weight:400; }
+.sub{ color:var(--ink-2); font-size:14.5px; margin-bottom:22px; max-width:62ch; }
+
+/* two gates callout */
+.gates{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px; }
+.gate{ border:1px solid var(--line); border-radius:var(--r-md); background:var(--surface); padding:20px 22px; }
+.gate .g{ font-size:11.5px; font-weight:700; letter-spacing:.04em; color:var(--accent-deep); margin-bottom:7px; }
+.gate h4{ font-size:17px; font-weight:600; margin-bottom:6px; }
+.gate p{ font-size:14px; color:var(--ink-2); text-wrap:pretty; }
+
+/* automatic list */
+.auto{ list-style:none; border:1px solid var(--line); border-radius:var(--r-md); background:var(--surface); overflow:hidden; }
+.auto li{ display:flex; gap:13px; align-items:baseline; padding:12px 18px; border-top:1px solid var(--line); font-size:14.5px; }
+.auto li:first-child{ border-top:0; }
+.auto .dot{ width:6px; height:6px; border-radius:50%; background:var(--ink-3); flex-shrink:0; }
+.auto b{ font-weight:600; }
+
+@media (max-width:760px){
+  .lanes{ grid-template-columns:1fr; }
+  .step{ grid-column:1 !important; }
+  .lanehead{ display:none; }
+  .box::before{ content:attr(data-who); display:block; font-size:10.5px; font-weight:700; letter-spacing:.04em; color:var(--ink-3); margin-bottom:6px; }
+  .split{ grid-template-columns:1fr; }
+  .spine{ height:10px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="mark">Design<em>ally</em></span>
+  <h1>The whole flow, <em>start to finish</em>.</h1>
+  <p class="lede">One signed deal, from the moment the client says yes to the moment the project is archived. Read the three columns as three sets of hands: what the client does, what your team does, and what the app does by itself.</p>
+
+  <div class="legend">
+    <span><i class="i-client"></i> The client</span>
+    <span><i class="i-team"></i> Your team</span>
+    <span><i class="i-app"></i> The app, automatically</span>
+  </div>
+
+  <div class="lanes">
+    <div class="lanehead">The client</div>
+    <div class="lanehead">Your team</div>
+    <div class="lanehead">The app</div>
+
+    <div class="step" style="--col:2"><div class="box team" data-who="YOUR TEAM">
+      <div class="n">1</div><h3>Deal signed — create the survey</h3>
+      <p>Type the client name, choose the package. Nothing else.</p>
+      <div class="time">1 minute</div>
+    </div></div>
+
+    <div class="step" style="--col:3"><div class="box" data-who="THE APP">
+      <div class="n">2</div><h3>Attaches the right questions</h3>
+      <p>Branding, Website, or both — the app picks the questionnaire and makes one link.</p>
+      <div class="time">instant</div>
+    </div></div>
+    <div class="spine"></div>
+
+    <div class="step" style="--col:2"><div class="box team" data-who="YOUR TEAM">
+      <div class="n">3</div><h3>Send the link</h3>
+      <p>One link to the client's main contact. No need to know who will answer.</p>
+    </div></div>
+
+    <div class="step" style="--col:1"><div class="box client" data-who="THE CLIENT">
+      <div class="n">4</div><h3>Answers, and forwards it</h3>
+      <p>Each person enters their name, role, and whether they decide. They pass the link to whoever else should have a say.</p>
+      <div class="time">about 20 minutes each</div>
+    </div></div>
+
+    <div class="step" style="--col:3"><div class="box" data-who="THE APP">
+      <div class="n">5</div><h3>Collects, and waits</h3>
+      <p>Shows "3 answers so far · last one 2 days ago". Your team does nothing during this time.</p>
+    </div></div>
+    <div class="spine"></div>
+
+    <div class="step" style="--col:3"><div class="box" data-who="THE APP">
+      <div class="n">6</div><h3>Speaks up when it goes quiet</h3>
+      <p>After 5 silent days: "4 answers in. Enough to work with, or wait a little longer?"</p>
+    </div></div>
+
+    <div class="step" style="--col:2"><div class="box gate" data-who="YOUR TEAM">
+      <span class="gatetag">DECISION 1 OF 2</span>
+      <div class="n">7</div><h3>Close and analyse</h3>
+      <p>The one judgement call in the whole flow. The app never closes a survey by itself.</p>
+      <div class="time">5 seconds</div>
+    </div></div>
+    <div class="spine"></div>
+
+    <div class="step" style="--col:3"><div class="box" data-who="THE APP">
+      <div class="n">8</div><h3>Writes the brief</h3>
+      <p>What everyone agrees on, where they conflict, what the client hasn't decided, and a kick-off deck outline.</p>
+      <div class="time">about 30 seconds</div>
+    </div></div>
+
+    <div class="step" style="--col:2"><div class="box gate" data-who="YOUR TEAM">
+      <span class="gatetag">DECISION 2 OF 2</span>
+      <div class="n">9</div><h3>Read it and confirm</h3>
+      <p>Is each conflict real? Is the ranking right? Is anything missing that you know from the meetings? Nothing reaches a client before this.</p>
+      <div class="time">15–20 minutes</div>
+    </div></div>
+    <div class="spine"></div>
+
+    <div class="step" style="--col:2"><div class="box team" data-who="YOUR TEAM">
+      <div class="n">10</div><h3>Build the deck</h3>
+      <p>Send to Claude, get a .pptx back, polish it in Canva.</p>
+      <div class="time">30–60 minutes</div>
+    </div></div>
+
+    <div class="step" style="--col:1"><div class="box client" data-who="CLIENT + TEAM">
+      <div class="n">11</div><h3>The kick-off meeting</h3>
+      <p>The conflict slides are the agenda. The client settles them in the room, with your facilitation notes in your hand.</p>
+    </div></div>
+
+    <div class="step" style="--col:2"><div class="box team" data-who="YOUR TEAM">
+      <div class="n">12</div><h3>Write down what was decided</h3>
+      <p>Two minutes after the meeting. Everything downstream reads from this.</p>
+      <div class="time">2 minutes</div>
+    </div></div>
+
+    <div class="split">
+      <div class="branch">
+        <div class="bt">IF BRANDING ONLY — done here</div>
+        <ol>
+          <li>Design work begins, with the decisions as the brief</li>
+          <li>Project archives itself 14 days after the kick-off</li>
+        </ol>
+      </div>
+      <div class="branch">
+        <div class="bt">IF WEBSITE OR BOTH — two more steps</div>
+        <ol>
+          <li>App counts the content: 18 pages × 2 languages ≈ 828 pieces</li>
+          <li>Team sends the content survey to one named coordinator</li>
+          <li>Coordinator answers who writes what, by when — 8 minutes</li>
+          <li>App produces the content readiness plan, then the build starts</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <h2>Only <em>two</em> decisions belong to your team</h2>
+  <p class="sub">Everything else is either the client's work or the app's. These two are deliberately human, and neither can be automated away.</p>
+  <div class="gates">
+    <div class="gate">
+      <div class="g">DECISION 1</div>
+      <h4>Is this enough to work with?</h4>
+      <p>Only a person knows whether four answers from the right people beat ten from the wrong ones. The app watches the silence and asks, but it never decides.</p>
+    </div>
+    <div class="gate">
+      <div class="g">DECISION 2</div>
+      <h4>Is this brief true?</h4>
+      <p>The AI can mistake two wordings of the same idea for a disagreement — especially across Thai and English. Fifteen minutes of a human reading it is what makes the output trustworthy.</p>
+    </div>
+  </div>
+
+  <h2>What happens without anyone <em>touching it</em></h2>
+  <p class="sub">The reason the daily screen is usually empty.</p>
+  <ul class="auto">
+    <li><span class="dot"></span><span>The right questionnaire is attached when the package is chosen</span></li>
+    <li><span class="dot"></span><span>Answers are collected and counted, however many arrive</span></li>
+    <li><span class="dot"></span><span>A project is raised to <b>Needs you</b> after 5 quiet days</span></li>
+    <li><span class="dot"></span><span>The brief is written — agreements, conflicts, gaps, deck outline</span></li>
+    <li><span class="dot"></span><span>Conflicts become <b>DECIDE</b> slides, placed early in the deck</span></li>
+    <li><span class="dot"></span><span>Content volume is calculated from pages × languages</span></li>
+    <li><span class="dot"></span><span>Finished projects move to the archive 14 days after the kick-off</span></li>
+  </ul>
+
+  <h2>Where you see all of this</h2>
+  <p class="sub">Two screens and one drawer. That is the entire app.</p>
+  <ul class="auto">
+    <li><span class="dot"></span><span><b>Today</b> — only what is waiting on your team. Usually two or three lines, sometimes empty.</span></li>
+    <li><span class="dot"></span><span><b>Projects</b> — every live client, their stage, who has answered, how long since. Click one to open it.</span></li>
+    <li><span class="dot"></span><span><b>Library</b> — the question templates and finished projects. Opened a few times a year.</span></li>
+  </ul>
+
+</div>
+</body>
+</html>

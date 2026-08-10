@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Designally — internal platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Noto+Sans+Thai:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOKENS — restrained: tinted neutrals + one accent under 10%.
+   The accent is reserved. It means "a person is needed here".
+   ============================================================ */
+:root{
+  /* Apple-derived. Action Blue is the only accent: "a person is needed here". */
+  --primary:#0066cc; --primary-focus:#0071e3; --primary-on-dark:#2997ff;
+  --ink:#1d1d1f; --ink-2:#333333; --ink-3:#7a7a7a; --on-dark:#ffffff;
+  --canvas:#ffffff; --bg:#f5f5f7; --surface:#ffffff; --pearl:#fafafc;
+  --tile:#272729;
+  --hairline:#e0e0e0; --divider:#f0f0f0;
+  --affirm:#248a3d; --caution:#c93400; --critical:#d70015;
+  --affirm-tint:#eef7f1; --caution-tint:#fdf1ec; --critical-tint:#fdeff0;
+  --primary-tint:#e8f1fb;
+
+  /* aliases kept so existing rules resolve */
+  --accent:var(--primary); --accent-deep:#004f9e; --accent-soft:var(--primary-tint);
+  --line:var(--divider); --line-2:var(--hairline);
+  --amber:var(--caution); --amber-soft:var(--caution-tint); --green:var(--affirm);
+
+  --r-sm:8px; --r-md:18px; --r-lg:18px;
+  --ease:cubic-bezier(0.22,1,0.36,1);
+  --z-sticky:10; --z-panel:20; --z-toast:30;
+
+  --font: "Inter", system-ui, -apple-system, "SF Pro Text", "Noto Sans Thai", sans-serif;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+html{ -webkit-text-size-adjust:100%; }
+body{
+  font-family:var(--font);
+  background:var(--bg); color:var(--ink); font-size:17px; line-height:1.6;
+  letter-spacing:-0.374px; -webkit-font-smoothing:antialiased;
+}
+/* Thai stacks four levels; 1.6 minimum on anything a client reads */
+.survey, .sheet-body, .say, .greet-sub, .th, .qth, .desc, .intro{ line-height:1.6; }
+button{ font-family:inherit; }
+:focus-visible{ outline:2px solid var(--primary-focus); outline-offset:2px; }
+.wordmark{ font-weight:700; font-size:17px; letter-spacing:-0.01em; white-space:nowrap; }
+.wordmark{ letter-spacing:-0.374px; } .wordmark em{ font-style:normal; font-weight:400; color:inherit; }
+
+/* ---------- prototype bar (demo scaffolding) ---------- */
+.protobar{
+  background:var(--ink); color:oklch(93% 0.008 280);
+  display:flex; align-items:center; justify-content:space-between; gap:14px;
+  padding:9px 20px; font-size:12.5px; flex-wrap:wrap;
+}
+.protobar .who{ opacity:.8; }
+.protobar .ctrls{ display:flex; align-items:center; gap:14px; }
+.segmented{ display:flex; background:oklch(31% 0.022 280); border-radius:999px; padding:3px; }
+.segmented button{
+  font-size:12.5px; font-weight:500; border:0; cursor:pointer; background:transparent;
+  color:oklch(87% 0.008 280); padding:5px 15px; border-radius:999px;
+  transition:background .28s var(--ease), color .28s var(--ease);
+}
+.segmented button[aria-pressed="true"]{ background:var(--surface); color:var(--ink); }
+.tglp{ display:flex; align-items:center; gap:7px; cursor:pointer; user-select:none; font-size:12.5px; }
+.tglp input{ accent-color:oklch(70% 0.14 277); }
+
+/* ---------- shell ---------- */
+.app{ display:none; } .app.on{ display:block; }
+.topbar{
+  position:sticky; top:0; z-index:var(--z-sticky);
+  background:rgba(245,245,247,.8); backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:1px solid var(--line);
+}
+.topbar .inner{ max-width:880px; margin:0 auto; padding:14px 28px; display:flex; align-items:center; gap:20px; }
+.navtabs{ display:flex; gap:2px; }
+.navtabs button{
+  font-size:14px; letter-spacing:-0.224px; font-weight:600; border:0; cursor:pointer; background:transparent;
+  color:var(--ink-3); padding:7px 14px; border-radius:var(--r-sm);
+  transition:color .2s var(--ease), background .2s var(--ease);
+}
+.navtabs button:hover{ color:var(--ink); }
+.navtabs button[aria-pressed="true"]{ color:var(--ink); background:var(--divider); }
+.navtabs .badge{ letter-spacing:0;
+  display:inline-block; min-width:18px; margin-left:6px; padding:0 5px;
+  font-size:11.5px; font-weight:700; line-height:18px; text-align:center;
+  border-radius:999px; background:var(--accent); color:#fff; vertical-align:1px;
+}
+.navtabs button[aria-pressed="true"] .badge{ background:var(--accent); }
+
+.btn{
+  font-family:inherit; font-size:17px; font-weight:400; letter-spacing:-0.374px;
+  cursor:pointer; border:1px solid transparent; border-radius:9999px;
+  padding:11px 22px; white-space:nowrap;
+  transition:background .2s var(--ease), border-color .2s var(--ease), transform .16s var(--ease), color .2s;
+}
+.btn:active{ transform:scale(.95); }
+.btn-primary{ background:var(--accent); color:#fff; }
+.btn-primary:hover{ background:var(--accent-deep); }
+.btn-ink{ background:var(--ink); color:#fff; }
+.btn-ink:hover{ background:oklch(30% 0.03 280); }
+.btn-quiet{ background:transparent; border-color:var(--primary); color:var(--primary); }
+.btn-quiet:hover{ background:var(--primary-tint); }
+.btn-sm{ font-size:14px; padding:9px 18px; }
+.btn[disabled]{ opacity:.5; cursor:default; }
+
+.page{ max-width:880px; margin:0 auto; padding:44px 28px 44px; }
+.view{ display:none; } .view.on{ display:block; animation:fade .35s var(--ease); }
+
+.greet{
+  font-size:clamp(1.75rem,4.2vw,2.5rem); line-height:1.10; font-weight:600;
+  letter-spacing:-0.03em; text-wrap:balance; margin-bottom:10px;
+}
+.greet em{ font-style:normal; font-weight:600; color:inherit; }
+.greet-sub{ color:var(--ink-2); font-size:17px; line-height:1.6; max-width:60ch; margin-bottom:48px; text-wrap:pretty; }
+
+.sec{ margin-bottom:14px; display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; }
+.sec h2{ font-size:15px; font-weight:600; letter-spacing:-0.005em; }
+.sec .count{ font-size:13px; color:var(--ink-3); }
+.sec .hint{ margin-left:auto; font-size:12.5px; color:var(--ink-3); }
+
+/* ============ P0 · needs you ============ */
+.worklist{ background:var(--canvas); border:1px solid var(--hairline); border-radius:18px; overflow:hidden; margin-bottom:48px; }
+.work{ display:flex; gap:24px; align-items:flex-start; padding:24px; border-top:1px solid var(--divider); animation:rise .5s var(--ease) backwards; }
+.work:first-child{ border-top:0; }
+.work .body{ flex:1; min-width:0; }
+.work .name{ font-size:21px; font-weight:600; letter-spacing:0.231px; line-height:1.19; display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+.work .name .dot{ width:8px; height:8px; border-radius:50%; background:var(--primary); flex-shrink:0; }
+.work .say{ font-size:17px; line-height:1.6; color:var(--ink-2); text-wrap:pretty; max-width:60ch; }
+.work .say b{ color:inherit; font-weight:600; }
+.work .when{ font-size:14px; color:var(--ink-3); margin-top:8px; letter-spacing:-0.224px; }
+.work .act{ flex-shrink:0; padding-top:2px; }
+@media (max-width:660px){ .work{ flex-direction:column; gap:14px; padding:22px 20px; } .work .act{ padding-top:0; } }
+
+/* ============ P1 · with the client ============ */
+.waitlist{ margin-bottom:56px; }
+.wait{ display:flex; align-items:center; gap:16px; padding:16px 4px; border-bottom:1px solid var(--hairline); }
+.wait:last-child{ border-bottom:0; }
+.wait .nm{ font-size:17px; font-weight:600; letter-spacing:-0.374px; }
+.wait .meta{ font-size:14px; color:var(--ink-3); letter-spacing:-0.224px; }
+.wait .side{ margin-left:auto; display:flex; align-items:center; gap:6px; flex-shrink:0; }
+.wait .act{
+  font-size:13px; font-weight:600; color:var(--ink-3); background:transparent; border:0;
+  cursor:pointer; padding:5px 10px; border-radius:var(--r-sm); white-space:nowrap;
+  transition:color .18s, background .18s;
+}
+.wait .act:hover{ color:var(--primary); background:var(--primary-tint); }
+@media (max-width:620px){ .wait{ flex-wrap:wrap; gap:6px 14px; } .wait .side{ margin-left:auto; } }
+
+.calm{ background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg); padding:44px 30px; text-align:center; margin-bottom:52px; }
+.calm p{ font-size:17px; color:var(--ink-2); }
+.calm p em{ font-family:'Instrument Serif', Georgia, serif; font-style:italic; color:var(--ink); }
+
+/* ============ occasional destinations ============ */
+.elsewhere{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:8px;
+  padding-top:28px; border-top:1px solid var(--hairline);
+}
+.elsewhere button{
+  display:block; text-align:left; background:transparent; border:0; cursor:pointer;
+  padding:14px 12px; border-radius:8px; transition:background .18s;
+}
+.elsewhere button:hover{ background:var(--canvas); }
+.elsewhere .et{ display:block; font-size:17px; font-weight:600; color:var(--primary);
+  letter-spacing:-0.374px; margin-bottom:3px; }
+.elsewhere .es{ display:block; font-size:14px; color:var(--ink-3); letter-spacing:-0.224px; line-height:1.43; }
+
+/* ============ all projects — table ============ */
+.ptable{ width:100%; border-collapse:collapse; margin-bottom:48px; }
+.ptable thead th{
+  text-align:left; font-size:14px; font-weight:600; color:var(--ink-3);
+  letter-spacing:-0.224px; padding:0 12px 10px; border-bottom:1px solid var(--hairline);
+  white-space:nowrap;
+}
+.ptable thead th:first-child{ padding-left:12px; }
+.ptable tbody tr{ border-bottom:1px solid var(--hairline); cursor:pointer; transition:background .18s; }
+.ptable tbody tr:hover{ background:var(--canvas); }
+.ptable td{ padding:18px 12px; vertical-align:top; }
+.ptable .c-name{ font-size:17px; font-weight:600; letter-spacing:-0.374px; display:flex; align-items:center; gap:9px; }
+.ptable .pdot{ width:8px; height:8px; border-radius:50%; background:var(--primary); flex-shrink:0; }
+.ptable .c-sub{ font-size:14px; color:var(--ink-3); letter-spacing:-0.224px; margin-top:2px; }
+.ptable .c-main{ font-size:14px; color:var(--ink-2); letter-spacing:-0.224px; }
+.ptable .c-stage{ width:170px; }
+.ptable .stage{ display:flex; gap:3px; margin-bottom:6px; }
+.ptable .stage i{ height:4px; flex:1; border-radius:2px; background:var(--hairline); }
+.ptable .stage i.on{ background:var(--ink-2); }
+.ptable .stage i.now{ background:var(--primary); }
+.ptable .c-when{ font-size:14px; color:var(--ink-3); letter-spacing:-0.224px; }
+
+@media (max-width:820px){
+  .ptable thead{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+  .ptable tbody tr{ display:block; padding:18px 12px; }
+  .ptable td{ display:block; padding:0; }
+  .ptable td + td{ margin-top:8px; }
+  .ptable td[data-label]::before{
+    content:attr(data-label); display:block; font-size:12px; font-weight:600;
+    color:var(--ink-3); letter-spacing:-0.12px; margin-bottom:2px;
+  }
+  .ptable .c-stage{ width:auto; max-width:200px; }
+}
+
+/* ---- project detail ---- */
+.pd-head{ margin-bottom:26px; }
+.pd-head h1{ font-size:clamp(1.5rem,3.6vw,2rem); font-weight:600; letter-spacing:-0.02em; margin-bottom:3px; }
+.pd-head .pkg{ font-size:14px; color:var(--ink-3); }
+.pd-now{ background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg); padding:22px 24px; margin-bottom:30px; }
+.pd-now .lab{ font-size:11.5px; font-weight:700; letter-spacing:.05em; color:var(--accent-deep); margin-bottom:8px; }
+.pd-now p{ font-size:16px; text-wrap:pretty; margin-bottom:14px; }
+.pd-now p b{ font-weight:600; }
+.pd-sec{ margin-bottom:30px; }
+.pd-sec > h3{ font-size:13px; font-weight:600; color:var(--ink-3); margin-bottom:12px; }
+.tl{ list-style:none; position:relative; padding-left:22px; }
+.tl::before{ content:''; position:absolute; left:4px; top:8px; bottom:8px; width:1px; background:var(--line-2); }
+.tl li{ position:relative; padding:8px 0; font-size:14.5px; display:flex; gap:12px; align-items:baseline; }
+.tl li::before{ content:''; position:absolute; left:-22px; top:16px; width:9px; height:9px; border-radius:50%;
+  background:var(--line-2); border:2px solid var(--bg); }
+.tl li.done::before{ background:var(--ink-2); }
+.tl li.now::before{ background:var(--accent); }
+.tl li.next{ color:var(--ink-3); }
+.tl .when{ margin-left:auto; font-size:12.5px; color:var(--ink-3); white-space:nowrap; padding-left:14px; }
+.pd-people{ display:flex; gap:9px; flex-wrap:wrap; }
+.pd-dec{ border:1px solid var(--line); border-radius:18px; background:var(--surface); overflow:hidden; }
+.pd-dec .row{ padding:14px 18px; border-top:1px solid var(--line); }
+.pd-dec .row:first-child{ border-top:0; }
+.pd-dec .q{ font-size:12.5px; color:var(--ink-3); margin-bottom:2px; display:block; }
+.pd-dec .a{ font-size:15px; font-weight:600; }
+.pd-dec .note{ font-size:13.5px; color:var(--ink-2); margin-top:4px; }
+.pd-docs{ display:flex; gap:9px; flex-wrap:wrap; }
+.doc{ border:1px solid var(--line); border-radius:18px; background:var(--surface); padding:12px 16px;
+  font-size:14px; font-weight:600; cursor:pointer; transition:border-color .18s; }
+.doc:hover{ border-color:var(--accent); color:var(--accent-deep); }
+.doc small{ display:block; font-size:12px; color:var(--ink-3); font-weight:400; margin-top:1px; }
+.doc[disabled]{ opacity:.5; cursor:default; } .doc[disabled]:hover{ border-color:var(--line); color:var(--ink); }
+@media (max-width:700px){ .prow{ flex-direction:column; gap:14px; } .prow .right{ width:100%; } }
+
+/* stage meter: five steps, current one named */
+.stage{ display:flex; gap:3px; margin-bottom:7px; }
+.stage i{ height:4px; flex:1; border-radius:2px; background:var(--line-2); }
+.stage i.on{ background:var(--ink-2); }
+.stage i.now{ background:var(--accent); }
+.stage-n{ font-size:14px; font-weight:600; color:var(--ink-3); letter-spacing:-0.224px; }
+.stage-n .of{ font-weight:400; color:inherit; }
+
+/* ============ panels ============ */
+dialog{ border:0; padding:0; background:transparent; max-width:none; max-height:none; width:100%; height:100%; }
+dialog::backdrop{ background:rgba(0,0,0,.32); }
+.sheet{ background:var(--bg); width:min(760px,100%); margin:0 auto; min-height:100%; animation:slideup .42s var(--ease); }
+.sheet.narrow{ width:min(560px,100%); }
+.sheet-top{
+  position:sticky; top:0; z-index:2; background:rgba(245,245,247,.8); backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:1px solid var(--line); display:flex; align-items:center; gap:14px; padding:15px 28px;
+}
+.sheet-top .t{ font-size:15.5px; font-weight:600; }
+.sheet-top .x{
+  margin-left:auto; font-size:14px; color:var(--ink-2); background:transparent;
+  border:1px solid var(--line-2); border-radius:999px; padding:6px 16px; cursor:pointer; transition:border-color .18s;
+}
+.sheet-top .x:hover{ border-color:var(--ink); }
+.sheet-body{ padding:34px 28px 72px; }
+
+@keyframes rise{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:none;} }
+@keyframes slideup{ from{opacity:0; transform:translateY(18px);} to{opacity:1; transform:none;} }
+@keyframes fade{ from{opacity:0;} to{opacity:1;} }
+@media (prefers-reduced-motion: reduce){ *,*::before,*::after{ animation-duration:.01ms !important; transition-duration:.01ms !important; } }
+
+/* brief */
+.brief h1{ font-size:clamp(1.5rem,3.6vw,2rem); font-weight:600; letter-spacing:-0.02em; margin-bottom:4px; }
+.brief .lede{ color:var(--ink-2); font-size:15px; margin-bottom:30px; }
+.bsec{ margin-bottom:34px; }
+.bsec > h3{ font-size:13.5px; font-weight:600; color:var(--ink-3); margin-bottom:12px; }
+.people{ display:flex; gap:9px; flex-wrap:wrap; }
+.person{ border:1px solid var(--line); border-radius:18px; background:var(--surface); padding:11px 15px; font-size:13.5px; line-height:1.45; }
+.person b{ display:block; font-size:14.5px; }
+.person .role{ display:block; color:var(--ink-3); }
+.person .lead{ display:block; color:var(--accent-deep); font-weight:600; font-size:12.5px; margin-top:2px; }
+.agree{ list-style:none; }
+.agree li{ display:flex; gap:12px; align-items:baseline; padding:10px 0; border-bottom:1px solid var(--line); font-size:15px; }
+.agree li:last-child{ border-bottom:0; }
+.agree .ck{ color:var(--green); font-weight:700; flex-shrink:0; }
+.agree .n{ margin-left:auto; font-size:12.5px; color:var(--ink-3); white-space:nowrap; }
+.conflict{ border:1px solid var(--line); border-radius:18px; background:var(--surface); padding:19px 21px; margin-bottom:12px; }
+.conflict .h{ display:flex; align-items:center; gap:10px; margin-bottom:13px; flex-wrap:wrap; }
+.conflict .h b{ font-size:15.5px; }
+.sev{ font-size:10.5px; font-weight:700; letter-spacing:.04em; border-radius:999px; padding:3px 9px; }
+.sev.hi{ background:oklch(95% 0.032 25); color:oklch(48% 0.17 25); }
+.sev.md{ background:var(--amber-soft); color:var(--amber); }
+.sides{ display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr)); gap:10px; margin-bottom:11px; }
+.side{ background:var(--bg); border-radius:var(--r-sm); padding:12px 14px; font-size:14px; }
+.side b{ display:block; font-size:13px; color:inherit; font-weight:600; margin-bottom:4px; }
+.conflict .plan{ font-size:13.5px; color:var(--accent-deep); }
+.insights{ counter-reset:i; list-style:none; }
+.insights li{ position:relative; padding:11px 0 11px 36px; border-bottom:1px solid var(--line); font-size:15px; text-wrap:pretty; }
+.insights li:last-child{ border-bottom:0; }
+.insights li::before{
+  counter-increment:i; content:counter(i); position:absolute; left:0; top:12px;
+  width:24px; height:24px; border-radius:50%; background:var(--accent-soft); color:var(--accent-deep);
+  font-size:12.5px; font-weight:600; display:flex; align-items:center; justify-content:center;
+}
+.slides{ list-style:none; border:1px solid var(--line); border-radius:18px; background:var(--surface); overflow:hidden; }
+.slides li{ display:flex; gap:14px; align-items:baseline; padding:11px 18px; border-top:1px solid var(--line); font-size:14.5px; }
+.slides li:first-child{ border-top:0; }
+.slides .sn{ color:var(--ink-3); font-size:12.5px; width:16px; flex-shrink:0; }
+.slides .need{ margin-left:auto; font-size:10.5px; font-weight:700; letter-spacing:.04em; color:var(--accent-deep); background:var(--accent-soft); border-radius:999px; padding:3px 9px; white-space:nowrap; }
+.internal{ background:var(--amber-soft); border-radius:18px; padding:17px 20px; font-size:14px; }
+.internal .lock{ font-size:11.5px; font-weight:700; letter-spacing:.04em; color:var(--amber); margin-bottom:7px; }
+.internal b{ color:inherit; font-weight:600; }
+.internal p{ margin-bottom:7px; text-wrap:pretty; } .internal p:last-child{ margin-bottom:0; }
+.briefbar{
+  position:sticky; bottom:0; background:rgba(245,245,247,.8); backdrop-filter:saturate(180%) blur(20px);
+  border-top:1px solid var(--line); padding:14px 28px; margin:34px -28px -72px;
+  display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+}
+.briefbar .st{ font-size:13.5px; font-weight:600; color:var(--amber); }
+.briefbar .st.ok{ color:var(--green); }
+.briefbar .grp{ margin-left:auto; display:flex; gap:8px; }
+
+/* library */
+.libtabs{ display:flex; gap:4px; background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:4px; width:max-content; margin-bottom:26px; }
+.libtabs button{ font-size:13.5px; font-weight:600; border:0; cursor:pointer; background:transparent; color:var(--ink-2); padding:7px 17px; border-radius:999px; transition:background .2s var(--ease), color .2s var(--ease); }
+.libtabs button[aria-pressed="true"]{ background:var(--ink); color:#fff; }
+.tpair{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin-bottom:22px; }
+.tpl{ border:1px solid var(--line); border-radius:18px; background:var(--surface); padding:18px 20px; }
+.tpl[aria-current="true"]{ border-color:var(--accent); }
+.tpl h4{ font-size:16px; font-weight:600; margin-bottom:2px; }
+.tpl .m{ font-size:12.5px; color:var(--ink-3); margin-bottom:13px; }
+.vrule{ background:var(--amber-soft); border-radius:var(--r-sm); padding:11px 15px; font-size:13.5px; margin-bottom:18px; text-wrap:pretty; }
+.qwrap{ border:1px solid var(--line); border-radius:18px; background:var(--surface); padding:6px 20px 14px; }
+.q{ display:flex; gap:13px; align-items:flex-start; padding:13px 2px; border-top:1px solid var(--line); }
+.q:first-child{ border-top:0; }
+.q .num{ font-size:12.5px; font-weight:600; color:var(--ink-3); width:22px; flex-shrink:0; padding-top:2px; }
+.q .txt{ flex:1; min-width:0; font-size:14.5px; }
+.q .txt .th{ display:block; font-size:12.5px; color:var(--ink-3); }
+.q .txt .cfg{ display:block; font-size:12.5px; color:var(--accent-deep); margin-top:2px; }
+.qtype{ font-size:11px; font-weight:600; color:var(--ink-3); border:1px solid var(--line-2); border-radius:999px; padding:2px 9px; white-space:nowrap; }
+.qlink{ font-size:12.5px; font-weight:600; color:var(--ink-3); background:transparent; border:0; cursor:pointer; transition:color .18s; }
+.qlink:hover{ color:var(--accent); }
+.past{ list-style:none; }
+.past li{ display:flex; align-items:center; gap:14px; padding:14px 2px; border-bottom:1px solid var(--line); }
+.past li:last-child{ border-bottom:0; }
+.past .n{ font-size:15px; font-weight:600; }
+.past .d{ font-size:13px; color:var(--ink-3); }
+.past .o{ margin-left:auto; font-size:13px; font-weight:600; color:var(--ink-3); background:transparent; border:0; cursor:pointer; }
+.past .o:hover{ color:var(--accent); }
+
+/* roadmap */
+.rmlist{ display:grid; gap:11px; }
+.rm{ border:1px solid var(--line); border-radius:18px; background:var(--surface); padding:17px 20px; }
+.rm.live{ border-color:oklch(86% 0.05 277); }
+.rm.out{ opacity:.62; }
+.rmtop{ display:flex; align-items:center; gap:10px; margin-bottom:7px; }
+.rmtop b{ font-size:16px; font-weight:600; }
+.rmtag{ font-size:10px; font-weight:700; letter-spacing:.05em; border-radius:999px; padding:3px 9px;
+  background:oklch(93.5% 0.006 280); color:var(--ink-3); }
+.rmtag.on{ background:var(--accent-soft); color:var(--accent-deep); }
+.rm p{ font-size:14px; color:var(--ink-2); text-wrap:pretty; }
+.rm .where{ font-size:13px; color:var(--ink-3); margin-top:8px; padding-top:8px; border-top:1px solid var(--line); }
+.rm .where b{ color:var(--ink-2); font-weight:600; }
+
+/* forms */
+label.f{ display:block; font-size:13.5px; font-weight:600; margin-bottom:7px; }
+label.f span{ font-weight:400; color:var(--ink-3); }
+input[type=text]{
+  width:100%; font-family:inherit; font-size:17px; letter-spacing:-0.374px; color:var(--ink);
+  background:var(--canvas); border:1px solid var(--hairline); border-radius:9999px;
+  padding:12px 20px; height:44px;
+}
+textarea{
+  width:100%; font-family:inherit; font-size:17px; line-height:1.6; color:var(--ink);
+  background:var(--canvas); border:1px solid var(--hairline); border-radius:18px;
+  padding:14px 18px; min-height:96px; resize:vertical;
+}
+input:focus, textarea:focus{ outline:2px solid var(--primary-focus); outline-offset:2px; border-color:var(--hairline); }
+::placeholder{ color:var(--ink-3); }
+.field{ margin-bottom:22px; }
+.note{ font-size:13px; color:var(--ink-2); background:var(--accent-soft); border-radius:var(--r-sm); padding:12px 15px; text-wrap:pretty; }
+.opts{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:8px; }
+.opt{
+  border:1px solid var(--hairline); border-radius:9999px; background:var(--canvas);
+  padding:12px 18px; font-size:14px; font-weight:400; letter-spacing:-0.224px;
+  cursor:pointer; text-align:left; transition:border-color .18s, box-shadow .18s;
+}
+.opt small{ display:block; font-size:11.5px; color:var(--ink-3); font-weight:400; margin-top:1px; }
+.opt[aria-pressed="true"]{ border:2px solid var(--primary-focus); padding:11px 17px; }
+.choicerow{ display:flex; gap:7px; margin-bottom:7px; }
+.choicerow input{ flex:1; }
+.xbtn{ font-size:13px; color:var(--ink-3); background:transparent; border:1px solid var(--line-2); border-radius:var(--r-sm); padding:0 12px; cursor:pointer; }
+.xbtn:hover{ border-color:var(--ink); color:var(--ink); }
+.linkbox{
+  display:flex; gap:10px; align-items:center; background:var(--surface); border:1px solid var(--line);
+  border-radius:var(--r-sm); padding:11px 14px; font-size:13.5px;
+  font-family:ui-monospace, Menlo, monospace; overflow-wrap:anywhere;
+}
+pre.handoff{
+  font-family:ui-monospace, Menlo, monospace; font-size:12.5px; line-height:1.6;
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--r-sm);
+  padding:16px 18px; white-space:pre-wrap; margin-bottom:16px; color:var(--ink);
+}
+
+/* ============ client survey ============ */
+.survey{ display:none; } .survey.on{ display:block; }
+.bar{ position:sticky; top:0; z-index:var(--z-sticky); height:3px; background:var(--line); }
+.bar i{ display:block; height:100%; width:0; background:var(--accent); transition:width .55s var(--ease); }
+.sform{ max-width:660px; margin:0 auto; padding:44px 26px 90px; }
+.sform .head{ display:flex; align-items:baseline; gap:11px; margin-bottom:38px; }
+.sform .head .proj{ font-size:12.5px; color:var(--ink-3); border-left:1px solid var(--line-2); padding-left:11px; }
+.step{ display:none; } .step.on{ display:block; animation:rise .45s var(--ease); }
+.step h1{ font-size:clamp(1.9rem,5vw,2.7rem); line-height:1.14; font-weight:600; letter-spacing:-0.024em; text-wrap:balance; margin-bottom:10px; }
+.step h1 em{ font-style:normal; font-weight:600; letter-spacing:0; }
+.step h2{ font-size:clamp(1.4rem,3.6vw,1.85rem); font-weight:600; letter-spacing:-0.02em; line-height:1.22; text-wrap:balance; }
+.stepno{ font-size:13px; font-weight:600; color:var(--accent-deep); margin-bottom:7px; }
+.th{ color:var(--ink-2); font-size:15px; }
+.intro{ font-size:16.5px; max-width:58ch; margin-bottom:8px; text-wrap:pretty; }
+.facts{ display:flex; gap:26px; flex-wrap:wrap; margin:30px 0 34px; font-size:13.5px; color:var(--ink-3); }
+.facts b{ display:block; color:var(--ink); font-size:15px; font-weight:600; }
+.desc{ color:var(--ink-2); margin:8px 0 30px; max-width:60ch; text-wrap:pretty; }
+.sq{ margin-bottom:28px; }
+.sq .qq{ display:block; font-weight:600; font-size:15.5px; line-height:1.45; margin-bottom:2px; }
+.sq .qth{ display:block; color:var(--ink-3); font-size:13.5px; margin-bottom:9px; }
+.sq .qn{ color:inherit; font-weight:600; margin-right:6px; }
+.pick{ display:grid; gap:9px; }
+.pickone{ display:flex; gap:11px; align-items:flex-start; cursor:pointer; background:var(--surface); border:1px solid var(--line-2); border-radius:18px; padding:13px 15px; transition:border-color .18s, background .18s; }
+.pickone input{ margin-top:5px; accent-color:var(--accent); }
+.pickone.sel{ border-color:var(--accent); background:var(--accent-soft); }
+.pickone b{ display:block; font-size:15px; font-weight:600; }
+.pickone span{ font-size:13.5px; color:var(--ink-2); }
+.scale{ border-top:1px solid var(--line); padding:17px 0 13px; }
+.scale:last-of-type{ border-bottom:1px solid var(--line); margin-bottom:6px; }
+.poles{ display:flex; justify-content:space-between; gap:12px; font-size:14.5px; font-weight:600; margin-bottom:11px; }
+.poles small{ display:block; font-size:12px; color:var(--ink-3); font-weight:400; }
+.poles > span:last-child{ text-align:right; }
+.pts{ display:flex; justify-content:space-between; align-items:center; max-width:400px; margin:0 auto; }
+.pts button{ border-radius:50%; cursor:pointer; border:1.5px solid var(--line-2); background:var(--surface); font-size:0; transition:transform .18s var(--ease), border-color .18s, background .18s; width:32px; height:32px; }
+.pts button:nth-child(3){ width:24px; height:24px; }
+.pts button:nth-child(2), .pts button:nth-child(4){ width:28px; height:28px; }
+.pts button:hover{ border-color:var(--accent); }
+.pts button[aria-pressed="true"]{ background:var(--accent); border-color:var(--accent); transform:scale(1.14); }
+.chips{ display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.chip{ font-size:14px; font-weight:500; cursor:pointer; background:var(--surface); color:var(--ink); border:1px solid var(--line-2); border-radius:999px; padding:7px 14px; transition:background .18s, border-color .18s, color .18s; }
+.chip:hover{ border-color:var(--accent); }
+.chip[aria-pressed="true"]{ border:2px solid var(--primary-focus); color:var(--ink); }
+.chipn{ margin-top:11px; font-size:13.5px; color:var(--ink-3); }
+.chipn b{ color:var(--accent-deep); }
+.nav{ display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:42px; }
+.nav .of{ font-size:13px; color:var(--ink-3); }
+.done-mark{ font-size:52px; line-height:1; margin-bottom:20px; }
+
+.toast{
+  position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(16px);
+  background:var(--ink); color:#fff; font-size:13.5px; border-radius:999px; padding:10px 21px;
+  opacity:0; pointer-events:none; z-index:var(--z-toast);
+  transition:opacity .3s var(--ease), transform .3s var(--ease); max-width:90vw; text-align:center;
+}
+.toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+@media (max-width:520px){
+  .topbar .inner{ padding:12px 20px; gap:12px; flex-wrap:wrap; }
+  .navtabs button{ padding:6px 11px; font-size:14px; }
+  .page{ padding:32px 20px 40px; }
+}
+</style>
+</head>
+<body>
+
+<div class="protobar">
+  <span class="who">Designally platform · prototype v2.3 · ต้นแบบ</span>
+  <div class="ctrls">
+    <div class="segmented" role="group" aria-label="Switch view">
+      <button id="sw-team" aria-pressed="true" onclick="setView('team')">Team</button>
+      <button id="sw-client" aria-pressed="false" onclick="setView('client')">Client</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ TEAM APP ═══════════════ -->
+<div class="app on" id="teamApp">
+  <header class="topbar">
+    <div class="inner">
+      <span class="wordmark">Design<em>ally</em></span>
+      <span class="today" id="topDate">Friday, 7 August</span>
+      <button class="btn btn-primary" style="margin-left:auto;" onclick="dNew.showModal()">New survey</button>
+    </div>
+  </header>
+
+  <main class="page">
+    <!-- ─────────── TODAY ─────────── -->
+    <section class="view on" id="v-today">
+      <h1 class="greet" id="greet"></h1>
+      <p class="greet-sub" id="greetSub"></p>
+
+      <div class="sec"><h2>Needs you</h2><span class="count" id="needN"></span></div>
+      <div id="needWrap"></div>
+
+      <div class="sec">
+        <h2>All projects</h2><span class="count" id="projN"></span>
+        <span class="hint">click any project to open it</span>
+      </div>
+      <table class="ptable">
+        <thead><tr>
+          <th scope="col">Project</th>
+          <th scope="col">Stage</th>
+          <th scope="col">Answers</th>
+          <th scope="col">Latest</th>
+        </tr></thead>
+        <tbody id="projWrap"></tbody>
+      </table>
+
+      <div class="elsewhere">
+        <button onclick="dTpl.showModal()">
+          <span class="et">Question templates</span>
+          <span class="es">Branding 26 · Website 15 · edit the questions clients answer</span>
+        </button>
+        <button onclick="dPast.showModal()">
+          <span class="et">Past projects</span>
+          <span class="es" id="pastCount">4 archived · briefs and decks stay searchable</span>
+        </button>
+        <button onclick="dRoad.showModal()">
+          <span class="et">What's coming</span>
+          <span class="es">2 planned modules · Leads &amp; Clients, Proposals &amp; Quotes</span>
+        </button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ═══════════════ CLIENT SURVEY ═══════════════ -->
+<div class="survey" id="clientView">
+  <div class="bar"><i id="progBar"></i></div>
+  <div class="sform">
+    <div class="head">
+      <span class="wordmark">Design<em>ally</em></span>
+      <span class="proj">F.W. Dentogenesis · Branding</span>
+    </div>
+
+    <section class="step on" data-s="0">
+      <h1>Let's shape your brand, <em>together</em>.</h1>
+      <p class="th" style="margin-bottom:26px;">มาร่วมกันสร้างตัวตนของแบรนด์คุณ — คำตอบของคุณคือรากฐานของงานออกแบบ</p>
+      <p class="intro">This questionnaire helps our team understand your brand deeply before we begin designing. There are no wrong answers — please answer honestly, in your own words.</p>
+      <p class="th" style="max-width:58ch;">แบบสอบถามนี้ช่วยให้ทีมเข้าใจแบรนด์ของคุณก่อนเริ่มออกแบบ ไม่มีคำตอบที่ผิด</p>
+      <div class="facts">
+        <div><b>≈ 20 minutes</b> เวลาโดยประมาณ</div>
+        <div><b>26 questions</b> จำนวนคำถาม</div>
+        <div><b>Share freely</b> ส่งต่อให้เพื่อนร่วมงานได้</div>
+      </div>
+      <button class="btn btn-ink" onclick="go(1)">Start · เริ่มทำแบบสอบถาม</button>
+    </section>
+
+    <section class="step" data-s="1">
+      <p class="stepno">Step 1 of 5 — About you</p>
+      <h2>First, tell us who you are</h2>
+      <p class="desc">Anyone on your team can answer this — please pass the link to whoever should have a say. · ส่งลิงก์นี้ต่อให้ผู้ที่ควรมีส่วนร่วมได้เลย</p>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px; margin-bottom:26px;">
+        <div><label class="f" for="f-name">Your name <span>· ชื่อของคุณ</span></label><input type="text" id="f-name" placeholder="e.g. Khun Napat"></div>
+        <div><label class="f" for="f-role">Your role <span>· ตำแหน่ง</span></label><input type="text" id="f-role" placeholder="e.g. Marketing Director"></div>
+      </div>
+      <div class="sq">
+        <span class="qq">Are you a final decision maker for this project?</span>
+        <span class="qth">คุณเป็นผู้ตัดสินใจขั้นสุดท้ายของโปรเจกต์นี้หรือไม่?</span>
+        <div class="pick" id="dm">
+          <label class="pickone"><input type="radio" name="dm"><span><b>Yes — final decisions come to me</b><span>ใช่ · Your answers guide us when opinions differ.</span></span></label>
+          <label class="pickone"><input type="radio" name="dm"><span><b>Shared — we decide as a group</b><span>ตัดสินใจร่วมกัน</span></span></label>
+          <label class="pickone"><input type="radio" name="dm"><span><b>No — I contribute my perspective</b><span>ให้มุมมองประกอบ · Your input still matters.</span></span></label>
+        </div>
+      </div>
+      <div class="nav"><button class="btn btn-quiet" onclick="go(0)">Back</button><span class="of">1 / 5</span><button class="btn btn-ink" onclick="go(2)">Continue</button></div>
+    </section>
+
+    <section class="step" data-s="2">
+      <p class="stepno">Step 2 of 5 — Brand discovery</p>
+      <h2>The story of your brand</h2>
+      <p class="desc">Where you come from, and what you offer. Short, honest answers are perfect. · เล่าให้เราฟังว่าแบรนด์ของคุณมีที่มาอย่างไร</p>
+      <div id="qs-a"></div>
+      <div class="nav"><button class="btn btn-quiet" onclick="go(1)">Back</button><span class="of">2 / 5</span><button class="btn btn-ink" onclick="go(3)">Continue</button></div>
+    </section>
+
+    <section class="step" data-s="3">
+      <p class="stepno">Step 3 of 5 — How it should feel</p>
+      <h2>Feelings and inspiration</h2>
+      <p class="desc">How your brand should feel, and the brands you admire. · ความรู้สึกที่แบรนด์ควรมอบให้ และแบรนด์ที่คุณชื่นชม</p>
+      <div id="qs-b"></div>
+      <div class="nav"><button class="btn btn-quiet" onclick="go(2)">Back</button><span class="of">3 / 5</span><button class="btn btn-ink" onclick="go(4)">Continue</button></div>
+    </section>
+
+    <section class="step" data-s="4">
+      <p class="stepno">Step 4 of 5 — Brand personality</p>
+      <h2>Where does your brand sit?</h2>
+      <p class="desc">For each pair, tap the point that feels right. The middle means balanced. · แตะจุดที่ตรงกับความรู้สึกของคุณ</p>
+      <div id="qs-c"></div>
+      <div class="nav"><button class="btn btn-quiet" onclick="go(3)">Back</button><span class="of">4 / 5</span><button class="btn btn-ink" onclick="go(5)">Continue</button></div>
+    </section>
+
+    <section class="step" data-s="5">
+      <p class="stepno">Step 5 of 5 — Identity</p>
+      <h2>The character of your brand</h2>
+      <div class="sq" style="margin-top:30px;">
+        <span class="qq"><span class="qn">24.</span>If your brand were a famous person, who would it be — and why?</span>
+        <span class="qth">ถ้าเปรียบแบรนด์ของคุณเป็นคนมีชื่อเสียง เขาจะเป็นใคร เพราะอะไร?</span>
+        <textarea placeholder="Your answer · คำตอบของคุณ"></textarea>
+      </div>
+      <div class="sq">
+        <span class="qq"><span class="qn">25.</span>Select 6–10 words your brand should project</span>
+        <span class="qth">เลือกคำ 6–10 คำ ที่สะท้อนตัวตนของแบรนด์</span>
+        <div class="chips" id="chips"></div>
+        <p class="chipn" id="chipn">Selected <b>0</b> of 10 · เลือกแล้ว 0 คำ (ขั้นต่ำ 6)</p>
+      </div>
+      <div class="sq">
+        <span class="qq"><span class="qn">26.</span>Are there any qualities your brand should avoid?</span>
+        <span class="qth">มีคุณลักษณะใดที่คุณไม่ต้องการให้มีในแบรนด์?</span>
+        <textarea placeholder="Your answer · คำตอบของคุณ"></textarea>
+      </div>
+      <div class="nav"><button class="btn btn-quiet" onclick="go(4)">Back</button><span class="of">5 / 5</span><button class="btn btn-primary" onclick="go(6)">Send answers · ส่งคำตอบ</button></div>
+    </section>
+
+    <section class="step" data-s="6">
+      <div class="done-mark">✓</div>
+      <h1>Thank you, <em id="doneName">friend</em>.</h1>
+      <p class="intro">Your answers are with the Designally team. We'll bring every perspective together and see you at the kick-off meeting.</p>
+      <p class="th" style="max-width:58ch; margin-top:8px;">คำตอบของคุณถูกส่งถึงทีมแล้ว แล้วพบกันในการประชุมเริ่มโปรเจกต์</p>
+      <div class="facts"><div><b>Know someone else who should answer?</b> Just forward the same link — we'll include their voice too. · ส่งลิงก์เดิมต่อให้เพื่อนร่วมงานได้เลย</div></div>
+      <button class="btn btn-quiet" onclick="go(0)">Answer as another stakeholder · ตอบในฐานะผู้อื่น</button>
+    </section>
+  </div>
+</div>
+
+<!-- ═══════════════ BRIEF ═══════════════ -->
+<dialog id="dBrief">
+  <div class="sheet">
+    <div class="sheet-top"><span class="t">PCE-TH — Survey analysis</span><button class="x" onclick="dBrief.close()">Close</button></div>
+    <div class="sheet-body brief">
+      <h1>Three voices, two decisions.</h1>
+      <p class="lede">Generated from the 3 answers collected before the team closed this survey · 26 questions each.</p>
+
+      <div class="bsec">
+        <h3>Who answered</h3>
+        <div class="people">
+          <div class="person"><b>Khun Tanawat</b><span class="role">CEO</span><span class="lead">Final decision maker</span></div>
+          <div class="person"><b>Khun Siriporn</b><span class="role">Marketing Manager</span><span class="role">Shared decision</span></div>
+          <div class="person"><b>Khun Krit</b><span class="role">Logistics Director</span><span class="role">Perspective only</span></div>
+        </div>
+      </div>
+
+      <div class="bsec">
+        <h3>Where they agree — build on this</h3>
+        <ul class="agree">
+          <li><span class="ck">✓</span><span>Core strength is the fully integrated supply chain — "everything in one place"</span><span class="n">3 of 3</span></li>
+          <li><span class="ck">✓</span><span>Brand personality: trustworthy and professional</span><span class="n">3 of 3</span></li>
+          <li><span class="ck">✓</span><span>Modern, not traditional, on every personality scale</span><span class="n">3 of 3</span></li>
+          <li><span class="ck">✓</span><span>Pride in southern-Thai roots and community impact</span><span class="n">2 of 3</span></li>
+        </ul>
+      </div>
+
+      <div class="bsec">
+        <h3>Where they disagree — decide at the kick-off</h3>
+        <div class="conflict">
+          <div class="h"><b>Brand positioning</b><span class="sev hi">HIGH</span></div>
+          <div class="sides">
+            <div class="side"><b>Khun Tanawat · CEO · decides</b>"A global-standard industrial leader" — ผู้นำอุตสาหกรรมระดับสากล</div>
+            <div class="side"><b>Khun Krit · Logistics</b>"A community-rooted Thai company" — รากฐานชุมชนภาคใต้</div>
+          </div>
+          <p class="plan">Kick-off framing: can it be both? Propose "global standards, southern roots" as a bridge.</p>
+        </div>
+        <div class="conflict">
+          <div class="h"><b>Tone of voice</b><span class="sev md">MEDIUM</span></div>
+          <div class="sides">
+            <div class="side"><b>Khun Tanawat · CEO · decides</b>Formal, corporate, authoritative</div>
+            <div class="side"><b>Khun Siriporn · Marketing</b>Friendly, warm, approachable</div>
+          </div>
+          <p class="plan">Kick-off framing: which tone for which audience? Investors and communities may need different registers.</p>
+        </div>
+      </div>
+
+      <div class="bsec">
+        <h3>For the creative team</h3>
+        <ol class="insights">
+          <li>The real tension is <b>scale versus roots</b> — international credibility and southern-Thai identity. The winning direction bridges both rather than picking one.</li>
+          <li>Every audience named is <b>B2B</b>: industrial buyers, logistics clients, port and warehouse users. Speak to procurement decision-makers, never consumers.</li>
+          <li>The CEO is the confirmed decision maker — weight his answers, but surface the positioning conflict openly so all voices are heard before he decides.</li>
+          <li>No competitor offers the same total solution. The integrated model itself is the thing to visualise.</li>
+        </ol>
+      </div>
+
+      <div class="bsec">
+        <h3>Kick-off deck outline</h3>
+        <ul class="slides">
+          <li><span class="sn">1</span>Welcome and project goals</li>
+          <li><span class="sn">2</span>What we heard — 3 voices, 26 answers</li>
+          <li><span class="sn">3</span>Agreed foundations: integrated · trustworthy · modern</li>
+          <li><span class="sn">4</span>Positioning: global leader or community roots?<span class="need">DECIDE</span></li>
+          <li><span class="sn">5</span>Tone of voice: formal or friendly?<span class="need">DECIDE</span></li>
+          <li><span class="sn">6</span>Audience map — 4 B2B segments</li>
+          <li><span class="sn">7</span>Inspiration from stakeholder answers</li>
+          <li><span class="sn">8</span>Next steps and timeline</li>
+        </ul>
+      </div>
+
+      <div class="bsec">
+        <h3>How to run the room</h3>
+        <div class="internal">
+          <div class="lock">🔒 INTERNAL — never shown to the client</div>
+          <p><b>Positioning:</b> prepare two quick moodboards. Let Khun Krit and Khun Siriporn speak first; invite the CEO to decide last, so other voices are heard before the final call.</p>
+          <p><b>Tone:</b> frame it as a spectrum, not a choice. Ask each person to place a dot. If the room splits, propose formal for investors and warmer for community content.</p>
+        </div>
+      </div>
+
+      <div class="briefbar">
+        <span class="st" id="briefSt">Draft — not yet reviewed</span>
+        <div class="grp">
+          <button class="btn btn-quiet btn-sm" onclick="dBrief.close(); dHand.showModal();">Send to Claude</button>
+          <button class="btn btn-primary btn-sm" id="confirmB" onclick="confirmBrief()">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<!-- ═══════════════ LIBRARY ═══════════════ -->
+<dialog id="dTpl">
+  <div class="sheet">
+    <div class="sheet-top"><span class="t">Question templates</span><button class="x" onclick="dTpl.close()">Close</button></div>
+    <div class="sheet-body">
+      <div id="lib-tpl">
+        <div class="tpair">
+          <div class="tpl" aria-current="true"><h4>Branding</h4><p class="m">26 questions · version 3 · updated August 2026</p><button class="btn btn-quiet btn-sm">Open</button></div>
+          <div class="tpl"><h4>Website</h4><p class="m">18 questions · version 2 · updated May 2026</p><button class="btn btn-quiet btn-sm" onclick="toast('Opens the Website template in the same editor')">Open</button></div>
+        </div>
+        <p class="vrule"><b>Editing is safe.</b> Changes apply to future surveys only. Anything already sent keeps its own version, so answers always match the questions that were asked. · การแก้ไขมีผลกับแบบสอบถามใหม่เท่านั้น</p>
+        <div class="qwrap">
+          <div class="q">
+            <span class="num">1</span>
+            <div class="txt">How did your brand start?<span class="th">แบรนด์ของคุณเริ่มต้นขึ้นได้อย่างไร</span></div>
+            <span class="qtype">Paragraph</span>
+            <button class="qlink" onclick="toast('Inline editing — question 2 shows the open state')">Edit</button>
+          </div>
+          <div class="q">
+            <span class="num">2</span>
+            <div class="txt">
+              <div style="background:var(--accent-soft); border-radius:var(--r-sm); padding:14px 16px;">
+                <label class="f" style="margin-top:0;">Question (EN)</label>
+                <input type="text" value="What is your main product or service?">
+                <label class="f" style="margin-top:12px;">Question (TH)</label>
+                <input type="text" value="ผลิตภัณฑ์หรือบริการหลักของคุณคืออะไร?">
+                <div style="display:flex; gap:8px; margin-top:14px;">
+                  <button class="btn btn-ink btn-sm" onclick="toast('Saved as version 4 draft · บันทึกแล้ว')">Save</button>
+                  <button class="btn btn-quiet btn-sm" onclick="toast('Cancelled')">Cancel</button>
+                </div>
+              </div>
+            </div>
+            <span class="qtype">Paragraph</span>
+          </div>
+          <div class="q">
+            <span class="num">15</span>
+            <div class="txt">Personality pairs — 10 scales<span class="th">คู่บุคลิกภาพแบรนด์ 10 คู่</span><span class="cfg">Traditional ↔ Modern, and 9 more · 5 points each</span></div>
+            <span class="qtype">Linear scale</span>
+            <button class="qlink" onclick="toast('Poles and scale points are editable per pair')">Edit</button>
+          </div>
+          <div class="q">
+            <span class="num">25</span>
+            <div class="txt">Select 6–10 words your brand should project<span class="th">เลือกคำ 6–10 คำ</span><span class="cfg">24 choices · pick 6–10</span></div>
+            <span class="qtype">Checkboxes</span>
+            <button class="qlink" onclick="toast('Add or remove choices, change the 6–10 limit')">Edit</button>
+          </div>
+          <div id="qNew"></div>
+          <div style="padding-top:14px;">
+            <button class="btn btn-quiet btn-sm" id="addBtn" onclick="showAdd(true)">Add question · เพิ่มคำถาม</button>
+            <div id="addBox" style="display:none; background:var(--accent-soft); border-radius:var(--r-sm); padding:16px 18px; margin-top:6px;">
+              <label class="f" style="margin-top:0;">Question (EN)</label>
+              <input type="text" id="nqEN" placeholder="e.g. What makes your customers come back?">
+              <label class="f" style="margin-top:12px;">Question (TH)</label>
+              <input type="text" id="nqTH" placeholder="เช่น อะไรทำให้ลูกค้ากลับมาซื้อซ้ำ?">
+              <label class="f" style="margin-top:14px;">Answer type <span>· the five types your Google Forms already use</span></label>
+              <div class="opts" id="typeRow">
+                <button class="opt" aria-pressed="true" data-t="Paragraph">Paragraph<small>long answer</small></button>
+                <button class="opt" aria-pressed="false" data-t="Short text">Short text<small>one line</small></button>
+                <button class="opt" aria-pressed="false" data-t="Multiple choice">Multiple choice<small>pick one</small></button>
+                <button class="opt" aria-pressed="false" data-t="Checkboxes">Checkboxes<small>pick many</small></button>
+                <button class="opt" aria-pressed="false" data-t="Linear scale">Linear scale<small>two poles</small></button>
+              </div>
+              <div id="cfgPick" style="display:none; margin-top:14px;">
+                <label class="f">Choices · ตัวเลือกคำตอบ</label>
+                <div id="choices"></div>
+                <button class="btn btn-quiet btn-sm" onclick="addChoice('')">Add choice</button>
+                <div id="cfgLimit" style="display:none; margin-top:14px;">
+                  <label class="f">Selection limit <span>· optional</span></label>
+                  <div style="display:flex; gap:8px; align-items:center;">
+                    <input type="text" id="lmin" placeholder="min" style="width:78px;">
+                    <span style="color:var(--ink-3); font-size:14px;">to</span>
+                    <input type="text" id="lmax" placeholder="max" style="width:78px;">
+                    <span style="font-size:12.5px; color:var(--ink-3);">like the 6–10 words question</span>
+                  </div>
+                </div>
+              </div>
+              <div id="cfgScale" style="display:none; margin-top:14px;">
+                <label class="f">Left pole</label><input type="text" id="poleL" placeholder="e.g. Traditional / ดั้งเดิม">
+                <label class="f" style="margin-top:12px;">Right pole</label><input type="text" id="poleR" placeholder="e.g. Modern / ทันสมัย">
+                <label class="f" style="margin-top:12px;">Points on the scale</label>
+                <div class="opts" id="ptsRow" style="max-width:340px;">
+                  <button class="opt" aria-pressed="false" data-p="2">2<small>today's forms</small></button>
+                  <button class="opt" aria-pressed="true" data-p="5">5<small>recommended</small></button>
+                  <button class="opt" aria-pressed="false" data-p="10">10<small>ratings</small></button>
+                </div>
+              </div>
+              <div style="display:flex; gap:8px; margin-top:18px;">
+                <button class="btn btn-ink btn-sm" onclick="addQuestion()">Add to template</button>
+                <button class="btn btn-quiet btn-sm" onclick="showAdd(false)">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</dialog>
+
+<dialog id="dPast">
+  <div class="sheet">
+    <div class="sheet-top"><span class="t">Past projects</span><button class="x" onclick="dPast.close()">Close</button></div>
+    <div class="sheet-body">
+      <p style="font-size:17px; line-height:1.6; color:var(--ink-2); margin-bottom:24px; max-width:60ch;">Projects arrive here when your team archives them — never automatically. Nothing is deleted; every survey, brief, decision and deck stays searchable. · โปรเจกต์จะมาที่นี่เมื่อทีมเก็บเข้าคลังเท่านั้น ข้อมูลไม่ถูกลบ</p>
+      <ul class="past" id="pastList"></ul>
+    </div>
+  </div>
+</dialog>
+
+<!-- ═══════════════ NEW SURVEY ═══════════════ -->
+<dialog id="dNew">
+  <div class="sheet narrow">
+    <div class="sheet-top"><span class="t">New survey</span><button class="x" onclick="dNew.close()">Close</button></div>
+    <div class="sheet-body">
+      <div class="field">
+        <label class="f" for="nClient">Client and project code</label>
+        <input type="text" id="nClient" placeholder="ACME Coffee — ACME-2026-01">
+      </div>
+      <div class="field">
+        <label class="f">Package <span>· this chooses the questionnaire</span></label>
+        <div class="opts" id="pkgRow">
+          <button class="opt" aria-pressed="false" data-k="Branding">Branding<small>26 questions</small></button>
+          <button class="opt" aria-pressed="false" data-k="Website">Website<small>18 questions</small></button>
+          <button class="opt" aria-pressed="false" data-k="Branding + Website">Both<small>44 questions, one link</small></button>
+        </div>
+      </div>
+      <div class="field">
+        <p class="note"><b>No need to know who will answer.</b> One link, shared as widely as the client likes. Answers arrive as people find time, and you close collection when there's enough. · ไม่ต้องระบุจำนวนผู้ตอบ ลูกค้าส่งลิงก์ต่อได้ตามต้องการ</p>
+      </div>
+      <div class="field" id="nOut" style="display:none;">
+        <label class="f">Send this link to the client's main contact</label>
+        <div class="linkbox"><span id="nLink">designally.co/s/ACME-2026-01</span><button class="btn btn-quiet btn-sm" style="margin-left:auto;" onclick="toast('Link copied · คัดลอกลิงก์แล้ว')">Copy</button></div>
+      </div>
+      <button class="btn btn-primary" id="nGo" onclick="createSurvey()">Create and get link</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- ═══════════════ ROADMAP ═══════════════ -->
+<dialog id="dRoad">
+  <div class="sheet">
+    <div class="sheet-top"><span class="t">The platform, and what's coming</span><button class="x" onclick="dRoad.close()">Close</button></div>
+    <div class="sheet-body">
+
+      <h1 style="font-size:clamp(1.4rem,3.4vw,1.9rem); font-weight:600; letter-spacing:-0.02em; margin-bottom:6px;">Four modules. Two are live.</h1>
+      <p style="color:var(--ink-2); font-size:14.5px; margin-bottom:30px; max-width:62ch;">The live modules don't have their own tabs — they are the flow you already use. Only planned work sits behind this link, so the daily screens never show a door that doesn't open yet. · โมดูลที่ใช้งานได้แล้วคือขั้นตอนที่คุณใช้อยู่ ไม่ต้องมีแท็บแยก</p>
+
+      <div class="pd-sec">
+        <h3>Live now</h3>
+        <div class="rmlist">
+          <div class="rm live">
+            <div class="rmtop"><b>Survey</b><span class="rmtag on">LIVE</span></div>
+            <p>Branded bilingual questionnaires, one link per project, open-ended collection.</p>
+            <p class="where"><b>Where it lives:</b> the New survey button · every survey row in Projects · question templates in the Library.</p>
+          </div>
+          <div class="rm live">
+            <div class="rmtop"><b>Analysis &amp; Decks</b><span class="rmtag on">LIVE</span></div>
+            <p>The brief, the conflict map, the deck outline, the Claude handoff, and the decision record.</p>
+            <p class="where"><b>Where it lives:</b> Close and analyse → Review brief → Send to Claude → Record decisions. It has no tab because it isn't a place you visit — it's what happens to a project.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="pd-sec">
+        <h3>Planned</h3>
+        <div class="rmlist">
+          <div class="rm">
+            <div class="rmtop"><b>Leads &amp; Clients</b><span class="rmtag">PHASE 3</span></div>
+            <p>A light record of every lead: company profile sent, greeting meeting booked, deal status. Becomes the shared client database every other module reads from — enter a client once, use them everywhere.</p>
+            <p class="where"><b>Where it will plug in:</b> before the Survey stage. Creating a survey would pick an existing client instead of typing a name.</p>
+          </div>
+          <div class="rm">
+            <div class="rmtop"><b>Proposals &amp; Quotes</b><span class="rmtag">PHASE 3</span></div>
+            <p>Proposals and quotations generated from templates, pre-filled with client details. Tracked from sent to viewed to signed.</p>
+            <p class="where"><b>Where it will plug in:</b> between Leads and Survey. A signed quotation would open the survey stage automatically, so nobody has to remember to send it.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="pd-sec" style="margin-bottom:0;">
+        <h3>Removed from scope</h3>
+        <div class="rmlist">
+          <div class="rm out">
+            <div class="rmtop"><b>Client Satisfaction</b><span class="rmtag">DROPPED</span></div>
+            <p>Dropped at your request on 7 August. The existing Google Form stays as it is.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</dialog>
+
+<!-- ═══════════════ PROJECT DETAIL ═══════════════ -->
+<dialog id="dProj">
+  <div class="sheet">
+    <div class="sheet-top"><span class="t">Project</span><button class="x" onclick="dProj.close()">Close</button></div>
+    <div class="sheet-body">
+      <div class="pd-head">
+        <h1 id="pdName"></h1>
+        <div class="pkg" id="pdPkg"></div>
+      </div>
+
+      <div class="pd-now" id="pdNow"></div>
+
+      <div class="pd-sec">
+        <h3>Where it is</h3>
+        <ul class="tl" id="pdTl"></ul>
+      </div>
+
+      <div class="pd-sec">
+        <h3>Who answered</h3>
+        <div class="pd-people" id="pdPeople"></div>
+      </div>
+
+      <div class="pd-sec" id="pdDecSec">
+        <h3>Decided at the kick-off</h3>
+        <div class="pd-dec" id="pdDec"></div>
+      </div>
+
+      <div class="pd-sec">
+        <h3>Documents</h3>
+        <div class="pd-docs" id="pdDocs"></div>
+      </div>
+
+      <div class="pd-sec" style="border-top:1px solid var(--line); padding-top:24px; margin-bottom:0;">
+        <h3>Finished with this project?</h3>
+        <p style="font-size:14px; color:var(--ink-2); margin-bottom:14px; max-width:60ch;">Archiving moves it out of your live list and into the Library. Nothing is deleted — the survey, the brief, the decisions and the deck stay searchable. Only your team can do this; the app never archives anything by itself. · ข้อมูลไม่ถูกลบ ค้นหาได้เสมอ</p>
+        <button class="btn btn-quiet btn-sm" id="pdArchive">Archive project</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<!-- ═══════════════ RECORD DECISIONS ═══════════════ -->
+<dialog id="dDec">
+  <div class="sheet">
+    <div class="sheet-top"><span class="t">What was decided — Sushi Shin</span><button class="x" onclick="dDec.close()">Close</button></div>
+    <div class="sheet-body">
+      <p class="note" style="margin-bottom:26px;"><b>These are the two conflicts the survey found, and the deck put in front of the client.</b> Whatever the room decided goes here — then the design brief, the content survey and the final handover all carry the same answer. · บันทึกผลที่ตกลงกันในห้องประชุม</p>
+
+      <div id="decWrap">
+        <div class="decgroup" data-q="Brand character" style="margin-bottom:30px;">
+          <label class="f" style="font-size:15.5px; margin-bottom:4px;">1 · Brand character</label>
+          <p style="font-size:13.5px; color:var(--ink-3); margin-bottom:12px;">Khun Mind wanted traditional Japanese craft. Khun Aof wanted modern and casual.</p>
+          <div class="opts">
+            <button class="opt" aria-pressed="false" data-v="Traditional Japanese craft">Traditional craft<small>Khun Mind</small></button>
+            <button class="opt" aria-pressed="false" data-v="Modern and casual">Modern casual<small>Khun Aof</small></button>
+            <button class="opt" aria-pressed="false" data-v="A bridge between both">A bridge<small>something new</small></button>
+            <button class="opt" aria-pressed="false" data-v="Still open">Still open<small>needs another meeting</small></button>
+          </div>
+          <textarea placeholder="What was actually said — the nuance the options miss · บันทึกรายละเอียดเพิ่มเติม" style="margin-top:10px; min-height:64px;"></textarea>
+        </div>
+
+        <div class="decgroup" data-q="Price positioning" style="margin-bottom:26px;">
+          <label class="f" style="font-size:15.5px; margin-bottom:4px;">2 · Price positioning</label>
+          <p style="font-size:13.5px; color:var(--ink-3); margin-bottom:12px;">Premium omakase feel, or accessible everyday sushi?</p>
+          <div class="opts">
+            <button class="opt" aria-pressed="false" data-v="Premium">Premium<small>omakase feel</small></button>
+            <button class="opt" aria-pressed="false" data-v="Accessible">Accessible<small>everyday</small></button>
+            <button class="opt" aria-pressed="false" data-v="Premium quality, accessible price">Both<small>quality at fair price</small></button>
+            <button class="opt" aria-pressed="false" data-v="Still open">Still open<small>needs another meeting</small></button>
+          </div>
+          <textarea placeholder="What was actually said · บันทึกรายละเอียดเพิ่มเติม" style="margin-top:10px; min-height:64px;"></textarea>
+        </div>
+      </div>
+
+      <div style="border-top:1px solid var(--line); padding-top:20px;">
+        <p style="font-size:13.5px; color:var(--ink-2); margin-bottom:16px; max-width:62ch;">Once recorded, these travel with the project: into the design brief the team works from, into the content survey the client receives next, and into the final handover document. Nobody has to remember them, and nobody can quietly reopen them in month three.</p>
+        <button class="btn btn-primary" onclick="saveDecisions()">Record and continue</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<!-- ═══════════════ CONTENT SURVEY ═══════════════ -->
+<dialog id="dContent">
+  <div class="sheet narrow">
+    <div class="sheet-top"><span class="t">Content survey — <span id="csClient"></span></span><button class="x" onclick="dContent.close()">Close</button></div>
+    <div class="sheet-body">
+      <p class="note" style="margin-bottom:22px;"><b>Goes to one or two named people, not the whole stakeholder group.</b> The people who chose the brand direction rarely know who owns the domain or which inbox receives form submissions. · ส่งให้ผู้ประสานงาน 1–2 คน ไม่ใช่ทุกคน</p>
+
+      <div class="field">
+        <label class="f">What the client will see first</label>
+        <div style="background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:18px 20px; font-size:15px; line-height:1.55;">
+          Your website will have <b id="csPages"></b> pages in <b id="csLangs"></b>.<br><br>
+          <span style="color:var(--ink-2); font-size:14px;">This short survey works out who produces each part of the content, and by when — text, translation, photographs, legal pages. It takes about 8 minutes. · แบบสอบถามสั้น ๆ นี้ช่วยระบุว่าใครเป็นผู้จัดทำเนื้อหาแต่ละส่วน และเสร็จเมื่อไร</span>
+        </div>
+        <p style="font-size:12.5px; color:var(--ink-3); margin-top:8px;">Pages and languages come from what was agreed at the kick-off. No volume estimate is shown — the client is asked who owns each part, not how much there is.</p>
+      </div>
+
+      <div class="field">
+        <label class="f">12 questions · about 8 minutes</label>
+        <ul style="list-style:none; font-size:14px; color:var(--ink-2);">
+          <li style="padding:5px 0; border-bottom:1px solid var(--line);">Single point of contact for content</li>
+          <li style="padding:5px 0; border-bottom:1px solid var(--line);">Who writes the copy · how much exists · when it will be ready</li>
+          <li style="padding:5px 0; border-bottom:1px solid var(--line);">Who produces the second language, and by when</li>
+          <li style="padding:5px 0; border-bottom:1px solid var(--line);">Photography and video</li>
+          <li style="padding:5px 0; border-bottom:1px solid var(--line);">Legal pages — privacy, cookies, terms, returns</li>
+          <li style="padding:5px 0; border-bottom:1px solid var(--line);">Form inbox · domain and hosting owner · existing accounts</li>
+          <li style="padding:5px 0;">Who maintains the site after launch</li>
+        </ul>
+      </div>
+
+      <div class="field">
+        <label class="f">Send this link to the content coordinator</label>
+        <div class="linkbox"><span id="csLink"></span><button class="btn btn-quiet btn-sm" style="margin-left:auto;" onclick="toast('Link copied · คัดลอกลิงก์แล้ว')">Copy</button></div>
+      </div>
+
+      <button class="btn btn-primary" onclick="dContent.close(); toast('Content survey sent · ส่งแบบสอบถามแล้ว')">Done</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- ═══════════════ CLAUDE HANDOFF ═══════════════ -->
+<dialog id="dHand">
+  <div class="sheet">
+    <div class="sheet-top"><span class="t">Deck brief for Claude</span><button class="x" onclick="dHand.close()">Close</button></div>
+    <div class="sheet-body">
+      <p style="font-size:14.5px; color:var(--ink-2); margin-bottom:18px; max-width:62ch;">Paste this into the Survey Tool project in Claude. It returns a .pptx you import into Canva. · วางข้อความนี้ใน Claude เพื่อสร้างเด็ค แล้วนำเข้า Canva</p>
+      <pre class="handoff" id="handText">Design the kick-off deck for PCE-TH (Branding) in the Designally style.
+
+CLIENT
+PCE-TH — integrated palm-oil supply chain group, B2B.
+3 answers collected. Brief confirmed by the team.
+
+FOUNDATIONS — all respondents agree, present as settled
+· Integrated supply chain: everything in one place
+· Trustworthy and professional
+· Modern, with southern-Thai roots
+
+DECISIONS — one slide each, placed early, both sides equal
+1. Positioning: "global-standard industrial leader" (decision maker)
+   versus "community-rooted Thai company" (Logistics Director)
+2. Tone: formal and corporate (decision maker)
+   versus friendly and approachable (Marketing Manager)
+
+SLIDES
+1 Welcome and project goals
+2 What we heard — 3 voices, 26 answers
+3 Agreed foundations
+4 DECISION: positioning
+5 DECISION: tone of voice
+6 Audience map — 4 B2B segments
+7 Inspiration from stakeholder answers
+8 Next steps and timeline
+
+RULES
+· Bilingual TH/EN where it helps
+· Client-facing — no internal facilitation notes
+· Keep decision slides neutral</pre>
+      <button class="btn btn-primary" onclick="copyHand()">Copy · คัดลอก</button>
+    </div>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ══════════════════ DATA ══════════════════
+   Collection is open-ended: no expected total.
+   A survey is finished when the team says so.        */
+/* Website projects have two stages branding projects don't:
+   content collection and build. The flow follows the package. */
+const FLOW_BRAND = ['Lead','Proposal','Survey','Analysis','Kick-off'];
+const FLOW_WEB   = ['Lead','Proposal','Survey','Analysis','Kick-off','Content','Build'];
+const flowOf = p => p.pkg.includes('Website') ? FLOW_WEB : FLOW_BRAND;
+
+let projects = [
+  { id:'pce',  name:'PCE-TH', pkg:'Branding', stage:3, sent:'12 Jun', quiet:2, closed:true,
+    brief:'ready', people:[
+      {n:'Khun Tanawat', r:'CEO', dm:true}, {n:'Khun Siriporn', r:'Marketing'}, {n:'Khun Krit', r:'Logistics'}] },
+
+  { id:'sushi', name:'Sushi Shin', pkg:'Branding + Website', stage:4, sent:'11 May', quiet:1, closed:true,
+    brief:'confirmed', kick:'done 4 Aug', pages:18, langs:['Thai','English'],
+    decisions:null, contentSurvey:'not sent',
+    people:[{n:'Khun Mind', r:'Owner', dm:true}, {n:'Khun Aof', r:'Operations'}] },
+
+  { id:'nyssa', name:'Nyssa', pkg:'Branding', stage:2, sent:'24 Jul', quiet:6, closed:false,
+    people:[{n:'Khun David', r:'Founder', dm:true}, {n:'Khun Ratiporn', r:'Brand Lead'},
+            {n:'Khun Ploy', r:'Sales'}, {n:'Khun Win', r:'Product'}] },
+
+  { id:'dento', name:'F.W. Dentogenesis', pkg:'Branding', stage:2, sent:'4 Aug', quiet:1, closed:false,
+    people:[{n:'Khun Napat', r:'Clinic Director', dm:true}, {n:'Khun Preeda', r:'Marketing'}] },
+
+  { id:'blu',  name:'Blu Green Token', pkg:'Branding', stage:1, sent:null, quiet:0, closed:false,
+    note:'quotation sent · waiting on signature', people:[] },
+
+  { id:'a35',  name:'A35 Group', pkg:'not chosen yet', stage:0, sent:null, quiet:0, closed:false,
+    note:'greeting call booked for Friday', people:[] }
+];
+
+const QUIET_LIMIT = 5;   // days of silence before the app suggests closing
+
+const days = n => `${n} day${n === 1 ? '' : 's'}`;
+
+/* what does this project need from us right now? */
+function action(p){
+  if(p.closed && p.brief === 'ready')
+    return { say:`The survey is closed and the analysis is written. <b>It found 2 conflicts</b> — positioning and tone of voice.`,
+             when:`Closed ${days(p.quiet)} ago · kick-off not booked`, label:'Review brief', fn:'openBrief' };
+  if(p.kick && p.kick.startsWith('done') && p.decisions === null)
+    return { say:`The kick-off happened on the 4th. <b>Two decisions were made in that room</b> and nothing has been written down yet.`,
+             when:`Everything downstream depends on them`, label:'Record decisions', fn:`openDecisions:${p.id}` };
+  if(p.contentSurvey === 'not sent')
+    return { say:`Decisions are recorded. <b>Nobody is named as owner for the website content yet</b> — copy, translation, photography, legal pages.`,
+             when:`${p.pages} pages in ${p.langs.join(' and ')} · kick-off ${p.kick}`,
+             label:'Send content survey', fn:`sendContent:${p.id}` };
+  if(p.closed && p.brief === 'confirmed')
+    return { say:`Brief confirmed. <b>The deck outline is ready to hand to Claude.</b>`,
+             when:`Kick-off ${p.kick}`, label:'Build the deck', fn:'openHand' };
+  if(!p.closed && p.stage === 2 && p.people.length && p.quiet >= QUIET_LIMIT)
+    return { say:`<b>${p.people.length} answers in, and it has been quiet for ${days(p.quiet)}.</b> Enough to work with, or wait a little longer?`,
+             when:`Sent ${p.sent} · last answer ${days(p.quiet)} ago`, label:'Close and analyse', fn:`closeSurvey:${p.id}` };
+  return null;
+}
+
+function names(p){
+  if(!p.people.length) return '<span class="none">no answers yet</span>';
+  return p.people.map(x => `${x.n} · ${x.r}`).join('　');
+}
+
+/* ══════════════════ RENDER ══════════════════ */
+function render(){
+  const need = [], wait = [];
+  projects.filter(p => !p.archived).forEach(p => { const a = action(p); (a ? need : wait).push([p, a]); });
+
+  /* --- greeting --- */
+  const g = document.getElementById('greet'), gs = document.getElementById('greetSub');
+  const live = projects.filter(p => !p.archived);
+  const w = ['Nothing','One thing','Two things','Three things','Four things','Five things'][need.length] || need.length + ' things';
+  if(need.length === 0){
+    g.innerHTML = 'Nothing needs you <em>right now</em>.';
+    gs.textContent = `${live.length} projects are moving on their own. Close the laptop. · ไม่มีงานค้างที่ทีม`;
+  } else {
+    g.innerHTML = `${w} need${need.length === 1 ? 's' : ''} you <em>this morning</em>.`;
+    gs.innerHTML = `${live.length} projects running. Everything not listed below is moving on its own. · เรื่องอื่นกำลังเดินหน้าอยู่แล้ว`;
+  }
+  document.getElementById('needN').textContent = need.length;
+  document.getElementById('projN').textContent = live.length;
+
+  /* --- P0 --- */
+  const nw = document.getElementById('needWrap');
+  nw.innerHTML = need.length
+    ? `<div class="worklist">${need.map(([p,a],i)=>`
+        <article class="work" style="animation-delay:${.05 + i*.07}s">
+          <div class="body">
+            <div class="name"><span class="dot"></span>${p.name}</div>
+            <p class="say">${a.say}</p>
+            <p class="when">${a.when}</p>
+          </div>
+          <div class="act"><button class="btn btn-primary btn-sm" data-fn="${a.fn}">${a.label}</button></div>
+        </article>`).join('')}</div>`
+    : `<div class="calm"><p>All clear. We'll tell you when a survey goes quiet. <em>Have a good one.</em></p></div>`;
+
+  /* --- all projects, action-needed first --- */
+  const ordered = [...need.map(x => x[0]), ...wait.map(x => x[0])];
+  document.getElementById('projWrap').innerHTML = ordered.map(p => {
+    const n = p.people.length, flow = flowOf(p), needs = !!action(p);
+    const decider = p.people.find(x => x.dm);
+
+    let latest;
+    if(p.decisions === null && p.kick && p.kick.startsWith('done')) latest = `Kick-off ${p.kick}<br>decisions not recorded`;
+    else if(p.contentSurvey) latest = `Kick-off ${p.kick}<br>content survey ${p.contentSurvey}`;
+    else if(p.stage === 2) latest = n ? `Sent ${p.sent}<br>last answer ${days(p.quiet)} ago` : `Sent ${p.sent}<br>no answers yet`;
+    else if(p.closed && p.kick) latest = `Closed with ${n} answers<br>kick-off ${p.kick}`;
+    else if(p.closed) latest = `Closed with ${n} answers<br>kick-off not booked`;
+    else latest = p.note;
+
+    const answers = n
+      ? `<div class="c-main">${n} answer${n===1?'':'s'}</div>` +
+        (decider ? `<div class="c-when">${decider.n} decides</div>` : `<div class="c-when">no decision maker named</div>`)
+      : `<div class="c-when">none yet</div>`;
+
+    return `<tr data-open="${p.id}" tabindex="0">
+      <td data-label="Project">
+        <div class="c-name">${needs ? '<i class="pdot" aria-label="needs you"></i>' : ''}${p.name}</div>
+        <div class="c-sub">${p.pkg}</div>
+      </td>
+      <td class="c-stage" data-label="Stage">
+        <div class="stage">${flow.map((x,i)=>`<i class="${i<p.stage?'on':(i===p.stage?'now':'')}"></i>`).join('')}</div>
+        <div class="c-main">${flow[p.stage]} · ${p.stage+1} of ${flow.length}</div>
+      </td>
+      <td data-label="Answers">${answers}</td>
+      <td class="c-when" data-label="Latest">${latest}</td>
+    </tr>`;
+  }).join('');
+
+  /* --- wire buttons --- */
+  document.querySelectorAll('[data-fn]').forEach(b => b.onclick = () => {
+    const f = b.dataset.fn;
+    if(f === 'openBrief') dBrief.showModal();
+    else if(f === 'openHand') dHand.showModal();
+    else if(f === 'nudge') toast('Reminder sent · ส่งการแจ้งเตือนแล้ว');
+    else if(f.startsWith('closeSurvey:')) closeSurvey(f.split(':')[1]);
+    else if(f.startsWith('sendContent:')) sendContent(f.split(':')[1]);
+    else if(f.startsWith('openDecisions:')) dDec.showModal();
+  });
+  document.querySelectorAll('[data-open]').forEach(r => {
+    r.onclick = () => openProject(r.dataset.open);
+    r.onkeydown = e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openProject(r.dataset.open); } };
+  });
+}
+
+/* archiving is always a person's call — the app never does it on a timer */
+function archiveProject(id){
+  const p = projects.find(x => x.id === id);
+  if(!p) return;
+  p.archived = true;
+  p.archivedOn = 'today';
+  dProj.close();
+  render(); renderPast();
+  toast(`${p.name} archived — find it in Library › Past projects · เก็บเข้าคลังแล้ว`);
+}
+
+function renderPast(){
+  const seed = [
+    { name:'Your Choco', pkg:'Branding + Website', when:'kick-off June 2026', n:2 },
+    { name:'Sanyod', pkg:'Branding', when:'kick-off January 2026', n:3 },
+    { name:'A Lang Karn Autopart', pkg:'Website', when:'kick-off December 2025', n:1 },
+    { name:'Momo', pkg:'Branding', when:'kick-off November 2025', n:2 }
+  ];
+  const archived = projects.filter(p => p.archived)
+    .map(p => ({ name:p.name, pkg:p.pkg, when:`archived ${p.archivedOn}`, n:p.people.length }));
+  const total = archived.length + seed.length;
+  const pc = document.getElementById('pastCount');
+  if(pc) pc.textContent = `${total} archived · briefs and decks stay searchable`;
+  document.getElementById('pastList').innerHTML = [...archived, ...seed].map(x =>
+    `<li><span><span class="n">${x.name}</span><br><span class="d">${x.pkg} · ${x.when} · ${x.n} answer${x.n===1?'':'s'}</span></span>
+     <button class="o" onclick="toast('Opens the archived brief and deck — read only')">Open</button></li>`).join('');
+}
+
+/* ══════════════ PROJECT DETAIL — everything about one client ══════════════ */
+function openProject(id){
+  const p = projects.find(x => x.id === id);
+  if(!p) return;
+  const flow = flowOf(p), a = action(p), n = p.people.length;
+
+  document.getElementById('pdName').textContent = p.name;
+  document.getElementById('pdPkg').textContent = `${p.pkg} · ${flow[p.stage]} · step ${p.stage+1} of ${flow.length}`;
+
+  /* right now */
+  document.getElementById('pdNow').innerHTML = a
+    ? `<div class="lab">NEEDS YOUR TEAM</div><p>${a.say}</p>
+       <button class="btn btn-primary btn-sm" data-fn="${a.fn}">${a.label}</button>`
+    : `<div class="lab">WAITING</div><p>${p.stage === 2
+        ? (n ? `${n} answer${n===1?'':'s'} so far, the last one ${days(p.quiet)} ago. Nothing for your team to do — the app will speak up if it goes quiet.`
+             : 'The link has been sent. No answers yet.')
+        : p.note || 'Moving along. Nothing for your team right now.'}</p>`;
+
+  /* timeline — what has happened, what is next */
+  const steps = flow.map((s,i) => {
+    let when = '', cls = i < p.stage ? 'done' : (i === p.stage ? 'now' : 'next');
+    if(s === 'Survey' && p.sent) when = `sent ${p.sent}`;
+    if(s === 'Analysis' && p.closed) when = `closed with ${n} answers`;
+    if(s === 'Kick-off' && p.kick) when = p.kick;
+    if(s === 'Content' && p.contentSurvey) when = `survey ${p.contentSurvey}`;
+    return `<li class="${cls}"><span>${s}</span><span class="when">${when}</span></li>`;
+  }).join('');
+  document.getElementById('pdTl').innerHTML = steps;
+
+  /* people */
+  document.getElementById('pdPeople').innerHTML = n
+    ? p.people.map(x => `<div class="person"><b>${x.n}</b><span class="role">${x.r}</span>${x.dm ? '<span class="lead">Decision maker</span>' : ''}</div>`).join('')
+    : `<p style="font-size:14px; color:var(--ink-3);">Nobody has answered yet.</p>`;
+
+  /* decisions */
+  const decSec = document.getElementById('pdDecSec');
+  if(p.decisions){
+    decSec.style.display = 'block';
+    document.getElementById('pdDec').innerHTML = p.decisions.map(d =>
+      `<div class="row"><span class="q">${d.q}</span><span class="a">${d.a}</span>${d.note ? `<p class="note">${d.note}</p>` : ''}</div>`).join('');
+  } else decSec.style.display = 'none';
+
+  /* documents */
+  const docs = [];
+  if(p.closed) docs.push(['Survey analysis', `${n} answers`, 'openBrief']);
+  if(p.brief === 'confirmed') docs.push(['Kick-off deck', 'confirmed brief', 'openHand']);
+  if(p.contentSurvey && p.contentSurvey !== 'not sent') docs.push(['Content readiness', `${p.pages} pages`, null]);
+  document.getElementById('pdDocs').innerHTML = docs.length
+    ? docs.map(([t,s,fn]) => `<button class="doc" ${fn ? `data-fn="${fn}"` : 'disabled'}>${t}<small>${s}</small></button>`).join('')
+    : `<p style="font-size:14px; color:var(--ink-3);">Nothing produced yet — documents appear here as the project moves.</p>`;
+
+  document.getElementById('pdArchive').onclick = () => archiveProject(p.id);
+
+  dProj.showModal();
+  dProj.querySelectorAll('[data-fn]').forEach(b => b.onclick = () => {
+    const f = b.dataset.fn;
+    dProj.close();
+    if(f === 'openBrief') dBrief.showModal();
+    else if(f === 'openHand') dHand.showModal();
+    else if(f.startsWith('closeSurvey:')) closeSurvey(f.split(':')[1]);
+    else if(f.startsWith('sendContent:')) sendContent(f.split(':')[1]);
+    else if(f.startsWith('openDecisions:')) dDec.showModal();
+  });
+}
+
+/* the missing link: what the room decided, written down where the work can find it */
+function saveDecisions(){
+  const picks = [...document.querySelectorAll('#decWrap .decgroup')].map(g => {
+    const chosen = g.querySelector('.opt[aria-pressed="true"]');
+    return { q: g.dataset.q, a: chosen ? chosen.dataset.v : null, note: g.querySelector('textarea').value.trim() };
+  });
+  if(picks.some(x => !x.a)){ toast('Please record an outcome for each decision · กรุณาระบุผลของทุกข้อ'); return; }
+  const p = projects.find(x => x.id === 'sushi');
+  p.decisions = picks; p.stage = 5;
+  render();
+  dDec.close();
+  toast('Decisions recorded — the brief and the content survey now carry them · บันทึกผลการตัดสินใจแล้ว');
+}
+
+/* the second survey — goes to one or two named people, not the stakeholder group */
+function sendContent(id){
+  const p = projects.find(x => x.id === id);
+  if(!p) return;
+  document.getElementById('csLangs').textContent = p.langs.join(' and ');
+  document.getElementById('csPages').textContent = p.pages;
+  document.getElementById('csClient').textContent = p.name;
+  document.getElementById('csLink').textContent = 'designally.co/c/' + p.name.toUpperCase().replace(/[^A-Z]/g,'').slice(0,6);
+  dContent.showModal();
+  p.contentSurvey = 'sent today';
+  p.stage = 5;
+  render();
+}
+
+/* the one decision the app never makes alone */
+function closeSurvey(id){
+  const p = projects.find(x => x.id === id);
+  if(!p) return;
+  p.closed = true; p.stage = 3; p.brief = 'ready';
+  render();
+  toast(`${p.name} closed with ${p.people.length} answers — analysis written · ปิดรับคำตอบแล้ว`);
+}
+
+/* ══════════════════ NAV ══════════════════ */
+function tab(){ window.scrollTo({top:0}); }   /* single landing page — kept as a no-op */
+function setView(v){
+  document.getElementById('teamApp').classList.toggle('on', v==='team');
+  document.getElementById('clientView').classList.toggle('on', v==='client');
+  document.getElementById('sw-team').setAttribute('aria-pressed', v==='team');
+  document.getElementById('sw-client').setAttribute('aria-pressed', v==='client');
+  window.scrollTo({top:0});
+}
+
+/* ══════════════════ DIALOGS ══════════════════ */
+const dBrief = document.getElementById('dBrief'), dTpl = document.getElementById('dTpl'),
+      dPast = document.getElementById('dPast'),
+      dNew = document.getElementById('dNew'), dHand = document.getElementById('dHand'),
+      dContent = document.getElementById('dContent'), dDec = document.getElementById('dDec'),
+      dProj = document.getElementById('dProj'), dRoad = document.getElementById('dRoad');
+/* decision option groups behave like the other pickers */
+document.querySelectorAll('#decWrap .decgroup').forEach(g => {
+  g.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+    g.querySelectorAll('.opt').forEach(x => x.setAttribute('aria-pressed','false'));
+    b.setAttribute('aria-pressed','true');
+  });
+});
+function openLib(t){ (t === 'past' ? dPast : dTpl).showModal(); }
+function confirmBrief(){
+  const st = document.getElementById('briefSt');
+  st.textContent = 'Confirmed — ready for the kick-off'; st.classList.add('ok');
+  const b = document.getElementById('confirmB');
+  b.textContent = 'Confirmed'; b.disabled = true; b.className = 'btn btn-quiet btn-sm';
+  const p = projects.find(x => x.id === 'pce');
+  if(p){ p.brief = 'confirmed'; p.kick = 'not booked'; render(); }
+  toast('Brief confirmed · ยืนยันแล้ว');
+}
+let tTimer;
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(tTimer); tTimer = setTimeout(()=>t.classList.remove('show'), 3400);
+}
+function copyHand(){
+  const txt = document.getElementById('handText').textContent;
+  if(navigator.clipboard?.writeText)
+    navigator.clipboard.writeText(txt).then(()=>toast('Copied — paste into Claude · คัดลอกแล้ว'), sel);
+  else sel();
+  function sel(){
+    const r = document.createRange(); r.selectNodeContents(document.getElementById('handText'));
+    const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+    toast('Text selected — press Ctrl/Cmd+C');
+  }
+}
+
+/* ══════════════════ ADD QUESTION ══════════════════ */
+let qType='Paragraph', qPts='5', qNum=27;
+function press(sel, el){ document.querySelectorAll(sel+' .opt').forEach(b=>b.setAttribute('aria-pressed','false')); el.setAttribute('aria-pressed','true'); }
+document.querySelectorAll('#typeRow .opt').forEach(b=>b.onclick=()=>{ press('#typeRow',b); qType=b.dataset.t; cfg(); });
+document.querySelectorAll('#ptsRow .opt').forEach(b=>b.onclick=()=>{ press('#ptsRow',b); qPts=b.dataset.p; });
+function cfg(){
+  const pick = (qType==='Multiple choice' || qType==='Checkboxes');
+  document.getElementById('cfgPick').style.display = pick ? 'block' : 'none';
+  document.getElementById('cfgLimit').style.display = (qType==='Checkboxes') ? 'block' : 'none';
+  document.getElementById('cfgScale').style.display = (qType==='Linear scale') ? 'block' : 'none';
+  if(pick && !document.querySelector('#choices .choicerow')){ addChoice(''); addChoice(''); }
+}
+function addChoice(v){
+  const r = document.createElement('div'); r.className='choicerow';
+  r.innerHTML = `<input type="text" value="${v}" placeholder="Choice text EN / TH"><button class="xbtn" aria-label="Remove choice">✕</button>`;
+  r.querySelector('.xbtn').onclick = ()=>r.remove();
+  document.getElementById('choices').appendChild(r); r.querySelector('input').focus();
+}
+function showAdd(on){
+  document.getElementById('addBox').style.display = on ? 'block':'none';
+  document.getElementById('addBtn').style.display = on ? 'none':'inline-block';
+  if(on){ cfg(); document.getElementById('nqEN').focus(); }
+}
+function addQuestion(){
+  const en = document.getElementById('nqEN').value.trim(), th = document.getElementById('nqTH').value.trim();
+  if(!en){ toast('Please write the question in English · กรุณาใส่คำถาม'); return; }
+  let extra='';
+  if(qType==='Multiple choice' || qType==='Checkboxes'){
+    const cs=[...document.querySelectorAll('#choices input')].map(i=>i.value.trim()).filter(Boolean);
+    if(cs.length<2){ toast('Add at least 2 choices · เพิ่มตัวเลือกอย่างน้อย 2 ข้อ'); return; }
+    extra = cs.length+' choices · '+cs.join(' · ');
+    if(qType==='Checkboxes'){
+      const a=document.getElementById('lmin').value.trim(), b=document.getElementById('lmax').value.trim();
+      if(a&&b) extra += ' · pick '+a+'–'+b;
+    }
+  }
+  if(qType==='Linear scale'){
+    const l=document.getElementById('poleL').value.trim(), r=document.getElementById('poleR').value.trim();
+    if(!l||!r){ toast('Fill both poles · กรุณาใส่ขั้วซ้ายและขวา'); return; }
+    extra = l+' ↔ '+r+' · '+qPts+' points';
+  }
+  const row=document.createElement('div'); row.className='q';
+  row.innerHTML = `<span class="num">${qNum}</span><div class="txt">${en}<span class="th">${th||'—'}</span>${extra?`<span class="cfg">${extra}</span>`:''}</div><span class="qtype">${qType}</span>`;
+  document.getElementById('qNew').appendChild(row); qNum++;
+  document.getElementById('nqEN').value=''; document.getElementById('nqTH').value='';
+  document.getElementById('choices').innerHTML='';
+  ['lmin','lmax','poleL','poleR'].forEach(i=>document.getElementById(i).value='');
+  showAdd(false); toast(`Question ${qNum-1} added — saved as draft · เพิ่มคำถามแล้ว`);
+}
+
+/* ══════════════════ NEW SURVEY ══════════════════ */
+let pkg=null;
+document.querySelectorAll('#pkgRow .opt').forEach(b=>b.onclick=()=>{ press('#pkgRow',b); pkg=b.dataset.k; });
+function createSurvey(){
+  const c = document.getElementById('nClient').value.trim();
+  if(!c){ toast('Enter a client name · กรุณาใส่ชื่อลูกค้า'); return; }
+  if(!pkg){ toast('Choose a package · กรุณาเลือกแพ็กเกจ'); return; }
+  const code = (c.split('—').pop()||'PROJECT').trim().replace(/\s+/g,'-');
+  document.getElementById('nLink').textContent = 'designally.co/s/'+code;
+  document.getElementById('nOut').style.display='block';
+  document.getElementById('nGo').style.display='none';
+  projects.unshift({ id:'new'+Date.now(), name:c.split('—')[0].trim(), pkg, stage:2,
+    sent:'today', quiet:0, closed:false, people:[] });
+  render();
+  toast(pkg+' questionnaire attached · สร้างแบบสอบถามแล้ว');
+}
+
+/* ══════════════════ CLIENT SURVEY ══════════════════ */
+const setA=[["How did your brand start?","แบรนด์ของคุณเริ่มต้นขึ้นได้อย่างไร"],["What is your main product or service?","ผลิตภัณฑ์หรือบริการหลักของคุณคืออะไร?"],["Describe what you do in one short sentence.","อธิบายสิ่งที่คุณทำด้วย 1 ประโยค"],["Who are your main competitors?","ใครคือคู่แข่งหลักของคุณ"],["What do you believe in and stand for as a brand?","สิ่งที่คุณเชื่อและยึดมั่น คืออะไร?"],["What are you most proud of?","สิ่งที่แบรนด์ภาคภูมิใจมากที่สุด"],["Who is your target audience?","กลุ่มเป้าหมายของคุณคือใคร?"],["What is your unique selling point?","จุดขายหรือเอกลักษณ์เฉพาะของคุณคืออะไร?"],["What problems do you solve for them — and how?","ปัญหาที่คุณช่วยแก้ให้กลุ่มเป้าหมายคืออะไร และช่วยอย่างไร?"],["Any existing brand guidelines we should follow?","มีแนวทางการออกแบบเดิมที่ต้องการให้เราใช้ต่อหรือไม่?"]];
+const setB=[["When people meet your brand, how should they feel?","เมื่อผู้คนสัมผัสแบรนด์ คุณอยากให้เขารู้สึกอย่างไร"],["Name 1–2 brands that inspire you — and why.","ยกตัวอย่างแบรนด์ 1–2 แบรนด์ที่สร้างแรงบันดาลใจ เพราะอะไร"],["Name a competitor brand that you like.","บอกชื่อแบรนด์คู่แข่งที่คุณชื่นชอบ เพราะอะไร"],["Name a brand you don't like — and why.","บอกชื่อแบรนด์ที่คุณไม่ชอบ เพราะอะไร"],["Any favourite design work we could look at?","ยกตัวอย่างงานออกแบบที่คุณชื่นชอบ"],["Anything you don't want to see in the design?","มีอะไรที่คุณไม่อยากให้มีในงานออกแบบหรือไม่?"]];
+const pairs=[["Traditional","ดั้งเดิม","Modern","ทันสมัย"],["Exclusive","เฉพาะกลุ่ม","Accessible","เข้าถึงง่าย"],["Serious","จริงจัง","Fun","สนุก"],["Corporate","เป็นทางการ","Friendly","เป็นกันเอง"],["Simple","เรียบง่าย","Sophisticated","ซับซ้อนมีระดับ"],["Subtle","นุ่มนวล","Bold","โดดเด่น"],["Cosmopolitan","เมืองสากล","Natural","ธรรมชาติ"],["Calm","สงบ","Dynamic","มีพลัง"],["Familiar","คุ้นเคย","Disruptive","แหวกแนว"],["Realistic","สมจริง","Idealistic","อุดมคติ"]];
+const words=["Trustworthy เชื่อถือได้","Professional เป็นมืออาชีพ","Friendly เป็นกันเอง","Smart ปราดเปรื่อง","Passionate น่าหลงใหล","Enthusiastic กระตือรือร้น","Caring ห่วงใย","Frank จริงใจ","Fun สนุก","Playful ขี้เล่น","Cheerful ร่าเริง","Witty มีไหวพริบ","Humourous มีอารมณ์ขัน","Serious จริงจัง","Formal เป็นทางการ","Casual ไม่เป็นทางการ","Authoritative มีอำนาจ","Respectful น่าเคารพ","Informative ให้ความรู้","Conversational ชอบพูดคุย","Matter-of-fact ตรงไปตรงมา","Trendy ตามกระแส","Provocative เร้าใจ","Romantic โรแมนติก"];
+
+const qb=(n,en,th)=>`<div class="sq"><span class="qq"><span class="qn">${n}.</span>${en}</span><span class="qth">${th}</span><textarea placeholder="Your answer · คำตอบของคุณ"></textarea></div>`;
+document.getElementById('qs-a').innerHTML = setA.map((q,i)=>qb(i+1,q[0],q[1])).join('');
+document.getElementById('qs-b').innerHTML = setB.map((q,i)=>qb(i+11,q[0],q[1])).join('');
+document.getElementById('qs-c').innerHTML = pairs.map(p=>`
+  <div class="scale">
+    <div class="poles"><span>${p[0]}<small>${p[1]}</small></span><span>${p[2]}<small>${p[3]}</small></span></div>
+    <div class="pts">${[1,2,3,4,5].map(v=>`<button aria-pressed="false" aria-label="${p[0]} to ${p[2]}, ${v} of 5"></button>`).join('')}</div>
+  </div>`).join('');
+document.querySelectorAll('.pts button').forEach(b=>b.onclick=()=>{
+  b.parentElement.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed','false'));
+  b.setAttribute('aria-pressed','true');
+});
+let picked=0;
+const chipBox=document.getElementById('chips'), chipN=document.getElementById('chipn');
+words.forEach(w=>{
+  const c=document.createElement('button'); c.className='chip'; c.textContent=w; c.setAttribute('aria-pressed','false');
+  c.onclick=()=>{
+    const on=c.getAttribute('aria-pressed')==='true';
+    if(!on && picked>=10){ toast('Maximum 10 words · เลือกได้สูงสุด 10 คำ'); return; }
+    c.setAttribute('aria-pressed', String(!on)); picked += on ? -1 : 1;
+    chipN.innerHTML = `Selected <b>${picked}</b> of 10 · เลือกแล้ว ${picked} คำ (ขั้นต่ำ 6)`;
+  };
+  chipBox.appendChild(c);
+});
+document.querySelectorAll('#dm input').forEach(r=>r.onchange=()=>{
+  document.querySelectorAll('#dm .pickone').forEach(l=>l.classList.remove('sel'));
+  r.closest('.pickone').classList.add('sel');
+});
+function go(step){
+  document.querySelectorAll('.step').forEach(s=>s.classList.toggle('on', +s.dataset.s === step));
+  document.getElementById('progBar').style.width = (step/6*100)+'%';
+  if(step===6){ const n=document.getElementById('f-name').value.trim(); document.getElementById('doneName').textContent = n||'friend'; }
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+render(); renderPast();
+</script>
+</body>
+</html>
