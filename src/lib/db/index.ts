@@ -87,6 +87,21 @@ function closeOnExit(client: { close: () => Promise<void> }) {
 async function create() {
   const url = process.env.DATABASE_URL;
 
+  /**
+   * The local fallback is a development convenience and nothing else. On a
+   * serverless host its directory is ephemeral and per-instance, so a client
+   * could complete a twenty-minute questionnaire into a database that is
+   * discarded when the function does. Refuse to start rather than lose a
+   * client's answers.
+   */
+  if (!url && process.env.NODE_ENV === 'production') {
+    throw new Error(
+      'DATABASE_URL is not set. Production must run on Supabase Postgres — the local ' +
+        'PGlite fallback is per-instance and ephemeral, and answers written to it would ' +
+        'be lost. Set DATABASE_URL to the pooled Supabase connection string.',
+    );
+  }
+
   if (url) {
     const { drizzle } = await import('drizzle-orm/postgres-js');
     const postgres = (await import('postgres')).default;
