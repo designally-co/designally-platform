@@ -1,7 +1,12 @@
 # What the survey should tell the team
 
 **Designally Platform · analysis engine design**
-*Grounded in the real ARUN+ survey (28 responses, 6 departments) and the PCE-TH / Branding questionnaire.*
+*Grounded in the real ARUN+ survey (26 exported responses, 6 departments) and the PCE-TH data.*
+
+> **Note, 11 August 2026.** ARUN+ answered the **version-1** questionnaire. Two questions its
+> strongest findings leaned on — "who are your main competitors" and "what are you most proud of" —
+> are not in version 2. The engine's prompt is tuned against that data and needs re-testing on a
+> real version-2 survey before a brief from it is trusted.
 
 ---
 
@@ -65,39 +70,57 @@ A single honest read on how unified the client organisation is: high consensus, 
 
 ## Layer 2 — Depends on the package
 
-### Branding projects
+_Rewritten 11 August 2026. The website and combined packages were retired; the questionnaire is
+now Brand (24 questions) or Design (14). Both share the Visual Direction block._
 
-**Personality position — and the spread.** The 10 scales give an average, but the *disagreement width* is the real finding. If nine people say Serious and one says Fun, that is noise. If the split is 50/50, the brand has no agreed temperament yet and the kick-off must resolve it.
-*In ARUN+:* Serious–Fun and Subtle–Bold were genuinely split, while Traditional–Modern was near-unanimous. Two of ten scales need discussion; eight are settled. That is a five-minute agenda item instead of a one-hour one.
+### Both packages — from Visual Direction
 
-**Adjective clusters.** The 6–10 chosen words rarely form one family. Group them and name the tension: *Authority* (Professional, Trustworthy, Authoritative) versus *Warmth* (Friendly, Cheerful, Caring) versus *Energy* (Enthusiastic, Trendy, Provocative). Most brands want two of the three; the design job is deciding which is dominant.
+**The avoid list, cross-checked.** What stakeholders said they *don't* want, against what they
+said they *do*. A client asking for Bold while also selecting "Too Serious" and "Minimal Style" as
+things to avoid has an internal contradiction that must surface before the first concept, not
+after. Version 2 makes this sharper than version 1 did: Mood, Things to Avoid and Design Elements
+to Avoid are all comparable lists, so the contradiction is between two sets rather than between
+two paragraphs.
 
-**Archetype signal.** The famous-person answers cluster more reliably than people expect.
-*In ARUN+:* Steve Jobs, Elon Musk, Nikola Tesla, Christopher Columbus formed a clear Innovator/Explorer camp — while a smaller group answered Taylor Swift, Lisa, Justin Bieber, a Performer camp. Those two camps map exactly onto the Serious–Fun split. Cross-referencing two questions produced a stronger finding than either alone, and that is what the engine should be doing.
+**Mood spread.** Each respondent picks three words from six. Three people picking three different
+sets is not a brand with a personality yet; it is a decision waiting to be made. Name the spread,
+not the average.
 
-**The avoid list.** What stakeholders said they *don't* want, cross-checked for contradictions against what they said they *do* want. A client asking for "bold and disruptive" while also saying "avoid anything provocative" has an internal contradiction that must surface before the first concept, not after.
+**Reference decoding — the *why*, not the names.** Unchanged and still the most valuable single
+mechanic. Version 2 asks for it directly: the question tells the client to explain mood, layout,
+feeling and visual style, and to avoid answering "because it looks nice". When they answer it
+properly, the reasons are the data.
 
-**Rebrand only — equity to keep.** When the project is a rebrand rather than a new brand, one question dominates: what must survive? Colour, mark, name, tone, a specific asset customers recognise. Getting this wrong is the most expensive error in the discipline.
+**Hard constraints.** Limitations and Technical Requirements are not opinions — a required font, a
+retained CI asset, a regulated claim, a deadline. They belong in the brief as facts, separated
+from everything the kick-off can still decide.
 
-### Website projects
+### Brand only — from the strategy block
 
-*(Proposed — I have the Branding template from your Drive but not the Website one, so treat this as a draft until I see the real questions.)*
+**Personality position, and the spread.** The ten scales now run 0–10 rather than 1–5, so the
+disagreement width is finer and more honest. The width is still the finding, not the average: nine
+people at Serious and one at Fun is noise; a 50/50 split means the brand has no agreed temperament
+and the kick-off must resolve it.
 
-**Primary task and success measure.** What one thing must a visitor be able to do, and how will the client judge in six months whether the site worked. If stakeholders answer this differently, the information architecture has no agreed centre.
+**The three protected things.** What the brand would defend at higher cost, with a real example
+each. Where several respondents protect different things, the brand has more than one idea of what
+it stands for.
 
-**Content readiness.** Do they have copy, photography, product data, translations — and who owns producing what is missing. This is the single most common cause of website projects stalling, and the survey can predict it weeks in advance.
+**The one-sentence answers.** Two questions ask for a single sentence — what people should say in
+3–5 years, and what customers can be sure of every time. Short answers are comparable almost
+literally, and where three people write three different sentences the positioning is not settled.
 
-**Feature-versus-goal fit.** Requested features that do not serve any stated goal. A blog nobody will write, a members area with no membership. Naming this early is the cheapest scope protection an agency has.
+**Inside against outside.** The brand voice question asks separately how the brand should come
+across to customers and internally. A gap between the two is worth naming.
 
-**Technical constraints.** Existing platform, CMS preference, integrations, who maintains it after handover.
+### Design only — from the project block
 
-**Implied structure.** The pages and sections stakeholders describe, assembled into a first-draft sitemap — so the kick-off starts from something concrete to react to rather than a blank page.
+**Objective against usage.** What the work is for, against where it will be used. A stated
+objective of "build credibility" paired with a usage list of online ads and social media is a
+mismatch worth raising before design starts.
 
-### Branding + Website together
-
-One extra insight the separate analyses cannot produce: **coherence between the brand promise and the expected digital experience.** A brand positioned as premium and exclusive, paired with requests for discount banners and a chat widget, is a conflict — but it only becomes visible when both question sets are read as one.
-
----
+**Single-respondent risk is higher here.** Design projects are more likely to be answered by one
+person. Layer 3's single-respondent rule applies more often, not less.
 
 ## Layer 3 — Only when the data triggers it
 

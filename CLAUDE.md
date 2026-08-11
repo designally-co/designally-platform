@@ -2,7 +2,7 @@
 
 ## Project
 
-Internal platform replacing the manual work between a signed deal and a kick-off meeting. Clients answer branded bilingual questionnaires; the platform collects responses, finds where stakeholders disagree, and produces one confirmed page that drives the kick-off. Website projects continue with a second survey covering content ownership.
+Internal platform replacing the manual work between a signed deal and a kick-off meeting. Clients answer branded bilingual questionnaires; the platform collects responses, finds where stakeholders disagree, and produces one confirmed page that drives the kick-off.
 
 Read `PRODUCT.md` for users, purpose and design principles. Read `DESIGN.md` for the visual system. Both take precedence over anything inferred from existing code.
 
@@ -15,7 +15,7 @@ Read `PRODUCT.md` for users, purpose and design principles. Read `DESIGN.md` for
 - Vercel deployment
 - Anthropic API for analysis (server-side only, never exposed to the client)
 
-**Survey links live at `s.designally.co/s/<token>`** and the content survey at `s.designally.co/c/<token>`.
+**Survey links live at `s.designally.co/s/<token>`.**
 
 **Decided 10 August 2026 — a subdomain, not a path on the main site.** The original plan was
 `designally.co/s/<token>`, routed from the main site. The main site turned out to run on
@@ -59,7 +59,7 @@ changes; only `DATABASE_URL`.
 
 ## Two surfaces, one app
 
-- **Public** (`/s/[token]`, `/c/[token]`) — client surveys. No login. Must work on a phone, in Thai, on a poor connection. Saves progress as the client goes.
+- **Public** (`/s/[token]`) — client surveys. No login. Must work on a phone, in Thai, on a poor connection. Saves progress as the client goes.
 - **Private** (everything else) — the team app. Behind auth. Designally staff only.
 
 Keep them in one Next.js app. Do not build two projects.
@@ -73,14 +73,15 @@ docs/complete-flow.md              the whole flow, step by step, who does what
 docs/first-session-brief.md        the build plan and milestone prompts
 docs/insight-engine-spec.md        what the analysis produces, and what it must never produce
 docs/questionnaire-architecture.md block structure — shared questions, not separate templates
-docs/website-questionnaire-v2.md   the revised website questionnaire, bilingual
-docs/content-survey.md             the follow-up survey and when it is sent
 docs/team-workflow-after-survey.md what the team does after answers arrive
 docs/navigation-decisions.md       why the navigation is what it is
 reference/designally-app.html      the working prototype — design system, copy, interactions
 reference/brief-one-page.html      the brief format, built from real ARUN+ data
 reference/flow-map.html            the flow as a diagram
 ```
+
+`docs/website-questionnaire-v2.md` and `docs/content-survey.md` were deleted on 11 August 2026
+with the website track. `reference/flow-map.html` still draws the old branch after the kick-off.
 
 **The prototype is the source of truth for design and copy.** It holds the bilingual strings, the token values, the interaction decisions, and the tone. Port from it. Never regenerate a screen from scratch when it already exists there.
 
@@ -115,10 +116,11 @@ Do not retype the questions; import that file.
 ```
 clients          name, project_code
 projects         client_id, package, stage, archived, archived_at/by,
-                 kickoff_at, pages, languages[]
-question_blocks  key (identity | core | branding | website | content | ecommerce)
+                 kickoff_at, pages, languages[]   (last two unused since v2)
+question_blocks  key (identity | strategy | project | visual
+                      | core | branding | website | content | ecommerce — retired)
 questions        block_id, order, text_en, text_th, type, config, version
-surveys          project_id, kind (discovery | content), token,
+surveys          project_id, kind (discovery), token,
                  opened_at, closed_at, closed_by
 responses        survey_id, respondent_name, role, decision_maker, email, submitted_at
 answers          response_id, question_id, value
@@ -127,12 +129,30 @@ decisions        project_id, question, outcome, note, recorded_at, recorded_by
 users            team members
 ```
 
-Question types are exactly five, matching the current Google Forms: `paragraph`, `short_text`, `multiple_choice`, `checkboxes` (with optional min/max), `linear_scale` (with pole labels and point count).
+Question types are exactly five: `paragraph`, `short_text`, `multiple_choice`, `checkboxes` (with
+optional min/max), `linear_scale` (with pole labels, point count, and an optional `start` — the
+version-2 personality scales run 0–10, not 1–5).
 
-Stage flow differs by package — branding runs 5 stages, website and combined run 7:
+**Decided 11 August 2026 — two packages, and the website track is retired.** The branding team
+replaced the questionnaire. A client buys Brand **or** Design, never both.
+
+| Package | Blocks | Questions |
+|---|---|---|
+| **Brand** — Brand Strategy + Brand Identity | identity · strategy · visual | 24 |
+| **Design** | identity · project · visual | 14 |
+
+Part 2 of the new questionnaire is identical in both packages, word for word, in both languages —
+so `visual` is one shared block. See `docs/questionnaire-architecture.md`.
+
+Gone with the website track: the `website`, `both` and `content` packages, the content survey and
+its `/c/<token>` route, and **milestone 5**. The retired blocks stay in the database because
+surveys already sent keep the questions they were sent with (rule 5); deleting a block key would
+orphan a real brief.
+
+Both packages run the same five stages, but the meter reads its length from `STAGE_FLOW` rather
+than assuming five:
 ```
-branding  Lead → Proposal → Survey → Analysis → Kick-off
-website   Lead → Proposal → Survey → Analysis → Kick-off → Content → Build
+Lead → Proposal → Survey → Analysis → Kick-off
 ```
 
 ## Build milestones
@@ -143,7 +163,7 @@ Each one ends with something usable. Do not start the next before the previous h
 2. **The team can see it** — auth, Projects list, create survey, view responses. Already replaces Google Forms.
 3. **The brief writes itself** — close and analyse, Anthropic API, structured output. Test against the real ARUN+ (28 responses) and PCE-TH data.
 4. **The human gate and the decisions** — review, confirm, deck handoff, record decisions.
-5. **The website track** — content survey after decisions are recorded.
+5. ~~The website track~~ — retired 11 August 2026 with the website package.
 6. **The template editor** — until then, questions live in a seed file.
 
 ## Working conventions

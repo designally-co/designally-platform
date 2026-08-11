@@ -5,6 +5,9 @@ Clients answer branded bilingual questionnaires; the platform collects however m
 responses arrive, finds where stakeholders disagree, and produces one confirmed page
 that drives the kick-off.
 
+Two packages: **Brand** (Brand Strategy + Brand Identity, 24 questions) and **Design**
+(14 questions). A client buys one or the other.
+
 ## Read these first, in this order
 
 1. **`PRODUCT.md`** — who it is for, what it does, the design principles
@@ -19,7 +22,7 @@ that drives the kick-off.
 | Stack | Next.js 14 App Router · TypeScript · Tailwind · Drizzle |
 | Database | Neon Postgres |
 | Login | Google OAuth, designally.co only |
-| Survey links | `s.designally.co/s/<token>` and `/c/<token>` |
+| Survey links | `s.designally.co/s/<token>` |
 | Hosting | Vercel |
 | Analysis | Anthropic API, server-side |
 
@@ -38,8 +41,6 @@ docs/
   complete-flow.md           every step, and who owns it
   insight-engine-spec.md     what the analysis produces — and never produces
   questionnaire-architecture.md  shared question blocks, not separate templates
-  website-questionnaire-v2.md    the revised website questionnaire
-  content-survey.md          the follow-up survey and when it is sent
   team-workflow-after-survey.md  what the team does after answers arrive
   navigation-decisions.md    why the navigation is what it is
 reference/
@@ -47,7 +48,7 @@ reference/
   brief-one-page.html        the brief format, built from real ARUN+ data
   flow-map.html              the flow as a diagram
 seed/
-  question-blocks.json       60 questions, bilingual, ready to import
+  question-blocks.json       the version-2 questionnaire, bilingual, ready to import
 ```
 
 ## The eight rules
@@ -102,7 +103,7 @@ Two hostnames, one Vercel project.
 
 | Host | Serves | Who sees it |
 |---|---|---|
-| `s.designally.co` | client questionnaires at `/s/<token>` and `/c/<token>` | clients, no login |
+| `s.designally.co` | client questionnaires at `/s/<token>` | clients, no login |
 | the Vercel project domain | the team app | Designally staff, behind Google OAuth |
 
 `s.designally.co` is a **CNAME to Vercel**. The main site is WordPress and is never in the path —
@@ -130,16 +131,16 @@ build time.
 
 *Milestone 1 — the survey.* A public bilingual questionnaire at `/s/<token>`, saving to Postgres.
 
-- All six question blocks seeded from `seed/question-blocks.json` — 60 questions, versioned
-- The branding questionnaire in the five steps from `reference/designally-app.html`
-- All five question types, including the ten personality scales and the 6–10 word chips
+- Every question block seeded from `seed/question-blocks.json`, versioned
+- Steps derived from the blocks, so a new package gets a flow without one being written
+- All five question types, including the ten personality scales
 - Progress saved to localStorage **and** a server draft, so a cleared browser or a second device still picks up where it left off
 - One response row and its answer rows on submit; a blank answer is stored as absent, which is what the analysis reads as a clarity gap
 
 *Milestone 2 — the team can see it.* One page, behind Google OAuth.
 
 - **Needs you** — a survey that has gone quiet for five days is promoted here and asks whether there is enough to work with. It only ever asks
-- **All projects** — a real table; the segment meter follows the package, five stages for branding and seven for website
+- **All projects** — a real table; the segment meter reads its length from the package rather than assuming five
 - **New survey** — client, package, a generated link. No expected respondent count, and there never will be
 - **Project detail** — right now, the stage timeline, who answered, the link, and archive
 - Two of the four gates are live: closing collection and archiving, each recording who acted and when. Archiving is reversible; nothing is ever deleted

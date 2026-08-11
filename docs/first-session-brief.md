@@ -2,13 +2,19 @@
 
 **Designally Platform · August 2026**
 
+> **Where this is out of date, 11 August 2026.** Milestones 1, 2 and 3 are built and deployed.
+> Milestone 5 is retired with the website track. The questionnaire this plan describes is
+> version 1; the branding team replaced it, and `docs/questionnaire-architecture.md` has the
+> current structure. The milestone prompts are kept because the *habits* section above them is
+> the useful part, not the wording of any single prompt.
+
 ---
 
 ## Are you ready?
 
 Almost. Here is the honest state.
 
-**Decided and written down** — the product, the users, the whole flow, what the analysis produces, the questionnaire structure for both packages, the content survey, the navigation, and a complete design system. All of it argued out and recorded. That is far more than most builds start with, and it is the part that usually goes wrong.
+**Decided and written down** — the product, the users, the whole flow, what the analysis produces, the questionnaire structure, the navigation, and a complete design system. All of it argued out and recorded. That is far more than most builds start with, and it is the part that usually goes wrong.
 
 **Not decided yet — four things.** None takes long, but the first session needs three of them.
 
@@ -16,7 +22,7 @@ Almost. Here is the honest state.
 |---|---|---|
 | Database host | **Neon** Postgres | Cleanest with Vercel and Drizzle, which you already use. Supabase is fine too if you want auth bundled. |
 | Team login | **Google OAuth restricted to designally.co** | You are already on Google Workspace. Nobody manages another password, and access dies with the account. |
-| Survey link domain | A subdomain — `s.designally.co` or a path on the main app | Client links must be short, public and obviously yours. Decide before milestone 1 so tokens don't need migrating. |
+| Survey link domain | A subdomain — `s.designally.co` or a path on the main app | Client links must be short, public and obviously yours. Decide before milestone 1 so tokens don't need migrating. **Settled: the subdomain.** |
 | Anthropic API key | An account with billing, key in Vercel env | Not needed until milestone 3. Cents per brief at your volume. |
 
 **One housekeeping step.** Copy the docs out of the Claude Project into the repo. Claude Code cannot see the Project — only files on disk.
@@ -30,8 +36,6 @@ designally-platform/
     complete-flow.md
     insight-engine-spec.md
     questionnaire-architecture.md
-    website-questionnaire-v2.md
-    content-survey.md
     team-workflow-after-survey.md
     navigation-decisions.md
   reference/
@@ -90,7 +94,7 @@ Copy these as-is. Run each to completion and use it before starting the next.
 > Scope:
 > - Public route `/s/[token]`, no auth
 > - Drizzle schema + migration for: clients, projects, question_blocks, questions, surveys, responses, answers — as specified in CLAUDE.md
-> - Seed the Branding questionnaire from docs/questionnaire-architecture.md. Question types: paragraph, short_text, multiple_choice, checkboxes with optional min/max, linear_scale with pole labels and point count
+> - Seed the questionnaire from docs/questionnaire-architecture.md. Question types: paragraph, short_text, multiple_choice, checkboxes with optional min/max, linear_scale with pole labels and point count
 > - Render it in the five steps used in reference/designally-app.html, with the same copy in English and Thai
 > - Save progress as the respondent moves between steps, keyed to the token in localStorage plus a server draft
 > - On submit, write one response row and its answer rows
@@ -109,7 +113,7 @@ Copy these as-is. Run each to completion and use it before starting the next.
 > - The project detail panel: right now, stage timeline, who answered, documents, archive
 > - Manual archive only. No timers anywhere in this codebase
 >
-> The stage flow follows the package — five stages for branding, seven for website. Never hard-code five.
+> The stage flow follows the package. Never hard-code the number of stages.
 >
 > Done when: I create a survey for a real client, send the link, watch answers arrive in the table, open the project, and archive it when I choose to.
 
@@ -138,18 +142,15 @@ This is the milestone that will take longest, and the time will go on tuning the
 > - Review and confirm the brief, recording confirmed_at and confirmed_by
 > - "Send to Claude" panel with the copyable deck brief, per docs/team-workflow-after-survey.md
 > - Record decisions: each conflict the brief found, the options the deck presented, a free-text note, and "still open" as a valid outcome
-> - Recorded decisions appear in the project detail and travel into the content survey
+> - Recorded decisions appear in the project detail and are the brief the design work runs on
 >
 > Nothing reaches a client before a human confirms. Enforce it in the data layer, not just the UI.
 
-### Milestone 5 — the website track
+### ~~Milestone 5 — the website track~~
 
-> Build milestone 5 from docs/content-survey.md.
->
-> - Second survey kind, route `/c/[token]`, twelve questions, sent after decisions are recorded
-> - It cannot be sent before decisions exist — order matters
-> - Client-facing intro shows pages and languages only. **No estimated content volume anywhere**, client-facing or internal — rule 4 in CLAUDE.md
-> - Produces the content readiness plan: verdict, owner map, unresolved list, plumbing checklist
+**Retired 11 August 2026.** The website and combined packages were dropped, and the content survey
+went with them. Rule 4 survives on its own merits — the platform still never displays a predicted
+quantity of work.
 
 ### Milestone 6 — the template editor
 

@@ -25,7 +25,7 @@ Then **Confirm**. Nothing reaches a client before a person has confirmed.
 
 **7 · Record what was decided.**
 
-**8 · Then the paths split.** Branding → design work begins with the decisions as the brief. Website or both → the content survey goes to the named coordinator, then the build.
+**8 · The work begins**, with the recorded decisions as the brief.
 
 ## Time
 Before: roughly 4–8 hours per project reading surveys, analysing, and building a deck from scratch.
@@ -39,4 +39,4 @@ Consequences: the designer works from a memory of the meeting; a stakeholder who
 When a kick-off is marked done and no decisions are recorded, the project appears in "Needs you". The panel shows each conflict the brief found, the options the deck presented, and a free-text field for the nuance the options miss. **"Still open — needs another meeting" is a valid outcome**, because pretending a decision happened is worse than recording that it didn't.
 
 ## Order matters
-Decisions are recorded **before** the content survey goes out, because what was decided changes what content is needed. A project cannot reach "Send content survey" until its decisions exist.
+Decisions are recorded before the design work starts, because what was decided is the brief the work runs on. Nothing downstream should begin from a memory of the meeting.

@@ -1,42 +1,84 @@
 # Questionnaire architecture — shared blocks, not separate templates
 
-_Designally Platform_
+_Designally Platform · rewritten 11 August 2026 for the version-2 questionnaire_
 
 ## The finding
-Section 2 of the real Website Survey ("Brand Essentials", 10 questions) is **the same questionnaire as the Branding template** — same wording, same order, same personality scales.
 
-## Therefore: block architecture
-One library of blocks, not parallel templates. Implemented in `seed/question-blocks.json`.
+The branding team's questionnaire arrives as two packages, and **Part 2 is identical in both** —
+word for word, in both languages. Diffed, it is zero lines apart.
+
+That is the same shape as the original finding, which was that the Website survey's "Brand
+Essentials" section *was* the Branding template. One library of blocks, not parallel templates.
+
+## The blocks
+
+Implemented in `seed/question-blocks.json`, imported by `npm run db:seed`.
 
 | Block | Contents | Used by |
 |---|---|---|
-| `identity` | name · role · final decision maker? | every survey |
-| `core` | the 10 shared brand-essential questions | branding, website, both |
-| `branding` | 11 branding-specific questions | branding, both |
-| `website` | 15 website questions | website, both |
-| `ecommerce` | 9 questions, conditional | website, both — only when selling online |
-| `content` | 12 questions | the follow-up content survey only |
+| `identity` | name · role · final decision maker? | both packages |
+| `strategy` | Package A Part 1 — 14 questions | Brand |
+| `project` | Package B Part 1 — 4 questions | Design |
+| `visual` | Part 2 — 7 questions | **both packages** |
 
-**Consequence:** a "Branding + Website" client answers `core` **once**, not twice. Under the old Google Forms they either answered it twice or the team dropped one form and lost stakeholder coverage.
+| Package | Blocks | Questions |
+|---|---|---|
+| **Brand** — Brand Strategy + Brand Identity | identity · strategy · visual | 24 |
+| **Design** | identity · project · visual | 14 |
 
-**Consequence:** editing "Who is your target audience?" once updates every questionnaire that uses it.
+**Consequence:** editing a Visual Direction question once updates both questionnaires.
 
-## Bugs in the original Google Form, already fixed in the seed
-1. **Duplicate question** — the website section asked for desired features twice in a row. Removed.
-2. **Missing personality pair** — the instruction said "10 pairs" but only nine were listed. *Realistic – Idealistic* restored, so website and branding projects compare on the same ten scales.
-3. **Question asked twice across sections** — sample product information appeared in both the website and e-commerce sections. Now asked once.
-4. **No stakeholder identity** — the form collected email only. The `identity` block adds name, role and decision-maker status, without which conflict weighting has nothing to run on.
+**A client buys one package or the other, never both**, so nobody is ever asked the visual block
+twice. That was the risk `core` carried under the old model and the reason it existed.
 
-## Ordering
-The website block is deliberately ordered so the feasibility inputs come first: goal, budget, launch date, page count, languages, features. Clients answer budget more honestly before describing everything they want, and the feasibility check needs all six.
+## Why `identity` is ours and not theirs
+
+The questionnaire does not ask who is answering. The platform adds it, because everything the
+analysis does with authority depends on it: weighting a conflict by who holds the decision, and
+the red flag raised when nobody claims it (`docs/insight-engine-spec.md`). Without the block, a
+conflict between two people is just two opinions.
+
+## Retired blocks
+
+`core`, `branding`, `website`, `ecommerce` and `content` are attached to no package. They stay in
+the database and in `BLOCK_KEYS`.
+
+This is rule 5 doing its job. A survey stores the question version and block keys it was sent
+with, so a brief written from the old branding questionnaire still resolves its questions and
+still reads correctly. Deleting a block key would orphan a real brief. `steps.ts` falls back to a
+step per block for those surveys, using each block's own name from the seed.
 
 ## Question types — exactly five
-`paragraph` · `short_text` · `multiple_choice` · `checkboxes` (optional min/max) · `linear_scale` (pole labels + point count).
 
-These are the five the original Google Forms used. Do not add a sixth without a product reason.
+`paragraph` · `short_text` · `multiple_choice` · `checkboxes` (optional min/max) ·
+`linear_scale` (pole labels, point count, optional `start`).
 
-## Conditional blocks
-`ecommerce` is shown only when the website block's goal is "Sell products online" or its feature list includes "Online shop and checkout". The trigger is declared in the seed file.
+`start` was added for version 2: the personality scales moved from 1–5 to **0–10**, where 0 is a
+position — "fully Traditional" — and not an absence of one. Absent means 1, which is what every
+version-1 question uses.
 
-## Fields the analysis needs
-Several questions carry `maps_to` in the seed — `decision_maker`, `pages`, `languages`, `skus`. These populate project fields used by the feasibility check and the content survey. Keep the mapping when importing.
+Eleven points do not fit one row of 44px touch targets on a 390px phone (484px needed, 350px
+available). Wide scales number their buttons and wrap. A graded dot cannot wrap: position is the
+only thing telling you what it is.
+
+## No conditional blocks
+
+Version 1 had one: `ecommerce` appeared only when the website block's feature list included an
+online shop, declared as `triggers` in the seed. Version 2 has no conditional blocks, so nothing
+is hidden and nothing is revealed. The trigger mechanism remains in the loader and is unused.
+
+## Open with the branding team
+
+Four question shapes were read from the source document rather than specified by it. Each is one
+line in the seed to change, and a change lands as version 3 without touching a sent survey.
+
+1. **Mood and Personality**, **Things to Avoid**, **Design Elements to Avoid** — the Thai says
+   **เช่น** (for example), which reads as illustrations, but each says "choose N". They are seeded
+   as checkboxes, because the adjective-cluster and avoid-list findings in the insight spec need
+   answers that can be compared between respondents. Free text cannot be compared.
+2. **"3D, Character"** — seeded as two elements, following the comma in the source. The PDF had
+   none.
+3. **"เลือก 3 สิ่งที่แบรนด์ของคุณจะรักษาไว้เสมอ"** — seeded as one paragraph, because no list is
+   offered to choose from. Three separate fields would compare better.
+4. **Package A has no Project Objective and no Usage/Application**; Design has both. Seeded as
+   written rather than filled in.

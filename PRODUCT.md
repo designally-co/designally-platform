@@ -14,7 +14,7 @@ Two audiences with opposite needs.
 
 **Designally's project team** — the people who run client projects: sending questionnaires, reading what came back, preparing kick-off meetings, and keeping several clients moving at once. They open this tool between other work, often for fifteen seconds, and need to know immediately whether anything is waiting on them. They are not looking for a dashboard to study; they are looking for an answer to "is there anything I have to do".
 
-**The client's stakeholders** — founders, marketing leads, operations managers at the client company, answering a questionnaire once. Most are answering on a phone, in Thai, without much context about why they were sent the link. Several people from the same company answer separately, and they will not all agree with each other. A second, smaller group — usually one content coordinator — answers a short follow-up survey later in website projects.
+**The client's stakeholders** — founders, marketing leads, operations managers at the client company, answering a questionnaire once. Most are answering on a phone, in Thai, without much context about why they were sent the link. Several people from the same company answer separately, and they will not all agree with each other.
 
 ## Product Purpose
 

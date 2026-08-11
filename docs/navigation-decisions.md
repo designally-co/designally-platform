@@ -11,7 +11,7 @@ _Designally Platform · final (prototype v2.3)_
 | Column | Contents |
 |---|---|
 | Project | Blue dot when the project needs the team · client name · package beneath |
-| Stage | Segment meter (5 branding / 7 website) · "Analysis · 4 of 5" |
+| Stage | Segment meter, one segment per stage · "Analysis · 4 of 5" |
 | Answers | "3 answers" · "Khun Tanawat decides", or "no decision maker named" |
 | Latest | Two lines of state |
 

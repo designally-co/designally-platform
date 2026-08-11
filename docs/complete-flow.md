@@ -21,9 +21,8 @@ Every step belongs to the client, the team, or the app.
 | 12 | **Team** | **Record what was decided** ← human decision | 2 min |
 | 13 | **Team** | **Archive the project** ← human decision, whenever they judge it finished | 5 sec |
 
-**Branch after 12.**
-Branding only → design work begins with the decisions as the brief.
-Website or both → team sends the content survey to one named coordinator → coordinator answers in ~8 min → content readiness plan → build.
+**After 12.** Design work begins, with the recorded decisions as the brief. Both packages —
+Brand and Design — follow the same thirteen steps; only the questionnaire differs.
 
 ## Four decisions belong to the team — nothing happens on a timer
 1. **Is this enough to work with?** Only a person knows whether four answers from the right people beat ten from the wrong ones.
@@ -31,10 +30,11 @@ Website or both → team sends the content survey to one named coordinator → c
 3. **What did the room actually decide?** Written down after the kick-off, in the team's own words.
 4. **Is this project finished?** Archiving is manual. There is no automatic rule. Nothing is deleted; archived projects stay searchable.
 
-## No content volume estimate
-The content survey shows the client **pages and languages only** — no estimated piece count, client-facing or internal.
-
-The earlier figure (~46 content rows per page across two languages) came from **one project**, Solramari. One data point is not a basis for a number put in front of a client. The survey asks *who owns each part*, not *how much there is*. Once several website projects have run through the platform with real row counts recorded, a calibrated estimate could return as an internal planning signal. Phase 2 at the earliest.
+## No volume estimates
+Rule 4 stands even though the content survey that prompted it is gone: the platform never
+calculates or displays a predicted quantity of work, client-facing or internal. The earlier figure
+(~46 content rows per page) came from **one project**, Solramari, and one data point is not a basis
+for a number put in front of a client.
 
 ## What runs with nobody touching it
 Question-block selection from the package · answer collection · promotion to "Needs you" after 5 quiet days · the brief itself · conflicts → DECIDE slides placed early.
@@ -46,7 +46,7 @@ Question-block selection from the package · answer collection · promotion to "
 
 ## Project detail
 1. **Right now** — one sentence on what is happening, plus the action if the team is needed
-2. **Where it is** — full stage timeline, dated; branding 5 stages, website 7
+2. **Where it is** — full stage timeline, dated; five stages, read from the package
 3. **Who answered** — names, roles, and who decides
 4. **Decided at the kick-off** — the recorded decisions, once they exist
 5. **Documents** — survey analysis, kick-off deck, content readiness plan
