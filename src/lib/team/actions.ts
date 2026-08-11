@@ -107,7 +107,7 @@ export async function closeCollection(surveyId: string): Promise<ActionResult> {
   const { buildTranscript } = await import('@/lib/analysis/transcript');
   const { analyse } = await import('@/lib/analysis/run');
 
-  const { transcript, respondentCount } = await buildTranscript(survey.id);
+  const { transcript, respondentCount, decisionMakers } = await buildTranscript(survey.id);
 
   if (respondentCount === 0) {
     revalidatePath('/');
@@ -122,6 +122,7 @@ export async function closeCollection(surveyId: string): Promise<ActionResult> {
     packageLabel: PACKAGE_LABEL[client.package],
     respondentCount,
     transcript,
+    decisionMakers,
   });
 
   if (!result.ok) {
@@ -164,7 +165,7 @@ export async function reanalyse(projectId: string): Promise<ActionResult> {
   const { buildTranscript } = await import('@/lib/analysis/transcript');
   const { analyse } = await import('@/lib/analysis/run');
 
-  const { transcript, respondentCount } = await buildTranscript(row.survey.id);
+  const { transcript, respondentCount, decisionMakers } = await buildTranscript(row.survey.id);
   if (respondentCount === 0) return { ok: false, error: 'Nobody answered this survey.' };
 
   const result = await analyse({
@@ -172,6 +173,7 @@ export async function reanalyse(projectId: string): Promise<ActionResult> {
     packageLabel: PACKAGE_LABEL[row.package],
     respondentCount,
     transcript,
+    decisionMakers,
   });
 
   if (!result.ok) return { ok: false, error: result.error };

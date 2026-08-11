@@ -136,7 +136,7 @@ export const FindingsSchema = z.object({
       }),
     )
     .describe(
-      'Only what the data triggered — a missing decision maker, one person disagreeing with everyone, low-effort answers, a stated–revealed contradiction, single-respondent risk. Their rarity is what makes them read. An empty array is a good outcome.',
+      'Only what the data triggered — one person disagreeing with everyone, low-effort answers, a stated–revealed contradiction, single-respondent risk. Their rarity is what makes them read, so do not pad this. One case is not optional: if nobody claimed final decision authority, say so here and say it first, because it makes every conflict unresolvable from the survey alone.',
     ),
 });
 

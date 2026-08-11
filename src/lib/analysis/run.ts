@@ -32,6 +32,8 @@ export async function analyse(input: {
   packageLabel: string;
   respondentCount: number;
   transcript: string;
+  /** Respondents who claimed final decision authority. An empty list is a flag. */
+  decisionMakers: string[];
 }): Promise<AnalysisResult> {
   if (!process.env.ANTHROPIC_API_KEY) {
     return {
@@ -59,7 +61,10 @@ export async function analyse(input: {
   );
   if (!second.ok) return second;
 
-  const brief = { ...(first.value as Findings), ...(second.value as Creative) } as Brief;
+  const brief = withDecisionMakerFlag(
+    { ...(first.value as Findings), ...(second.value as Creative) } as Brief,
+    input,
+  );
 
   const missing = findMissingSections(brief);
   if (missing) return { ok: false, error: missing };
@@ -91,7 +96,14 @@ async function callPass(
        max_tokens risks an HTTP timeout. */
     const stream = client.messages.stream({
       model: MODEL,
-      max_tokens: 16000,
+      /**
+       * A complete brief for a 26-person survey runs to a dozen deck slides,
+       * ten scale readings and ten facilitation notes. At 16000 the second
+       * pass was truncated mid-string, and because the SDK parses inside
+       * finalMessage() that surfaced as an opaque JSON error rather than the
+       * max_tokens branch below — the check never got to run.
+       */
+      max_tokens: 32000,
       system: SYSTEM_PROMPT,
       /* Structured outputs, so the brief arrives as data rather than as
          markdown to be parsed later. */
@@ -144,8 +156,61 @@ async function callPass(
     if (err instanceof Anthropic.APIError) {
       return { ok: false, error: `The Anthropic API returned ${err.status}: ${err.message}` };
     }
+    /* The SDK parses structured output inside finalMessage(), so a response cut
+       off at the token limit arrives here as a JSON error rather than reaching
+       the max_tokens branch above. Say what actually happened. */
+    if (err instanceof Error && /parse structured output/i.test(err.message)) {
+      return {
+        ok: false,
+        error:
+          'The brief was cut off before it finished and could not be read, so nothing was saved. This usually means an unusually long survey. Run the analysis again.',
+      };
+    }
     return { ok: false, error: err instanceof Error ? err.message : 'The analysis failed.' };
   }
+}
+
+/**
+ * Guarantees the decision-maker flag rather than hoping for it.
+ *
+ * docs/insight-engine-spec.md: "If nobody marked themselves as final decision
+ * maker, everything in the conflict section is unresolvable and the kick-off
+ * needs the right person in the room. This is a red flag worth stating first."
+ *
+ * That makes it mandatory, not something the model decides is interesting. On
+ * the real ARUN+ survey — where not one of 26 people claimed authority — the
+ * flags array came back empty twice running. The condition is deterministic and
+ * already known here, so it is asserted rather than requested: a finding the
+ * database can prove should never depend on the model's attention.
+ *
+ * If the model did raise it, its wording is kept and only moved to the front.
+ */
+function withDecisionMakerFlag(
+  brief: Brief,
+  input: { decisionMakers: string[]; respondentCount: number },
+): Brief {
+  const existing = brief.flags.findIndex((f) => /decision[- ]?maker/i.test(f.label));
+
+  if (input.decisionMakers.length > 0) {
+    /* Somebody owns the decision. Nothing to add. */
+    return brief;
+  }
+  if (input.respondentCount === 0) return brief;
+
+  const flag =
+    existing >= 0
+      ? brief.flags[existing]
+      : {
+          label: 'Decision maker',
+          finding:
+            input.respondentCount === 1
+              ? 'The one person who answered did not claim final decision authority, so nothing here can be treated as settled. The kick-off needs whoever does decide, in the room.'
+              : `Not one of the ${input.respondentCount} people who answered claimed final decision authority. Every conflict below is therefore unresolvable from the survey alone — the kick-off needs the person who decides, in the room, or it will produce agreement that does not hold.`,
+          severity: 'high' as const,
+        };
+
+  const rest = brief.flags.filter((_, i) => i !== existing);
+  return { ...brief, flags: [flag, ...rest] };
 }
 
 /**

@@ -13,6 +13,7 @@ import {
 } from '@/lib/db/schema';
 
 import { PACKAGE_LABEL } from '@/lib/team/labels';
+import { claimsDecision } from '@/lib/survey/decision';
 
 export { PACKAGE_LABEL };
 
@@ -53,16 +54,7 @@ function agoText(days: number) {
   return `${plural(days, 'day')} ago`;
 }
 
-/**
- * Whether a respondent claimed final decision authority. The identity block's
- * third question offers "Yes — …", "Shared — …" and "No — …"; only the first
- * is a named decision maker. Shared authority is real and is not the same
- * thing, so it counts as nobody named — which is what the kick-off needs to
- * know (docs/insight-engine-spec.md flags a missing decision maker first).
- */
-export function claimsDecision(answer: string | null) {
-  return typeof answer === 'string' && answer.trim().toLowerCase().startsWith('yes');
-}
+export { claimsDecision } from '@/lib/survey/decision';
 
 export type Person = { name: string; role: string | null; decides: boolean };
 

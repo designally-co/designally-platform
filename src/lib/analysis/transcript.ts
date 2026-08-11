@@ -10,6 +10,7 @@ import {
   type AnswerValue,
   type QuestionConfig,
 } from '@/lib/db/schema';
+import { claimsDecision } from '@/lib/survey/decision';
 
 /**
  * Turns a survey's answers into the text the analysis reads.
@@ -109,6 +110,15 @@ export async function buildTranscript(surveyId: string) {
     transcript: sections.join('\n\n---\n\n'),
     respondentCount: people.length,
     questionCount: ordered.length,
+    /**
+     * Who claimed final decision authority. Returned separately because
+     * docs/insight-engine-spec.md makes an empty list a mandatory red flag, and
+     * a mandatory finding should not depend on the model noticing it in the
+     * transcript — the database already knows the answer.
+     */
+    decisionMakers: people
+      .filter((p) => claimsDecision(p.decisionMaker))
+      .map((p) => p.respondentName),
   };
 }
 
