@@ -94,6 +94,36 @@ ${transcript}`;
 }
 
 /**
+ * Pass two reads a **condensed** transcript, not the full one.
+ *
+ * On the real ARUN+ survey — 26 respondents, ~101,000 characters, 85,000 input
+ * tokens — pass two degenerated: it returned empty arrays for the scales, the
+ * deck outline and the facilitation notes, and emitted one field of corrupted
+ * text with stray quote-escaping. Pass one, on the same input, was fine. The
+ * difference is that pass two also carries pass one's findings and then has to
+ * generate a long constrained structure on top of an already large context.
+ *
+ * Every answer is capped. Nothing is dropped — every respondent and every
+ * question still appears — but long prose is cut after the first few hundred
+ * characters. That is where brand names, the reasons given for them and the
+ * repeated phrases live, and the structured answers pass two actually needs
+ * (the scales, the word lists) are short enough to survive whole.
+ */
+const MAX_ANSWER_CHARS = 320;
+
+export function condenseTranscript(transcript: string, limit = MAX_ANSWER_CHARS) {
+  return transcript
+    .split('\n')
+    .map((line) => {
+      if (!line.startsWith('A: ')) return line;
+      const body = line.slice(3);
+      if (body.length <= limit) return line;
+      return `A: ${body.slice(0, limit).trimEnd()}…`;
+    })
+    .join('\n');
+}
+
+/**
  * Pass two. The findings from pass one are given back so the creative notes,
  * the deck outline and the facilitation notes are built on what was actually
  * found — the spec's own order: the deck outline comes from the settled and
@@ -118,7 +148,9 @@ export function buildCreativePrompt(
     ? findings.notDecidedYet.map((g) => `- ${g.topic}`).join('\n')
     : '- none';
 
-  return `${buildUserPrompt(input)}
+  return `${buildUserPrompt({ ...input, transcript: condenseTranscript(input.transcript) })}
+
+Long answers above are cut short with an ellipsis — you have already read them in full.
 
 ---
 

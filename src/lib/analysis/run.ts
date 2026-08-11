@@ -61,6 +61,9 @@ export async function analyse(input: {
 
   const brief = { ...(first.value as Findings), ...(second.value as Creative) } as Brief;
 
+  const missing = findMissingSections(brief);
+  if (missing) return { ok: false, error: missing };
+
   const violation = findForbiddenNumbers(brief);
   if (violation) return { ok: false, error: violation };
 
@@ -145,10 +148,46 @@ async function callPass(
   }
 }
 
+/**
+ * A brief is allowed to find nothing — an empty conflict list on a genuinely
+ * aligned client is a real result, and empty flags is a good outcome. But some
+ * sections are not findings, they are always written: every project gets a deck
+ * outline and notes on running the room.
+ *
+ * On the real ARUN+ survey those came back empty and nothing complained. The
+ * schema was satisfied, because an empty array is a valid array, and the team
+ * would have opened a brief with no deck and no facilitation notes with no way
+ * to know anything had gone wrong. Silence is the worst outcome; refuse.
+ */
+function findMissingSections(brief: Brief): string | null {
+  const empty: string[] = [];
+  if (!brief.headline.trim()) empty.push('an opening finding');
+  if (!brief.deckOutline.length) empty.push('a kick-off deck outline');
+  if (!brief.howToRunTheRoom.length) empty.push('notes on running the room');
+
+  if (!empty.length) return null;
+  return `The brief came back without ${empty.join(' and ')}, which every brief has. It was not saved. Run the analysis again.`;
+}
+
+/**
+ * Rule 7 belt-and-braces. The schema has no numeric field, so an invented
+ * statistic can only arrive inside prose.
+ *
+ * **What rule 7 forbids is the analysis inventing a statistic about the
+ * respondents**, not any percentage anywhere. The first version matched every
+ * `%` and threw away a whole brief for faithfully repeating a client's own
+ * claim — "เราส่งมอบตรงเวลา 100%" — which principle 7 says must survive
+ * verbatim. The second still fired, on "one respondent claims 100% on-time
+ * delivery": proximity to the word *respondent* is not the signal.
+ *
+ * The test is what FOLLOWS the number. "80% of respondents" is derived and is
+ * refused; an attributed claim passes.
+ */
 function findForbiddenNumbers(brief: Brief): string | null {
   const FORBIDDEN = [
-    /\b\d+(\.\d+)?\s*(%|percent|per cent)/i,
-    /\b(sentiment|confidence)\s+(score|rating|level)\b/i,
+    /\b\d+(\.\d+)?\s*(%|percent|per cent)\s+(of\s+)?(the\s+)?(respondents?|people|stakeholders?|them|answers?|participants?)/i,
+    /\b\d+(\.\d+)?\s*(%|percent|per cent)\s+(agree|disagree|said|positive|negative|favou?r)/i,
+    /\b(sentiment|confidence|positivity|alignment)\s+(score|rating|index)\b/i,
     /\bscore(d|s)?\s+\d+(\.\d+)?\s*(\/|out of)\s*\d+/i,
   ];
 
