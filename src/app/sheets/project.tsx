@@ -169,7 +169,7 @@ export default function ProjectSheet({
         ) : (
           <p className="quiet">
             {p.closedOn
-              ? 'Collection is closed but no brief was written. Run the analysis again from Needs you.'
+              ? 'Collection is closed but no brief was written. Needs you has a button to write it.'
               : 'Nothing produced yet — documents appear here as the project moves.'}
           </p>
         )}

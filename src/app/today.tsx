@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useTransition } from 'react';
 
 import type { LibraryBlock } from '@/lib/team/library-types';
 import type { ProjectView } from '@/lib/team/projects';
@@ -11,6 +11,7 @@ import TemplatesSheet from './sheets/templates';
 import PastSheet from './sheets/past';
 import ComingSheet from './sheets/coming';
 import Toast, { useToast } from './toast';
+import { reanalyse } from '@/lib/team/actions';
 
 const WORDS = ['Nothing', 'One thing', 'Two things', 'Three things', 'Four things', 'Five things'];
 
@@ -36,6 +37,7 @@ export default function Today({
   const [openProject, setOpenProject] = useState<string | null>(null);
   const [openBrief, setOpenBrief] = useState<string | null>(null);
   const toast = useToast();
+  const [writing, startWriting] = useTransition();
 
   const needs = useMemo(() => live.filter((p) => p.action), [live]);
   const ordered = useMemo(
@@ -111,11 +113,25 @@ export default function Today({
                 <div className="act">
                   <button
                     className="btn btn-primary btn-sm"
-                    onClick={() =>
-                      p.action!.kind === 'review-brief' ? setOpenBrief(p.id) : setOpenProject(p.id)
-                    }
+                    disabled={writing}
+                    onClick={() => {
+                      if (p.action!.kind === 'review-brief') return setOpenBrief(p.id);
+                      if (p.action!.kind === 'write-brief') {
+                        return startWriting(async () => {
+                          const result = await reanalyse(p.id);
+                          toast.show(
+                            result.ok
+                              ? `Brief written for ${p.clientName}`
+                              : result.error,
+                          );
+                        });
+                      }
+                      setOpenProject(p.id);
+                    }}
                   >
-                    {p.action!.label}
+                    {writing && p.action!.kind === 'write-brief'
+                      ? 'Writing — this takes a few minutes…'
+                      : p.action!.label}
                   </button>
                 </div>
               </article>

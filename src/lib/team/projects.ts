@@ -68,7 +68,7 @@ export type Person = { name: string; role: string | null; decides: boolean };
 
 export type ProjectAction = {
   /** what the button does */
-  kind: 'close-collection' | 'review-brief';
+  kind: 'close-collection' | 'review-brief' | 'write-brief';
   say: string;
   emphasis?: string;
   when: string;
@@ -119,6 +119,20 @@ function buildAction(v: {
   briefConfirmedOn: string | null;
   conflicts: number;
 }): ProjectAction | null {
+  /* Collection was closed but no brief came back — the analysis failed, the
+     key was missing, or the request ran past the function's time limit. The
+     work is recoverable and the team needs a way to ask for it again. Without
+     this the project falls out of Needs you entirely and looks finished. */
+  if (v.closedOn && !v.hasBrief && v.answers > 0) {
+    return {
+      kind: 'write-brief',
+      say: `Collection is closed with ${plural(v.answers, 'answer')}, but no brief was written.`,
+      emphasis: 'The analysis did not finish.',
+      when: `Closed ${v.closedOn}`,
+      label: 'Write the brief',
+    };
+  }
+
   /* A brief exists and nobody has read it. This is the only step in the flow
      that cannot be skipped — the AI mistakes two wordings of one idea for a
      disagreement, especially across Thai and English. */
