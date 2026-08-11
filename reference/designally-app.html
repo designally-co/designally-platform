@@ -435,6 +435,28 @@ pre.handoff{
 .pts button:nth-child(2), .pts button:nth-child(4){ width:28px; height:28px; }
 .pts button:hover{ border-color:var(--accent); }
 .pts button[aria-pressed="true"]{ background:var(--accent); border-color:var(--accent); transform:scale(1.14); }
+/* Version 2 scales run 0–10. Eleven 44px targets need 484px and a 390px phone
+   offers 350, so they wrap and carry their number — a graded dot on a second
+   row means nothing, because position was the only thing telling you what it
+   was. Targets stay 44px; the visible circle inside is smaller. */
+.pts-wide{ flex-wrap:wrap; justify-content:center; gap:4px; max-width:none; }
+.pts-wide button{ width:44px; height:44px; border:0; background:transparent;
+  border-radius:999px; display:grid; place-items:center; font-size:14px; }
+/* the graded-dot sizes above are keyed on nth-child and out-specify the rule
+   before this one, which left three buttons per scale at 24 and 28px */
+.pts-wide button:nth-child(2), .pts-wide button:nth-child(3),
+.pts-wide button:nth-child(4){ width:44px; height:44px; }
+.pts-wide button span{ display:grid; place-items:center; width:36px; height:36px;
+  border-radius:999px; border:1.5px solid var(--line-2); background:var(--surface);
+  font-size:14px; letter-spacing:0; color:var(--ink-2);
+  transition:background .18s, border-color .18s, color .18s; }
+.pts-wide button:hover span{ border-color:var(--accent); }
+.pts-wide button[aria-pressed="true"]{ background:transparent; transform:none; }
+.pts-wide button[aria-pressed="true"] span{ background:var(--accent); border-color:var(--accent);
+  color:#fff; font-weight:600; }
+/* the six mood words each carry the traits they stand for */
+.chip small{ display:block; font-size:11.5px; color:var(--ink-3); font-weight:400; margin-top:1px; }
+.chip[aria-pressed="true"] small{ color:var(--ink-2); }
 .chips{ display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
 .chip{ font-size:14px; font-weight:500; cursor:pointer; background:var(--surface); color:var(--ink); border:1px solid var(--line-2); border-radius:999px; padding:7px 14px; transition:background .18s, border-color .18s, color .18s; }
 .chip:hover{ border-color:var(--accent); }
