@@ -13,7 +13,16 @@ import { NextResponse, type NextRequest } from 'next/server';
  * the real gate; this exists so a signed-out visitor is redirected rather than
  * shown a flash of the team app.
  */
-const PUBLIC_PREFIXES = ['/s/', '/c/', '/api/s/', '/api/c/', '/api/auth/'];
+/**
+ * `/moodboard/` is here because a public page's images are public too.
+ *
+ * The image optimiser fetches the source file back through this same app over
+ * HTTP, so the request arrives here with no session and was redirected to
+ * `/sign-in`. Next then read an HTML page where a PNG should be and returned
+ * 400, which renders as an empty box — the client would have been asked to
+ * choose between six blank cards with no error anywhere they could see.
+ */
+const PUBLIC_PREFIXES = ['/s/', '/c/', '/api/s/', '/api/c/', '/api/auth/', '/moodboard/'];
 const PUBLIC_EXACT = ['/sign-in'];
 
 const SESSION_COOKIES = [

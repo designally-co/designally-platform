@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useId } from 'react';
 
 import type { QuestionConfig } from '@/lib/db/schema';
@@ -170,6 +171,18 @@ function asChips(config: QuestionConfig) {
   return (config.choices?.length ?? 0) > 12;
 }
 
+/**
+ * A choice carrying an image is answered by looking, not by reading.
+ *
+ * "Bold" and "โดดเด่น" mean whatever the person reading them already thinks
+ * they mean, and that is the one question in the survey where the client and
+ * the designer must be picturing the same thing. The mood board is the answer;
+ * the word is its handle.
+ */
+function asBoards(config: QuestionConfig) {
+  return (config.choices ?? []).some((c) => Boolean(c.image));
+}
+
 function CheckboxAnswer({ question, value, onChange }: Props) {
   const v = (value ?? { choices: [] }) as { choices: string[]; other?: string };
   const config = question.config;
@@ -194,11 +207,15 @@ function CheckboxAnswer({ question, value, onChange }: Props) {
       en: c.en,
       th: c.th,
       label: c.label ?? `${c.en} ${c.th}`,
+      image: c.image,
     })),
-    ...(config.other ? [{ key: OTHER, en: 'Other', th: 'อื่น ๆ', label: 'Other อื่น ๆ' }] : []),
+    ...(config.other
+      ? [{ key: OTHER, en: 'Other', th: 'อื่น ๆ', label: 'Other อื่น ๆ', image: undefined }]
+      : []),
   ];
 
   const chips = asChips(config);
+  const boards = !chips && asBoards(config);
 
   return (
     <fieldset className="sq">
@@ -221,6 +238,38 @@ function CheckboxAnswer({ question, value, onChange }: Props) {
               >
                 {o.label}
               </button>
+            );
+          })}
+        </div>
+      ) : boards ? (
+        <div className="boards">
+          {options.map((o) => {
+            const on = chosen.has(o.key);
+            /* "Friendly — warm, approachable, human" → the half after the dash */
+            const gloss = o.label.includes('—') ? o.label.split('—')[1].trim() : null;
+            return (
+              <label key={o.key} className={`board${on ? ' sel' : ''}`}>
+                <input
+                  type="checkbox"
+                  checked={on}
+                  disabled={!on && atMax}
+                  onChange={() => toggle(o.key)}
+                />
+                {o.image && (
+                  <Image
+                    src={o.image}
+                    alt={`Reference images for ${o.en}`}
+                    width={578}
+                    height={403}
+                    sizes="(max-width: 600px) 92vw, 300px"
+                  />
+                )}
+                <span className="boardname">
+                  <b>{o.en}</b>
+                  <span className="pth th">{o.th}</span>
+                  {gloss && <small>{gloss}</small>}
+                </span>
+              </label>
             );
           })}
         </div>

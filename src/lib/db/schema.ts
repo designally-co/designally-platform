@@ -145,8 +145,15 @@ export type QuestionType = (typeof QUESTION_TYPES)[number];
 
 /** Per-type settings. Exactly the five types the Google Forms used. */
 export type QuestionConfig = {
-  /** multiple_choice, checkboxes */
-  choices?: { en: string; th: string; label?: string }[];
+  /**
+   * multiple_choice, checkboxes.
+   *
+   * `image` is a path under `public/`. A choice that carries one is a visual
+   * reference, not an illustration of a word — the Mood and Personality
+   * question asks the client to pick a feeling, and a mood board says what
+   * "Bold" means far better than the adjective does, in either language.
+   */
+  choices?: { en: string; th: string; label?: string; image?: string }[];
   /** multiple_choice, checkboxes — allow a free-text "Other" */
   other?: boolean;
   /** checkboxes */

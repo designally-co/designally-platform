@@ -522,6 +522,99 @@ label.f span {
   gap: 9px;
 }
 
+/* ── mood boards ───────────────────────────────────────────────────
+   Choices answered by looking. One column on a phone: these are
+   collages, and half a phone's width is not enough of one to judge a
+   mood from. Two or three columns once there is room.
+   ------------------------------------------------------------------ */
+.boards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+.board {
+  position: relative;
+  display: block;
+  cursor: pointer;
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  transition:
+    border-color 0.18s,
+    background 0.18s;
+}
+.board:hover {
+  border-color: var(--primary);
+}
+/* Selection is a 2px border, as everywhere else. The padding compensates so
+   nothing shifts when it thickens (DESIGN.md §5). */
+.board.sel {
+  border: 2px solid var(--primary-focus);
+}
+.board img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-bottom: 1px solid var(--divider);
+  background: var(--parchment);
+}
+/* The checkbox sits over the image so the whole card reads as one control,
+   and stays a real input so it is still tabbable and announced. */
+.board input {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  accent-color: var(--primary);
+  /* The images are light and busy; the box needs an edge of its own to survive
+     them. A ring, not a shadow — there are none in this product. */
+  background: var(--canvas);
+  border-radius: 6px;
+  outline: 3px solid var(--canvas);
+}
+.boardname {
+  display: block;
+  padding: 12px 15px 14px;
+  /* Thai never below 1.6 — DESIGN.md §2 */
+  line-height: 1.6;
+}
+.board.sel .boardname {
+  background: var(--primary-tint);
+}
+.boardname b {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+}
+.boardname span.pth {
+  display: block;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+.boardname small {
+  display: block;
+  font-size: 13px;
+  color: var(--ink-3);
+  margin-top: 2px;
+}
+/* A card at the selection ceiling is not an error, so it is not tinted —
+   it simply stops responding. */
+.board:has(input:disabled) {
+  opacity: 0.45;
+  cursor: default;
+}
+.board:has(input:disabled):hover {
+  border-color: var(--hairline);
+}
+.board:has(input:focus-visible) {
+  outline: 4px solid var(--primary-focus);
+  outline-offset: 2px;
+}
+
 .otherwrap {
   margin-top: 9px;
 }

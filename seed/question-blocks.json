@@ -357,32 +357,38 @@
               {
                 "en": "Friendly",
                 "th": "เป็นกันเอง",
-                "label": "Friendly — warm, approachable, human"
+                "label": "Friendly — warm, approachable, human",
+                "image": "/moodboard/friendly.png"
               },
               {
                 "en": "Elegant",
                 "th": "เรียบหรู",
-                "label": "Elegant — refined, premium, timeless"
+                "label": "Elegant — refined, premium, timeless",
+                "image": "/moodboard/elegant.png"
               },
               {
                 "en": "Natural",
                 "th": "เป็นธรรมชาติ",
-                "label": "Natural — honest, organic, calm"
+                "label": "Natural — honest, organic, calm",
+                "image": "/moodboard/natural.png"
               },
               {
                 "en": "Bold",
                 "th": "โดดเด่น",
-                "label": "Bold — confident, expressive, fearless"
+                "label": "Bold — confident, expressive, fearless",
+                "image": "/moodboard/bold.png"
               },
               {
                 "en": "Innovative",
                 "th": "สร้างสรรค์นวัตกรรม",
-                "label": "Innovative — smart, progressive, visionary"
+                "label": "Innovative — smart, progressive, visionary",
+                "image": "/moodboard/innovative.png"
               },
               {
                 "en": "Playful",
                 "th": "ขี้เล่น",
-                "label": "Playful — energetic, creative, fun"
+                "label": "Playful — energetic, creative, fun",
+                "image": "/moodboard/playful.png"
               }
             ]
           }
