@@ -10,7 +10,7 @@ Every step belongs to the client, the team, or the app.
 | 1 | Team | Deal signed → create survey: client name + package | 1 min |
 | 2 | App | Attaches the right question blocks, makes one link | instant |
 | 3 | Team | Send the link to the client's main contact | — |
-| 4 | Client | Answers; enters name, role, decision-maker status; forwards the link onward | ~20 min each |
+| 4 | Client | Answers; enters name and email; forwards the link onward | ~20 min each |
 | 5 | App | Collects and counts — "3 answers so far · last one 2 days ago" | — |
 | 6 | App | After 5 quiet days: "enough to work with, or wait a little longer?" | — |
 | 7 | **Team** | **Close and analyse** ← human decision | 5 sec |
@@ -41,13 +41,13 @@ Question-block selection from the package · answer collection · promotion to "
 
 ## The whole team app is one page
 - **Needs you** — work blocked on the team. Usually two or three rows, sometimes empty.
-- **All projects** — a table of every live project: stage, answers, decision maker, latest. Click a row to open it.
+- **All projects** — a table of every live project: stage, answers, who answered, latest. Click a row to open it.
 - **Three destinations at the foot** — Question templates · Past projects · What's coming.
 
 ## Project detail
 1. **Right now** — one sentence on what is happening, plus the action if the team is needed
 2. **Where it is** — full stage timeline, dated; five stages, read from the package
-3. **Who answered** — names, roles, and who decides
+3. **Who answered** — names and contact emails
 4. **Decided at the kick-off** — the recorded decisions, once they exist
 5. **Documents** — survey analysis, kick-off deck, content readiness plan
 6. **Archive project** — manual, always available

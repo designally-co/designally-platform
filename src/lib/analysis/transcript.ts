@@ -10,7 +10,6 @@ import {
   type AnswerValue,
   type QuestionConfig,
 } from '@/lib/db/schema';
-import { claimsDecision } from '@/lib/survey/decision';
 
 /**
  * Turns a survey's answers into the text the analysis reads.
@@ -95,30 +94,21 @@ export async function buildTranscript(surveyId: string) {
       return `Q: ${q.textEn}\nA: ${rendered}`;
     });
 
-    const who = [
-      person.respondentName,
-      person.role ? `role: ${person.role}` : 'role not given',
-      person.decisionMaker
-        ? `final decision maker: ${person.decisionMaker}`
-        : 'did not answer whether they are a decision maker',
-    ].join(' · ');
-
-    return `### ${who}\n\n${lines.join('\n\n')}`;
+    /**
+     * The name and nothing else.
+     *
+     * Version 3 replaced the role question with a contact email, and an email
+     * address is contact detail, not evidence — it tells the analysis nothing
+     * it could use and it is the one field here that identifies a real person
+     * off this system. It is not sent to the API.
+     */
+    return `### ${person.respondentName}\n\n${lines.join('\n\n')}`;
   });
 
   return {
     transcript: sections.join('\n\n---\n\n'),
     respondentCount: people.length,
     questionCount: ordered.length,
-    /**
-     * Who claimed final decision authority. Returned separately because
-     * docs/insight-engine-spec.md makes an empty list a mandatory red flag, and
-     * a mandatory finding should not depend on the model noticing it in the
-     * transcript — the database already knows the answer.
-     */
-    decisionMakers: people
-      .filter((p) => claimsDecision(p.decisionMaker))
-      .map((p) => p.respondentName),
   };
 }
 

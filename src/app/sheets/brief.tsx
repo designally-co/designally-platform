@@ -110,7 +110,6 @@ export default function BriefSheet({
                   ))}
                 </div>
                 <p className="why">{c.severityReason}</p>
-                <p className="plan">{c.decisionMakerPosition}</p>
               </article>
             ))
           ) : (

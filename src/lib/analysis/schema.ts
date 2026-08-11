@@ -93,11 +93,6 @@ export const FindingsSchema = z.object({
             }),
           )
           .describe('Two or more positions, each with its own respondents.'),
-        decisionMakerPosition: z
-          .string()
-          .describe(
-            'Which side the person who claimed final decision authority is on. If no decision maker answered, or they did not address this, say so in words — never guess.',
-          ),
       }),
     )
     .describe('Ranked most severe first.'),
@@ -130,13 +125,13 @@ export const FindingsSchema = z.object({
   flags: z
     .array(
       z.object({
-        label: z.string().describe('Short label — "Decision maker", "Outlier", "Low effort".'),
+        label: z.string().describe('Short label — "Outlier", "Low effort", "Single respondent".'),
         finding: z.string().describe('What is true, stated plainly.'),
         severity: z.enum(SEVERITY),
       }),
     )
     .describe(
-      'Only what the data triggered — one person disagreeing with everyone, low-effort answers, a stated–revealed contradiction, single-respondent risk. Their rarity is what makes them read, so do not pad this. One case is not optional: if nobody claimed final decision authority, say so here and say it first, because it makes every conflict unresolvable from the survey alone.',
+      'Only what the data triggered — one person disagreeing with everyone, low-effort answers, a stated–revealed contradiction, single-respondent risk. Their rarity is what makes them read, so do not pad this.',
     ),
 });
 

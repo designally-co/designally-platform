@@ -10,13 +10,19 @@ import { normaliseToken } from '@/lib/survey/token';
 export const dynamic = 'force-dynamic';
 
 /**
- * Identity answers are promoted onto the response row so the analysis can weigh
- * a conflict by who said it without joining through answers. They are also kept
- * as ordinary answer rows, so `answers` remains a complete record of what was
- * asked and what came back.
+ * Identity answers are promoted onto the response row so the analysis can say
+ * who said what without joining through answers. They are also kept as ordinary
+ * answer rows, so `answers` remains a complete record of what was asked and
+ * what came back.
  *
- * The identity block's first two short answers are the name and the role; the
- * decision-maker question carries `maps_to: "decision_maker"` in the seed.
+ * The identity block asks two things: the name, and an email to follow up on.
+ * The email is found by `maps_to: "email"` rather than by position, so it stays
+ * correct if the block is ever reordered.
+ *
+ * Two columns here are retired and deliberately not dropped: `decision_maker`
+ * (question version 3) and `role` (replaced by the email in the same version).
+ * Surveys sent before then collected real answers into both, and rule 5 means
+ * they keep asking the questions they were sent with.
  */
 function identityOf(questions: SurveyQuestion[], values: DraftValues) {
   const identity = questions.filter((q) => q.blockKey === 'identity');
@@ -26,19 +32,11 @@ function identityOf(questions: SurveyQuestion[], values: DraftValues) {
   };
 
   const shortAnswers = identity.filter((q) => q.type === 'short_text');
-  const decisionQuestion = identity.find((q) => q.config.maps_to === 'decision_maker');
-
-  const decisionRaw = decisionQuestion ? values[decisionQuestion.ref] : undefined;
-  const decisionMaker =
-    decisionRaw && typeof decisionRaw === 'object' && 'choice' in decisionRaw
-      ? decisionRaw.choice
-      : '';
+  const emailQuestion = identity.find((q) => q.config.maps_to === 'email');
 
   return {
     name: text(shortAnswers[0]),
-    role: text(shortAnswers[1]),
-    /* stored verbatim — "Shared — we decide as a group" is not a boolean */
-    decisionMaker: decisionMaker || null,
+    email: text(emailQuestion),
   };
 }
 
@@ -63,7 +61,7 @@ export async function POST(req: NextRequest, ctx: RouteContext<'/api/s/[token]/s
   if (!payload) return NextResponse.json({ error: 'no such survey' }, { status: 404 });
 
   const questions = payload.steps.flatMap((s) => s.questions);
-  const { name, role, decisionMaker } = identityOf(questions, values);
+  const { name, email } = identityOf(questions, values);
 
   if (!name) return NextResponse.json({ error: 'respondent name is required' }, { status: 400 });
 
@@ -81,8 +79,7 @@ export async function POST(req: NextRequest, ctx: RouteContext<'/api/s/[token]/s
     .values({
       surveyId: survey.id,
       respondentName: name,
-      role: role || null,
-      decisionMaker,
+      email: email || null,
     })
     .returning();
 

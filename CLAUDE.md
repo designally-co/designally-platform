@@ -122,7 +122,9 @@ question_blocks  key (identity | strategy | project | visual
 questions        block_id, order, text_en, text_th, type, config, version
 surveys          project_id, kind (discovery), token,
                  opened_at, closed_at, closed_by
-responses        survey_id, respondent_name, role, decision_maker, email, submitted_at
+responses        survey_id, respondent_name, email, submitted_at
+                 role, decision_maker — both retired at question version 3,
+                 kept for surveys sent before it
 answers          response_id, question_id, value
 briefs           project_id, generated_at, content, confirmed_at, confirmed_by
 decisions        project_id, question, outcome, note, recorded_at, recorded_by
@@ -130,8 +132,9 @@ users            team members
 ```
 
 Question types are exactly five: `paragraph`, `short_text`, `multiple_choice`, `checkboxes` (with
-optional min/max), `linear_scale` (with pole labels, point count, and an optional `start` — the
-version-2 personality scales run 0–10, not 1–5).
+optional min/max), `linear_scale` (with pole labels, point count, and an optional `start`). The personality scales
+run **1–5**. Version 2 briefly ran them 0–10; `start` and the wide rendering stay for the surveys
+sent while that was true.
 
 **Decided 11 August 2026 — two packages, and the website track is retired.** The branding team
 replaced the questionnaire. A client buys Brand **or** Design, never both.

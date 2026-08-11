@@ -22,7 +22,7 @@ export const PACKAGE_BLOCKS: Record<Package, readonly BlockKey[]> = {
  * `version` disagree — the two must move together or new surveys go out asking
  * questions that were never imported.
  */
-export const CURRENT_QUESTION_VERSION = 2;
+export const CURRENT_QUESTION_VERSION = 3;
 
 export function blocksFor(_kind: SurveyKind, pkg: Package): BlockKey[] {
   return [...PACKAGE_BLOCKS[pkg]];

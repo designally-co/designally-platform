@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "updated": "2026-08-11",
   "note": "Version 2. The website and combined packages were retired; the branding questionnaire was replaced by two packages, Brand and Design. Blocks core, branding, website and ecommerce stay in the database at version 1 because surveys already sent keep the questions they were sent with (rule 5) — they are simply no longer attached to any package.",
   "packages": {
@@ -45,32 +45,13 @@
         {
           "order": 2,
           "type": "short_text",
-          "text_en": "Your role or position",
-          "text_th": "ตำแหน่งของคุณ",
-          "required": true
-        },
-        {
-          "order": 3,
-          "type": "multiple_choice",
-          "text_en": "Are you a final decision maker for this project?",
-          "text_th": "คุณเป็นผู้ตัดสินใจขั้นสุดท้ายของโปรเจกต์นี้หรือไม่?",
+          "text_en": "Your email",
+          "text_th": "อีเมลของคุณ",
           "required": true,
+          "help_en": "So we can reach you if something in your answers needs a follow-up.",
+          "help_th": "เพื่อให้เราติดต่อกลับได้หากมีคำถามเพิ่มเติม",
           "config": {
-            "choices": [
-              {
-                "en": "Yes — final decisions come to me",
-                "th": "ใช่ ฉันเป็นผู้ตัดสินใจขั้นสุดท้าย"
-              },
-              {
-                "en": "Shared — we decide as a group",
-                "th": "ตัดสินใจร่วมกับผู้อื่น"
-              },
-              {
-                "en": "No — I contribute my perspective",
-                "th": "ไม่ ฉันให้มุมมองประกอบ"
-              }
-            ],
-            "maps_to": "decision_maker"
+            "maps_to": "email"
           }
         }
       ]
@@ -121,8 +102,7 @@
           "text_th": "ถ้าแบรนด์เป็นคนอยากให้เขาเป็นคนแบบไหน",
           "required": true,
           "config": {
-            "points": 11,
-            "start": 0,
+            "points": 5,
             "pairs": [
               {
                 "left_en": "Traditional",

@@ -5,8 +5,8 @@ Clients answer branded bilingual questionnaires; the platform collects however m
 responses arrive, finds where stakeholders disagree, and produces one confirmed page
 that drives the kick-off.
 
-Two packages: **Brand** (Brand Strategy + Brand Identity, 24 questions) and **Design**
-(14 questions). A client buys one or the other.
+Two packages: **Brand** (Brand Strategy + Brand Identity, 23 questions) and **Design**
+(13 questions). A client buys one or the other.
 
 ## Read these first, in this order
 

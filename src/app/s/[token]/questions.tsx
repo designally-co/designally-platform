@@ -82,6 +82,9 @@ function TextAnswer({ question, value, onChange }: Props) {
 export function IdentityField({ question, value, onChange }: Props) {
   const text = typeof value === 'string' ? value : '';
   const id = useId();
+  /* An email field typed on a phone deserves the @ keyboard and no
+     autocapitalise — the first character is otherwise a capital every time. */
+  const email = question.config.maps_to === 'email';
   return (
     <div>
       <label className="f" htmlFor={id}>
@@ -89,11 +92,20 @@ export function IdentityField({ question, value, onChange }: Props) {
       </label>
       <input
         id={id}
-        type="text"
+        type={email ? 'email' : 'text'}
+        inputMode={email ? 'email' : undefined}
+        autoComplete={email ? 'email' : 'name'}
+        autoCapitalize={email ? 'none' : undefined}
+        spellCheck={email ? false : undefined}
         className="input"
         value={text}
         onChange={(e) => onChange(e.target.value)}
       />
+      {email && (question.helpEn || question.helpTh) && (
+        <span className="fhelp">
+          {[question.helpEn, question.helpTh].filter(Boolean).join(' · ')}
+        </span>
+      )}
     </div>
   );
 }
@@ -355,10 +367,11 @@ function ScaleAnswer({ question, value, onChange }: Props) {
           </div>
           {/**
             * Up to seven points keep the prototype's graded dots, which fit one
-            * row at 390px with 44px targets. The version-2 scales have eleven,
-            * and eleven 44px targets need 484px where a phone offers 350. They
-            * are numbered and allowed to wrap instead: a dot that wraps loses
-            * its meaning, because position is all it has, but a number keeps it.
+            * row at 390px with 44px targets — which is every scale in versions 1
+            * and 3. Version 2 ran eleven, and eleven 44px targets need 484px
+            * where a phone offers 350; those are numbered and allowed to wrap
+            * instead. A dot that wraps loses its meaning, because position is
+            * all it has, but a number keeps it. Kept for the surveys sent then.
             */}
           <div
             className={`pts${wide ? ' pts-wide' : ''}`}

@@ -358,6 +358,15 @@ label.f span {
   font-size: 13.5px;
   margin-bottom: 9px;
 }
+/* the same note beneath a compact identity field, which is not inside .sq */
+.fhelp {
+  display: block;
+  color: var(--ink-3);
+  font-size: 13.5px;
+  /* Thai never below 1.6 — DESIGN.md §2 */
+  line-height: 1.6;
+  margin-top: 6px;
+}
 /* a required question that was left blank, after the respondent tried to move on */
 .sq .qwarn {
   display: block;
@@ -2035,7 +2044,8 @@ dialog::backdrop {
 }
 
 /* ============================================================
-   Wide scales — the version-2 personality pairs run 0–10.
+   Wide scales — the version-2 personality pairs ran 0–10. Versions 1 and 3
+   use five points and the graded dots above; this stays for rule 5.
    Eleven 44px targets need 484px; a 390px phone offers 350.
    So they wrap, and each one carries its number: a graded dot
    means nothing once it is on a second row, because position

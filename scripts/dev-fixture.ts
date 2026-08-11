@@ -40,20 +40,14 @@ import { makeToken } from '../src/lib/survey/token';
 
 type Person = {
   name: string;
-  role: string;
-  decisionMaker: string | null;
+  email: string;
   /** keyed "blockKey.order" — omit a key entirely to leave it blank */
   answers: Record<string, AnswerValue>;
 };
 
 const t = (text: string): AnswerValue => ({ kind: 'text', text });
-const choice = (c: string): AnswerValue => ({ kind: 'choice', choice: c });
 const multi = (...choices: string[]): AnswerValue => ({ kind: 'multi', choices });
 const scale = (values: Record<string, number>): AnswerValue => ({ kind: 'scale', points: 5, values });
-
-const YES = 'Yes — final decisions come to me';
-const SHARED = 'Shared — we decide as a group';
-const NO = 'No — I contribute my perspective';
 
 /* Scale pair indices, in seed order:
    0 Traditional–Modern · 1 Exclusive–Accessible · 2 Serious–Fun
@@ -64,8 +58,7 @@ const NO = 'No — I contribute my perspective';
 const PEOPLE: Person[] = [
   {
     name: 'คุณธนวัฒน์ วงศ์สกุล',
-    role: 'CEO',
-    decisionMaker: YES,
+    email: 'tanawat@example.co.th',
     answers: {
       'core.1': t('เราผลิตชิ้นส่วนอิเล็กทรอนิกส์สำหรับผู้ผลิตรถยนต์ OEM รายใหญ่ในไทยและอาเซียน'),
       'core.2': t('We supply precision electronic components to automotive manufacturers.'),
@@ -94,8 +87,7 @@ const PEOPLE: Person[] = [
   },
   {
     name: 'คุณศิริพร ตั้งจิตต์',
-    role: 'Marketing Director',
-    decisionMaker: SHARED,
+    email: 'siriporn@example.co.th',
     answers: {
       'core.1': t('ชิ้นส่วนอิเล็กทรอนิกส์ และกำลังจะมีสายผลิตภัณฑ์สำหรับผู้บริโภคด้วย'),
       'core.2': t('We make electronics — and we are moving into consumer products.'),
@@ -127,8 +119,7 @@ const PEOPLE: Person[] = [
   },
   {
     name: 'คุณกฤษณ์ ภักดีวงศ์',
-    role: 'Head of Production',
-    decisionMaker: NO,
+    email: 'krit@example.co.th',
     answers: {
       'core.1': t('ผลิตชิ้นส่วนตามสเปกลูกค้า'),
       'core.2': t('We build to spec.'),
@@ -152,8 +143,7 @@ const PEOPLE: Person[] = [
   },
   {
     name: 'คุณพลอย รัตนาภรณ์',
-    role: 'Sales Manager',
-    decisionMaker: NO,
+    email: 'napat@example.co.th',
     answers: {
       'core.1': t('ชิ้นส่วนสำหรับอุตสาหกรรมยานยนต์'),
       'core.2': t('Automotive components for OEM assembly lines.'),
@@ -180,8 +170,7 @@ const PEOPLE: Person[] = [
   {
     /* planted: the outlier — answers against everyone on nearly everything */
     name: 'คุณวินัย เจริญสุข',
-    role: 'Head of New Ventures',
-    decisionMaker: NO,
+    email: 'preeda@example.co.th',
     answers: {
       'core.1': t('เราควรเลิกทำชิ้นส่วนแล้วไปทำแพลตฟอร์มซอฟต์แวร์'),
       'core.2': t('We should be a software company.'),
@@ -261,23 +250,14 @@ async function main() {
       .values({
         surveyId: survey.id,
         respondentName: person.name,
-        role: person.role,
-        decisionMaker: person.decisionMaker,
+        email: person.email,
       })
       .returning();
 
     const rows: { responseId: string; questionId: string; value: AnswerValue }[] = [
       { responseId: response.id, questionId: identity[0].id, value: t(person.name) },
-      { responseId: response.id, questionId: identity[1].id, value: t(person.role) },
+      { responseId: response.id, questionId: identity[1].id, value: t(person.email) },
     ];
-    if (person.decisionMaker) {
-      rows.push({
-        responseId: response.id,
-        questionId: identity[2].id,
-        value: choice(person.decisionMaker),
-      });
-    }
-
     for (const [ref, value] of Object.entries(person.answers)) {
       const questionId = idByRef.get(ref);
       if (!questionId) throw new Error(`Fixture references an unknown question: ${ref}`);

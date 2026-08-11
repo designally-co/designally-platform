@@ -19,7 +19,6 @@ async function main() {
     for (const person of people) {
       console.log(
         `\n  ${person.respondentName}${person.role ? ` · ${person.role}` : ''}` +
-          `\n  ${person.decisionMaker ?? 'no decision-maker answer'}` +
           `\n  submitted ${person.submittedAt.toISOString()}`,
       );
 

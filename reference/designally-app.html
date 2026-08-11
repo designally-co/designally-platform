@@ -358,6 +358,7 @@ dialog::backdrop{ background:rgba(0,0,0,.32); }
 .rm .where b{ color:var(--ink-2); font-weight:600; }
 
 /* forms */
+.fhelp{display:block;color:var(--ink-3);font-size:13.5px;line-height:1.6;margin-top:6px}
 label.f{ display:block; font-size:13.5px; font-weight:600; margin-bottom:7px; }
 label.f span{ font-weight:400; color:var(--ink-3); }
 input[type=text]{
@@ -573,16 +574,7 @@ pre.handoff{
       <p class="desc">Anyone on your team can answer this — please pass the link to whoever should have a say. · ส่งลิงก์นี้ต่อให้ผู้ที่ควรมีส่วนร่วมได้เลย</p>
       <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px; margin-bottom:26px;">
         <div><label class="f" for="f-name">Your name <span>· ชื่อของคุณ</span></label><input type="text" id="f-name" placeholder="e.g. Khun Napat"></div>
-        <div><label class="f" for="f-role">Your role <span>· ตำแหน่ง</span></label><input type="text" id="f-role" placeholder="e.g. Marketing Director"></div>
-      </div>
-      <div class="sq">
-        <span class="qq">Are you a final decision maker for this project?</span>
-        <span class="qth">คุณเป็นผู้ตัดสินใจขั้นสุดท้ายของโปรเจกต์นี้หรือไม่?</span>
-        <div class="pick" id="dm">
-          <label class="pickone"><input type="radio" name="dm"><span><b>Yes — final decisions come to me</b><span>ใช่ · Your answers guide us when opinions differ.</span></span></label>
-          <label class="pickone"><input type="radio" name="dm"><span><b>Shared — we decide as a group</b><span>ตัดสินใจร่วมกัน</span></span></label>
-          <label class="pickone"><input type="radio" name="dm"><span><b>No — I contribute my perspective</b><span>ให้มุมมองประกอบ · Your input still matters.</span></span></label>
-        </div>
+        <div><label class="f" for="f-email">Your email <span>· อีเมลของคุณ</span></label><input type="email" id="f-email" inputmode="email" autocapitalize="none" placeholder="e.g. napat@company.co.th"><span class="fhelp">So we can reach you if something in your answers needs a follow-up. · เพื่อให้เราติดต่อกลับได้หากมีคำถามเพิ่มเติม</span></div>
       </div>
       <div class="nav"><button class="btn btn-quiet" onclick="go(0)">Back</button><span class="of">1 / 5</span><button class="btn btn-ink" onclick="go(2)">Continue</button></div>
     </section>
@@ -658,14 +650,14 @@ pre.handoff{
     <div class="sheet-top"><span class="t">PCE-TH — Survey analysis</span><button class="x" onclick="dBrief.close()">Close</button></div>
     <div class="sheet-body brief">
       <h1>Three voices, two decisions.</h1>
-      <p class="lede">Generated from the 3 answers collected before the team closed this survey · 24 questions each.</p>
+      <p class="lede">Generated from the 3 answers collected before the team closed this survey · 23 questions each.</p>
 
       <div class="bsec">
         <h3>Who answered</h3>
         <div class="people">
-          <div class="person"><b>Khun Tanawat</b><span class="role">CEO</span><span class="lead">Final decision maker</span></div>
-          <div class="person"><b>Khun Siriporn</b><span class="role">Marketing Manager</span><span class="role">Shared decision</span></div>
-          <div class="person"><b>Khun Krit</b><span class="role">Logistics Director</span><span class="role">Perspective only</span></div>
+          <div class="person"><b>Khun Tanawat</b><span class="role">tanawat@example.co.th</span></div>
+          <div class="person"><b>Khun Siriporn</b><span class="role">siriporn@example.co.th</span></div>
+          <div class="person"><b>Khun Krit</b><span class="role">krit@example.co.th</span></div>
         </div>
       </div>
 
@@ -684,7 +676,7 @@ pre.handoff{
         <div class="conflict">
           <div class="h"><b>Brand positioning</b><span class="sev hi">HIGH</span></div>
           <div class="sides">
-            <div class="side"><b>Khun Tanawat · CEO · decides</b>"A global-standard industrial leader" — ผู้นำอุตสาหกรรมระดับสากล</div>
+            <div class="side"><b>Khun Tanawat</b>"A global-standard industrial leader" — ผู้นำอุตสาหกรรมระดับสากล</div>
             <div class="side"><b>Khun Krit · Logistics</b>"A community-rooted Thai company" — รากฐานชุมชนภาคใต้</div>
           </div>
           <p class="plan">Kick-off framing: can it be both? Propose "global standards, southern roots" as a bridge.</p>
@@ -692,7 +684,7 @@ pre.handoff{
         <div class="conflict">
           <div class="h"><b>Tone of voice</b><span class="sev md">MEDIUM</span></div>
           <div class="sides">
-            <div class="side"><b>Khun Tanawat · CEO · decides</b>Formal, corporate, authoritative</div>
+            <div class="side"><b>Khun Tanawat</b>Formal, corporate, authoritative</div>
             <div class="side"><b>Khun Siriporn · Marketing</b>Friendly, warm, approachable</div>
           </div>
           <p class="plan">Kick-off framing: which tone for which audience? Investors and communities may need different registers.</p>
@@ -704,7 +696,7 @@ pre.handoff{
         <ol class="insights">
           <li>The real tension is <b>scale versus roots</b> — international credibility and southern-Thai identity. The winning direction bridges both rather than picking one.</li>
           <li>Every audience named is <b>B2B</b>: industrial buyers, logistics clients, port and warehouse users. Speak to procurement decision-makers, never consumers.</li>
-          <li>The CEO is the confirmed decision maker — weight his answers, but surface the positioning conflict openly so all voices are heard before he decides.</li>
+          <li>Three people hold two positions and nothing in the survey settles which one wins. Surface the positioning conflict openly in the kick-off rather than resolving it quietly.</li>
           <li>No competitor offers the same total solution. The integrated model itself is the thing to visualise.</li>
         </ol>
       </div>
@@ -1035,9 +1027,9 @@ FOUNDATIONS — all respondents agree, present as settled
 · Modern, with southern-Thai roots
 
 DECISIONS — one slide each, placed early, both sides equal
-1. Positioning: "global-standard industrial leader" (decision maker)
+1. Positioning: "global-standard industrial leader" (Khun Tanawat)
    versus "community-rooted Thai company" (Logistics Director)
-2. Tone: formal and corporate (decision maker)
+2. Tone: formal and corporate (Khun Tanawat)
    versus friendly and approachable (Marketing Manager)
 
 SLIDES
@@ -1076,19 +1068,19 @@ const flowOf = () => FLOW;
 let projects = [
   { id:'pce',  name:'PCE-TH', pkg:'Brand', stage:3, sent:'12 Jun', quiet:2, closed:true,
     brief:'ready', people:[
-      {n:'Khun Tanawat', r:'CEO', dm:true}, {n:'Khun Siriporn', r:'Marketing'}, {n:'Khun Krit', r:'Logistics'}] },
+      {n:'Khun Tanawat', r:'tanawat@example.co.th'}, {n:'Khun Siriporn', r:'siriporn@example.co.th'}, {n:'Khun Krit', r:'krit@example.co.th'}] },
 
   { id:'sushi', name:'Sushi Shin', pkg:'Design', stage:4, sent:'11 May', quiet:1, closed:true,
     brief:'confirmed', kick:'done 4 Aug',
     decisions:null,
-    people:[{n:'Khun Mind', r:'Owner', dm:true}, {n:'Khun Aof', r:'Operations'}] },
+    people:[{n:'Khun Mind', r:'mind@example.co.th'}, {n:'Khun Aof', r:'aof@example.co.th'}] },
 
   { id:'nyssa', name:'Nyssa', pkg:'Brand', stage:2, sent:'24 Jul', quiet:6, closed:false,
-    people:[{n:'Khun David', r:'Founder', dm:true}, {n:'Khun Ratiporn', r:'Brand Lead'},
-            {n:'Khun Ploy', r:'Sales'}, {n:'Khun Win', r:'Product'}] },
+    people:[{n:'Khun David', r:'david@example.co.th'}, {n:'Khun Ratiporn', r:'ratiporn@example.co.th'},
+            {n:'Khun Ploy', r:'ploy@example.co.th'}, {n:'Khun Win', r:'win@example.co.th'}] },
 
   { id:'dento', name:'F.W. Dentogenesis', pkg:'Brand', stage:2, sent:'4 Aug', quiet:1, closed:false,
-    people:[{n:'Khun Napat', r:'Clinic Director', dm:true}, {n:'Khun Preeda', r:'Marketing'}] },
+    people:[{n:'Khun Napat', r:'napat@example.co.th'}, {n:'Khun Preeda', r:'preeda@example.co.th'}] },
 
   { id:'blu',  name:'Blu Green Token', pkg:'Brand', stage:1, sent:null, quiet:0, closed:false,
     note:'quotation sent · waiting on signature', people:[] },
@@ -1160,7 +1152,6 @@ function render(){
   const ordered = [...need.map(x => x[0]), ...wait.map(x => x[0])];
   document.getElementById('projWrap').innerHTML = ordered.map(p => {
     const n = p.people.length, flow = flowOf(p), needs = !!action(p);
-    const decider = p.people.find(x => x.dm);
 
     let latest;
     if(p.decisions === null && p.kick && p.kick.startsWith('done')) latest = `Kick-off ${p.kick}<br>decisions not recorded`;
@@ -1169,9 +1160,13 @@ function render(){
     else if(p.closed) latest = `Closed with ${n} answers<br>kick-off not booked`;
     else latest = p.note;
 
+    /* An empty cell is a defect — name who answered, never leave it blank. */
+    const who = !n ? null
+      : p.people.length === 1 ? p.people[0].n
+      : `${p.people[0].n} +${p.people.length - 1}`;
     const answers = n
       ? `<div class="c-main">${n} answer${n===1?'':'s'}</div>` +
-        (decider ? `<div class="c-when">${decider.n} decides</div>` : `<div class="c-when">no decision maker named</div>`)
+        `<div class="c-when">${who || 'nobody named'}</div>`
       : `<div class="c-when">none yet</div>`;
 
     return `<tr data-open="${p.id}" tabindex="0">
@@ -1261,7 +1256,7 @@ function openProject(id){
 
   /* people */
   document.getElementById('pdPeople').innerHTML = n
-    ? p.people.map(x => `<div class="person"><b>${x.n}</b><span class="role">${x.r}</span>${x.dm ? '<span class="lead">Decision maker</span>' : ''}</div>`).join('')
+    ? p.people.map(x => `<div class="person"><b>${x.n}</b><span class="role">${x.r}</span></div>`).join('')
     : `<p style="font-size:14px; color:var(--ink-3);">Nobody has answered yet.</p>`;
 
   /* decisions */
@@ -1457,7 +1452,7 @@ document.getElementById('qs-c').innerHTML =
   pairs.map(p=>`
   <div class="scale">
     <div class="poles"><span>${p[0]}<small>${p[1]}</small></span><span>${p[2]}<small>${p[3]}</small></span></div>
-    <div class="pts pts-wide">${[0,1,2,3,4,5,6,7,8,9,10].map(v=>`<button aria-pressed="false" aria-label="${p[0]} to ${p[2]}, ${v} of 10"><span>${v}</span></button>`).join('')}</div>
+    <div class="pts">${[1,2,3,4,5].map(v=>`<button aria-pressed="false" aria-label="${p[0]} to ${p[2]}, ${v} of 5"><i></i></button>`).join('')}</div>
   </div>`).join('') +
   setC.map((q,i)=>qb(i+15,q[0],q[1])).join('');
 document.querySelectorAll('.pts button').forEach(b=>b.onclick=()=>{

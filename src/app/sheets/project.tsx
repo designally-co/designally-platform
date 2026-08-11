@@ -143,18 +143,12 @@ export default function ProjectSheet({
             {p.people.map((person, i) => (
               <div className="person" key={`${person.name}-${i}`}>
                 <b>{person.name}</b>
-                <span className="role">{person.role || 'role not given'}</span>
-                {person.decides && <span className="lead">Decision maker</span>}
+                <span className="role">{person.email || 'no email given'}</span>
               </div>
             ))}
           </div>
         ) : (
           <p className="quiet">Nobody has answered yet.</p>
-        )}
-        {p.people.length > 0 && !p.decidedBy && (
-          <p className="quiet" style={{ marginTop: 12 }}>
-            No decision maker named. Worth knowing before the kick-off.
-          </p>
         )}
       </div>
 

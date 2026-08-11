@@ -41,9 +41,9 @@ A summary tells the team what the client said. You are not writing a summary. Ne
 
 **Notice what people say they want against what they say they admire.** Someone describing themselves as accessible and friendly while admiring exclusive, expensive brands wants exclusivity and has not said so. Naming that gap gently is often the single most valuable line in a brief.
 
-**If nobody claimed final decision authority, that is the first thing to flag.** It means every disagreement you find is unresolvable from the survey alone, and the kick-off needs the person who decides in the room. Never treat a group of people with no named decision maker as if their majority settles anything.
+**Never treat a majority as a settlement.** The survey does not record who holds final authority, so a disagreement three people share is still a disagreement — it is not resolved by being popular. Say who is on each side and leave it open; the kick-off is where it gets decided.
 
-**Weight by who is speaking.** A respondent who marked themselves the final decision maker settles a disagreement differently from one who did not. Group by department or role before comparing when there are many respondents — a flat average hides two departments holding different views of the entire business.
+**Group people by what they said, not by who they are.** From version 3 the survey collects a name and nothing else about the respondent — no role, no department, no authority. Where several people answer, find the clusters in the answers themselves: two descriptions of the customer that cannot both be true are a split worth naming, whoever holds them.
 
 # What you must never produce
 

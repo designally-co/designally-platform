@@ -115,7 +115,7 @@ Apple's ladder, mapped to this product. Weights are **300 / 400 / 600 / 700** �
 
 This applies to page headings (no greyed closing phrase), the wordmark (one colour, weight contrast only), bold inside prose, stage labels, respondent lines and question numbers. Colour still differentiates across *separate* lines and columns — a meta line beneath a title, a right-aligned count — never within one.
 
-A corollary: markers carried by a coloured glyph are not allowed. Decision-maker status is the word "decides", not a star. A bare glyph needs a legend; words don't — and a coloured glyph steals Action Blue from its one meaning.
+A corollary: markers carried by a coloured glyph are not allowed. A status is the word for it, never a star or a dot beside a name. A bare glyph needs a legend; words don't — and a coloured glyph steals Action Blue from its one meaning. The blue dot in the projects table is the single exception, and only because it carries the accent's own meaning: this project needs a person.
 
 ### The Thai leading rule — overrides Apple
 
@@ -244,7 +244,7 @@ The full project list is a real `<table>` — `<thead>`, `th scope="col"`, keybo
 |---|---|
 | Project | 8px Action Blue dot when the project needs the team · name at `body-strong` · package beneath at `caption` in `--ink-muted-48` |
 | Stage | Segment meter, then `caption` label "Analysis · 4 of 5" |
-| Answers | "3 answers" at `caption` in `--ink-muted-80`, then "Khun Tanawat decides" — or "no decision maker named" — at `caption` in `--ink-muted-48` |
+| Answers | "3 answers" at `caption` in `--ink-muted-80`, then who answered — "Khun Tanawat", or "Khun Tanawat +2" — at `caption` in `--ink-muted-48` |
 | Latest | Two lines of state at `caption` in `--ink-muted-48` |
 
 Header cells at `caption-strong` in `--ink-muted-48`, 1px `--hairline` beneath. Body rows separated by 1px `--hairline`. **No zebra striping, no fills, no vertical rules.** Hover tints the row to `--canvas` — the same white-on-parchment lift used everywhere else. Cell padding `18px 12px`, top-aligned.
@@ -253,7 +253,7 @@ Segment meter: N segments, 4px tall, 2px radius, 3px gap. Done `--ink-muted-80`,
 
 Below **820px** the `<thead>` is visually hidden (`clip: rect(0 0 0 0)`) and each row becomes a stacked block; `td[data-label]::before` reprints the column name as a `fine` label above each value. No horizontal scrolling on a phone.
 
-An empty cell is a defect. Where there is nothing to report, say so — "none yet", "no decision maker named".
+An empty cell is a defect. Where there is nothing to report, say so — "none yet", "nobody named".
 
 ### Inputs
 
@@ -325,7 +325,7 @@ Same tokens, same accent, same pill grammar. Different volume.
 - Use `scale(0.95)` as the press state on every button
 - Set 1.6 minimum leading on any line containing Thai
 - Keep weight 500 out of the ladder
-- Say decision-maker status in words
+- Say a status in words, not a glyph
 
 **Don't**
 - Introduce a second accent colour

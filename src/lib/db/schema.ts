@@ -162,13 +162,14 @@ export type QuestionConfig = {
   /** linear_scale */
   points?: number;
   /**
-   * First value on the scale. Absent means 1, which is what every version-1
-   * question uses. The version-2 personality scales run 0–10, where 0 is a
-   * position ("fully Traditional") and not an absence of one.
+   * First value on the scale. Absent means 1, which is what versions 1 and 3
+   * use. Version 2 briefly ran the personality scales 0–10, where 0 was a
+   * position ("fully Traditional") and not an absence of one — those surveys
+   * still exist and still have to render (rule 5).
    */
   start?: number;
   pairs?: { left_en: string; left_th: string; right_en: string; right_th: string }[];
-  /** populates a project field — decision_maker | pages | languages | skus */
+  /** promotes the answer onto the response or project row — email | pages | languages | skus */
   maps_to?: string;
   /** choice label → block key that the choice reveals */
   triggers?: Record<string, BlockKey>;

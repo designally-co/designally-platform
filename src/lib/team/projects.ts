@@ -13,7 +13,6 @@ import {
 } from '@/lib/db/schema';
 
 import { PACKAGE_LABEL, packageLabel } from '@/lib/team/labels';
-import { claimsDecision } from '@/lib/survey/decision';
 
 export { PACKAGE_LABEL };
 
@@ -54,9 +53,7 @@ function agoText(days: number) {
   return `${plural(days, 'day')} ago`;
 }
 
-export { claimsDecision } from '@/lib/survey/decision';
-
-export type Person = { name: string; role: string | null; decides: boolean };
+export type Person = { name: string; email: string | null };
 
 export type ProjectAction = {
   /** what the button does */
@@ -89,7 +86,8 @@ export type ProjectView = {
   lastAnswerOn: string | null;
   quietDays: number | null;
   people: Person[];
-  decidedBy: string | null;
+  /** the names in the Answers column — "Khun A" or "Khun A +2" */
+  answeredBy: string | null;
 
   /** the most recent brief, if the analysis has run */
   brief: import('@/lib/analysis/schema').Brief | null;
@@ -212,8 +210,7 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
         .select({
           surveyId: responses.surveyId,
           name: responses.respondentName,
-          role: responses.role,
-          decisionMaker: responses.decisionMaker,
+          email: responses.email,
           submittedAt: responses.submittedAt,
         })
         .from(responses)
@@ -223,7 +220,7 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
   const peopleBySurvey = new Map<string, Person[]>();
   for (const r of everyone) {
     const list = peopleBySurvey.get(r.surveyId) ?? [];
-    list.push({ name: r.name, role: r.role, decides: claimsDecision(r.decisionMaker) });
+    list.push({ name: r.name, email: r.email });
     peopleBySurvey.set(r.surveyId, list);
   }
 
@@ -268,7 +265,14 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
       : null;
 
     const people = survey ? (peopleBySurvey.get(survey.id) ?? []) : [];
-    const decider = people.find((p) => p.decides) ?? null;
+    /* DESIGN.md §6 — an empty cell is a defect, so the Answers column names
+       who answered now that it no longer names who decides. */
+    const answeredBy =
+      people.length === 0
+        ? null
+        : people.length === 1
+          ? people[0].name
+          : `${people[0].name} +${people.length - 1}`;
 
     const briefRow = briefByProject.get(project.id) ?? null;
     const brief = (briefRow?.content ?? null) as import('@/lib/analysis/schema').Brief | null;
@@ -295,7 +299,7 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
       lastAnswerOn: formatDay(lastAnswer),
       quietDays,
       people,
-      decidedBy: decider?.name ?? null,
+      answeredBy,
 
       brief,
       briefWrittenOn: formatDay(briefRow?.generatedAt ?? null),

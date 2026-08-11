@@ -200,7 +200,7 @@ export default function Today({
                         </div>
                         <div className="c-when">
                           {/* words, never a coloured glyph — docs/navigation-decisions.md */}
-                          {p.decidedBy ? `${p.decidedBy} decides` : 'no decision maker named'}
+                          {p.answeredBy ?? 'nobody named'}
                         </div>
                       </>
                     ) : (

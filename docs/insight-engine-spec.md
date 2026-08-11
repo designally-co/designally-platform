@@ -34,7 +34,7 @@ Where respondents independently said the same thing. This is what the team can d
 **Why it changes a decision:** it removes the temptation to re-open settled questions in the kick-off, which is where meetings lose an hour.
 
 ### 2. Conflict map — the unsettled ground
-Where answers contradict, ranked by how expensive the disagreement is, and weighted by who holds decision authority.
+Where answers contradict, ranked by how expensive the disagreement is.
 
 *In your ARUN+ data:* the target audience split between B2B (OEM manufacturers) and B2C (general public, Gen Y–Z). One employee wrote, in the form, *"งงจัง ตกลงลูกค้าเราเป็น B2B หรือ B2C?"* — "I'm confused, are our customers B2B or B2C?" A conflict a stakeholder can articulate in the survey itself is one the agency will otherwise discover in revision round three.
 
@@ -97,10 +97,9 @@ from everything the kick-off can still decide.
 
 ### Brand only — from the strategy block
 
-**Personality position, and the spread.** The ten scales now run 0–10 rather than 1–5, so the
-disagreement width is finer and more honest. The width is still the finding, not the average: nine
-people at Serious and one at Fun is noise; a 50/50 split means the brand has no agreed temperament
-and the kick-off must resolve it.
+**Personality position, and the spread.** The ten scales run 1–5. The width is the finding, not
+the average: nine people at Serious and one at Fun is noise; a 50/50 split means the brand has no
+agreed temperament and the kick-off must resolve it.
 
 **The three protected things.** What the brand would defend at higher cost, with a real example
 each. Where several respondents protect different things, the brand has more than one idea of what
@@ -131,8 +130,6 @@ These should not appear on every brief. They earn their place by condition, and 
 **Many respondents (10+).** Group answers by department or role before comparing. *In ARUN+ this was essential:* Strategy and Product Development held different views of the entire business, and a flat average would have hidden it completely.
 
 **Outlier respondent.** One person answering against everyone on nearly every question. *In ARUN+:* the Head of EV Charger chose Conservative, Irreverent, and "slow" as desired brand traits, contradicting all 27 others. The brief should surface this as *one person disagrees fundamentally* — either they know something the others don't, or they weren't taking it seriously. Either way the team should know before quoting them in a deck.
-
-**Decision maker did not answer.** If nobody marked themselves as final decision maker, everything in the conflict section is unresolvable and the kick-off needs the right person in the room. This is a red flag worth stating first.
 
 **Low effort answers.** Very short responses across the board signal a disengaged client, which reliably predicts slow feedback and late-stage changes.
 
