@@ -459,6 +459,23 @@ pre.handoff{
 .chip small{ display:block; font-size:11.5px; color:var(--ink-3); font-weight:400; margin-top:1px; }
 .chip[aria-pressed="true"] small{ color:var(--ink-2); }
 .chips{ display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+/* Mood boards — two columns on a phone so all six are comparable in a couple
+   of screenfuls; three once there is room. */
+.boards{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:12px; }
+.board{ position:relative; display:block; cursor:pointer; background:var(--surface); border:1px solid var(--line-2); border-radius:18px; overflow:hidden; transition:border-color .18s, background .18s; }
+.board:hover{ border-color:var(--accent); }
+.board.sel{ border:2px solid var(--accent); }
+.board.sel .boardname{ background:var(--accent-soft); }
+.board img{ display:block; width:100%; height:auto; border-bottom:1px solid var(--line); background:var(--bg); }
+.board input{ position:absolute; top:9px; left:9px; width:22px; height:22px; margin:0; accent-color:var(--accent); background:var(--surface); border-radius:6px; outline:3px solid var(--surface); }
+.boardname{ display:block; padding:10px 11px 12px; line-height:1.6; }
+.boardname b{ display:block; font-size:15px; font-weight:600; }
+.boardname span.pth{ display:block; font-size:13.5px; color:var(--ink-2); }
+.boardname small{ display:block; font-size:13px; color:var(--ink-3); margin-top:2px; }
+.board:has(input:disabled){ opacity:.45; cursor:default; }
+.board:has(input:disabled):hover{ border-color:var(--line-2); }
+.board:has(input:focus-visible){ outline:4px solid var(--accent); outline-offset:2px; }
+@media(min-width:620px){ .boards{ grid-template-columns:repeat(3,1fr); gap:12px; } .boardname{ padding:12px 15px 14px; } }
 .chip{ font-size:14px; font-weight:500; cursor:pointer; background:var(--surface); color:var(--ink); border:1px solid var(--line-2); border-radius:999px; padding:7px 14px; transition:background .18s, border-color .18s, color .18s; }
 .chip:hover{ border-color:var(--accent); }
 .chip[aria-pressed="true"]{ border:2px solid var(--primary-focus); color:var(--ink); }
@@ -608,25 +625,25 @@ pre.handoff{
       <h2>How it should look and feel</h2>
       <p class="desc">The mood you want, and just as usefully, what you want to avoid. · ทิศทางงานออกแบบที่ต้องการ และสิ่งที่ไม่อยากให้เป็น</p>
       <div class="sq">
-        <span class="qq"><span class="qn">19.</span>Mood and Personality — choose 3 words that best reflect how you want the brand to feel</span>
+        <span class="qq"><span class="qn">15.</span>Mood and Personality — choose 3 words that best reflect how you want the brand to feel</span>
         <span class="qth">กรุณาเลือก 3 คำที่อยากให้แบรนด์สะท้อนมากที่สุด</span>
-        <div class="chips" id="chips"></div>
+        <div class="boards" id="chips"></div>
         <p class="chipn" id="chipn">Selected <b>0</b> of 3 · เลือกแล้ว 0 จาก 3 คำ</p>
       </div>
       <div class="sq">
-        <span class="qq"><span class="qn">20.</span>First Impression — when people first see the brand, how do you want them to feel?</span>
+        <span class="qq"><span class="qn">16.</span>First Impression — when people first see the brand, how do you want them to feel?</span>
         <span class="qth">เมื่อคนเห็นแบรนด์ครั้งแรก อยากให้เขารู้สึกอย่างไร?</span>
         <span class="qhelp">Please describe in 3 words · กรุณาตอบเป็น 3 คำ</span>
         <input type="text" placeholder="Your answer · คำตอบของคุณ">
       </div>
       <div class="sq">
-        <span class="qq"><span class="qn">21.</span>Visual References — select references you like and explain why</span>
+        <span class="qq"><span class="qn">17.</span>Visual References — select references you like and explain why</span>
         <span class="qth">กรุณาเลือกภาพ reference ที่ชอบ พร้อมอธิบายว่า “ชอบเพราะอะไร”</span>
         <span class="qhelp">Focus on mood, layout, feeling and visual style. Avoid “because it looks nice”. · เน้นอธิบายในเชิง Mood, Layout, Feeling, Visual Style หลีกเลี่ยงการตอบเพียงว่า “สวย”</span>
         <textarea placeholder="Your answer · คำตอบของคุณ"></textarea>
       </div>
       <div class="sq">
-        <span class="qq"><span class="qn">22.</span>Things to Avoid — what impression do you not want the brand to have?</span>
+        <span class="qq"><span class="qn">18.</span>Things to Avoid — what impression do you not want the brand to have?</span>
         <span class="qth">ไม่อยากให้แบรนด์ดูมีภาพลักษณ์แบบไหน</span>
         <div class="checks" id="avoid"></div>
       </div>
@@ -1437,7 +1454,10 @@ const setB=[["Describe your core customers: who are they, how do they buy, and w
 const setC=[["What brand voice do you want to communicate — to customers, and internally?","น้ำเสียงของแบรนด์ที่คุณอยากสื่อสาร เวลาคุยกับลูกค้า และเวลาคุยกันภายในทีม"],["When your team talks about the brand, what should they feel most confident or proud about?","เมื่อทีมงานพูดถึงแบรนด์ คุณอยากให้เขารู้สึกมั่นใจหรือภูมิใจในเรื่องใดมากที่สุด?"],["If your team could remember one thing, who does their work help and what difference does it make?","หากทีมของคุณจำได้เพียงหนึ่งเรื่อง อยากให้เขารู้สึกว่างานของตัวเองช่วยใคร และอย่างไร?"]];
 const pairs=[["Traditional","ดั้งเดิม","Modern","ทันสมัย"],["Exclusive","เฉพาะกลุ่ม","Accessible","เข้าถึงง่าย"],["Serious","จริงจัง","Fun","สนุก"],["Corporate","เป็นทางการ","Friendly","เป็นกันเอง"],["Simple","เรียบง่าย","Sophisticated","ซับซ้อนมีระดับ"],["Subtle","นุ่มนวล","Bold","โดดเด่น"],["Cosmopolitan","เมืองสากล","Natural","ธรรมชาติ"],["Calm","สงบ","Dynamic","มีพลัง"],["Familiar","คุ้นเคย","Disruptive","แหวกแนว"],["Realistic","สมจริง","Idealistic","อุดมคติ"]];
 /* Version 2: three words from six, each with the traits it carries. */
-const words=[["Friendly","warm, approachable, human"],["Elegant","refined, premium, timeless"],["Natural","honest, organic, calm"],["Bold","confident, expressive, fearless"],["Innovative","smart, progressive, visionary"],["Playful","energetic, creative, fun"]];
+/* Each word carries its board. "Bold" means whatever the reader already thinks
+   it means; the images are the answer and the word is the handle on it. Paths
+   are relative so this file works opened straight from disk. */
+const words=[["Friendly","warm, approachable, human","เป็นกันเอง"],["Elegant","refined, premium, timeless","เรียบหรู"],["Natural","honest, organic, calm","เป็นธรรมชาติ"],["Bold","confident, expressive, fearless","โดดเด่น"],["Innovative","smart, progressive, visionary","สร้างสรรค์นวัตกรรม"],["Playful","energetic, creative, fun","ขี้เล่น"]];
 const avoids=[["Cheap","ดูราคาถูก"],["Too Corporate","เป็นทางการเกินไป"],["Too Cute","น่ารักเกินไป"],["Too Luxury","หรูหราเกินไป"],["Too Trendy","ตามกระแสเกินไป"],["Too Playful","ขี้เล่นเกินไป"],["Too Serious","จริงจังเกินไป"]];
 
 const qb=(n,en,th)=>`<div class="sq"><span class="qq"><span class="qn">${n}.</span>${en}</span><span class="qth">${th}</span><textarea placeholder="Your answer · คำตอบของคุณ"></textarea></div>`;
@@ -1462,13 +1482,19 @@ document.querySelectorAll('.pts button').forEach(b=>b.onclick=()=>{
 let picked=0;
 const chipBox=document.getElementById('chips'), chipN=document.getElementById('chipn');
 words.forEach(w=>{
-  const c=document.createElement('button'); c.className='chip'; c.setAttribute('aria-pressed','false');
-  c.innerHTML = w[0] + '<small>' + w[1] + '</small>';
-  c.onclick=()=>{
-    const on=c.getAttribute('aria-pressed')==='true';
-    if(!on && picked>=3){ toast('Choose 3 words · เลือกได้ 3 คำ'); return; }
-    c.setAttribute('aria-pressed', String(!on)); picked += on ? -1 : 1;
+  const [en, gloss, th] = w;
+  const c=document.createElement('label'); c.className='board';
+  c.innerHTML = '<input type="checkbox">' +
+    '<img src="../public/moodboard/' + en.toLowerCase() + '.png" alt="Reference images for ' + en + '">' +
+    '<span class="boardname"><b>' + en + '</b><span class="pth th">' + th + '</span><small>' + gloss + '</small></span>';
+  const box = c.querySelector('input');
+  box.onchange=()=>{
+    if(box.checked && picked>=3){ box.checked=false; toast('Choose 3 words · เลือกได้ 3 คำ'); return; }
+    picked += box.checked ? 1 : -1;
+    c.classList.toggle('sel', box.checked);
     chipN.innerHTML = 'Selected <b>' + picked + '</b> of 3 · เลือกแล้ว ' + picked + ' จาก 3 คำ';
+    /* at the ceiling the rest stop responding — reaching a limit is not an error */
+    chipBox.querySelectorAll('input').forEach(i=>{ i.disabled = picked>=3 && !i.checked; });
   };
   chipBox.appendChild(c);
 });

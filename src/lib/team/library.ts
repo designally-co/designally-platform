@@ -1,17 +1,32 @@
-import { asc } from 'drizzle-orm';
+import { asc, eq } from 'drizzle-orm';
 
 import { getDb } from '@/lib/db';
 import { questionBlocks, questions, type BlockKey, type QuestionType } from '@/lib/db/schema';
-import { PACKAGE_BLOCKS } from '@/lib/survey/packages';
+import { CURRENT_QUESTION_VERSION, PACKAGE_BLOCKS } from '@/lib/survey/packages';
 import { PACKAGE_LABEL } from '@/lib/team/labels';
 import { QUESTION_TYPE_LABEL, type LibraryBlock } from './library-types';
 
-/** Reads back to the team what a client is actually asked. */
+/**
+ * Reads back to the team what a client is actually asked.
+ *
+ * Only the current version. Every earlier version's rows are still in the table
+ * — rule 5 keeps them so an already-sent survey still resolves — and reading
+ * them all made the new-survey sheet offer "Brand · 50 questions", the sum of
+ * versions 1, 2 and 3 stacked on top of each other. What a *new* survey asks is
+ * one version, and that is the only number this screen may show.
+ *
+ * Reading an already-sent survey is `loadSurvey`'s job, and it filters by the
+ * version frozen onto the survey row.
+ */
 export async function loadQuestionLibrary(): Promise<LibraryBlock[]> {
   const db = await getDb();
 
   const blocks = await db.select().from(questionBlocks);
-  const all = await db.select().from(questions).orderBy(asc(questions.order));
+  const all = await db
+    .select()
+    .from(questions)
+    .where(eq(questions.version, CURRENT_QUESTION_VERSION))
+    .orderBy(asc(questions.order));
 
   return blocks
     .map((b) => ({

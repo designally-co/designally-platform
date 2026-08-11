@@ -273,7 +273,7 @@ function CheckboxAnswer({ question, value, onChange }: Props) {
                     alt={`Reference images for ${o.en}`}
                     width={578}
                     height={403}
-                    sizes="(max-width: 600px) 92vw, 300px"
+                    sizes="(max-width: 620px) 46vw, 210px"
                   />
                 )}
                 <span className="boardname">

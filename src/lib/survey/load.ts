@@ -169,6 +169,12 @@ export async function loadSurvey(rawToken: string): Promise<SurveyPayload | null
     package: row.project.package,
     closed: row.survey.closedAt !== null,
     steps,
-    questionCount: steps.reduce((n, s) => n + s.questions.length, 0),
+    /* Numbered questions only, so the welcome screen's promise and the last
+       number the respondent reaches are the same figure. Name and email are
+       not numbered and are not counted. */
+    questionCount: steps.reduce(
+      (n, s) => n + s.questions.filter((q) => q.number !== null).length,
+      0,
+    ),
   };
 }

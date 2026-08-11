@@ -34,6 +34,14 @@ export const QUESTION_TYPE_LABEL: Record<QuestionType, string> = {
 };
 
 /** How many questions a package's blocks add up to. */
+/**
+ * What the client will see numbered, which is what the team means by "how long
+ * is this". The identity block is a name and an email — the survey prints no
+ * number beside either (`load.ts`), so counting them here would promise 23
+ * where the last question on screen reads 21.
+ */
 export function countQuestions(library: LibraryBlock[], keys: readonly BlockKey[]) {
-  return library.filter((b) => keys.includes(b.key)).reduce((n, b) => n + b.questions.length, 0);
+  return library
+    .filter((b) => keys.includes(b.key) && b.key !== 'identity')
+    .reduce((n, b) => n + b.questions.length, 0);
 }
