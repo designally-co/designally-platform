@@ -80,13 +80,39 @@ export default function ProjectSheet({
             </p>
           </>
         ) : (
-          <p>
-            {p.closedOn
-              ? `Collection closed on ${p.closedOn}${p.closedByName ? ` by ${p.closedByName}` : ''}, with ${p.answers} ${p.answers === 1 ? 'answer' : 'answers'}. The analysis arrives in milestone 3.`
-              : p.answers
-                ? `${p.answers} ${p.answers === 1 ? 'answer' : 'answers'} so far, the last one ${p.lastAnswerOn}. Nothing for your team to do — the app will speak up if it goes quiet.`
-                : 'The link has been sent. No answers yet.'}
-          </p>
+          <>
+            <p>
+              {p.closedOn
+                ? `Collection closed on ${p.closedOn}${p.closedByName ? ` by ${p.closedByName}` : ''}, with ${p.answers} ${p.answers === 1 ? 'answer' : 'answers'}.`
+                : p.answers
+                  ? `${p.answers} ${p.answers === 1 ? 'answer' : 'answers'} so far, the last one ${p.lastAnswerOn}. Nothing for your team to do — the app will speak up if it goes quiet.`
+                  : 'The link has been sent. No answers yet.'}
+            </p>
+
+            {/**
+             * Closing is always available, not only once the app has noticed a
+             * quiet survey (docs/team-workflow-after-survey.md). Only a person
+             * knows whether four answers from the right people beat ten from
+             * the wrong ones, and they may know that on day one. The five-day
+             * prompt is the app catching up, never the gate opening.
+             */}
+            {!p.closedOn && p.surveyId && p.answers > 0 && (
+              <>
+                <button
+                  className="btn btn-quiet btn-sm"
+                  disabled={pending}
+                  onClick={() =>
+                    run(() => closeCollection(p.surveyId!), 'Collection closed · ปิดรับคำตอบแล้ว')
+                  }
+                >
+                  {pending ? 'Closing and analysing…' : 'Close collection and write the brief'}
+                </button>
+                <p className="hintline">
+                  Closing stops new answers and starts the analysis. It takes a few minutes.
+                </p>
+              </>
+            )}
+          </>
         )}
       </div>
 
