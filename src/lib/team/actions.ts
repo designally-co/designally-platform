@@ -1,11 +1,20 @@
 'use server';
 
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, count, eq, inArray, isNull } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 
 import { auth } from '@/auth';
 import { getDb } from '@/lib/db';
-import { briefs, clients, projects, surveys, PACKAGES, type Package } from '@/lib/db/schema';
+import {
+  briefs,
+  clients,
+  projects,
+  questionBlocks,
+  questions,
+  surveys,
+  PACKAGES,
+  type Package,
+} from '@/lib/db/schema';
 import { CURRENT_QUESTION_VERSION, PACKAGE_BLOCKS } from '@/lib/survey/packages';
 import { makeToken } from '@/lib/survey/token';
 import { packageLabel } from '@/lib/team/labels';
@@ -45,6 +54,36 @@ export async function createSurvey(formData: FormData): Promise<ActionResult> {
 
   const db = await getDb();
 
+  /**
+   * Refuse to issue a link to a questionnaire that is not in the database.
+   *
+   * This shipped once: the code moved to question version 2 before the version-2
+   * questions were imported, so surveys were created asking for a version that
+   * did not exist. The client saw a welcome screen offering nothing and a
+   * thank-you a tap later. Checking here means a broken link cannot leave the
+   * building, rather than being caught by whoever opens it.
+   */
+  const blockKeys = [...PACKAGE_BLOCKS[pkg]];
+  const [available] = await db
+    .select({ n: count() })
+    .from(questions)
+    .innerJoin(questionBlocks, eq(questionBlocks.id, questions.blockId))
+    .where(
+      and(
+        eq(questions.version, CURRENT_QUESTION_VERSION),
+        inArray(questionBlocks.key, blockKeys),
+      ),
+    );
+
+  if (!available || available.n === 0) {
+    return {
+      ok: false,
+      error:
+        `No questions are loaded for version ${CURRENT_QUESTION_VERSION}. The survey was not ` +
+        `created, because the link would have opened an empty questionnaire. Run \`npm run db:seed\`.`,
+    };
+  }
+
   const [client] = await db.insert(clients).values({ name, projectCode }).returning();
   const [project] = await db
     .insert(projects)
@@ -59,7 +98,7 @@ export async function createSurvey(formData: FormData): Promise<ActionResult> {
       token: makeToken(),
       /* Rule 5 — frozen now. Editing a template later cannot reach this survey. */
       questionVersion: CURRENT_QUESTION_VERSION,
-      blockKeys: [...PACKAGE_BLOCKS[pkg]],
+      blockKeys,
     })
     .returning();
 
