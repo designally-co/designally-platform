@@ -23,7 +23,7 @@ import {
   type QuestionConfig,
   type QuestionType,
 } from '../src/lib/db/schema';
-import { PACKAGE_BLOCKS } from '../src/lib/survey/packages';
+import { CURRENT_QUESTION_VERSION, PACKAGE_BLOCKS } from '../src/lib/survey/packages';
 import { makeToken } from '../src/lib/survey/token';
 
 type SeedQuestion = {
@@ -57,6 +57,14 @@ type SeedFile = {
 const SEED_PATH = resolve(process.cwd(), 'seed/question-blocks.json');
 
 function assertPackagesAgree(seed: SeedFile) {
+  if (seed.version !== CURRENT_QUESTION_VERSION) {
+    throw new Error(
+      `seed/question-blocks.json is version ${seed.version} but CURRENT_QUESTION_VERSION is ` +
+        `${CURRENT_QUESTION_VERSION}. New surveys would be sent asking for a version that was ` +
+        `never imported. Fix src/lib/survey/packages.ts.`,
+    );
+  }
+
   for (const [pkg, blocks] of Object.entries(PACKAGE_BLOCKS)) {
     const fromSeed = seed.packages[pkg];
     if (!fromSeed) throw new Error(`seed packages is missing "${pkg}"`);
@@ -71,12 +79,15 @@ function assertPackagesAgree(seed: SeedFile) {
   }
 }
 
+let SEED_VERSION = 1;
+
 async function main() {
   const seed: SeedFile = JSON.parse(readFileSync(SEED_PATH, 'utf8'));
+  SEED_VERSION = seed.version;
   assertPackagesAgree(seed);
 
   const db = await getDb();
-  const version = 1;
+  const version = seed.version;
 
   for (const block of seed.blocks) {
     const [row] = await db
@@ -173,7 +184,7 @@ async function seedExampleProject(db: Awaited<ReturnType<typeof getDb>>) {
     .values({ name: 'F.W. Dentogenesis', projectCode: 'FWD' })
     .returning();
 
-  const pkg: Package = 'branding';
+  const pkg: Package = 'brand';
   const [project] = await db
     .insert(projects)
     .values({ clientId: client.id, package: pkg, stage: 2 })
@@ -185,7 +196,7 @@ async function seedExampleProject(db: Awaited<ReturnType<typeof getDb>>) {
       projectId: project.id,
       kind: 'discovery',
       token: makeToken(),
-      questionVersion: 1,
+      questionVersion: SEED_VERSION,
       blockKeys: [...PACKAGE_BLOCKS[pkg]],
     })
     .returning();

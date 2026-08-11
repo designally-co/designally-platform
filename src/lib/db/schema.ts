@@ -41,14 +41,20 @@ export const clients = pgTable('clients', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
-/** branding runs 5 stages; website and both run 7. Never hard-code five. */
-export const PACKAGES = ['branding', 'website', 'both'] as const;
+/**
+ * Two packages, and a client buys one or the other — never both.
+ *
+ * The website and combined packages were retired on 11 August 2026 along with
+ * the whole website track. Both remaining packages run the same five stages,
+ * but the meter still reads its length from here rather than assuming five:
+ * the moment that is hard-coded, adding a package becomes a hunt.
+ */
+export const PACKAGES = ['brand', 'design'] as const;
 export type Package = (typeof PACKAGES)[number];
 
 export const STAGE_FLOW: Record<Package, readonly string[]> = {
-  branding: ['Lead', 'Proposal', 'Survey', 'Analysis', 'Kick-off'],
-  website: ['Lead', 'Proposal', 'Survey', 'Analysis', 'Kick-off', 'Content', 'Build'],
-  both: ['Lead', 'Proposal', 'Survey', 'Analysis', 'Kick-off', 'Content', 'Build'],
+  brand: ['Lead', 'Proposal', 'Survey', 'Analysis', 'Kick-off'],
+  design: ['Lead', 'Proposal', 'Survey', 'Analysis', 'Kick-off'],
 };
 
 export const projects = pgTable('projects', {
@@ -61,7 +67,8 @@ export const projects = pgTable('projects', {
   stage: integer('stage').notNull().default(2),
 
   kickoffAt: timestamp('kickoff_at', { withTimezone: true }),
-  /** populated from the website block's maps_to answers, once a human confirms them */
+  /* Held the retired website block's answers. Unused since the website track
+     was dropped; kept rather than migrated away, in case it returns. */
   pages: text('pages'),
   languages: text('languages').array(),
 
@@ -75,8 +82,18 @@ export const projects = pgTable('projects', {
 
 /* ── the question library ─────────────────────────────────────────── */
 
+/**
+ * `core`, `branding`, `website`, `ecommerce` and `content` are no longer
+ * attached to any package, but they stay listed: surveys already sent keep the
+ * questions they were sent with (rule 5), and their answers still point at
+ * those blocks. Removing a key here would orphan a real brief.
+ */
 export const BLOCK_KEYS = [
   'identity',
+  'strategy',
+  'project',
+  'visual',
+  /* retired — kept so already-sent surveys still resolve */
   'core',
   'branding',
   'website',
@@ -116,6 +133,12 @@ export type QuestionConfig = {
   max?: number;
   /** linear_scale */
   points?: number;
+  /**
+   * First value on the scale. Absent means 1, which is what every version-1
+   * question uses. The version-2 personality scales run 0–10, where 0 is a
+   * position ("fully Traditional") and not an absence of one.
+   */
+  start?: number;
   pairs?: { left_en: string; left_th: string; right_en: string; right_th: string }[];
   /** populates a project field — decision_maker | pages | languages | skus */
   maps_to?: string;
@@ -146,7 +169,12 @@ export const questions = pgTable(
 
 /* ── surveys ──────────────────────────────────────────────────────── */
 
-export const SURVEY_KINDS = ['discovery', 'content'] as const;
+/**
+ * The content survey was the website track's follow-up and went with it. The
+ * kind is kept as a one-member union rather than removed, because `surveys.kind`
+ * is a stored column and a second kind may return.
+ */
+export const SURVEY_KINDS = ['discovery'] as const;
 export type SurveyKind = (typeof SURVEY_KINDS)[number];
 
 export const surveys = pgTable('surveys', {

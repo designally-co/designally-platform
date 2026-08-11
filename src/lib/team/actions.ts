@@ -6,7 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { auth } from '@/auth';
 import { getDb } from '@/lib/db';
 import { briefs, clients, projects, surveys, PACKAGES, type Package } from '@/lib/db/schema';
-import { PACKAGE_BLOCKS } from '@/lib/survey/packages';
+import { CURRENT_QUESTION_VERSION, PACKAGE_BLOCKS } from '@/lib/survey/packages';
 import { makeToken } from '@/lib/survey/token';
 import { PACKAGE_LABEL } from '@/lib/team/labels';
 
@@ -58,7 +58,7 @@ export async function createSurvey(formData: FormData): Promise<ActionResult> {
       kind: 'discovery',
       token: makeToken(),
       /* Rule 5 — frozen now. Editing a template later cannot reach this survey. */
-      questionVersion: 1,
+      questionVersion: CURRENT_QUESTION_VERSION,
       blockKeys: [...PACKAGE_BLOCKS[pkg]],
     })
     .returning();

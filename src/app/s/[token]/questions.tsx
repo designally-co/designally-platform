@@ -275,7 +275,12 @@ function CheckboxAnswer({ question, value, onChange }: Props) {
 function ScaleAnswer({ question, value, onChange }: Props) {
   const v = (value ?? { scale: {} }) as { scale: Record<string, number> };
   const points = question.config.points ?? 5;
+  /* Version 1 scales run 1..points; the version-2 personality scales run 0..10,
+     where 0 is a position and not an absence of one. */
+  const start = question.config.start ?? 1;
   const pairs = question.config.pairs ?? [];
+  /* more points than fit one row of 44px targets on a 390px screen */
+  const wide = points > 7;
 
   // functional, so ten pairs answered in quick succession all survive
   const set = (index: number, point: number) =>
@@ -299,20 +304,27 @@ function ScaleAnswer({ question, value, onChange }: Props) {
               <small className="th">{p.right_th}</small>
             </span>
           </div>
+          {/**
+            * Up to seven points keep the prototype's graded dots, which fit one
+            * row at 390px with 44px targets. The version-2 scales have eleven,
+            * and eleven 44px targets need 484px where a phone offers 350. They
+            * are numbered and allowed to wrap instead: a dot that wraps loses
+            * its meaning, because position is all it has, but a number keeps it.
+            */}
           <div
-            className="pts"
+            className={`pts${wide ? ' pts-wide' : ''}`}
             role="group"
             aria-labelledby={`pole-${question.ref}-${i}`}
           >
-            {Array.from({ length: points }, (_, n) => n + 1).map((n) => (
+            {Array.from({ length: points }, (_, n) => n + start).map((n) => (
               <button
                 key={n}
                 type="button"
                 aria-pressed={v.scale[String(i)] === n}
-                aria-label={`${p.left_en} to ${p.right_en}, ${n} of ${points}`}
+                aria-label={`${p.left_en} to ${p.right_en}, ${n} of ${start + points - 1}`}
                 onClick={() => set(i, n)}
               >
-                <i />
+                {wide ? <span>{n}</span> : <i />}
               </button>
             ))}
           </div>

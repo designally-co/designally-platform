@@ -222,7 +222,7 @@ async function main() {
 
   const [project] = await db
     .insert(projects)
-    .values({ clientId: client.id, package: 'branding', stage: 2 })
+    .values({ clientId: client.id, package: 'brand', stage: 2 })
     .returning();
 
   const [survey] = await db
@@ -232,7 +232,7 @@ async function main() {
       kind: 'discovery',
       token: makeToken(),
       questionVersion: 1,
-      blockKeys: [...PACKAGE_BLOCKS.branding],
+      blockKeys: [...PACKAGE_BLOCKS.brand],
     })
     .returning();
 

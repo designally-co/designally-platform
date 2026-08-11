@@ -10,9 +10,8 @@ import { forDisplay } from '@/lib/survey/link';
 import Sheet from './sheet';
 
 const OPTIONS: { key: Package; label: string }[] = [
-  { key: 'branding', label: 'Branding' },
-  { key: 'website', label: 'Website' },
-  { key: 'both', label: 'Both' },
+  { key: 'brand', label: 'Brand Strategy + Identity' },
+  { key: 'design', label: 'Design' },
 ];
 
 export default function NewSurveySheet({

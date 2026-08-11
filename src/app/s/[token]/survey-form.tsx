@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { isAnswered, type DraftValues } from '@/lib/survey/answers';
 import type { SurveyPayload, SurveyStep } from '@/lib/survey/load';
+import { PACKAGE_FULL } from '@/lib/team/labels';
 import Question, { IdentityField, type ValueUpdate } from './questions';
 
 const WELCOME = 0;
@@ -255,7 +256,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
             Design<em>ally</em>
           </span>
           <span className="proj">
-            {survey.clientName} · {survey.package === 'branding' ? 'Branding' : survey.package === 'website' ? 'Website' : 'Branding + Website'}
+            {survey.clientName} · {PACKAGE_FULL[survey.package]}
           </span>
         </div>
 

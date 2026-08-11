@@ -3,6 +3,7 @@ import { asc } from 'drizzle-orm';
 import { getDb } from '@/lib/db';
 import { questionBlocks, questions, type BlockKey, type QuestionType } from '@/lib/db/schema';
 import { PACKAGE_BLOCKS } from '@/lib/survey/packages';
+import { PACKAGE_LABEL } from '@/lib/team/labels';
 import { QUESTION_TYPE_LABEL, type LibraryBlock } from './library-types';
 
 /** Reads back to the team what a client is actually asked. */
@@ -35,14 +36,12 @@ export async function loadQuestionLibrary(): Promise<LibraryBlock[]> {
 function usedBy(key: BlockKey) {
   const packages = Object.entries(PACKAGE_BLOCKS)
     .filter(([, keys]) => keys.includes(key))
-    .map(([name]) =>
-      name === 'both' ? 'Branding + Website' : name[0].toUpperCase() + name.slice(1),
-    );
-  return packages.length ? packages.join(' · ') : 'Content survey';
+    .map(([name]) => PACKAGE_LABEL[name as keyof typeof PACKAGE_LABEL] ?? name);
+  return packages.length ? packages.join(' · ') : 'Retired — kept for surveys already sent';
 }
 
 function order(key: BlockKey) {
-  return ['identity', 'core', 'branding', 'website', 'ecommerce', 'content'].indexOf(key);
+  return ['identity', 'strategy', 'project', 'visual', 'core', 'branding', 'website', 'ecommerce', 'content'].indexOf(key);
 }
 
 function describeConfig(

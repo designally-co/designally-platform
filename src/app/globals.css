@@ -1940,3 +1940,47 @@ dialog::backdrop {
   color: inherit;
   font-weight: 600;
 }
+
+/* ============================================================
+   Wide scales — the version-2 personality pairs run 0–10.
+   Eleven 44px targets need 484px; a 390px phone offers 350.
+   So they wrap, and each one carries its number: a graded dot
+   means nothing once it is on a second row, because position
+   was the only thing telling you what it was.
+   ============================================================ */
+.pts-wide {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  max-width: none;
+}
+.pts-wide button {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-pill);
+}
+.pts-wide button span {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-pill);
+  border: 1.5px solid var(--hairline);
+  background: var(--canvas);
+  font-size: 14px;
+  letter-spacing: 0;
+  color: var(--ink-2);
+  transition:
+    background 0.18s,
+    border-color 0.18s,
+    color 0.18s;
+}
+.pts-wide button:hover span {
+  border-color: var(--primary);
+}
+.pts-wide button[aria-pressed='true'] span {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  font-weight: 600;
+}
