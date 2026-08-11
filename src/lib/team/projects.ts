@@ -7,12 +7,12 @@ import {
   responses,
   surveys,
   users,
-  STAGE_FLOW,
+  flowFor,
   briefs,
   type Package,
 } from '@/lib/db/schema';
 
-import { PACKAGE_LABEL } from '@/lib/team/labels';
+import { PACKAGE_LABEL, packageLabel } from '@/lib/team/labels';
 import { claimsDecision } from '@/lib/survey/decision';
 
 export { PACKAGE_LABEL };
@@ -278,9 +278,9 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
       clientName: client.name,
       projectCode: client.projectCode,
       package: project.package,
-      packageLabel: PACKAGE_LABEL[project.package],
+      packageLabel: packageLabel(project.package),
       stage: project.stage,
-      flow: STAGE_FLOW[project.package],
+      flow: flowFor(project.package),
       archived: project.archived,
       archivedOn: formatDay(project.archivedAt),
       archivedByName: project.archivedBy ? (actorName.get(project.archivedBy) ?? null) : null,

@@ -8,7 +8,7 @@ import { getDb } from '@/lib/db';
 import { briefs, clients, projects, surveys, PACKAGES, type Package } from '@/lib/db/schema';
 import { CURRENT_QUESTION_VERSION, PACKAGE_BLOCKS } from '@/lib/survey/packages';
 import { makeToken } from '@/lib/survey/token';
-import { PACKAGE_LABEL } from '@/lib/team/labels';
+import { packageLabel } from '@/lib/team/labels';
 
 /**
  * Every gate records who acted. That is rule 2, and it is enforced here rather
@@ -119,7 +119,7 @@ export async function closeCollection(surveyId: string): Promise<ActionResult> {
 
   const result = await analyse({
     clientName: client.name,
-    packageLabel: PACKAGE_LABEL[client.package],
+    packageLabel: packageLabel(client.package),
     respondentCount,
     transcript,
     decisionMakers,
@@ -170,7 +170,7 @@ export async function reanalyse(projectId: string): Promise<ActionResult> {
 
   const result = await analyse({
     clientName: row.clientName,
-    packageLabel: PACKAGE_LABEL[row.package],
+    packageLabel: packageLabel(row.package),
     respondentCount,
     transcript,
     decisionMakers,

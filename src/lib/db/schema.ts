@@ -57,6 +57,27 @@ export const STAGE_FLOW: Record<Package, readonly string[]> = {
   design: ['Lead', 'Proposal', 'Survey', 'Analysis', 'Kick-off'],
 };
 
+/**
+ * `projects.package` is a stored string, so a row written before a package was
+ * retired still carries the old value — `branding`, `website`, `both`. Reading
+ * STAGE_FLOW by that value returns undefined, and the landing page then calls
+ * `.map` on it and the whole team app 500s. That is exactly what happened on
+ * the version-2 deploy.
+ *
+ * Never index STAGE_FLOW directly. A retired package must render, because
+ * archived work has to stay readable — the same promise rule 5 makes about
+ * questions.
+ */
+const RETIRED_FLOW: Record<string, readonly string[]> = {
+  branding: ['Lead', 'Proposal', 'Survey', 'Analysis', 'Kick-off'],
+  website: ['Lead', 'Proposal', 'Survey', 'Analysis', 'Kick-off', 'Content', 'Build'],
+  both: ['Lead', 'Proposal', 'Survey', 'Analysis', 'Kick-off', 'Content', 'Build'],
+};
+
+export function flowFor(pkg: string): readonly string[] {
+  return STAGE_FLOW[pkg as Package] ?? RETIRED_FLOW[pkg] ?? STAGE_FLOW.brand;
+}
+
 export const projects = pgTable('projects', {
   id: uuid('id').primaryKey().defaultRandom(),
   clientId: uuid('client_id')
