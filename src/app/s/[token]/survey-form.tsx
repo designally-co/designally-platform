@@ -314,19 +314,45 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
     const root = deck.current;
     if (!root || submitted) return;
 
+    /**
+     * The active slide is the one covering the middle of the screen.
+     *
+     * This was an IntersectionObserver firing above a fixed ratio, which cannot
+     * describe a slide taller than the viewport: the send screen listing every
+     * blank question runs 2,466px, so at most 34% of it is ever visible, it
+     * never crossed the threshold, and it never became active — which meant its
+     * Send answers button never appeared and the survey could not be submitted
+     * by anyone who had left a question blank.
+     *
+     * A midpoint works at any height and has no threshold to tune.
+     */
     const slides = Array.from(root.querySelectorAll<HTMLElement>('[data-slide]'));
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          if (e.isIntersecting && e.intersectionRatio > 0.55) {
-            setStep(Number((e.target as HTMLElement).dataset.slide));
-          }
-        }
-      },
-      { root, threshold: [0.56] },
-    );
-    slides.forEach((s) => observer.observe(s));
-    return () => observer.disconnect();
+    let frame = 0;
+
+    const measure = () => {
+      frame = 0;
+      const middle = root.clientHeight / 2;
+      const rootTop = root.getBoundingClientRect().top;
+      const found = slides.find((s) => {
+        const r = s.getBoundingClientRect();
+        return r.top - rootTop <= middle && r.bottom - rootTop > middle;
+      });
+      if (found) setStep(Number(found.dataset.slide));
+    };
+
+    const onScroll = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(measure);
+    };
+
+    measure();
+    root.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      root.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
   }, [cards.length, submitted]);
 
   /* ── submit ─────────────────────────────────────────────────────── */
@@ -429,7 +455,11 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
         </div>
 
         <div className="deck" ref={deck}>
-          <section className="slide" data-slide={WELCOME}>
+          <section
+            className="slide"
+            data-slide={WELCOME}
+            data-active={step === WELCOME ? '' : undefined}
+          >
             <div className="slidebody">
               <div className="slidemain">
                 <h1>Let&apos;s shape your brand, together.</h1>
@@ -507,7 +537,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
             );
           })}
 
-          <section className="slide" data-slide={LAST}>
+          <section className="slide" data-slide={LAST} data-active={step === LAST ? '' : undefined}>
             <div className="slidebody">
               <div className="slidemain">
                 <h2>Ready to send</h2>

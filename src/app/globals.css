@@ -2862,7 +2862,21 @@ dialog::backdrop {
     mask-image: linear-gradient(to top, #000 0%, transparent 11%);
   }
 
-  .slide[data-active] .okrow {
+  /**
+   * The controls never belong to a slide.
+   *
+   * Fixing only the active slide's row left every other row in normal flow, so
+   * mid-swipe you saw two: the outgoing one still pinned to the floor and the
+   * incoming one riding up the screen with its slide. Two OK buttons and two
+   * back arrows at once, and the second appeared to pop into place.
+   *
+   * Every slide's action now sits at the same fixed point and only the active
+   * one is visible. They are identical and never move, so the handover cannot
+   * be seen — the bar reads as one object the questions pass behind, which is
+   * what it always looked like it was.
+   */
+  .slide .okrow,
+  .slide .btn.start {
     position: fixed;
     left: 22px;
     right: 22px;
@@ -2870,7 +2884,14 @@ dialog::backdrop {
     z-index: 15;
     margin: 0;
     padding-top: 0;
+    opacity: 0;
+    pointer-events: none;
     transition: bottom 0.18s var(--ease);
+  }
+  .slide[data-active] .okrow,
+  .slide[data-active] .btn.start {
+    opacity: 1;
+    pointer-events: auto;
   }
   .slide {
     padding-bottom: 104px;
@@ -2886,14 +2907,11 @@ dialog::backdrop {
   /* Start, Send answers and the thank-you's action get the same floor, and the
      line that belongs to each sits above it rather than under the fold. */
   .btn.start {
-    order: 2;
-    width: 100%;
     min-height: 52px;
-    margin: 0;
   }
+  /* the button is out of flow now, so this has to clear the space it occupies */
   .takes {
-    order: 1;
-    margin: auto 0 14px;
+    margin: auto 0 62px;
   }
   .savednote {
     display: none;
