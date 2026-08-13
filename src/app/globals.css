@@ -2854,9 +2854,11 @@ dialog::backdrop {
 
 
 @media (hover: hover) {
+  /* the same hover every other quiet control has: the line darkens to ink-3
+     and the glyph to ink. No fill arrives — that was one property more than
+     anything else in the system changes. */
   .deck-nav button:hover {
-    background: var(--canvas);
-    border-color: var(--hairline);
+    border-color: var(--ink-3);
     color: var(--ink);
   }
 }

@@ -276,6 +276,16 @@ The team app is unchanged. There the accent has real competition and the hierarc
 
 **Text link** — `--primary`, no background. On dark surfaces use `--primary-on-dark`.
 
+### Hover
+
+One rule, because this drifted four times in a day: **a hover darkens the line to `--ink-3`, and nothing else.** A control that carries no text — an icon button — also takes its glyph to `--ink`, because it has nothing else to show the state with. No fill arrives, no colour changes, nothing moves.
+
+Filled buttons are the exception and deepen their own fill: `--primary` to `--primary-deep`, `--ink` to black.
+
+**Hover never uses the accent.** The accent means this needs you, or you chose this. Pointing at something is neither, and a blue hover beside an accent-marked selection makes the thing under the cursor read as more chosen than the thing actually chosen.
+
+**Every hover rule is wrapped in `@media (hover: hover)`.** A touch device has no way to end a hover: on a phone, tapping a chip to deselect it left the hover state behind, so the deselected chip stayed marked. This is not optional and there is no exception — the codebase has none.
+
 ### Cards and containers
 
 **Utility card** — the workhorse. `--canvas` white on the parchment page, 1px `--hairline`, `lg` radius (18px), padding `lg` (24px). No shadow.
