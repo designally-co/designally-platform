@@ -633,11 +633,17 @@ label.f span {
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 12px;
+  gap: 9px;
+  margin-top: 26px;
 }
 .chip {
-  font-size: 14px;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+  flex-wrap: wrap;
+  max-width: 100%;
+  text-align: left;
+  font-size: 15px;
   font-weight: 400;
   letter-spacing: -0.224px;
   cursor: pointer;
@@ -645,11 +651,28 @@ label.f span {
   color: var(--ink);
   border: 1px solid var(--hairline);
   border-radius: var(--r-pill);
-  padding: 12px 16px;
+  padding: 10px 17px;
+  /* the 44px floor is a touch target, not a look — DESIGN.md §5 */
   min-height: 44px;
   transition:
     border-color 0.18s,
     background 0.18s;
+}
+.chip b {
+  font-weight: 500;
+}
+.chip small {
+  font-size: 13px;
+  color: var(--ink-3);
+  /* Thai never below 1.6 */
+  line-height: 1.6;
+}
+.chip[aria-pressed='true'] small {
+  color: var(--ink-2);
+}
+.chip:disabled {
+  opacity: 0.4;
+  cursor: default;
 }
 .chip:hover {
   border-color: var(--primary);

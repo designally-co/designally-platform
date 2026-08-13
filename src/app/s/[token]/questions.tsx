@@ -268,9 +268,20 @@ function ChoiceAnswer({ question, value, onChange, total }: Props) {
 
 /* ── checkboxes ───────────────────────────────────────────────────── */
 
-/** Long word lists read as chips; short option lists read as rows. */
+/**
+ * A list of short labels reads as chips, not as a stack of full-width rows.
+ *
+ * Eight avoid-options set as rows ran a 390px slide to 1,080px — one line of
+ * text per 60px band, most of each band empty. As chips they wrap two and three
+ * to a line and the question fits the screen it is asked on. The threshold used
+ * to be twelve choices, which nothing in the questionnaire ever reached.
+ *
+ * Choices carrying an image are the exception and stay boards: the picture is
+ * the answer there, and it cannot wrap into a pill.
+ */
 function asChips(config: QuestionConfig) {
-  return (config.choices?.length ?? 0) > 12;
+  const choices = config.choices ?? [];
+  return choices.length > 0 && !choices.some((c) => c.image);
 }
 
 /**
@@ -340,7 +351,8 @@ function CheckboxAnswer({ question, value, onChange, total }: Props) {
                 onClick={() => toggle(o.key)}
                 disabled={!on && atMax}
               >
-                {o.label}
+                <b>{o.en}</b>
+                <small className="th">{o.th}</small>
               </button>
             );
           })}
