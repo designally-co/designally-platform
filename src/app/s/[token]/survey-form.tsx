@@ -781,13 +781,28 @@ function Ok({
   );
 }
 
+/**
+ * One chevron, drawn to the reference.
+ *
+ * It was a 1.6 stroke in a 24 viewBox rendered at 19px — 1.27px on screen,
+ * which at a distance reads as a lighter grey than it is set in, because a hair
+ * of a line does. It is 2.5px now, and the arms open to about 100 degrees
+ * across roughly a third of the control they sit in, which is the proportion
+ * the reference holds.
+ */
 function Chevron({ up, back }: { up?: boolean; back?: boolean }) {
   return (
-    <svg viewBox="0 0 24 24" width="19" height="19" fill="none" aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" aria-hidden="true">
       <path
-        d={back ? 'M14 6l-6 6 6 6' : up ? 'M6 14l6-6 6 6' : 'M6 10l6 6 6-6'}
+        d={
+          back
+            ? 'M16.5 3 L5.5 12 L16.5 21'
+            : up
+              ? 'M3 17.5 L12 6.5 L21 17.5'
+              : 'M3 6.5 L12 17.5 L21 6.5'
+        }
         stroke="currentColor"
-        strokeWidth="1.6"
+        strokeWidth="2.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       />

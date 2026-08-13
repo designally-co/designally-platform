@@ -33,6 +33,7 @@ Adopted from the source almost unchanged. One accent, no gradients, no decorativ
 --surface-pearl    #fafafc   /* ghost button fill */
 --surface-fill     #dedee1   /* icon-button fill */
 --surface-fill-deep #d4d4d8  /* its hover */
+--glyph            #5c5c61   /* an icon sitting on that fill */
 --surface-tile-1   #272729   /* dark tile */
 --surface-black    #000000   /* true void — rare */
 
@@ -266,7 +267,11 @@ Where a primary sits beside a secondary on a phone's floor, the primary takes al
 
 And its fill depends on the surface beneath it. Pearl was chosen against the team app's parchment page; on the client survey's flat page, pearl is all but invisible, so the quiet action there is `--canvas` with a 1px `--hairline` and an `--ink-muted-48` glyph. Same object, same weight, different ground.
 
-**Icon button — a filled disc.** 52px, `pill` radius, `--surface-fill`, **no border**, `--ink-muted-48` glyph. Hover deepens the fill to `--surface-fill-deep` and takes the glyph to `--ink`, per the rule below. This is the survey's back control, everywhere it appears.
+**Icon button — a filled disc.** 52px, `pill` radius, `--surface-fill`, **no border**, `--glyph` chevron. Hover deepens the fill to `--surface-fill-deep` and takes the glyph to `--ink`, per the rule below. This is the survey's back control, everywhere it appears.
+
+**The chevron.** 2.5px stroke, round cap and join, arms opening to about 100°, drawn about **a third of the height of the control** it sits in — 18px in a 52px disc. One geometry, used by every chevron in the product. It was a 1.27px hairline at half that presence, which reads as a lighter grey than it is set in, because a hair of a line does.
+
+`--glyph` exists because `--ink-muted-48` is tuned to the page: on a grey disc it measures 3.83:1 and looks pale. `--glyph` is 4.92:1 there, clearing even the text floor. On the page — the bare stepper — `--ink-muted-48` is still correct. Same object, different ground, again.
 
 **Corrected 13 August 2026.** It was the quiet secondary above — `--canvas` inside a hairline. White inside a thin line on an almost-white page gives a control a boundary and no body: the ring reads as the object and the glyph sits in a hole. A control with no label has only its shape to be recognised by, so it gets a shape. It stays quieter than the accented action beside it because it is grey, not because it is barely there.
 

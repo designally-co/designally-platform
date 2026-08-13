@@ -31,6 +31,9 @@
   /* the neutral control fill — an icon button with no label to carry it */
   --fill: #dedee1;
   --fill-deep: #d4d4d8;
+  /* the glyph that sits on that fill — ink-3 is tuned to the page, and on a
+     grey disc it measures 3.83:1 and reads pale. This is 4.92:1 there. */
+  --glyph: #5c5c61;
   --tile: #272729;
 
   /* line */
@@ -2866,7 +2869,7 @@ dialog::backdrop {
   border: 0;
   border-radius: var(--r-pill);
   background: var(--fill);
-  color: var(--ink-3);
+  color: var(--glyph);
   cursor: pointer;
   transition:
     background-color 0.18s,
