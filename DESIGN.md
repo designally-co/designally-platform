@@ -43,14 +43,19 @@ Adopted from the source almost unchanged. One accent, no gradients, no decorativ
 
 **Action Blue is the only accent, and it means "a person is needed here."** Every interactive element uses it; nothing decorative does. This survives unchanged from the previous system and matches Apple's own rule exactly.
 
-**Selection is not the accent — it is ink.** Decided 13 August 2026, after the survey had quietly spent the accent on chosen chips, chosen mood boards and the tick inside a checkbox. Being asked and having answered are different states, and if both are blue the blue stops meaning either. So:
+**The accent also marks what has been chosen — and hover never does.** Settled 13 August 2026, after one pass in the other direction.
+
+Apple tints the chosen thing: a checkmark, a selected segment, a picked row. Following that costs nothing here as long as the third state is kept out of the way, and the third state was the real fault. Selection and hover were both blue, so a chip you were merely pointing at read as more chosen than the one you had picked — and on a phone, where hover has no way to end, tapping to deselect left the blue behind.
 
 | | |
 |---|---|
-| **Accent** | this needs you: buttons, links, controls, the focus ring, the dot beside a project that is waiting |
-| **Ink** | you have chosen this: a selected chip's 2px border, a selected card's border, the fill behind a tick |
+| **Accent** | this needs you, or you chose this: buttons, links, controls, the focus ring, the waiting-project dot, a selected chip's 2px border, a selected card's border, the fill behind a tick |
+| **Ink** | you are pointing at this: every hover on a choice, and only on devices that can hover |
+| **Never** | decoration of any kind |
 
-A selected thing is already dealt with. It should read as settled, not as unfinished business.
+Hover rules are wrapped in `(hover: hover)`. A device that cannot hover must never be given a state it cannot clear.
+
+The accent's ten-percent ceiling still holds, and selection is what makes it easy to breach: a screen where everything is chosen is a screen that is entirely blue. If that starts happening, the ceiling wins and selection moves to ink.
 
 **Correction, milestone 1.** `--ink-muted-48` was `#7a7a7a`, described below as meeting 4.5:1. Measured, it does not: **3.94:1 on parchment and 4.29:1 on white**. Since the meta colour carries the Thai sub-line under every question, that failed the WCAG 2.2 AA baseline in `PRODUCT.md` for exactly the readers who most need it. It is now `#6e6e73` — Apple's own secondary label colour — which measures **4.66:1 on parchment and 5.07:1 on white**. Do not lighten it, and note that any grey checked only against white will fail on the parchment page.
 
@@ -420,7 +425,7 @@ Touch targets minimum 44 × 44px. Inputs are exactly 44px tall, matching Apple's
 4. Keyboard reachable; focus ring is `2px --primary-focus`
 5. `prefers-reduced-motion` honoured
 6. Exactly one primary button visible
-7. Action Blue appears only where a person must act — selection is ink
+7. Action Blue appears only where a person must act or has chosen — never on hover, never decorative
 8. No shadows anywhere; blur and scrim only for the two jobs in section 3
 9. Radii are only 8, 11, 18 or pill, and anything that reads as an action is a pill
 10. Weights are 300 / 400 / 600 / 700 — 500 is not in the ladder

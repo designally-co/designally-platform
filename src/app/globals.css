@@ -539,8 +539,8 @@ label.f span {
   flex-shrink: 0;
 }
 .pickone.sel {
-  border-color: var(--ink);
-  background: var(--pearl);
+  border-color: var(--primary);
+  background: var(--primary-tint);
 }
 .pickone b {
   display: block;
@@ -629,9 +629,9 @@ label.f span {
   transform: scale(1.14);
 }
 
-/* Word chips. Selection is border weight, not fill — and the border is ink,
-   not the accent: choosing is not the same as being called on, and the accent
-   answers only "a person is needed here" (DESIGN.md §1). */
+/* Word chips. Selection is border weight, not fill, and the border is the
+   accent — Apple tints what you have chosen. Hover is ink, so the thing you are
+   pointing at can never outrank the thing you picked (DESIGN.md §1). */
 .chips {
   display: flex;
   flex-wrap: wrap;
@@ -693,7 +693,7 @@ label.f span {
   }
 }
 .chip[aria-pressed="true"] {
-  border: 2px solid var(--ink);
+  border: 2px solid var(--primary);
   padding: 9px 16px;
 }
 .chipn {
@@ -892,7 +892,7 @@ label.f span {
 /* Selection is a 2px border, as everywhere else. The padding compensates so
    nothing shifts when it thickens (DESIGN.md §5). */
 .board.sel {
-  border: 2px solid var(--ink);
+  border: 2px solid var(--primary);
 }
 .board img {
   display: block;
@@ -931,7 +931,7 @@ label.f span {
     border-color 0.18s var(--ease);
 }
 .board input:checked {
-  background: var(--ink);
+  background: var(--primary);
   border-color: #fff;
 }
 .board:has(input:checked)::after {
@@ -2714,18 +2714,34 @@ dialog::backdrop {
   color: var(--ink-3);
 }
 
-/* the phone's back arrow, beside OK on the floor of the slide */
+/**
+ * The phone's back arrow, beside OK on the floor of the slide.
+ *
+ * It was a second solid ink pill, the same weight as OK — two equal buttons
+ * where only one is the way forward. There is exactly one primary action on a
+ * slide (DESIGN.md §8), so back steps down to an outline: the hairline and the
+ * muted chevron say it is available without asking to be pressed.
+ */
 .okback {
   display: none;
   place-items: center;
   width: 52px;
   height: 52px;
   flex: 0 0 auto;
-  border: 0;
+  border: 1px solid var(--hairline);
   border-radius: var(--r-pill);
-  background: var(--ink);
-  color: var(--on-dark);
+  background: var(--canvas);
+  color: var(--ink-3);
   cursor: pointer;
+  transition:
+    border-color 0.18s,
+    color 0.18s;
+}
+@media (hover: hover) {
+  .okback:hover {
+    border-color: var(--ink-3);
+    color: var(--ink);
+  }
 }
 
 /* the chevron pair, bottom right on a pointer device */
