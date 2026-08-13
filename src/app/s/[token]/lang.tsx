@@ -22,7 +22,7 @@ import { createContext, useContext } from 'react';
  */
 export type Lang = 'th' | 'en';
 
-export const LangContext = createContext<Lang>('th');
+export const LangContext = createContext<Lang>('en');
 
 export function useLang() {
   return useContext(LangContext);
@@ -41,8 +41,6 @@ export function useOtherText() {
   return (en: string | null | undefined, th: string | null | undefined) =>
     (lang === 'th' ? en : th) ?? '';
 }
-
-export const LANG_LABEL: Record<Lang, string> = { th: 'ไทย', en: 'English' };
 
 /** What the reveal control offers — always named in the language it shows. */
 export const OTHER_LABEL: Record<Lang, string> = { th: 'English', en: 'ไทย' };

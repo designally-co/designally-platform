@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { isAnswered, type DraftValues } from '@/lib/survey/answers';
 import type { SurveyPayload, SurveyQuestion, SurveyStep } from '@/lib/survey/load';
-import { LangContext, LANG_LABEL, type Lang } from './lang';
+import { LangContext, type Lang } from './lang';
 import Question, { IdentityField, type ValueUpdate } from './questions';
 
 const WELCOME = 0;
@@ -13,9 +13,16 @@ function draftStorageKey(token: string) {
   return `designally.draft.${token}`;
 }
 
-function langStorageKey(token: string) {
-  return `designally.lang.${token}`;
-}
+/**
+ * English leads, and Thai is one tap away on every question.
+ *
+ * There was a chooser on the welcome slide. It asked the respondent to make a
+ * decision before they had seen a single question, on a screen whose whole job
+ * is to get them started — and it was the only control competing with Start.
+ * The per-question reveal already does the work, so the choice is made where it
+ * is actually felt rather than up front.
+ */
+const LEAD: Lang = 'en';
 
 type StoredDraft = {
   draftKey: string;
@@ -71,7 +78,6 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   const [submitted, setSubmitted] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [nameMissing, setNameMissing] = useState(false);
-  const [lang, setLang] = useState<Lang>('th');
 
   const draftKey = useRef<string>('');
   const deck = useRef<HTMLDivElement | null>(null);
@@ -116,8 +122,6 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
       try {
         const raw = window.localStorage.getItem(storageKey);
         if (raw) local = JSON.parse(raw) as StoredDraft;
-        const savedLang = window.localStorage.getItem(langStorageKey(survey.token));
-        if (savedLang === 'th' || savedLang === 'en') setLang(savedLang);
       } catch {
         local = null;
       }
@@ -192,15 +196,6 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
     },
     [survey.token],
   );
-
-  const chooseLang = (next: Lang) => {
-    setLang(next);
-    try {
-      window.localStorage.setItem(langStorageKey(survey.token), next);
-    } catch {
-      // a blocked storage only costs the preference, not the answers
-    }
-  };
 
   const started = Object.keys(values).length > 0;
 
@@ -299,9 +294,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
       setSubmitted(respondentName);
     } catch {
       setError(
-        lang === 'th'
-          ? 'ส่งคำตอบไม่สำเร็จ คำตอบยังถูกบันทึกไว้ในเครื่องนี้ กรุณาลองอีกครั้ง'
-          : 'Your answers could not be sent. They are saved on this device — please try again.',
+        'Your answers could not be sent. They are saved on this device — please try again. · ส่งคำตอบไม่สำเร็จ คำตอบยังถูกบันทึกไว้ในเครื่องนี้',
       );
     } finally {
       setSubmitting(false);
@@ -320,11 +313,9 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
 
   /* ── render ─────────────────────────────────────────────────────── */
 
-  const t = (en: string, th: string) => (lang === 'th' ? th : en);
-
   if (submitted) {
     return (
-      <LangContext.Provider value={lang}>
+      <LangContext.Provider value={LEAD}>
         <div className="survey-shell client-surface">
           <div className="slide">
             <div className="slidebody">
@@ -335,20 +326,16 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                 Thank you, <em>{submitted}</em>.
               </h1>
               <p className="intro">
-                {t(
-                  "Your answers are with the Designally team. We'll bring every perspective together and see you at the kick-off meeting.",
-                  'คำตอบของคุณถูกส่งถึงทีมแล้ว เราจะรวบรวมทุกมุมมองเข้าด้วยกัน แล้วพบกันในการประชุมเริ่มโปรเจกต์',
-                )}
+                Your answers are with the Designally team. We&apos;ll bring every perspective
+                together and see you at the kick-off meeting.
+              </p>
+              <p className="introth th">
+                คำตอบของคุณถูกส่งถึงทีมแล้ว แล้วพบกันในการประชุมเริ่มโปรเจกต์
               </p>
               <button className="btn btn-quiet start" onClick={answerAsSomeoneElse}>
                 Answer as another stakeholder
               </button>
-              <p className="takes">
-                {t(
-                  'Know someone else who should answer? Forward the same link.',
-                  'มีคนอื่นที่ควรตอบด้วยไหม ส่งลิงก์เดิมต่อได้เลย',
-                )}
-              </p>
+              <p className="takes">Know someone else who should answer? Forward the same link.</p>
             </div>
           </div>
         </div>
@@ -357,7 +344,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   }
 
   return (
-    <LangContext.Provider value={lang}>
+    <LangContext.Provider value={LEAD}>
       <div className="survey-shell client-surface">
         <div className="bar" aria-hidden="true">
           <i style={{ transform: `scaleX(${Math.min(step / LAST, 1)})` }} />
@@ -368,30 +355,23 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
             <div className="slidebody">
               <h1>Let&apos;s shape your brand, together.</h1>
               <p className="intro">
-                {t(
-                  'This questionnaire helps our team understand your brand before we begin designing. There are no wrong answers.',
-                  'แบบสอบถามนี้ช่วยให้ทีมเข้าใจแบรนด์ของคุณก่อนเริ่มออกแบบ ไม่มีคำตอบที่ผิด',
-                )}
+                This questionnaire helps our team understand your brand before we begin designing.
+                There are no wrong answers.
               </p>
-
-              <div className="langswitch big" role="group" aria-label="Language · ภาษา">
-                {(['th', 'en'] as Lang[]).map((l) => (
-                  <button key={l} type="button" aria-pressed={lang === l} onClick={() => chooseLang(l)}>
-                    {LANG_LABEL[l]}
-                  </button>
-                ))}
-              </div>
+              {/* The two screens with no per-question reveal keep their Thai
+                  line, so a Thai-only reader is never stranded at the moment
+                  they decide to start or to send. */}
+              <p className="introth th">
+                แบบสอบถามนี้ช่วยให้ทีมเข้าใจแบรนด์ของคุณก่อนเริ่มออกแบบ ไม่มีคำตอบที่ผิด
+              </p>
 
               <button className="btn btn-ink start" onClick={() => goTo(1)} disabled={!ready}>
                 {started ? 'Continue' : 'Start'}
               </button>
               <p className="takes">
                 {started
-                  ? t('Your answers were saved on this device.', 'คำตอบของคุณถูกบันทึกไว้ในเครื่องนี้')
-                  : t(
-                      `About 20 minutes · ${survey.questionCount} questions`,
-                      `ประมาณ 20 นาที · ${survey.questionCount} คำถาม`,
-                    )}
+                  ? 'Your answers were saved on this device. · คำตอบของคุณถูกบันทึกไว้ในเครื่องนี้'
+                  : `About 20 minutes · ${survey.questionCount} questions · ประมาณ 20 นาที`}
               </p>
             </div>
           </section>
@@ -413,10 +393,8 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                           />
                           {nameMissing && q.ref === nameQuestion?.ref && (
                             <span className="qwarn">
-                              {t(
-                                'Please tell us your name so we know whose perspective this is.',
-                                'กรุณากรอกชื่อของคุณ เพื่อให้เรารู้ว่านี่คือมุมมองของใคร',
-                              )}
+                              Please tell us your name so we know whose perspective this is. ·
+                              กรุณากรอกชื่อของคุณ
                             </span>
                           )}
                         </div>
@@ -442,23 +420,25 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
 
           <section className="slide" data-slide={LAST}>
             <div className="slidebody">
-              <h2>{t('Ready to send', 'พร้อมส่งคำตอบ')}</h2>
+              <h2>Ready to send</h2>
               {blanks.length === 0 ? (
-                <p className="intro">{t('Every question is answered.', 'ตอบครบทุกข้อแล้ว')}</p>
+                <>
+                  <p className="intro">Every question is answered.</p>
+                  <p className="introth th">ตอบครบทุกข้อแล้ว</p>
+                </>
               ) : (
                 <>
                   <p className="intro">
-                    {t(
-                      `${blanks.length} ${blanks.length === 1 ? 'question is' : 'questions are'} still blank.`,
-                      `ยังไม่ได้ตอบ ${blanks.length} ข้อ`,
-                    )}
+                    {blanks.length} {blanks.length === 1 ? 'question is' : 'questions are'} still
+                    blank.
                   </p>
+                  <p className="introth th">ยังไม่ได้ตอบ {blanks.length} ข้อ</p>
                   <ul className="blanklist">
                     {blanks.map(({ question, index }) => (
                       <li key={question.ref}>
                         <button type="button" onClick={() => goTo(index)}>
                           <b>{question.number ?? '·'}</b>
-                          <span>{t(question.textEn, question.textTh)}</span>
+                          <span>{question.textEn}</span>
                         </button>
                       </li>
                     ))}
@@ -494,7 +474,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
 
         {savedAt && step > 0 && (
           <p className="savednote" aria-live="polite">
-            {t('Saved', 'บันทึกแล้ว')}
+            Saved · บันทึกแล้ว
           </p>
         )}
       </div>
