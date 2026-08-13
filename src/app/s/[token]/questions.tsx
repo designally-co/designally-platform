@@ -1,11 +1,12 @@
 'use client';
 
 import Image from 'next/image';
-import { useId } from 'react';
+import { useId, useState } from 'react';
 
 import type { QuestionConfig } from '@/lib/db/schema';
 import type { RawValue } from '@/lib/survey/answers';
 import type { SurveyQuestion } from '@/lib/survey/load';
+import { OTHER_LABEL, useLang, useOtherText, useText } from './lang';
 
 const OTHER = '__other__';
 
@@ -22,22 +23,54 @@ type Props = {
   onChange: (value: ValueUpdate) => void;
 };
 
-/* ── the question heading, always bilingual ───────────────────────── */
+/* ── the question, in the language that leads ─────────────────────── */
 
+/**
+ * No number beside the question any more. One question holds the screen and the
+ * progress line above it already says which one this is; printing "15." next to
+ * it as well made the position look like part of the sentence.
+ */
 function Heading({ question }: { question: SurveyQuestion }) {
+  const t = useText();
+  const help = t(question.helpEn, question.helpTh);
+
   return (
     <>
-      <span className="qq">
-        {question.number !== null && <span className="qn">{question.number}.</span>}
-        {question.textEn}
-      </span>
-      <span className="qth">{question.textTh}</span>
-      {(question.helpEn || question.helpTh) && (
-        <span className="qhelp">
-          {[question.helpEn, question.helpTh].filter(Boolean).join(' · ')}
-        </span>
-      )}
+      <span className="qq">{t(question.textEn, question.textTh)}</span>
+      {help && <span className="qhelp">{help}</span>}
     </>
+  );
+}
+
+/**
+ * The same question in the other language, one tap away.
+ *
+ * Deliberately a sibling of the label rather than a child of it: a button
+ * inside a `<label>` inherits the label's click target and would focus or
+ * toggle the control it names every time somebody asked to read the question
+ * again.
+ */
+function Alt({ question }: { question: SurveyQuestion }) {
+  const lang = useLang();
+  const other = useOtherText();
+  const [shown, setShown] = useState(false);
+
+  const text = other(question.textEn, question.textTh);
+  const help = other(question.helpEn, question.helpTh);
+  if (!text) return null;
+
+  return (
+    <div className="qalt">
+      <button type="button" className="qlangbtn" aria-expanded={shown} onClick={() => setShown((s) => !s)}>
+        {OTHER_LABEL[lang]}
+      </button>
+      {shown && (
+        <div className="qaltbody">
+          <span>{text}</span>
+          {help && <small>{help}</small>}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -47,19 +80,22 @@ function TextAnswer({ question, value, onChange }: Props) {
   const text = typeof value === 'string' ? value : '';
   const long = question.type === 'paragraph';
   const id = useId();
+  const t = useText();
+  const placeholder = t('Your answer', 'คำตอบของคุณ');
 
   return (
     <div className="sq">
       <label htmlFor={id}>
         <Heading question={question} />
       </label>
+      <Alt question={question} />
       {long ? (
         <textarea
           id={id}
           className="textarea"
           value={text}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="Your answer · คำตอบของคุณ"
+          placeholder={placeholder}
         />
       ) : (
         <input
@@ -68,7 +104,7 @@ function TextAnswer({ question, value, onChange }: Props) {
           className="input"
           value={text}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="Your answer · คำตอบของคุณ"
+          placeholder={placeholder}
         />
       )}
     </div>
@@ -76,19 +112,24 @@ function TextAnswer({ question, value, onChange }: Props) {
 }
 
 /**
- * The identity block's name and role. Unnumbered, compact, side by side — the
+ * The identity block's name and email. Unnumbered, compact, side by side — the
  * layout in reference/designally-app.html step 1.
  */
 export function IdentityField({ question, value, onChange }: Props) {
   const text = typeof value === 'string' ? value : '';
   const id = useId();
+  const t = useText();
+  const other = useOtherText();
   /* An email field typed on a phone deserves the @ keyboard and no
      autocapitalise — the first character is otherwise a capital every time. */
   const email = question.config.maps_to === 'email';
+  const help = t(question.helpEn, question.helpTh);
+
   return (
     <div>
       <label className="f" htmlFor={id}>
-        {question.textEn} <span>· {question.textTh}</span>
+        {t(question.textEn, question.textTh)}{' '}
+        <span>· {other(question.textEn, question.textTh)}</span>
       </label>
       <input
         id={id}
@@ -101,11 +142,7 @@ export function IdentityField({ question, value, onChange }: Props) {
         value={text}
         onChange={(e) => onChange(e.target.value)}
       />
-      {email && (question.helpEn || question.helpTh) && (
-        <span className="fhelp">
-          {[question.helpEn, question.helpTh].filter(Boolean).join(' · ')}
-        </span>
-      )}
+      {email && help && <span className="fhelp">{help}</span>}
     </div>
   );
 }
@@ -116,6 +153,7 @@ function ChoiceAnswer({ question, value, onChange }: Props) {
   const v = (value ?? { choice: '' }) as { choice: string; other?: string };
   const config = question.config;
   const name = useId();
+  const t = useText();
 
   const pick = (choice: string) =>
     onChange((prev) => {
@@ -128,15 +166,11 @@ function ChoiceAnswer({ question, value, onChange }: Props) {
       <legend>
         <Heading question={question} />
       </legend>
+      <Alt question={question} />
       <div className="pick">
         {(config.choices ?? []).map((c) => (
           <label key={c.en} className={`pickone${v.choice === c.en ? ' sel' : ''}`}>
-            <input
-              type="radio"
-              name={name}
-              checked={v.choice === c.en}
-              onChange={() => pick(c.en)}
-            />
+            <input type="radio" name={name} checked={v.choice === c.en} onChange={() => pick(c.en)} />
             <span>
               <b>{c.en}</b>
               <span className="pth th">{c.th}</span>
@@ -146,12 +180,7 @@ function ChoiceAnswer({ question, value, onChange }: Props) {
 
         {config.other && (
           <label className={`pickone${v.choice === OTHER ? ' sel' : ''}`}>
-            <input
-              type="radio"
-              name={name}
-              checked={v.choice === OTHER}
-              onChange={() => pick(OTHER)}
-            />
+            <input type="radio" name={name} checked={v.choice === OTHER} onChange={() => pick(OTHER)} />
             <span>
               <b>Other</b>
               <span className="pth th">อื่น ๆ</span>
@@ -167,8 +196,8 @@ function ChoiceAnswer({ question, value, onChange }: Props) {
             className="input"
             value={v.other ?? ''}
             onChange={(e) => onChange({ ...v, other: e.target.value })}
-            placeholder="Please tell us · โปรดระบุ"
-            aria-label="Other, please tell us"
+            placeholder={t('Please tell us', 'โปรดระบุ')}
+            aria-label={t('Other, please tell us', 'อื่น ๆ โปรดระบุ')}
           />
         </div>
       )}
@@ -202,6 +231,7 @@ function CheckboxAnswer({ question, value, onChange }: Props) {
   const max = config.max;
   const min = config.min;
   const atMax = typeof max === 'number' && v.choices.length >= max;
+  const t = useText();
 
   const toggle = (key: string) =>
     onChange((prev) => {
@@ -234,6 +264,7 @@ function CheckboxAnswer({ question, value, onChange }: Props) {
       <legend>
         <Heading question={question} />
       </legend>
+      <Alt question={question} />
 
       {chips ? (
         <div className="chips">
@@ -309,9 +340,10 @@ function CheckboxAnswer({ question, value, onChange }: Props) {
 
       {(typeof min === 'number' || typeof max === 'number') && (
         <p className="chipn" aria-live="polite">
-          Selected <b>{v.choices.length}</b>
-          {typeof max === 'number' ? ` of ${max}` : ''} · เลือกแล้ว {v.choices.length} คำ
-          {typeof min === 'number' ? ` (ขั้นต่ำ ${min})` : ''}
+          {t(
+            `Selected ${v.choices.length}${typeof max === 'number' ? ` of ${max}` : ''}`,
+            `เลือกแล้ว ${v.choices.length}${typeof max === 'number' ? ` จาก ${max}` : ''} คำ`,
+          )}
         </p>
       )}
 
@@ -322,8 +354,8 @@ function CheckboxAnswer({ question, value, onChange }: Props) {
             className="input"
             value={v.other ?? ''}
             onChange={(e) => onChange({ ...v, other: e.target.value })}
-            placeholder="Please tell us · โปรดระบุ"
-            aria-label="Other, please tell us"
+            placeholder={t('Please tell us', 'โปรดระบุ')}
+            aria-label={t('Other, please tell us', 'อื่น ๆ โปรดระบุ')}
           />
         </div>
       )}
@@ -353,6 +385,7 @@ function ScaleAnswer({ question, value, onChange }: Props) {
   return (
     <div className="sq">
       <Heading question={question} />
+      <Alt question={question} />
       {pairs.map((p, i) => (
         <div className="scale" key={`${p.left_en}-${p.right_en}`}>
           <div className="poles" id={`pole-${question.ref}-${i}`}>
