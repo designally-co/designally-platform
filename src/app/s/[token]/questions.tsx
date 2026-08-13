@@ -363,8 +363,6 @@ function CheckboxAnswer({ question, value, onChange, total }: Props) {
         <div className="boards">
           {options.map((o) => {
             const on = chosen.has(o.key);
-            /* "Friendly — warm, approachable, human" → the half after the dash */
-            const gloss = o.label.includes('—') ? o.label.split('—')[1].trim() : null;
             return (
               <label key={o.key} className={`board${on ? ' sel' : ''}`}>
                 <input
@@ -382,10 +380,12 @@ function CheckboxAnswer({ question, value, onChange, total }: Props) {
                     sizes="(max-width: 620px) 46vw, 210px"
                   />
                 )}
+                {/* The name sits on the board rather than under it. A caption
+                    block was 113px against a 117px picture — half the card
+                    explaining the half that is the answer. */}
                 <span className="boardname">
                   <b>{o.en}</b>
                   <span className="pth th">{o.th}</span>
-                  {gloss && <small>{gloss}</small>}
                 </span>
               </label>
             );

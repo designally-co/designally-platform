@@ -877,7 +877,6 @@ label.f span {
   display: block;
   width: 100%;
   height: auto;
-  border-bottom: 1px solid var(--divider);
   background: var(--parchment);
 }
 /* The checkbox sits over the image so the whole card reads as one control,
@@ -896,35 +895,50 @@ label.f span {
   border-radius: 6px;
   outline: 3px solid var(--canvas);
 }
+/**
+ * The name rides the picture instead of sitting under it.
+ *
+ * A caption block measured 113px against a 117px image — half the card
+ * explaining the half that is the answer. On the scrim it costs nothing, and
+ * the six boards fit one screen with room over.
+ *
+ * White and #ccc over a near-black ramp clear 4.5:1 whatever the photograph
+ * underneath happens to be doing; a tint keyed to the image could not promise
+ * that, and these six images have nothing in common by design.
+ */
 .boardname {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: block;
-  padding: 10px 11px 12px;
+  padding: 26px 11px 9px;
   /* Thai never below 1.6 — DESIGN.md §2 */
   line-height: 1.6;
-}
-@media (min-width: 620px) {
-  .boardname {
-    padding: 12px 15px 14px;
-  }
-}
-.board.sel .boardname {
-  background: var(--primary-tint);
+  color: var(--on-dark);
+  /* 0.92, not 0.82. Over the palest of the six boards a 0.82 scrim leaves the
+     Thai line at #ccc measuring 2.8:1 — under the 4.5:1 this product commits
+     to, on the language half the audience reads. At 0.92 it measures 5.0:1 and
+     the English 8:1, whatever the picture underneath is doing. */
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.92) 0%,
+    rgba(0, 0, 0, 0.62) 45%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  /* the label is on the control; taps belong to the label element itself */
+  pointer-events: none;
 }
 .boardname b {
   display: block;
   font-size: 15px;
   font-weight: 600;
+  letter-spacing: -0.01em;
 }
 .boardname span.pth {
   display: block;
-  font-size: 13.5px;
-  color: var(--ink-2);
-}
-.boardname small {
-  display: block;
   font-size: 13px;
-  color: var(--ink-3);
-  margin-top: 2px;
+  color: var(--body-muted);
 }
 /* A card at the selection ceiling is not an error, so it is not tinted —
    it simply stops responding. */
