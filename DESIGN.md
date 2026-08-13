@@ -286,8 +286,6 @@ The glyph measures **3.83:1** on the fill — above the 3:1 floor for a graphica
 
 **Corrected 13 August 2026 — the stepper is this too.** It was specified here as the exception: a bare glyph with no container until hover, on the grounds that it duplicates a gesture the scroll already offers and should not look as loud as the first way. What that produced was a control a pointer had to find before it looked like anything. Quieter is a matter of *size*, not of withholding the shape — so it is the same disc at 40px, and there is one icon button in this product rather than two that resemble each other.
 
-**Neutral outline** — `--canvas` fill, 1px `--hairline`, `--ink-muted-80` text, otherwise a button like any other. The survey's flat page version of the pearl capsule, for a quiet action that sits beside a ghost pill and is *not the same kind of thing*. Two blue outlines stacked read as one action repeated; ink against the blue distinguishes them without ranking them. Hover darkens the line to `--ink-muted-48`; press fills with `--surface-fill` at `scale(0.98)`.
-
 **Dark utility** — `--ink` fill, white text, `caption` (14px), `sm` radius (8px), padding `8px 15px`. Neutral commits in the team app.
 
 **The client survey's forward action is the accent, on every slide.** Start, Continue and Send answers are all `--primary`: `body` (17px), `pill` radius, 52px tall, full width on the phone's floor. Decided 13 August 2026, against the reading that ink should carry the twenty-one steps and blue only the final commit.
