@@ -14,7 +14,8 @@
     "db:inspect": "node --env-file-if-exists=.env.local --import tsx scripts/inspect.ts",
     "dev:backdate": "node --env-file-if-exists=.env.local --import tsx scripts/dev-backdate.ts",
     "dev:fixture": "node --env-file-if-exists=.env.local --import tsx scripts/dev-fixture.ts",
-    "dev:analyse": "node --env-file-if-exists=.env.local --require ./scripts/no-server-only.cjs --import tsx scripts/dev-analyse.ts"
+    "dev:analyse": "node --env-file-if-exists=.env.local --require ./scripts/no-server-only.cjs --import tsx scripts/dev-analyse.ts",
+    "db:clear": "node --env-file-if-exists=.env.local --import tsx scripts/clear-mock-data.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.116.0",

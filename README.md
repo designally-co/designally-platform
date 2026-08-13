@@ -81,6 +81,8 @@ production bundle and still refuses every other domain.
 | `npm run db:seed` | import `seed/question-blocks.json` (plus an example survey, on the local database only) |
 | `npm run db:inspect` | print what a survey has collected |
 | `npm run db:reset` | throw the local database away and rebuild it |
+| `npm run db:clear` | inventory the client data and retired question versions — deletes nothing |
+| `npm run db:clear -- --delete` | actually delete them. Against a real database it also needs `CONFIRM=yes` |
 | `npm run db:generate` | regenerate SQL after a schema change |
 | `npm run dev:fixture` | write a synthetic five-respondent survey with deliberately planted findings |
 | `npm run dev:analyse` | run the real analysis against it and print the brief — no team app, nothing stored |
