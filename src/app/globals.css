@@ -2702,10 +2702,18 @@ dialog::backdrop {
   margin-left: auto;
   margin-right: auto;
 }
-/* its own line — an inline-flex switch beside an inline-block button put the
-   language choice and the only action on the screen shoulder to shoulder */
+/**
+ * Its own line, and its label centred by layout.
+ *
+ * As a block it relied on symmetric padding to look centred, which any
+ * min-height taller than the text quietly undoes — the leftover height all goes
+ * to the bottom. Centring both axes with flex holds at any height.
+ */
 .btn.start {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
   margin: 26px auto 0;
 }
 .takes {
@@ -2849,18 +2857,7 @@ dialog::backdrop {
   .okback {
     display: grid;
   }
-  /**
-   * Back, OK, and an empty column the width of back.
-   *
-   * As a two-item flex row the label sat 31px right of the screen's
-   * centreline — centred in its own button, but the button was pushed over by
-   * the back arrow and nothing balanced it. The bar reads as one object, so the
-   * label has to sit on the centreline of the thing it appears to belong to.
-   * The empty column costs 52px of button width and buys that.
-   */
   .okrow {
-    display: grid;
-    grid-template-columns: 52px 1fr 52px;
     gap: 10px;
     margin-top: auto;
     padding-top: 26px;
@@ -2954,10 +2951,14 @@ dialog::backdrop {
     bottom: calc(var(--kb, 0px) + 22px);
     z-index: 15;
     margin: 0;
-    padding-top: 0;
     opacity: 0;
     pointer-events: none;
     transition: bottom 0.18s var(--ease);
+  }
+  /* cancels the row's own top padding — it must not reach the button, whose
+     11px top is what keeps its label off the ceiling */
+  .slide .okrow {
+    padding-top: 0;
   }
   .slide[data-active] .okrow,
   .slide[data-active] .btn.start {
@@ -2978,6 +2979,9 @@ dialog::backdrop {
   /* Start, Send answers and the thank-you's action get the same floor, and the
      line that belongs to each sits above it rather than under the fold. */
   .btn.start {
+    /* the desktop rule sizes it to its label; anchored left and right on the
+       phone's floor it has to take the width instead */
+    width: auto;
     min-height: 52px;
   }
   /* the button is out of flow now, so this has to clear the space it occupies */

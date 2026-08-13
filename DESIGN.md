@@ -254,15 +254,21 @@ Document default and pressed states only. The source analysis explicitly decline
 **Primary** — `--primary` fill, white text, `body` (17px/400), `pill` radius, padding `11px 22px`. Focus `2px solid --primary-focus`. Active `scale(0.95)`.
 Only one visible per region — and on the client survey, only once in the whole flow.
 
-Where a primary sits beside a secondary on a phone's floor, the row is a three-column grid — secondary, primary, and an empty column matching the secondary — so the primary's label lands on the screen's centreline. A two-item row centres the label in its button but not on the screen, and the bar reads as one object.
+Where a primary sits beside a secondary on a phone's floor, the primary takes all the width the secondary leaves. Its label is centred in the button, which is not the centre of the screen — that is correct: the label belongs to the button, and the button is what the thumb aims at.
 
 **Ghost pill** — transparent fill, `--primary` text, 1px `--primary` border, same size and radius. The second CTA when two appear together.
 
 **Pearl capsule** — `--surface-pearl` fill, `--ink-muted-80` text, `caption` (14px), 3px `--divider-soft` ring, `md` radius (11px), padding `8px 14px`. Quiet secondary actions.
 
-**Dark utility** — `--ink` fill, white text. Neutral commits: stepping through the survey. `caption` (14px), `sm` radius (8px), padding `8px 15px` in the team app; `body` (17px), `pill` radius, 52px tall and full width on the survey's floor, where it is the only action on the screen.
+**Dark utility** — `--ink` fill, white text, `caption` (14px), `sm` radius (8px), padding `8px 15px`. Neutral commits in the team app.
 
-**Ink or accent — the survey's answer.** Every OK is ink and only **Send answers** is the accent. Twenty-one blue buttons would spend the accent on every screen and leave nothing for the one action that cannot be taken back. The ink step and the blue commit are the same hierarchy the team app uses between navigating and closing a survey.
+**The client survey's forward action is the accent, on every slide.** Start, Continue and Send answers are all `--primary`: `body` (17px), `pill` radius, 52px tall, full width on the phone's floor. Decided 13 August 2026, against the reading that ink should carry the twenty-one steps and blue only the final commit.
+
+The argument for ink was that twenty-one blue buttons spend the accent everywhere. The argument that won is simpler: on a survey slide the accent has nothing to compete with. There is no "needs you" alert, no waiting-project dot, no second call for attention — the one thing a person must do is go forward, so the one accented thing is the way forward. A blue button on every slide is the accent doing its job, not diluting it.
+
+This is the clearest case of the ten-percent ceiling in section 1 being about proportion of surface, not frequency across screens: one 52px button on an otherwise empty slide is well inside it.
+
+The team app is unchanged. There the accent has real competition and the hierarchy in section 6 stands.
 
 **Text link** — `--primary`, no background. On dark surfaces use `--primary-on-dark`.
 

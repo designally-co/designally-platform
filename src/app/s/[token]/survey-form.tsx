@@ -475,7 +475,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                 </p>
               </div>
 
-              <button className="btn btn-ink start" onClick={() => goTo(1)} disabled={!ready}>
+              <button className="btn btn-primary start" onClick={() => goTo(1)} disabled={!ready}>
                 {started ? 'Continue' : 'Start'}
               </button>
               <p className="takes">
@@ -633,8 +633,8 @@ function Ok({
       <button className="okback" onClick={onBack} type="button" aria-label="Previous question">
         <Chevron back />
       </button>
-      <button className="btn btn-ink ok" onClick={onClick}>
-        OK
+      <button className="btn btn-primary ok" onClick={onClick}>
+        Continue
       </button>
       <span className="okhint">{hint ? 'Shift + Enter for a line break' : 'or press Enter'}</span>
     </div>
