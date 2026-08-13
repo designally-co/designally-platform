@@ -727,11 +727,18 @@ label.f span {
   margin-bottom: 26px;
 }
 
-/* name and email, the one card that holds two fields */
+/**
+ * Name and email, stacked at every width.
+ *
+ * They were side by side wherever there was room, which made the one slide that
+ * holds two fields the only one that reads across instead of down. Every other
+ * question in the deck is a single column, and these are underlined fields —
+ * two rules side by side read as one broken rule.
+ */
 .identitygrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 16px;
+  grid-template-columns: 1fr;
+  gap: 26px;
   margin-bottom: 26px;
 }
 
@@ -2776,14 +2783,37 @@ dialog::backdrop {
   }
 }
 
-/* the chevron pair, bottom right on a pointer device */
+/**
+ * The chevron pair, stacked, alongside the question.
+ *
+ * Up over down matches what the control does — the axis of the buttons is the
+ * axis of the movement, which a side-by-side pair had to be read to work out.
+ *
+ * It sits beside the reading column rather than in the corner, so the eye finds
+ * it where the question is instead of hunting the far edge of a 1280px screen.
+ * The column is 660px centred, so the pair is anchored off the centre line and
+ * tracks it at any width. Below 900px there is no room for anything beside the
+ * column, and it returns to the corner.
+ */
 .deck-nav {
   position: fixed;
   right: 20px;
   bottom: 20px;
   display: flex;
-  gap: 1px;
+  flex-direction: column;
+  /* two buttons, not one segmented control — each is the same round, hairline
+     object as the phone's back arrow */
+  gap: 10px;
   z-index: 20;
+}
+@media (min-width: 900px) {
+  .deck-nav {
+    top: 50%;
+    right: auto;
+    bottom: auto;
+    left: calc(50% + 348px);
+    transform: translateY(-50%);
+  }
 }
 /**
  * Quiet, and the same object as the phone's back arrow.
@@ -2803,6 +2833,7 @@ dialog::backdrop {
   width: 44px;
   height: 44px;
   border: 1px solid var(--hairline);
+  border-radius: var(--r-pill);
   background: var(--canvas);
   color: var(--ink-3);
   cursor: pointer;
@@ -2810,22 +2841,12 @@ dialog::backdrop {
     border-color 0.18s,
     color 0.18s;
 }
-.deck-nav button:first-child {
-  border-right: 0;
-}
-.deck-nav button:first-child {
-  border-radius: var(--r-pill) 0 0 var(--r-pill);
-  padding-left: 4px;
-}
-.deck-nav button:last-child {
-  border-radius: 0 var(--r-pill) var(--r-pill) 0;
-  padding-right: 4px;
-}
+
+
 @media (hover: hover) {
   .deck-nav button:hover {
     border-color: var(--ink-3);
     color: var(--ink);
-    z-index: 1;
   }
 }
 .deck-nav button:disabled {
