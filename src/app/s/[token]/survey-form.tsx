@@ -805,14 +805,17 @@ function Chevron({ up, back }: { up?: boolean; back?: boolean }) {
               ? 'M3 16.5 L12 7.5 L21 16.5'
               : 'M3 7.5 L12 16.5 L21 7.5'
         }
-        /* Centred by eye, not by box.
-           A chevron is not symmetrical about its own bounding box: the round
-           join at the apex fuses two strokes into one node, while the far ends
-           are two thin separated caps. The ink sits toward the point, so a
-           mathematically centred chevron looks pushed that way — and inside a
-           disc, which is perfectly symmetrical, there is nothing to hide it.
-           One pixel away from the point puts the weight in the middle. */
-        transform={back ? 'translate(1 0)' : up ? 'translate(0 1)' : 'translate(0 -1)'}
+        /* Centred by eye, not by box, and the eye wants it moved *toward* the
+           point.
+           A chevron's open end spreads two strokes apart and covers area; its
+           apex is a single node covering almost none. The perceived weight is
+           therefore at the open end, so a box-centred chevron reads as pushed
+           that way — and with the apex landing near the middle of a disc it
+           stops being an arrow and becomes a clock hand.
+           1.5px toward the point, judged against a centre line at 1, 0, -1,
+           -1.5, -2 and -2.5: at 0 the apex sits on the line, and by -2 the mark
+           has visibly overshot. */
+        transform={back ? 'translate(-1.5 0)' : up ? 'translate(0 -1.5)' : 'translate(0 1.5)'}
         stroke="currentColor"
         strokeWidth="2.5"
         strokeLinecap="round"
