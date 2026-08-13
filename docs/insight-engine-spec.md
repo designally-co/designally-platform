@@ -6,13 +6,13 @@
 > **Note, 11 August 2026.** ARUN+ answered the **version-1** questionnaire. Two questions its
 > strongest findings leaned on — "who are your main competitors" and "what are you most proud of" —
 > are not in version 2. The engine's prompt is tuned against that data and needs re-testing on a
-> real version-2 survey before a brief from it is trusted.
+> real version-2 survey before insights from it are trusted.
 
 ---
 
 ## Narrowed, 13 August 2026 — the engine prepares, it does not interpret
 
-The first brief from real answers came back with fourteen fields and about fifty
+The first insights from real answers came back with fourteen fields and about fifty
 items. The team's verdict was that it told them too much: they wanted **the
 things they might miss, or have to be careful about**, and the reading of the
 answers is their own work.
@@ -24,7 +24,7 @@ below, and the creative layer, describe what the engine used to do and are kept
 for the reasoning, not as a specification.
 
 **This is not a reversal of the filter below — it is the filter being enforced.**
-That section already warned that "a brief with 40 observations costs as much
+That section already warned that "a set of 40 observations costs as much
 reading as the raw survey did", and the engine wrote fifty. What changed is who
 does the reading: the team can now see every answer in the app, so anything the
 engine says *about* an answer is a second copy of something they are holding.

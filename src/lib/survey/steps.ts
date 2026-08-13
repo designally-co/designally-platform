@@ -87,7 +87,7 @@ const BY_PACKAGE: Record<Package, StepDef[]> = {
 /**
  * A survey sent before the version-2 questionnaire carries blocks that no
  * package attaches any more. Those keep working by falling back to a step per
- * block, using the block's own name and intro from the seed — a brief written
+ * block, using the block's own name and intro from the seed — insights written
  * from them is still readable, which is what rule 5 promises.
  */
 function stepsFromBlocks(

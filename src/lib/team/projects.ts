@@ -8,7 +8,7 @@ import {
   surveys,
   users,
   flowFor,
-  briefs,
+  insights,
   type Package,
 } from '@/lib/db/schema';
 
@@ -61,7 +61,7 @@ export type Person = {
 
 export type ProjectAction = {
   /** what the button does */
-  kind: 'close-collection' | 'review-brief' | 'write-brief';
+  kind: 'close-collection' | 'review-insights' | 'write-insights';
   say: string;
   emphasis?: string;
   when: string;
@@ -93,10 +93,10 @@ export type ProjectView = {
   /** the names in the Answers column — "Khun A" or "Khun A +2" */
   answeredBy: string | null;
 
-  /** the most recent brief, if the analysis has run */
-  brief: import('@/lib/analysis/schema').Brief | null;
-  briefWrittenOn: string | null;
-  briefConfirmedOn: string | null;
+  /** the most recent insights, if the analysis has run */
+  insights: import('@/lib/analysis/schema').Insights | null;
+  insightsWrittenOn: string | null;
+  insightsConfirmedOn: string | null;
   /**
    * Every run, newest first — the content of the newest only.
    *
@@ -105,25 +105,25 @@ export type ProjectView = {
    * a browser that will read one, so an older version's content is fetched when
    * somebody opens it.
    */
-  briefVersions: {
+  insightsVersions: {
     id: string;
     writtenOn: string;
     confirmedOn: string | null;
     confirmedBy: string | null;
     isNewest: boolean;
-    /** whose answers it read — null on briefs written before that was stored */
+    /** whose answers it read — null on insights written before that was stored */
     sources: { id: string; name: string }[] | null;
   }[];
   /**
-   * A brief was confirmed, and answers arrived afterwards.
+   * Insights were confirmed, and answers arrived afterwards.
    *
-   * Reopening collection leaves a confirmed brief alone — its signature stays
+   * Reopening collection leaves a confirmed insights alone — its signature stays
    * valid for the answers it was written from. What it cannot do is stay the
    * whole truth, and somebody working from it would never know.
    */
-  briefStale: boolean;
+  insightsStale: boolean;
   /** gate 2 records who acted, and a gate whose actor is not shown records nothing useful */
-  briefConfirmedBy: string | null;
+  insightsConfirmedBy: string | null;
 
   action: ProjectAction | null;
   /** the two lines of the Latest column */
@@ -136,45 +136,45 @@ function buildAction(v: {
   answers: number;
   quietDays: number | null;
   sentOn: string | null;
-  hasBrief: boolean;
-  briefConfirmedOn: string | null;
+  hasInsights: boolean;
+  insightsConfirmedOn: string | null;
   conflicts: number;
 }): ProjectAction | null {
-  /* Collection was closed but no brief came back — the analysis failed, the
+  /* Collection was closed but no insights came back — the analysis failed, the
      key was missing, or the request ran past the function's time limit. The
      work is recoverable and the team needs a way to ask for it again. Without
      this the project falls out of Needs you entirely and looks finished. */
-  if (v.closedOn && !v.hasBrief && v.answers > 0) {
+  if (v.closedOn && !v.hasInsights && v.answers > 0) {
     return {
-      kind: 'write-brief',
-      say: `Collection is closed with ${plural(v.answers, 'answer')}, but no brief was written.`,
+      kind: 'write-insights',
+      say: `Collection is closed with ${plural(v.answers, 'answer')}, but no insights were written.`,
       emphasis: 'The analysis did not finish.',
       when: `Closed ${v.closedOn}`,
-      label: 'Write the brief',
+      label: 'Write the insights',
     };
   }
 
-  /* A brief exists and nobody has read it. This is the only step in the flow
+  /* Insights exist and nobody has read it. This is the only step in the flow
      that cannot be skipped — the AI mistakes two wordings of one idea for a
      disagreement, especially across Thai and English. */
-  if (v.hasBrief && !v.briefConfirmedOn) {
+  if (v.hasInsights && !v.insightsConfirmedOn) {
     const found =
       v.conflicts === 0
         ? 'It found no conflicts.'
         : `It found ${plural(v.conflicts, 'conflict')}.`;
     return {
-      kind: 'review-brief',
+      kind: 'review-insights',
       say: `The survey is closed and the analysis is written.`,
       emphasis: found,
       when: v.closedOn
         ? `Closed ${v.closedOn} with ${plural(v.answers, 'answer')} · kick-off not booked`
         : `${plural(v.answers, 'answer')} · kick-off not booked`,
-      label: 'Review brief',
+      label: 'Review insights',
     };
   }
 
   /**
-   * Milestone 2 can reach one of these. Reviewing a brief, recording decisions
+   * Milestone 2 can reach one of these. Reviewing insights, recording decisions
    * and sending the content survey arrive in milestones 3, 4 and 5 — they are
    * not stubbed here, because a button that does nothing is worse than no
    * button.
@@ -256,24 +256,24 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
     peopleBySurvey.set(r.surveyId, list);
   }
 
-  /* the latest brief per project — newest wins; earlier runs are kept */
-  const briefRows = rows.length
+  /* the latest insights per project — newest wins; earlier runs are kept */
+  const insightRows = rows.length
     ? await db
         .select()
-        .from(briefs)
+        .from(insights)
         .where(
           inArray(
-            briefs.projectId,
+            insights.projectId,
             rows.map((r) => r.project.id),
           ),
         )
-        .orderBy(desc(briefs.generatedAt))
+        .orderBy(desc(insights.generatedAt))
     : [];
-  const briefByProject = new Map<string, (typeof briefRows)[number]>();
-  const briefsByProject = new Map<string, typeof briefRows>();
-  for (const b of briefRows) {
-    if (!briefByProject.has(b.projectId)) briefByProject.set(b.projectId, b);
-    briefsByProject.set(b.projectId, [...(briefsByProject.get(b.projectId) ?? []), b]);
+  const newestByProject = new Map<string, (typeof insightRows)[number]>();
+  const versionsByProject = new Map<string, typeof insightRows>();
+  for (const b of insightRows) {
+    if (!newestByProject.has(b.projectId)) newestByProject.set(b.projectId, b);
+    versionsByProject.set(b.projectId, [...(versionsByProject.get(b.projectId) ?? []), b]);
   }
 
   /* who acted on the gates */
@@ -283,7 +283,7 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
         .flatMap((r) => [
           r.project.archivedBy,
           r.survey?.closedBy,
-          ...(briefsByProject.get(r.project.id) ?? []).map((b) => b.confirmedBy),
+          ...(versionsByProject.get(r.project.id) ?? []).map((b) => b.confirmedBy),
         ])
         .filter((id): id is string => Boolean(id)),
     ),
@@ -314,8 +314,8 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
           ? people[0].name
           : `${people[0].name} +${people.length - 1}`;
 
-    const briefRow = briefByProject.get(project.id) ?? null;
-    const brief = (briefRow?.content ?? null) as import('@/lib/analysis/schema').Brief | null;
+    const insightRow = newestByProject.get(project.id) ?? null;
+    const insights = (insightRow?.content ?? null) as import('@/lib/analysis/schema').Insights | null;
 
     return {
       id: project.id,
@@ -341,11 +341,11 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
       people,
       answeredBy,
 
-      brief,
-      briefWrittenOn: formatDay(briefRow?.generatedAt ?? null),
-      briefConfirmedOn: formatDay(briefRow?.confirmedAt ?? null),
-      briefConfirmedBy: briefRow?.confirmedBy ? (actorName.get(briefRow.confirmedBy) ?? null) : null,
-      briefVersions: (briefsByProject.get(project.id) ?? []).map((b, i) => ({
+      insights,
+      insightsWrittenOn: formatDay(insightRow?.generatedAt ?? null),
+      insightsConfirmedOn: formatDay(insightRow?.confirmedAt ?? null),
+      insightsConfirmedBy: insightRow?.confirmedBy ? (actorName.get(insightRow.confirmedBy) ?? null) : null,
+      insightsVersions: (versionsByProject.get(project.id) ?? []).map((b, i) => ({
         id: b.id,
         writtenOn: formatDay(b.generatedAt) ?? '',
         confirmedOn: formatDay(b.confirmedAt ?? null),
@@ -355,8 +355,8 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
       })),
       /* the confirmed version, not the newest — a newer unconfirmed run does not
          make the signed one stale, more answers do */
-      briefStale: (() => {
-        const signed = (briefsByProject.get(project.id) ?? []).find((b) => b.confirmedAt);
+      insightsStale: (() => {
+        const signed = (versionsByProject.get(project.id) ?? []).find((b) => b.confirmedAt);
         return !!(signed?.confirmedAt && lastAnswer && lastAnswer > signed.confirmedAt);
       })(),
 
@@ -365,9 +365,9 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
         answers,
         quietDays,
         sentOn,
-        hasBrief: Boolean(brief),
-        briefConfirmedOn: formatDay(briefRow?.confirmedAt ?? null),
-        conflicts: brief?.unsettled.length ?? 0,
+        hasInsights: Boolean(insights),
+        insightsConfirmedOn: formatDay(insightRow?.confirmedAt ?? null),
+        conflicts: insights?.unsettled.length ?? 0,
       }),
       latest: buildLatest({ sentOn, closedOn, answers, quietDays }),
     };

@@ -95,12 +95,26 @@ Three things from it that are easy to get wrong:
 - **Thai leading: 1.6 in a paragraph, 1.25 on a line that stands alone.** Thai stacks four levels vertically and Latin-tuned values clip tone marks — but the flat 1.6 condemned `body` itself and so caught nothing. Measure the ink; see `DESIGN.md` §2.
 - **Borders, not shadows.** The focus ring is the only shadow in the system.
 
+## Two words, two things
+
+**Insights** are what the analysis produces from the answers — conflicts, clarity
+gaps, flags, the deck outline. **The brief** is what the designer is handed after
+the kick-off decisions are recorded, and it is what the work runs on.
+
+They were both called "brief" until 13 August 2026, which meant the button said
+one thing, the sheet title said "survey analysis", and the spec said "insight".
+One object, three words, and the second object had no word of its own.
+
+The SQL table is still `briefs`; renaming it needs `drizzle-kit generate` run
+interactively so it can be told the difference between a rename and dropping a
+table with real analyses in it. `src/lib/db/schema.ts` maps the two.
+
 ## Rules that must not be broken
 
 These are product decisions, not preferences. If a request conflicts with one, say so before building it.
 
 1. **Nothing happens on a timer.** The app never closes a survey, confirms a brief, or archives a project by itself. It may surface a prompt; a person acts.
-2. **Four human gates, each recording who acted:** close collection · confirm the brief · record the kick-off decisions · archive the project. Store `*_by` and `*_at` on every one.
+2. **Four human gates, each recording who acted:** close collection · confirm the insights · record the kick-off decisions · archive the project. Store `*_by` and `*_at` on every one.
 3. **No expected respondent count.** Collection is open-ended. Never show a fraction like "2 of 4". Show "3 answers so far · last one 2 days ago".
 4. **No estimated content volume.** Do not calculate or display a predicted piece count anywhere, client-facing or internal. The earlier figure came from one project and is not reliable.
 5. **Questions are versioned.** A sent survey keeps the question version it was sent with. Editing a template affects future surveys only.

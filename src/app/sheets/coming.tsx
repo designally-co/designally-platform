@@ -4,7 +4,7 @@ import Sheet from './sheet';
 
 /**
  * What the tool does not do yet, said plainly. The build order is the one in
- * docs/first-session-brief.md; each milestone is used on a real project before
+ * docs/first-session-insights.md; each milestone is used on a real project before
  * the next one starts.
  */
 const ITEMS: { title: string; state: 'live' | 'next' | 'later'; body: string; where: string }[] = [
@@ -15,7 +15,7 @@ const ITEMS: { title: string; state: 'live' | 'next' | 'later'; body: string; wh
     where: 'Where it lives: the New survey button · every row in All projects.',
   },
   {
-    title: 'The brief writes itself',
+    title: 'The insights write themselves',
     state: 'next',
     body: 'Closing collection will run the analysis: what the stakeholders agree on, where they contradict each other, and what the client has not decided yet. No percentages, no sentiment scores — three to twenty people cannot support them.',
     where: 'Where it will plug in: the Close collection button, which today only records that you closed it.',
@@ -23,8 +23,8 @@ const ITEMS: { title: string; state: 'live' | 'next' | 'later'; body: string; wh
   {
     title: 'The human gate and the decisions',
     state: 'later',
-    body: 'Reading and confirming the brief, the deck handoff, and recording what the room actually decided — including "still open", because pretending a decision happened is worse than recording that it did not.',
-    where: 'Where it will plug in: Needs you, after a brief exists.',
+    body: 'Reading and confirming the insights, the deck handoff, and recording what the room actually decided — including "still open", because pretending a decision happened is worse than recording that it did not.',
+    where: 'Where it will plug in: Needs you, after the insights exist.',
   },
   {
     title: 'The website track',

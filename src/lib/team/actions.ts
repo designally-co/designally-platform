@@ -8,7 +8,7 @@ import { getDb } from '@/lib/db';
 import {
   PACKAGES,
   answers,
-  briefs,
+  insights,
   clients,
   projects,
   questionBlocks,
@@ -116,7 +116,7 @@ export async function createSurvey(formData: FormData): Promise<ActionResult> {
 /**
  * `only` names the responses to analyse. Omitted means all of them, which is the
  * default and nearly always what happens — the subset exists so the team can
- * see the brief without an outlier or a duplicate submission, not as a routine
+ * see the insights without an outlier or a duplicate submission, not as a routine
  * step.
  */
 export async function closeCollection(surveyId: string, only?: string[]): Promise<ActionResult> {
@@ -141,7 +141,7 @@ export async function closeCollection(surveyId: string, only?: string[]): Promis
   /**
    * The close is committed before the analysis runs, and separately from it.
    * The gate is the human act — it must survive the analysis failing, the API
-   * being down, or the key being unset. A failed brief leaves a closed survey
+   * being down, or the key being unset. A failed insights leaves a closed survey
    * that can be analysed again; it never silently un-closes.
    */
   const [client] = await db
@@ -173,13 +173,13 @@ export async function closeCollection(surveyId: string, only?: string[]): Promis
 
   if (!result.ok) {
     revalidatePath('/');
-    return { ok: true, warning: `Collection is closed, but the brief was not written. ${result.error}` };
+    return { ok: true, warning: `Collection is closed, but the insights were not written. ${result.error}` };
   }
 
-  await db.insert(briefs).values({
+  await db.insert(insights).values({
     sources,
     projectId: survey.projectId,
-    content: result.brief,
+    content: result.insights,
   });
 
   revalidatePath('/');
@@ -188,8 +188,8 @@ export async function closeCollection(surveyId: string, only?: string[]): Promis
 
 /**
  * Runs the analysis again on an already-closed survey — after a failure, or
- * after the prompt changed. Each run stores a new brief rather than
- * overwriting: a confirmed brief is a record of what a person approved, and
+ * after the prompt changed. Each run stores a new insights rather than
+ * overwriting: a confirmed insights are a record of what a person approved, and
  * replacing it in place would rewrite that record.
  */
 export async function reanalyse(projectId: string, only?: string[]): Promise<ActionResult> {
@@ -209,7 +209,7 @@ export async function reanalyse(projectId: string, only?: string[]): Promise<Act
     return { ok: false, error: 'Close collection first — the analysis reads a closed survey.' };
   }
 
-  /* A confirmed brief is not replaced by a new run — it keeps its signature and
+  /* A confirmed insights are not replaced by a new run — it keeps its signature and
      stays in the history, and the new analysis becomes an unconfirmed version
      above it. Nothing is demoted, so nothing needs blocking. */
 
@@ -228,46 +228,46 @@ export async function reanalyse(projectId: string, only?: string[]): Promise<Act
 
   if (!result.ok) return { ok: false, error: result.error };
 
-  await db.insert(briefs).values({ projectId, content: result.brief, sources });
+  await db.insert(insights).values({ projectId, content: result.insights, sources });
 
   revalidatePath('/');
   return { ok: true };
 }
 
 /**
- * Gate 2 — confirm the brief.
+ * Gate 2 — confirm the insights.
  *
  * Rule 6: nothing reaches a client before a human confirms it. Rule 2: the gate
- * records who acted. Rule 1: it is never on a timer — a brief sits unconfirmed
+ * records who acted. Rule 1: it is never on a timer — insights sits unconfirmed
  * for as long as it takes, and the Needs You list keeps saying so.
  *
- * **The newest brief, not any brief.** Re-analysing inserts a new row and keeps
- * the earlier runs, so confirming by project id alone could sign off a brief
+ * **The newest insights, not any insights.** Re-analysing inserts a new row and keeps
+ * the earlier runs, so confirming by project id alone could sign off insights
  * that was superseded before anyone read it.
  *
  * The `isNull` in the update is not decoration: two people opening the same
- * brief and pressing at the same moment would otherwise both write, and the
+ * insights and pressing at the same moment would otherwise both write, and the
  * second would overwrite the first person's name on a gate whose entire purpose
  * is recording who acted.
  */
-export async function confirmBrief(projectId: string): Promise<ActionResult> {
+export async function confirmInsights(projectId: string): Promise<ActionResult> {
   const userId = await actingUser();
   const db = await getDb();
 
   const [latest] = await db
     .select()
-    .from(briefs)
-    .where(eq(briefs.projectId, projectId))
-    .orderBy(desc(briefs.generatedAt))
+    .from(insights)
+    .where(eq(insights.projectId, projectId))
+    .orderBy(desc(insights.generatedAt))
     .limit(1);
 
-  if (!latest) return { ok: false, error: 'There is no brief to confirm.' };
-  if (latest.confirmedAt) return { ok: false, error: 'That brief is already confirmed.' };
+  if (!latest) return { ok: false, error: 'There is no insights to confirm.' };
+  if (latest.confirmedAt) return { ok: false, error: 'Those insights are already confirmed.' };
 
   const [row] = await db
-    .update(briefs)
+    .update(insights)
     .set({ confirmedAt: new Date(), confirmedBy: userId })
-    .where(and(eq(briefs.id, latest.id), isNull(briefs.confirmedAt)))
+    .where(and(eq(insights.id, latest.id), isNull(insights.confirmedAt)))
     .returning();
 
   if (!row) return { ok: false, error: 'Somebody else confirmed it a moment ago.' };
@@ -329,7 +329,7 @@ export async function readAnswers(projectId: string) {
  *
  * A stakeholder replying the day after collection closed is not an edge case,
  * and until now the only answer was "too late". Reopening is a human act like
- * closing was, and it leaves the brief alone: what was analysed from the
+ * closing was, and it leaves the insights alone: what was analysed from the
  * answers of the time stays true about the answers of the time.
  *
  * It does clear who closed the survey, because the survey is no longer closed
@@ -358,35 +358,35 @@ export async function reopenCollection(projectId: string): Promise<ActionResult>
 /**
  * Undo gate 2.
  *
- * Deleting a brief somebody signed takes two deliberate steps, and this is the
+ * Deleting insights somebody signed takes two deliberate steps, and this is the
  * first: a signature should not disappear because a delete button was next to
- * the wrong row. It is also what makes a wrong brief fixable — permanence and
+ * the wrong row. It is also what makes a wrong insights fixable — permanence and
  * correctability pull against each other and this is where the line landed.
  */
-export async function unconfirmBrief(briefId: string): Promise<ActionResult> {
+export async function unconfirmInsights(insightsId: string): Promise<ActionResult> {
   await actingUser();
   const db = await getDb();
 
   const [row] = await db
-    .update(briefs)
+    .update(insights)
     .set({ confirmedAt: null, confirmedBy: null })
-    .where(eq(briefs.id, briefId))
+    .where(eq(insights.id, insightsId))
     .returning();
 
-  if (!row) return { ok: false, error: 'No such brief.' };
+  if (!row) return { ok: false, error: 'No such insights.' };
 
   revalidatePath('/');
   return { ok: true };
 }
 
 /** A version nobody has signed. Confirmed ones must be un-confirmed first. */
-export async function deleteBrief(briefId: string): Promise<ActionResult> {
+export async function deleteInsights(insightsId: string): Promise<ActionResult> {
   await actingUser();
   const db = await getDb();
 
   const [row] = await db
-    .delete(briefs)
-    .where(and(eq(briefs.id, briefId), isNull(briefs.confirmedAt)))
+    .delete(insights)
+    .where(and(eq(insights.id, insightsId), isNull(insights.confirmedAt)))
     .returning();
 
   if (!row) {
@@ -398,21 +398,21 @@ export async function deleteBrief(briefId: string): Promise<ActionResult> {
 }
 
 /** An older version's content, fetched when somebody opens it. */
-export async function readBriefVersion(briefId: string) {
+export async function readInsightsVersion(insightsId: string) {
   const session = await auth();
   if (!session?.user) return null;
   const db = await getDb();
-  const [row] = await db.select().from(briefs).where(eq(briefs.id, briefId)).limit(1);
-  return row ? (row.content as import('@/lib/analysis/schema').Brief) : null;
+  const [row] = await db.select().from(insights).where(eq(insights.id, insightsId)).limit(1);
+  return row ? (row.content as import('@/lib/analysis/schema').Insights) : null;
 }
 
 /**
  * Delete one client's response.
  *
- * Two presses when a confirmed brief was built from it. The first reports what
+ * Two presses when a confirmed insights were built from it. The first reports what
  * would go — deleting the evidence under work somebody has signed their name to
  * should not happen because a Delete button was next to the wrong row. The
- * brief keeps its snapshotted source names either way, so what it says stays
+ * insights keep their snapshotted source names either way, so what it says stays
  * readable after the response is gone.
  *
  * Answers go first: `answers.question_id` has no cascade, and orphaning them
@@ -433,15 +433,15 @@ export async function deleteResponse(
 
   if (!confirm) {
     const signed = (
-      await db.select().from(briefs).where(eq(briefs.projectId, survey.projectId))
+      await db.select().from(insights).where(eq(insights.projectId, survey.projectId))
     ).filter((b) => b.confirmedAt && b.sources?.some((x) => x.id === responseId));
 
     if (signed.length) {
       return {
         ok: false,
         error:
-          `${row.respondentName}'s answers were read by a confirmed brief. ` +
-          `Deleting them leaves that brief citing somebody whose answers are gone. Press again to delete.`,
+          `${row.respondentName}'s answers were read by a confirmed insights. ` +
+          `Deleting them leaves that insights citing somebody whose answers are gone. Press again to delete.`,
       };
     }
   }

@@ -107,7 +107,7 @@ export const projects = pgTable('projects', {
  * `core`, `branding`, `website`, `ecommerce` and `content` are no longer
  * attached to any package, but they stay listed: surveys already sent keep the
  * questions they were sent with (rule 5), and their answers still point at
- * those blocks. Removing a key here would orphan a real brief.
+ * those blocks. Removing a key here would orphan a real insights.
  */
 export const BLOCK_KEYS = [
   'identity',
@@ -286,7 +286,20 @@ export const surveyDrafts = pgTable(
 
 /* ── what comes out of the survey ─────────────────────────────────── */
 
-export const briefs = pgTable('briefs', {
+/**
+ * The analysis output.
+ *
+ * Renamed from "brief" in the product's vocabulary on 13 August 2026: the team
+ * calls this the insights, and "brief" means what the designer is handed after
+ * the kick-off decisions are recorded — a different artefact. One word for one
+ * thing.
+ *
+ * **The SQL table is still `briefs`.** Renaming it needs `drizzle-kit generate`
+ * run interactively, so it can be told this is a rename and not a drop of a
+ * table with real analyses in it. Worth doing in a terminal that can answer the
+ * prompt; not worth guessing at.
+ */
+export const insights = pgTable('briefs', {
   id: uuid('id').primaryKey().defaultRandom(),
   projectId: uuid('project_id')
     .notNull()
@@ -298,18 +311,18 @@ export const briefs = pgTable('briefs', {
   /**
    * Which responses this analysis read.
    *
-   * The team can analyse a subset — to see the brief without an outlier, or
+   * The team can analyse a subset — to see the insights without an outlier, or
    * without a duplicate submission. Once that is possible, every count in the
-   * brief is unreadable without this: "2 of 3 want X" is honest only if you can
+   * insights are unreadable without this: "2 of 3 want X" is honest only if you can
    * tell it was three of the five responses that exist.
    *
    * Names are snapshotted rather than joined, because a response can be deleted
-   * afterwards and a brief citing five people should still say who they were.
-   * Null on briefs written before this existed, which is the truth about them.
+   * afterwards and insights citing five people should still say who they were.
+   * Null on insights written before this existed, which is the truth about them.
    */
   sources: jsonb('sources').$type<{ id: string; name: string }[]>(),
 
-  /* gate 2 — confirm the brief. Rule 6: nothing reaches a client before this. */
+  /* gate 2 — confirm the insights. Rule 6: nothing reaches a client before this. */
   confirmedAt: timestamp('confirmed_at', { withTimezone: true }),
   confirmedBy: uuid('confirmed_by').references(() => users.id),
 });
@@ -338,7 +351,7 @@ export const clientsRelations = relations(clients, ({ many }) => ({
 export const projectsRelations = relations(projects, ({ one, many }) => ({
   client: one(clients, { fields: [projects.clientId], references: [clients.id] }),
   surveys: many(surveys),
-  briefs: many(briefs),
+  insights: many(insights),
   decisions: many(decisions),
 }));
 

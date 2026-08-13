@@ -8,7 +8,7 @@ _Designally Platform_
 
 **2 · Close collection** — the one judgement call. "Close and analyse" is always available; the app promotes the project into "Needs you" after 5 quiet days and asks *"enough to work with, or wait a little longer?"* It never closes a survey on its own.
 
-**3 · The analysis writes itself** — about 30 seconds.
+**3 · The insights write themselves** — about 30 seconds.
 
 **4 · A human reviews it** — 15–20 minutes, and the only step that cannot be skipped. What the reviewer is checking:
 - Is each conflict *real*, or two people wording the same idea differently? (Thai/English nuance is where the AI is weakest.)
@@ -36,7 +36,7 @@ The whole design points at the kick-off: detect conflicts, put them on DECIDE sl
 
 Consequences: the designer works from a memory of the meeting; a stakeholder who missed it reopens the question in month three; the client's own decision gets re-litigated because there is no record to point at.
 
-When a kick-off is marked done and no decisions are recorded, the project appears in "Needs you". The panel shows each conflict the brief found, the options the deck presented, and a free-text field for the nuance the options miss. **"Still open — needs another meeting" is a valid outcome**, because pretending a decision happened is worse than recording that it didn't.
+When a kick-off is marked done and no decisions are recorded, the project appears in "Needs you". The panel shows each conflict the insights found, the options the deck presented, and a free-text field for the nuance the options miss. **"Still open — needs another meeting" is a valid outcome**, because pretending a decision happened is worse than recording that it didn't.
 
 ## Order matters
 Decisions are recorded before the design work starts, because what was decided is the brief the work runs on. Nothing downstream should begin from a memory of the meeting.

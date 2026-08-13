@@ -9,7 +9,7 @@ import { readAnswers } from '@/lib/team/actions';
 import NewSurveySheet from './sheets/new-survey';
 import ProjectSheet from './sheets/project';
 import AnswersSheet from './sheets/answers';
-import BriefSheet from './sheets/brief';
+import InsightsSheet from './sheets/insights';
 import TemplatesSheet from './sheets/templates';
 import PastSheet from './sheets/past';
 import ComingSheet from './sheets/coming';
@@ -38,7 +38,7 @@ export default function Today({
 }) {
   const [panel, setPanel] = useState<Panel>(null);
   const [openProject, setOpenProject] = useState<string | null>(null);
-  const [openBrief, setOpenBrief] = useState<string | null>(null);
+  const [openInsights, setOpenInsights] = useState<string | null>(null);
   /* answers are fetched when asked for, not shipped with the page */
   const [answers, setAnswers] = useState<{ name: string; data: ProjectAnswers } | null>(null);
   const toast = useToast();
@@ -51,7 +51,7 @@ export default function Today({
   );
 
   const project = openProject ? live.find((p) => p.id === openProject) : null;
-  const briefProject = openBrief ? live.find((p) => p.id === openBrief) : null;
+  const insightsProject = openInsights ? live.find((p) => p.id === openInsights) : null;
 
   /* An empty screen is success. Say so and let them close the laptop. */
   const heading =
@@ -120,13 +120,13 @@ export default function Today({
                     className="btn btn-primary btn-sm"
                     disabled={writing}
                     onClick={() => {
-                      if (p.action!.kind === 'review-brief') return setOpenBrief(p.id);
-                      if (p.action!.kind === 'write-brief') {
+                      if (p.action!.kind === 'review-insights') return setOpenInsights(p.id);
+                      if (p.action!.kind === 'write-insights') {
                         return startWriting(async () => {
                           const result = await reanalyse(p.id);
                           toast.show(
                             result.ok
-                              ? `Brief written for ${p.clientName}`
+                              ? `Insights written for ${p.clientName}`
                               : result.error,
                           );
                         });
@@ -134,7 +134,7 @@ export default function Today({
                       setOpenProject(p.id);
                     }}
                   >
-                    {writing && p.action!.kind === 'write-brief'
+                    {writing && p.action!.kind === 'write-insights'
                       ? 'Writing — this takes a few minutes…'
                       : p.action!.label}
                   </button>
@@ -238,7 +238,7 @@ export default function Today({
           <button onClick={() => setPanel('past')}>
             <span className="et">Past projects</span>
             <span className="es">
-              {archived.length} archived · briefs and decks stay searchable
+              {archived.length} archived · insights and decks stay searchable
             </span>
           </button>
           <button onClick={() => setPanel('coming')}>
@@ -267,12 +267,12 @@ export default function Today({
         />
       )}
       {panel === 'coming' && <ComingSheet onClose={() => setPanel(null)} />}
-      {briefProject?.brief && (
-        <BriefSheet
-          project={briefProject}
-          onClose={() => setOpenBrief(null)}
+      {insightsProject?.insights && (
+        <InsightsSheet
+          project={insightsProject}
+          onClose={() => setOpenInsights(null)}
           onConfirmed={(msg) => {
-            setOpenBrief(null);
+            setOpenInsights(null);
             toast.show(msg);
           }}
         />
@@ -288,9 +288,9 @@ export default function Today({
         <ProjectSheet
           project={project}
           origin={origin}
-          onOpenBrief={() => {
+          onOpenInsights={() => {
             setOpenProject(null);
-            setOpenBrief(project.id);
+            setOpenInsights(project.id);
           }}
           onReadAnswers={async () => {
             const data = await readAnswers(project.id);

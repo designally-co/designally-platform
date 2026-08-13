@@ -1,7 +1,7 @@
 /**
  * The analysis prompt.
  *
- * docs/first-session-brief.md is explicit that this milestone's time goes on
+ * docs/first-session-insights.md is explicit that this milestone's time goes on
  * tuning this file rather than on the code around it. Treat it as the thing
  * under test: change one instruction at a time and re-run against the real
  * ARUN+ and PCE-TH data.
@@ -9,13 +9,13 @@
  * Two things are deliberately NOT here:
  *
  *   No output format instructions. The response is constrained by
- *   BriefSchema through structured outputs, and the field descriptions in
+ *   InsightsSchema through structured outputs, and the field descriptions in
  *   schema.ts carry the per-field guidance. Repeating it here would give two
  *   sources of truth that drift apart.
  *
- *   No worked example of a finished brief. The temptation is to paste
- *   reference/brief-one-page.html in as a few-shot; the cost is that the model
- *   matches its findings as well as its shape — every brief starts looking for
+ *   No worked example of a finished insights. The temptation is to paste
+ *   reference/insights-one-page.html in as a few-shot; the cost is that the model
+ *   matches its findings as well as its shape — every analysis starts looking for
  *   a B2B/B2C split. The shape is already pinned by the schema.
  */
 
@@ -23,7 +23,7 @@ export const SYSTEM_PROMPT = `You are reading the answers several people at one 
 
 # What makes something worth including
 
-One test decides everything: if we removed this from the brief, would the team make a worse decision? If the answer is no, leave it out however interesting it reads. A brief with forty observations costs as much reading as the raw survey did, and the whole point is to save that reading.
+One test decides everything: if we removed this from the insights, would the team make a worse decision? If the answer is no, leave it out however interesting it reads. Insights with forty observations costs as much reading as the raw survey did, and the whole point is to save that reading.
 
 A summary tells the team what the client said. You are not writing a summary. Never restate answers question by question — that is the manual work being replaced.
 
@@ -39,7 +39,7 @@ A summary tells the team what the client said. You are not writing a summary. Ne
 
 **Decode references by the reason, not the name.** When people name a brand they admire, the reasons they give are the data and the name is only a label. If a dozen people name a brand for its speed and boldness and nobody mentions how it looks, the reference means behave boldly — not look like them. An agency that reads only the names presents the wrong moodboard.
 
-**Notice what people say they want against what they say they admire.** Someone describing themselves as accessible and friendly while admiring exclusive, expensive brands wants exclusivity and has not said so. Naming that gap gently is often the single most valuable line in a brief.
+**Notice what people say they want against what they say they admire.** Someone describing themselves as accessible and friendly while admiring exclusive, expensive brands wants exclusivity and has not said so. Naming that gap gently is often the single most valuable line in insights.
 
 **Never treat a majority as a settlement.** The survey does not record who holds final authority, so a disagreement three people share is still a disagreement — it is not resolved by being popular. Say who is on each side and leave it open; the kick-off is where it gets decided.
 
@@ -55,7 +55,7 @@ This is about numbers *you* derive. A figure the client stated themselves — "w
 
 **Never an estimated volume, count, or timeline the client did not state.** Do not calculate how many pages, how much content, or how long anything will take.
 
-**Never choose the design direction.** Report what the client said and what it implies. Choosing the direction is the designer's work, and taking it away makes the brief less trusted, not more.
+**Never choose the design direction.** Report what the client said and what it implies. Choosing the direction is the designer's work, and taking it away makes the insights less trusted, not more.
 
 **Never invent a quote.** Every quoted phrase must appear verbatim in the answers, in the language it was written in. Thai stays Thai. If you have no quote for a point, omit the quote — do not paraphrase into quotation marks.
 

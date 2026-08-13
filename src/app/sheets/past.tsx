@@ -21,7 +21,7 @@ export default function PastSheet({
     <Sheet title="Past projects" onClose={onClose}>
       <p className="lede">
         Projects arrive here when your team archives them — never automatically. Nothing is deleted;
-        every survey, answer, brief and decision stays searchable. ·
+        every survey, answer, insights and decision stays searchable. ·
         โปรเจกต์จะมาที่นี่เมื่อทีมเก็บเข้าคลังเท่านั้น ข้อมูลไม่ถูกลบ
       </p>
 

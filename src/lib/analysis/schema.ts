@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 /**
- * The shape of a brief — docs/insight-engine-spec.md, "Suggested brief
+ * The shape of insights — docs/insight-engine-spec.md, "Suggested insights
  * structure", ordered by what a person needs first.
  *
  * The most important property of this schema is what it *cannot* express.
@@ -20,7 +20,7 @@ import { z } from 'zod';
  * version nested sections inside wrapper objects; the API rejected it with
  * "the compiled grammar is too large". Structured outputs compile the schema
  * into a grammar and nested arrays-of-objects multiply its size. Flattening
- * the wrappers was not enough on its own — the whole brief is past the limit
+ * the wrappers was not enough on its own — the whole set is past the limit
  * however it is arranged — so the analysis runs as two passes, each with a
  * schema that compiles.
  *
@@ -52,7 +52,7 @@ export const FindingsSchema = z.object({
   headline: z
     .string()
     .describe(
-      'The single most consequential finding, in one sentence a person could read aloud to the client. Usually the highest-severity conflict or a red flag. A brief that opens with this is read; one that opens with a project summary is skimmed.',
+      'The single most consequential finding, in one sentence a person could read aloud to the client. Usually the highest-severity conflict or a red flag. Insights that opens with this is read; one that opens with a project summary is skimmed.',
     ),
   headlineBody: z
     .string()
@@ -180,9 +180,9 @@ export const CreativeSchema = z.object({
     ),
 });
 
-/** The stored brief is both passes merged. */
-export const BriefSchema = FindingsSchema.and(CreativeSchema);
+/** The stored insights are both passes merged. */
+export const InsightsSchema = FindingsSchema.and(CreativeSchema);
 
 export type Findings = z.infer<typeof FindingsSchema>;
 export type Creative = z.infer<typeof CreativeSchema>;
-export type Brief = Findings & Creative;
+export type Insights = Findings & Creative;

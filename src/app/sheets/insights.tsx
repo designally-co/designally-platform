@@ -3,20 +3,20 @@
 import { useState, useTransition } from 'react';
 
 import {
-  confirmBrief,
-  deleteBrief,
-  readBriefVersion,
-  unconfirmBrief,
+  confirmInsights,
+  deleteInsights,
+  readInsightsVersion,
+  unconfirmInsights,
 } from '@/lib/team/actions';
 
-import type { Brief } from '@/lib/analysis/schema';
+import type { Insights } from '@/lib/analysis/schema';
 import type { ProjectView } from '@/lib/team/projects';
 import Sheet from './sheet';
 
 /**
- * The brief, in the order of docs/insight-engine-spec.md — what a person needs
+ * The insights, in the order of docs/insight-engine-spec.md — what a person needs
  * first, not the order questions were asked. Ported from
- * reference/brief-one-page.html.
+ * reference/insights-one-page.html.
  *
  * Every count on this page is `array.length`. Nothing is a percentage, because
  * the schema has nowhere to put one.
@@ -49,7 +49,7 @@ function CopyOutline({
   slides,
   confirmed,
 }: {
-  slides: Brief['deckOutline'];
+  slides: Insights['deckOutline'];
   confirmed: boolean;
 }) {
   const [copied, setCopied] = useState(false);
@@ -78,7 +78,7 @@ function CopyOutline({
    */
   if (!confirmed) {
     return (
-      <span className="copylocked">Confirm the brief to copy this</span>
+      <span className="copylocked">Confirm the insights to copy this</span>
     );
   }
 
@@ -96,23 +96,23 @@ function CopyOutline({
  * them rather than in a footnote — a reader who meets "2 of 3" first and learns
  * afterwards that it was three of five has already drawn the wrong conclusion.
  *
- * Names come from the brief's own snapshot rather than from the project, so a
+ * Names come from the insights's own snapshot rather than from the project, so a
  * respondent deleted since still appears. When they do, say so: otherwise
  * somebody hunting for that person in "Who answered" finds nothing and has no
- * way to tell whether the brief is wrong or the answers are gone.
+ * way to tell whether the insights are wrong or the answers are gone.
  */
 function Sources({
   version,
   onProject,
   writtenOn,
 }: {
-  version: ProjectView['briefVersions'][number] | undefined;
+  version: ProjectView['insightsVersions'][number] | undefined;
   onProject: { id: string }[];
   writtenOn: string | null;
 }) {
   const when = writtenOn ? ` · ${writtenOn}` : '';
 
-  /* briefs written before sources were stored. Saying so is more use than a
+  /* insights written before sources were stored. Saying so is more use than a
      guess that happens to be right most of the time. */
   if (!version?.sources) {
     return (
@@ -167,7 +167,7 @@ function Quotes({ quotes }: { quotes: string[] }) {
   );
 }
 
-export default function BriefSheet({
+export default function InsightsSheet({
   project,
   onClose,
   onConfirmed,
@@ -178,12 +178,12 @@ export default function BriefSheet({
 }) {
   const [busy, start] = useTransition();
   /* which version is on screen — the newest until somebody opens an older one */
-  const [shown, setShown] = useState<{ id: string; brief: Brief } | null>(null);
-  const versions = project.briefVersions;
+  const [shown, setShown] = useState<{ id: string; insights: Insights } | null>(null);
+  const versions = project.insightsVersions;
   const current = versions.find((v) => v.isNewest) ?? versions[0];
   const openId = shown?.id ?? current?.id;
   const openVersion = versions.find((v) => v.id === openId) ?? current;
-  const brief = (shown?.brief ?? project.brief) as Brief;
+  const insights = (shown?.insights ?? project.insights) as Insights;
   const people = project.answers;
 
   function act(run: () => Promise<{ ok: boolean; error?: string }>, done: string) {
@@ -194,23 +194,23 @@ export default function BriefSheet({
   }
 
   return (
-    <Sheet title={`${project.clientName} — survey analysis`} onClose={onClose}>
-      <div className="brief">
+    <Sheet title={`${project.clientName} — insights`} onClose={onClose}>
+      <div className="insights">
         {/* 1 · read this first */}
-        <h1>{brief.headline}</h1>
+        <h1>{insights.headline}</h1>
         <Sources
           version={openVersion}
           onProject={project.people}
-          writtenOn={openVersion?.writtenOn ?? project.briefWrittenOn}
+          writtenOn={openVersion?.writtenOn ?? project.insightsWrittenOn}
         />
-        <p className="firstpara">{brief.headlineBody}</p>
+        <p className="firstpara">{insights.headlineBody}</p>
 
         {/* 2 · settled */}
         <section className="bsec">
           <h3>Settled — design on this without asking</h3>
-          {brief.settled.length ? (
+          {insights.settled.length ? (
             <ul className="agree">
-              {brief.settled.map((a, i) => (
+              {insights.settled.map((a, i) => (
                 <li key={i}>
                   <span className="ck" aria-hidden="true">
                     ✓
@@ -233,8 +233,8 @@ export default function BriefSheet({
         {/* 3 · unsettled — these become the DECIDE slides */}
         <section className="bsec">
           <h3>Unsettled — resolve at the kick-off</h3>
-          {brief.unsettled.length ? (
-            brief.unsettled.map((c, i) => (
+          {insights.unsettled.length ? (
+            insights.unsettled.map((c, i) => (
               <article className="conflict" key={i}>
                 <div className="h">
                   <b>{c.question}</b>
@@ -264,9 +264,9 @@ export default function BriefSheet({
         {/* 4 · not decided by the client yet */}
         <section className="bsec">
           <h3>Not decided by the client yet</h3>
-          {brief.notDecidedYet.length ? (
-            <ul className="insights">
-              {brief.notDecidedYet.map((g, i) => (
+          {insights.notDecidedYet.length ? (
+            <ul className="gaps">
+              {insights.notDecidedYet.map((g, i) => (
                 <li key={i}>
                   <b>{g.topic}</b> — {g.whatWasSeen}
                   <span className="conseq">{g.consequence}</span>
@@ -284,10 +284,10 @@ export default function BriefSheet({
           <div className="signal">
             <div className="lab">Internal alignment</div>
             <p>
-              <b>{brief.alignment}</b> — {brief.alignmentReason}
+              <b>{insights.alignment}</b> — {insights.alignmentReason}
             </p>
           </div>
-          {brief.flags.map((f, i) => (
+          {insights.flags.map((f, i) => (
             <div className="signal" key={i}>
               <div className="lab">{f.label}</div>
               <p>{f.finding}</p>
@@ -299,10 +299,10 @@ export default function BriefSheet({
         <section className="bsec">
           <div className="bsechead">
             <h3>Kick-off deck outline</h3>
-            <CopyOutline slides={brief.deckOutline} confirmed={!!openVersion?.confirmedOn} />
+            <CopyOutline slides={insights.deckOutline} confirmed={!!openVersion?.confirmedOn} />
           </div>
           <ul className="slides">
-            {brief.deckOutline.map((s, i) => (
+            {insights.deckOutline.map((s, i) => (
               <li key={i}>
                 <span className="sn">{i + 1}</span>
                 <span>
@@ -320,7 +320,7 @@ export default function BriefSheet({
           <h3>How to run the room</h3>
           <div className="internal">
             <div className="lock">INTERNAL — NEVER SHOWN TO THE CLIENT</div>
-            {brief.howToRunTheRoom.map((n, i) => (
+            {insights.howToRunTheRoom.map((n, i) => (
               <p key={i}>
                 <b>{n.heading}</b> {n.body}
               </p>
@@ -342,8 +342,8 @@ export default function BriefSheet({
                       v.isNewest
                         ? setShown(null)
                         : start(async () => {
-                            const b = await readBriefVersion(v.id);
-                            if (b) setShown({ id: v.id, brief: b });
+                            const b = await readInsightsVersion(v.id);
+                            if (b) setShown({ id: v.id, insights: b });
                           })
                     }
                   >
@@ -361,7 +361,7 @@ export default function BriefSheet({
                     <button
                       className="drop"
                       disabled={busy}
-                      onClick={() => act(() => deleteBrief(v.id), 'Version deleted.')}
+                      onClick={() => act(() => deleteInsights(v.id), 'Version deleted.')}
                     >
                       Delete
                     </button>
@@ -374,7 +374,7 @@ export default function BriefSheet({
 
         {/* gate 2 — rule 2 records who acted, rule 1 never does it on a timer */}
         <section className="bsec gate">
-          {project.briefStale && (
+          {project.insightsStale && (
             <p className="stale">
               Answers arrived after this was confirmed. What it says was true of the answers it was
               written from — regenerate to take the newer ones in.
@@ -388,7 +388,7 @@ export default function BriefSheet({
               <button
                 className="linky"
                 disabled={busy}
-                onClick={() => act(() => unconfirmBrief(openVersion.id), 'Confirmation removed.')}
+                onClick={() => act(() => unconfirmInsights(openVersion.id), 'Confirmation removed.')}
               >
                 Un-confirm
               </button>
@@ -404,9 +404,9 @@ export default function BriefSheet({
               <button
                 className="btn btn-primary"
                 disabled={busy}
-                onClick={() => act(() => confirmBrief(project.id), 'Brief confirmed.')}
+                onClick={() => act(() => confirmInsights(project.id), 'Insights confirmed.')}
               >
-                {busy ? 'Confirming' : 'Confirm the brief'}
+                {busy ? 'Confirming' : 'Confirm the insights'}
               </button>
             </>
           )}

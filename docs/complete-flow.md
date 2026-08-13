@@ -14,7 +14,7 @@ Every step belongs to the client, the team, or the app.
 | 5 | App | Collects and counts — "3 answers so far · last one 2 days ago" | — |
 | 6 | App | After 5 quiet days: "enough to work with, or wait a little longer?" | — |
 | 7 | **Team** | **Close and analyse** ← human decision | 5 sec |
-| 8 | App | Writes the brief: agreements, conflicts, gaps, deck outline | ~30 sec |
+| 8 | App | Writes the insights: agreements, conflicts, gaps, deck outline | ~30 sec |
 | 9 | **Team** | **Read and confirm** ← human decision | 15–20 min |
 | 10 | Team | Send to Claude → .pptx → polish in Canva | 30–60 min |
 | 11 | Client + Team | Kick-off meeting; the DECIDE slides are the agenda | — |
@@ -26,7 +26,7 @@ Brand and Design — follow the same thirteen steps; only the questionnaire diff
 
 ## Four decisions belong to the team — nothing happens on a timer
 1. **Is this enough to work with?** Only a person knows whether four answers from the right people beat ten from the wrong ones.
-2. **Is this brief true?** The AI can mistake two wordings of the same idea for a disagreement, especially across Thai and English.
+2. **Are these insights true?** The AI can mistake two wordings of the same idea for a disagreement, especially across Thai and English.
 3. **What did the room actually decide?** Written down after the kick-off, in the team's own words.
 4. **Is this project finished?** Archiving is manual. There is no automatic rule. Nothing is deleted; archived projects stay searchable.
 
@@ -37,7 +37,7 @@ calculates or displays a predicted quantity of work, client-facing or internal. 
 for a number put in front of a client.
 
 ## What runs with nobody touching it
-Question-block selection from the package · answer collection · promotion to "Needs you" after 5 quiet days · the brief itself · conflicts → DECIDE slides placed early.
+Question-block selection from the package · answer collection · promotion to "Needs you" after 5 quiet days · the insights themselves · conflicts → DECIDE slides placed early.
 
 ## The whole team app is one page
 - **Needs you** — work blocked on the team. Usually two or three rows, sometimes empty.
@@ -49,5 +49,5 @@ Question-block selection from the package · answer collection · promotion to "
 2. **Where it is** — full stage timeline, dated; five stages, read from the package
 3. **Who answered** — names and contact emails
 4. **Decided at the kick-off** — the recorded decisions, once they exist
-5. **Documents** — survey analysis, kick-off deck, content readiness plan
+5. **Documents** — insights, kick-off deck, content readiness plan
 6. **Archive project** — manual, always available

@@ -23,7 +23,7 @@
  * acceptance test was passed by grouping on them. Version 3 gives it a name and
  * nothing else. So the audience split here is planted with *no* signal outside
  * the answers themselves: the two camps are not marked, not ordered together,
- * and not distinguishable by anything but what they wrote. If the brief still
+ * and not distinguishable by anything but what they wrote. If the insights still
  * finds them, the prompt survived losing the roles. If it doesn't, that is the
  * regression and it is better found here than on a client.
  *

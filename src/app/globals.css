@@ -2515,7 +2515,7 @@ dialog::backdrop {
    THE BRIEF — ported from reference/brief-one-page.html.
    Every count on this surface is a length, never a percentage.
    ============================================================ */
-.brief h1 {
+.insights h1 {
   font-size: clamp(1.5rem, 3.6vw, 2rem);
   font-weight: 600;
   letter-spacing: -0.02em;
@@ -2525,12 +2525,12 @@ dialog::backdrop {
   margin-bottom: 6px;
   text-wrap: balance;
 }
-.brief .lede {
+.insights .lede {
   color: var(--ink-3);
   font-size: 14px;
   margin-bottom: var(--sp-md);
 }
-.brief .firstpara {
+.insights .firstpara {
   font-size: 17px;
   line-height: 1.6;
   color: var(--ink-2);
@@ -2691,11 +2691,11 @@ dialog::backdrop {
 }
 
 /* clarity gaps */
-.insights {
+.gaps {
   counter-reset: i;
   list-style: none;
 }
-.insights li {
+.gaps li {
   position: relative;
   padding: 11px 0 11px 36px;
   border-bottom: 1px solid var(--divider);
@@ -2703,10 +2703,10 @@ dialog::backdrop {
   line-height: 1.6;
   text-wrap: pretty;
 }
-.insights li:last-child {
+.gaps li:last-child {
   border-bottom: 0;
 }
-.insights li::before {
+.gaps li::before {
   counter-increment: i;
   content: counter(i);
   position: absolute;
@@ -2723,7 +2723,7 @@ dialog::backdrop {
   align-items: center;
   justify-content: center;
 }
-.insights .conseq {
+.gaps .conseq {
   display: block;
   font-size: 13.5px;
   color: var(--ink-3);

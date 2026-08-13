@@ -24,14 +24,14 @@ import Sheet from './sheet';
 export default function ProjectSheet({
   project: p,
   origin,
-  onOpenBrief,
+  onOpenInsights,
   onReadAnswers,
   onClose,
   onActed,
 }: {
   project: ProjectView;
   origin: string;
-  onOpenBrief: () => void;
+  onOpenInsights: () => void;
   onReadAnswers: () => void;
   onClose: () => void;
   onActed: (message: string) => void;
@@ -43,7 +43,7 @@ export default function ProjectSheet({
   const [warned, setWarned] = useState<string | null>(null);
   /**
    * Whose answers the analysis should read. Null is everyone, which is the
-   * default and nearly always what happens — the subset exists to see the brief
+   * default and nearly always what happens — the subset exists to see the insights
    * without an outlier or a duplicate, not as a routine step, so it stays out
    * of the way until somebody opens it.
    */
@@ -51,7 +51,7 @@ export default function ProjectSheet({
   const [picking, setPicking] = useState(false);
 
   /* `onRefused` lets a caller treat a refusal as a step rather than a failure —
-     deleting a response a confirmed brief read comes back refused the first
+     deleting a response a confirmed insights read comes back refused the first
      time, with the reason, and the second press goes through. */
   const run = (
     fn: () => Promise<{ ok: boolean; error?: string }>,
@@ -109,7 +109,7 @@ export default function ProjectSheet({
                                 ? base.filter((id) => id !== person.id)
                                 : [...base, person.id];
                               /* everyone selected is the same as no selection —
-                                 keep it null so the brief records it that way */
+                                 keep it null so the insights records it that way */
                               setOnly(next.length === p.people.length ? null : next);
                             }}
                           />
@@ -140,7 +140,7 @@ export default function ProjectSheet({
               {pending ? 'Closing…' : p.action.label}
             </button>
             <p className="hintline">
-              This records that you closed it, and when. Writing the brief arrives in milestone 3.
+              This records that you closed it, and when. Writing the insights arrives in milestone 3.
             </p>
           </>
         ) : (
@@ -169,7 +169,7 @@ export default function ProjectSheet({
                     run(() => closeCollection(p.surveyId!), 'Collection closed · ปิดรับคำตอบแล้ว')
                   }
                 >
-                  {pending ? 'Closing and analysing…' : 'Close collection and write the brief'}
+                  {pending ? 'Closing and analysing…' : 'Close collection and write the insights'}
                 </button>
                 <p className="hintline">
                   Closing stops new answers and starts the analysis. It takes a few minutes.
@@ -210,7 +210,7 @@ export default function ProjectSheet({
                   <b>{person.name}</b>
                   <span className="role">{person.email || 'no email given'}</span>
                   {/* a duplicate submission, or a test one. Two presses when a
-                      confirmed brief read it — the first says what would go. */}
+                      confirmed insights read it — the first says what would go. */}
                   <button
                     className="drop"
                     disabled={pending}
@@ -251,7 +251,7 @@ export default function ProjectSheet({
               : 'Still open. Forward it to anyone who should have a say.'}
           </p>
           {/* A stakeholder replying the day after collection closed is not an
-              edge case. Reopening leaves the brief alone: what it says was true
+              edge case. Reopening leaves the insights alone: what it says was true
               of the answers it was written from, and it keeps saying so. */}
           {p.closedOn && (
             <button
@@ -274,20 +274,20 @@ export default function ProjectSheet({
       {/* documents */}
       <div className="pd-sec">
         <h3>Documents</h3>
-        {p.brief ? (
+        {p.insights ? (
           <div className="pd-docs">
-            <button className="doc" onClick={onOpenBrief}>
+            <button className="doc" onClick={onOpenInsights}>
               Survey analysis
               <small>
                 {p.answers} {p.answers === 1 ? 'answer' : 'answers'}
-                {p.briefWrittenOn ? ` · ${p.briefWrittenOn}` : ''}
+                {p.insightsWrittenOn ? ` · ${p.insightsWrittenOn}` : ''}
               </small>
             </button>
           </div>
         ) : (
           <p className="quiet">
             {p.closedOn
-              ? 'Collection is closed but no brief was written. Needs you has a button to write it.'
+              ? 'Collection is closed but no insights were written. Needs you has a button to write it.'
               : 'Nothing produced yet — documents appear here as the project moves.'}
           </p>
         )}
@@ -300,7 +300,7 @@ export default function ProjectSheet({
         <h3>Finished with this project?</h3>
         <p>
           Archiving moves it out of your live list. Nothing is deleted — the survey, the answers,
-          the brief and the decisions stay searchable. Only your team can do this; the app never
+          the insights and the decisions stay searchable. Only your team can do this; the app never
           archives anything by itself. · ข้อมูลไม่ถูกลบ ค้นหาได้เสมอ
         </p>
         {confirmArchive ? (

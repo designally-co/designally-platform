@@ -17,7 +17,7 @@ import Sheet from './sheet';
  * **One respondent at a time, not one question at a time.** The team's question
  * is "what does this person think", and reading a single mind end to end is how
  * a contradiction inside one head becomes visible — which is the finding the
- * first real brief turned up. Comparing people across a question is what the
+ * first real insights turned up. Comparing people across a question is what the
  * summary is for.
  *
  * **Blanks are shown, and counted.** A question nobody could answer is the

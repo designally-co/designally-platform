@@ -1,6 +1,6 @@
 /**
  * Development only. Runs the real analysis against a survey and prints the
- * brief, without the team app, without auth, and without storing anything.
+ * insights, without the team app, without auth, and without storing anything.
  *
  *   npm run dev:fixture         # five synthetic respondents with planted findings
  *   npm run dev:analyse         # the newest fixture survey
@@ -15,7 +15,7 @@
  * real client's survey. This is that test.
  *
  * It checks the two things that are cheap to get wrong and expensive to notice:
- * that no contact detail reaches the API, and that the brief still contains the
+ * that no contact detail reaches the API, and that the insights still contains the
  * findings the fixture planted.
  */
 import { desc, eq } from 'drizzle-orm';
@@ -83,39 +83,39 @@ async function main() {
     process.exit(1);
   }
 
-  const brief = result.brief;
+  const insights = result.insights;
   console.log(`Done in ${seconds}s · ${result.usage.input} in / ${result.usage.output} out\n`);
 
   console.log('─'.repeat(72));
-  console.log(brief.headline.toUpperCase());
-  console.log(brief.headlineBody);
+  console.log(insights.headline.toUpperCase());
+  console.log(insights.headlineBody);
   console.log('─'.repeat(72));
 
-  console.log(`\nSETTLED (${brief.settled.length})`);
-  for (const s of brief.settled) console.log(`  · ${s.statement}\n      ${s.respondents.join(', ')}`);
+  console.log(`\nSETTLED (${insights.settled.length})`);
+  for (const s of insights.settled) console.log(`  · ${s.statement}\n      ${s.respondents.join(', ')}`);
 
-  console.log(`\nUNSETTLED (${brief.unsettled.length})`);
-  for (const c of brief.unsettled) {
+  console.log(`\nUNSETTLED (${insights.unsettled.length})`);
+  for (const c of insights.unsettled) {
     console.log(`  · [${c.severity}] ${c.question}`);
     for (const side of c.sides) console.log(`      "${side.position}" — ${side.respondents.join(', ')}`);
     console.log(`      why: ${c.severityReason}`);
   }
 
-  console.log(`\nNOT DECIDED YET (${brief.notDecidedYet.length})`);
-  for (const g of brief.notDecidedYet) console.log(`  · ${g.topic} — ${g.whatWasSeen}`);
+  console.log(`\nNOT DECIDED YET (${insights.notDecidedYet.length})`);
+  for (const g of insights.notDecidedYet) console.log(`  · ${g.topic} — ${g.whatWasSeen}`);
 
-  console.log(`\nFLAGS (${brief.flags.length})`);
-  for (const f of brief.flags) console.log(`  · [${f.severity}] ${f.label}: ${f.finding}`);
+  console.log(`\nFLAGS (${insights.flags.length})`);
+  for (const f of insights.flags) console.log(`  · [${f.severity}] ${f.label}: ${f.finding}`);
 
-  console.log(`\nALIGNMENT: ${brief.alignment} — ${brief.alignmentReason}`);
+  console.log(`\nALIGNMENT: ${insights.alignment} — ${insights.alignmentReason}`);
 
 
   /* Did the planted findings survive? A keyword hit is weak evidence — it says
      the subject was mentioned, not that the reading was right. Read the output
      above; this is only a fast way to spot something that vanished entirely. */
-  const haystack = JSON.stringify(brief);
+  const haystack = JSON.stringify(insights);
   console.log('\n' + '─'.repeat(72));
-  console.log('PLANTED FINDINGS — mentioned anywhere in the brief?');
+  console.log('PLANTED FINDINGS — mentioned anywhere in the insights?');
   let missing = 0;
   for (const p of PLANTED) {
     const hit = p.hint.test(haystack);
@@ -124,8 +124,8 @@ async function main() {
   }
   console.log(
     missing
-      ? `\n${missing} planted finding(s) not mentioned at all. Read the brief above before believing the tick marks.`
-      : '\nAll five mentioned. Now read the brief above and judge whether it read them correctly.',
+      ? `\n${missing} planted finding(s) not mentioned at all. Read the insights above before believing the tick marks.`
+      : '\nAll five mentioned. Now read the insights above and judge whether it read them correctly.',
   );
 
   process.exit(0);

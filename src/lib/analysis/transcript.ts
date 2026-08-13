@@ -27,10 +27,10 @@ import {
  * The answers, as the analysis reads them.
  *
  * `only` narrows it to chosen responses — the team can analyse a subset to see
- * the brief without an outlier or without a duplicate submission. Omitted means
+ * the insights without an outlier or without a duplicate submission. Omitted means
  * everyone, which is the default and by far the common case.
  *
- * It reports back which responses it actually read, because the brief has to
+ * It reports back which responses it actually read, because the insights has to
  * store that: once a subset is possible, "2 of 3 want X" cannot be interpreted
  * without knowing what the three were counted from.
  */
@@ -71,7 +71,7 @@ export async function buildTranscript(surveyId: string, only?: string[]) {
 
   /* an empty or absent selection means all of them — a caller that meant to
      analyse nothing has a bug, and silently returning an empty transcript
-     would hide it behind a brief about nobody */
+     would hide it behind insights about nobody */
   const people = only?.length ? everyone.filter((p) => only.includes(p.id)) : everyone;
 
   const allAnswers = people.length
@@ -139,7 +139,7 @@ export async function buildTranscript(surveyId: string, only?: string[]) {
     respondentCount: people.length,
     questionCount: ordered.length,
     /* snapshotted, not referenced — a response can be deleted afterwards and
-       the brief should still be able to say whose answers it read */
+       the insights should still be able to say whose answers it read */
     sources: people.map((p) => ({ id: p.id, name: p.respondentName })),
     availableCount: everyone.length,
   };

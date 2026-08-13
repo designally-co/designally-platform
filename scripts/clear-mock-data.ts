@@ -21,7 +21,7 @@
  *
  * **Why the old question versions go too.** Rule 5 keeps every version an
  * already-sent survey might need, and deleting one would normally orphan a real
- * brief. Once there are no surveys left there is nothing to orphan, and leaving
+ * insights. Once there are no surveys left there is nothing to orphan, and leaving
  * three versions stacked in the table is what made the new-survey sheet offer
  * "Brand · 50 questions". Re-seed after this and the table holds one version.
  */
@@ -30,7 +30,7 @@ import { count, eq, ne } from 'drizzle-orm';
 import { getDb, usingLocalDatabase } from '../src/lib/db';
 import {
   answers,
-  briefs,
+  insights,
   clients,
   decisions,
   projects,
@@ -47,7 +47,7 @@ const GOING = [
   ['answers', answers],
   ['survey_drafts', surveyDrafts],
   ['responses', responses],
-  ['briefs', briefs],
+  ['insights', insights],
   ['decisions', decisions],
   ['surveys', surveys],
   ['projects', projects],
@@ -126,7 +126,7 @@ async function main() {
   }
 
   /* clients cascades through projects, surveys, drafts, responses, answers,
-     briefs and decisions — but delete answers first anyway, because
+     insights and decisions — but delete answers first anyway, because
      answers.question_id has no cascade and the retired questions go next. */
   await db.delete(clients);
 
