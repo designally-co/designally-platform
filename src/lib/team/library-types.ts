@@ -33,12 +33,13 @@ export const QUESTION_TYPE_LABEL: Record<QuestionType, string> = {
   linear_scale: 'Linear scale',
 };
 
-/** How many questions a package's blocks add up to. */
 /**
- * What the client will see numbered, which is what the team means by "how long
- * is this". The identity block is a name and an email — the survey prints no
- * number beside either (`load.ts`), so counting them here would promise 23
- * where the last question on screen reads 21.
+ * How many questions a package's blocks add up to — what the client will see
+ * numbered, which is what the team means by "how long is this".
+ *
+ * The identity block is a name, and the survey prints no number beside it
+ * (`load.ts`), so counting it here would promise 22 where the last question on
+ * screen reads 21. It held an email too until question version 4.
  */
 export function countQuestions(library: LibraryBlock[], keys: readonly BlockKey[]) {
   return library
