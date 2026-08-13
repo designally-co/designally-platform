@@ -219,20 +219,20 @@ label.f span {
 .survey-shell {
   min-height: 100dvh;
   background: var(--parchment);
-  /* A single soft rise of light from the top, so a long form does not read as
-     a grey slab. Tonal only — white into parchment, no hue anywhere, so the
-     accent keeps its one meaning.
-
-     Linear rather than radial on purpose: a radial wash on a page whose height
-     is content-dependent puts its ellipse edge somewhere different on every
-     screen, and on a tall page that edge becomes visible. A top-down ramp
-     cannot, and it is cheaper for a phone to composite. */
-  background-image: linear-gradient(
-    to bottom,
-    var(--canvas) 0,
-    var(--parchment) 340px
-  );
-  background-repeat: no-repeat;
+  /**
+   * Flat, deliberately.
+   *
+   * There was a wash here — white ramping into parchment over the first 340px.
+   * It cost nothing until something had to sit on top of it: the pinned
+   * question on the personality battery paints a solid colour, and a solid
+   * colour cannot match a gradient. It read as a white box around the text, at
+   * whatever height the header happened to be.
+   *
+   * Anything that overlays the page — the pinned question, the blur under the
+   * controls — has to match the page exactly, and the only surface that lets
+   * them is a flat one. It is also what the reference this survey is patterned
+   * on uses.
+   */
 }
 
 .bar {
@@ -2870,7 +2870,7 @@ dialog::backdrop {
   z-index: 5;
   /* the page wash is near-white at the top of the viewport, which is the only
      place this element is ever seen */
-  background: var(--canvas);
+  background: var(--parchment);
   padding: 12px 0 10px;
 }
 .scalehead::after {
@@ -2880,7 +2880,7 @@ dialog::backdrop {
   right: 0;
   top: 100%;
   height: 16px;
-  background: linear-gradient(to bottom, var(--canvas), transparent);
+  background: linear-gradient(to bottom, var(--parchment), transparent);
   pointer-events: none;
 }
 .slide .scale {
