@@ -879,21 +879,52 @@ label.f span {
   height: auto;
   background: var(--parchment);
 }
-/* The checkbox sits over the image so the whole card reads as one control,
-   and stays a real input so it is still tabbable and announced. */
+/**
+ * The selection mark, drawn rather than borrowed.
+ *
+ * This was the platform's own checkbox on a white pad — a system control
+ * dropped onto a photograph, which is what it looked like. It stays a real
+ * input, so it is still tabbable, announced and operable; only its appearance
+ * is ours: a ring over the picture, filled with the accent when chosen.
+ *
+ * The tick is a rotated border on the label rather than a pseudo-element of the
+ * input, because pseudo-elements on replaced elements are not something to rely
+ * on, and a glyph would be an emoji standing in for an icon.
+ */
 .board input {
   position: absolute;
-  top: 9px;
-  left: 9px;
-  width: 22px;
-  height: 22px;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  width: 26px;
+  height: 26px;
   margin: 0;
-  accent-color: var(--primary);
-  /* The images are light and busy; the box needs an edge of its own to survive
-     them. A ring, not a shadow — there are none in this product. */
-  background: var(--canvas);
-  border-radius: 6px;
-  outline: 3px solid var(--canvas);
+  appearance: none;
+  -webkit-appearance: none;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+  background: rgba(0, 0, 0, 0.32);
+  cursor: pointer;
+  transition:
+    background 0.18s var(--ease),
+    border-color 0.18s var(--ease);
+}
+.board input:checked {
+  background: var(--primary);
+  border-color: #fff;
+}
+.board:has(input:checked)::after {
+  content: '';
+  position: absolute;
+  left: 19px;
+  top: 17px;
+  z-index: 3;
+  width: 6px;
+  height: 11px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  pointer-events: none;
 }
 /**
  * The name rides the picture instead of sitting under it.
