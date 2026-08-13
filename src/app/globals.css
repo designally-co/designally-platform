@@ -3073,26 +3073,6 @@ dialog::backdrop {
     padding-top: 0;
   }
 
-  /**
-   * English over Thai, so a chip is as wide as its longer line instead of the
-   * sum of both.
-   *
-   * Side by side, the eight "Things to Avoid" chips wanted seven rows of a
-   * 346px column — the labels ran from 139px to 237px, so almost none of them
-   * could share. Reordering does not fix that: brute-forcing all 5,040
-   * permutations with Other pinned last saves exactly one row, and no ordering
-   * a person would recognise as sorted reaches even that. The width is the
-   * problem, and stacking halves it.
-   */
-  .chip {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1px;
-    padding: 9px 15px;
-  }
-  .chip[aria-pressed='true'] {
-    padding: 8px 14px;
-  }
   .slide[data-active] .okrow,
   .slide[data-active] .btn.start {
     opacity: 1;
@@ -3151,13 +3131,6 @@ dialog::backdrop {
      place this element is ever seen */
   background: var(--parchment);
   padding: 12px 0 10px;
-}
-/* said in words, under the question, so the badge keeps meaning exactly one
-   thing: which question of twenty-one this is */
-.qpart {
-  margin-top: 9px;
-  font-size: 13px;
-  color: var(--ink-3);
 }
 .scalehead::after {
   content: '';

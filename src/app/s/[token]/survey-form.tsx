@@ -60,46 +60,21 @@ function stepIsVisible(step: SurveyStep, values: DraftValues, all: SurveyStep[])
 }
 
 /**
- * One slide.
+ * One screen.
  *
- * The identity block is the one slide holding two fields — name and email are a
- * single thought and neither is numbered.
+ * The identity block is the one screen holding more than a single question,
+ * because a name is not numbered and never stood alone.
+ *
+ * **The personality battery is no longer split.** Ten scale pairs were dealt
+ * across three screens, then four, because a screen taller than the viewport
+ * could not be rested inside a mandatory-snap deck — its bottom was literally
+ * unreachable. The deck is gone and a long question is a long page, so the
+ * battery is one question again, which is what it is: ten readings of the same
+ * thing, answered against each other.
  */
-type Slice = { from: number; to: number; part: number; parts: number };
-
 type Card =
   | { kind: 'fields'; questions: SurveyQuestion[] }
-  | { kind: 'question'; question: SurveyQuestion; slice?: Slice };
-
-/**
- * How many scale pairs share a screen.
- *
- * It was four, measured against a 390x844 browser window. A real iPhone is not
- * that: Safari's address bar takes roughly a hundred points off the bottom, and
- * with the Thai reveal open — which is the state a Thai reader is in for the
- * whole survey — the fourth pair sat behind the Continue button and could not
- * be reached — the deck snapped, so a screen taller than the viewport could not
- * be rested inside. The deck is gone and a long question now simply scrolls,
- * but three still reads better than four: a battery you can take in at a glance
- * is answered more honestly than one you have to scroll through.
- *
- * Three makes the ten pairs 3 · 3 · 2 · 2 rather than 4 · 3 · 3.
- */
-const PAIRS_PER_SLIDE = 3;
-
-/**
- * How many pairs each part holds, balanced rather than greedy.
- *
- * Ten pairs at four a slide is three parts. Filling them greedily gives 4-4-2,
- * and a final slide holding two rows under a pinned question looks like
- * something went wrong. Spreading the remainder gives 4-3-3.
- */
-function sliceSizes(count: number, max: number) {
-  const parts = Math.ceil(count / max);
-  const base = Math.floor(count / parts);
-  const extra = count % parts;
-  return Array.from({ length: parts }, (_, i) => base + (i < extra ? 1 : 0));
-}
+  | { kind: 'question'; question: SurveyQuestion };
 
 export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   const [ready, setReady] = useState(false);
@@ -155,21 +130,6 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
           continue;
         }
         flush();
-
-        const pairs = q.config.pairs?.length ?? 0;
-        if (q.type === 'linear_scale' && pairs > PAIRS_PER_SLIDE) {
-          const sizes = sliceSizes(pairs, PAIRS_PER_SLIDE);
-          let from = 0;
-          sizes.forEach((size, i) => {
-            out.push({
-              kind: 'question',
-              question: q,
-              slice: { from, to: from + size, part: i + 1, parts: sizes.length },
-            });
-            from += size;
-          });
-          continue;
-        }
 
         out.push({ kind: 'question', question: q });
       }
@@ -606,7 +566,6 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                     onChange={(v) => setValue(card.question.ref, v)}
                     onEnter={() => advance(step)}
                     total={survey.questionCount}
-                    slice={card.slice}
                   />
                 )}
               </div>
