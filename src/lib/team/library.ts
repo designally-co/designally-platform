@@ -45,6 +45,18 @@ export async function loadQuestionLibrary(): Promise<LibraryBlock[]> {
           version: q.version,
         })),
     }))
+    /**
+     * A block with no questions at this version is not part of the
+     * questionnaire — it is a row left in the table by an older one.
+     *
+     * The retired keys stay in `question_blocks` and in `BLOCK_KEYS` because a
+     * survey sent against them must still resolve (rule 5). But listing them
+     * here put five headings in front of the team reading "0 questions ·
+     * Retired — kept for surveys already sent", which stopped being true the
+     * moment the last of those surveys was cleared. An empty heading is not a
+     * record of anything; it is five lines of noise above the four that matter.
+     */
+    .filter((b) => b.questions.length > 0)
     .sort((a, b) => order(a.key) - order(b.key));
 }
 
