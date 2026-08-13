@@ -248,10 +248,15 @@ label.f span {
   height: 3px;
   background: var(--divider);
 }
-/* No bar on the welcome screen — nothing has progressed yet, and a 0% bar
-   reads as something broken. */
+/* Nothing on the welcome screen has progressed or can be gone back to, so
+   neither the bar nor the chevrons appear there. A 0% bar reads as something
+   broken, and an up arrow with nowhere to go is a control that lies. Start is
+   the only way out of that slide, which is the point of it. */
 .survey-shell.at-welcome .bar {
   background: transparent;
+}
+.survey-shell.at-welcome .deck-nav {
+  display: none;
 }
 /* scaleX rather than width: this now moves on every one of twenty-one
    advances instead of five, and animating width relayouts the page each time. */
