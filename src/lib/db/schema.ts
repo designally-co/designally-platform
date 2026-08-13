@@ -295,6 +295,20 @@ export const briefs = pgTable('briefs', {
   /** structured, not a blob of markdown */
   content: jsonb('content').notNull(),
 
+  /**
+   * Which responses this analysis read.
+   *
+   * The team can analyse a subset — to see the brief without an outlier, or
+   * without a duplicate submission. Once that is possible, every count in the
+   * brief is unreadable without this: "2 of 3 want X" is honest only if you can
+   * tell it was three of the five responses that exist.
+   *
+   * Names are snapshotted rather than joined, because a response can be deleted
+   * afterwards and a brief citing five people should still say who they were.
+   * Null on briefs written before this existed, which is the truth about them.
+   */
+  sources: jsonb('sources').$type<{ id: string; name: string }[]>(),
+
   /* gate 2 — confirm the brief. Rule 6: nothing reaches a client before this. */
   confirmedAt: timestamp('confirmed_at', { withTimezone: true }),
   confirmedBy: uuid('confirmed_by').references(() => users.id),

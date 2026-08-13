@@ -8,6 +8,13 @@
       "when": 1786332312065,
       "tag": "0000_init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1786615823707,
+      "tag": "0001_wooden_crystal",
+      "breakpoints": true
     }
   ]
 }

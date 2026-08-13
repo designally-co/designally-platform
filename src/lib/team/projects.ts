@@ -53,7 +53,11 @@ function agoText(days: number) {
   return `${plural(days, 'day')} ago`;
 }
 
-export type Person = { name: string; email: string | null };
+export type Person = {
+  id: string;
+  name: string;
+  email: string | null;
+};
 
 export type ProjectAction = {
   /** what the button does */
@@ -233,6 +237,7 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
   const everyone = surveyIds.length
     ? await db
         .select({
+          id: responses.id,
           surveyId: responses.surveyId,
           name: responses.respondentName,
           email: responses.email,
@@ -245,7 +250,7 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
   const peopleBySurvey = new Map<string, Person[]>();
   for (const r of everyone) {
     const list = peopleBySurvey.get(r.surveyId) ?? [];
-    list.push({ name: r.name, email: r.email });
+    list.push({ id: r.id, name: r.name, email: r.email });
     peopleBySurvey.set(r.surveyId, list);
   }
 

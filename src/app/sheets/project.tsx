@@ -2,7 +2,12 @@
 
 import { useState, useTransition } from 'react';
 
-import { archiveProject, closeCollection, reopenCollection } from '@/lib/team/actions';
+import {
+  archiveProject,
+  closeCollection,
+  deleteResponse,
+  reopenCollection,
+} from '@/lib/team/actions';
 import type { ProjectView } from '@/lib/team/projects';
 import { forDisplay } from '@/lib/survey/link';
 import Sheet from './sheet';
@@ -34,15 +39,34 @@ export default function ProjectSheet({
   const [confirmArchive, setConfirmArchive] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
+  /* which response has already been warned about, so the next press deletes */
+  const [warned, setWarned] = useState<string | null>(null);
+  /**
+   * Whose answers the analysis should read. Null is everyone, which is the
+   * default and nearly always what happens — the subset exists to see the brief
+   * without an outlier or a duplicate, not as a routine step, so it stays out
+   * of the way until somebody opens it.
+   */
+  const [only, setOnly] = useState<string[] | null>(null);
+  const [picking, setPicking] = useState(false);
 
-  const run = (fn: () => Promise<{ ok: boolean; error?: string }>, message: string) =>
+  /* `onRefused` lets a caller treat a refusal as a step rather than a failure —
+     deleting a response a confirmed brief read comes back refused the first
+     time, with the reason, and the second press goes through. */
+  const run = (
+    fn: () => Promise<{ ok: boolean; error?: string }>,
+    message: string,
+    onRefused?: () => void,
+  ) =>
     start(async () => {
       setError(null);
       const result = await fn();
       if (!result.ok) {
         setError(result.error ?? 'That did not work.');
+        onRefused?.();
         return;
       }
+      setWarned(null);
       onActed(message);
     });
 
@@ -65,12 +89,50 @@ export default function ProjectSheet({
               <b>{p.action.say}</b> {p.action.emphasis}
             </p>
             <p className="when">{p.action.when}</p>
+            {/* which answers this reads. Hidden until asked for, because the
+                answer is "all of them" almost every time. */}
+            {p.people.length > 1 && (
+              <div className="whoreads">
+                {picking ? (
+                  <>
+                    <p className="hintline">Read the answers of:</p>
+                    {p.people.map((person) => {
+                      const on = only === null || only.includes(person.id);
+                      return (
+                        <label key={person.id} className="pickwho">
+                          <input
+                            type="checkbox"
+                            checked={on}
+                            onChange={() => {
+                              const base = only ?? p.people.map((x) => x.id);
+                              const next = on
+                                ? base.filter((id) => id !== person.id)
+                                : [...base, person.id];
+                              /* everyone selected is the same as no selection —
+                                 keep it null so the brief records it that way */
+                              setOnly(next.length === p.people.length ? null : next);
+                            }}
+                          />
+                          <span>{person.name}</span>
+                        </label>
+                      );
+                    })}
+                  </>
+                ) : (
+                  <button className="linky" onClick={() => setPicking(true)}>
+                    {only
+                      ? `Reading ${only.length} of ${p.people.length} answers — change`
+                      : 'Choose whose answers to read'}
+                  </button>
+                )}
+              </div>
+            )}
             <button
               className="btn btn-primary btn-sm"
-              disabled={pending}
+              disabled={pending || only?.length === 0}
               onClick={() =>
                 run(
-                  () => closeCollection(p.surveyId!),
+                  () => closeCollection(p.surveyId!, only ?? undefined),
                   `Collection closed · ปิดรับคำตอบแล้ว`,
                 )
               }
@@ -143,10 +205,25 @@ export default function ProjectSheet({
         {p.people.length ? (
           <>
             <div className="pd-people">
-              {p.people.map((person, i) => (
-                <div className="person" key={`${person.name}-${i}`}>
+              {p.people.map((person) => (
+                <div className="person" key={person.id}>
                   <b>{person.name}</b>
                   <span className="role">{person.email || 'no email given'}</span>
+                  {/* a duplicate submission, or a test one. Two presses when a
+                      confirmed brief read it — the first says what would go. */}
+                  <button
+                    className="drop"
+                    disabled={pending}
+                    onClick={() =>
+                      run(
+                        () => deleteResponse(person.id, warned === person.id),
+                        `${person.name}'s answers deleted.`,
+                        () => setWarned(person.id),
+                      )
+                    }
+                  >
+                    {warned === person.id ? 'Delete anyway' : 'Delete'}
+                  </button>
                 </div>
               ))}
             </div>

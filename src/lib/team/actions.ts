@@ -6,13 +6,15 @@ import { revalidatePath } from 'next/cache';
 import { auth } from '@/auth';
 import { getDb } from '@/lib/db';
 import {
+  PACKAGES,
+  answers,
   briefs,
   clients,
   projects,
   questionBlocks,
   questions,
+  responses,
   surveys,
-  PACKAGES,
   type Package,
 } from '@/lib/db/schema';
 import { CURRENT_QUESTION_VERSION, PACKAGE_BLOCKS } from '@/lib/survey/packages';
@@ -111,7 +113,13 @@ export async function createSurvey(formData: FormData): Promise<ActionResult> {
  * right people beat ten from the wrong ones. Nothing closes on a timer; the app
  * only ever asks.
  */
-export async function closeCollection(surveyId: string): Promise<ActionResult> {
+/**
+ * `only` names the responses to analyse. Omitted means all of them, which is the
+ * default and nearly always what happens — the subset exists so the team can
+ * see the brief without an outlier or a duplicate submission, not as a routine
+ * step.
+ */
+export async function closeCollection(surveyId: string, only?: string[]): Promise<ActionResult> {
   const userId = await actingUser();
   const db = await getDb();
 
@@ -146,7 +154,7 @@ export async function closeCollection(surveyId: string): Promise<ActionResult> {
   const { buildTranscript } = await import('@/lib/analysis/transcript');
   const { analyse } = await import('@/lib/analysis/run');
 
-  const { transcript, respondentCount } = await buildTranscript(survey.id);
+  const { transcript, respondentCount, sources } = await buildTranscript(survey.id, only);
 
   if (respondentCount === 0) {
     revalidatePath('/');
@@ -169,6 +177,7 @@ export async function closeCollection(surveyId: string): Promise<ActionResult> {
   }
 
   await db.insert(briefs).values({
+    sources,
     projectId: survey.projectId,
     content: result.brief,
   });
@@ -183,7 +192,7 @@ export async function closeCollection(surveyId: string): Promise<ActionResult> {
  * overwriting: a confirmed brief is a record of what a person approved, and
  * replacing it in place would rewrite that record.
  */
-export async function reanalyse(projectId: string): Promise<ActionResult> {
+export async function reanalyse(projectId: string, only?: string[]): Promise<ActionResult> {
   await actingUser();
   const db = await getDb();
 
@@ -207,7 +216,7 @@ export async function reanalyse(projectId: string): Promise<ActionResult> {
   const { buildTranscript } = await import('@/lib/analysis/transcript');
   const { analyse } = await import('@/lib/analysis/run');
 
-  const { transcript, respondentCount } = await buildTranscript(row.survey.id);
+  const { transcript, respondentCount, sources } = await buildTranscript(row.survey.id, only);
   if (respondentCount === 0) return { ok: false, error: 'Nobody answered this survey.' };
 
   const result = await analyse({
@@ -219,7 +228,7 @@ export async function reanalyse(projectId: string): Promise<ActionResult> {
 
   if (!result.ok) return { ok: false, error: result.error };
 
-  await db.insert(briefs).values({ projectId, content: result.brief });
+  await db.insert(briefs).values({ projectId, content: result.brief, sources });
 
   revalidatePath('/');
   return { ok: true };
@@ -395,4 +404,51 @@ export async function readBriefVersion(briefId: string) {
   const db = await getDb();
   const [row] = await db.select().from(briefs).where(eq(briefs.id, briefId)).limit(1);
   return row ? (row.content as import('@/lib/analysis/schema').Brief) : null;
+}
+
+/**
+ * Delete one client's response.
+ *
+ * Two presses when a confirmed brief was built from it. The first reports what
+ * would go — deleting the evidence under work somebody has signed their name to
+ * should not happen because a Delete button was next to the wrong row. The
+ * brief keeps its snapshotted source names either way, so what it says stays
+ * readable after the response is gone.
+ *
+ * Answers go first: `answers.question_id` has no cascade, and orphaning them
+ * would leave rows pointing at a response that no longer exists.
+ */
+export async function deleteResponse(
+  responseId: string,
+  confirm?: boolean,
+): Promise<ActionResult> {
+  await actingUser();
+  const db = await getDb();
+
+  const [row] = await db.select().from(responses).where(eq(responses.id, responseId)).limit(1);
+  if (!row) return { ok: false, error: 'No such response.' };
+
+  const [survey] = await db.select().from(surveys).where(eq(surveys.id, row.surveyId)).limit(1);
+  if (!survey) return { ok: false, error: 'No such survey.' };
+
+  if (!confirm) {
+    const signed = (
+      await db.select().from(briefs).where(eq(briefs.projectId, survey.projectId))
+    ).filter((b) => b.confirmedAt && b.sources?.some((x) => x.id === responseId));
+
+    if (signed.length) {
+      return {
+        ok: false,
+        error:
+          `${row.respondentName}'s answers were read by a confirmed brief. ` +
+          `Deleting them leaves that brief citing somebody whose answers are gone. Press again to delete.`,
+      };
+    }
+  }
+
+  await db.delete(answers).where(eq(answers.responseId, responseId));
+  await db.delete(responses).where(eq(responses.id, responseId));
+
+  revalidatePath('/');
+  return { ok: true };
 }
