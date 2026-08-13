@@ -31,6 +31,7 @@
   /* the neutral control fill — an icon button with no label to carry it */
   --fill: #dedee1;
   --fill-deep: #d4d4d8;
+  --fill-press: #c8c8cd;
   /* the glyph that sits on that fill — ink-3 is tuned to the page, and on a
      grey disc it measures 3.83:1 and reads pale. This is 4.92:1 there. */
   --glyph: #5c5c61;
@@ -2860,8 +2861,8 @@ dialog::backdrop {
  * object, which is what carries the meaning here. The disc itself is 1.23:1
  * against the page and is not asked to carry any.
  */
-.okback {
-  display: none;
+.okback,
+.deck-nav button {
   place-items: center;
   width: 52px;
   height: 52px;
@@ -2873,11 +2874,31 @@ dialog::backdrop {
   cursor: pointer;
   transition:
     background-color 0.18s,
-    color 0.18s;
+    color 0.18s,
+    transform 0.12s var(--ease);
+}
+.okback {
+  display: none;
+}
+
+/**
+ * Pressed.
+ *
+ * A phone has no hover, so without this the only feedback for a tap was the
+ * screen changing — which on a slow connection is not immediate and not
+ * obviously caused by the tap. The fill goes one step deeper than hover and the
+ * disc shrinks, the same 0.95 the primary button uses.
+ */
+.okback:active,
+.deck-nav button:not(:disabled):active {
+  background: var(--fill-press);
+  color: var(--ink);
+  transform: scale(0.95);
 }
 @media (hover: hover) {
   /* a filled control deepens its own fill — DESIGN.md section 5, Hover */
-  .okback:hover {
+  .okback:hover,
+  .deck-nav button:not(:disabled):hover {
     background: var(--fill-deep);
     color: var(--ink);
   }
@@ -2901,7 +2922,8 @@ dialog::backdrop {
   bottom: 20px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  /* two discs at 2px read as one pill with a crease */
+  gap: 8px;
   z-index: 20;
 }
 /* The column is 660px centred, so its right edge is 50% + 330px. The pair sits
@@ -2929,22 +2951,26 @@ dialog::backdrop {
  * capsule, but pearl on parchment is nearly invisible and the survey's page is
  * flat — the hairline is what carries the shape here.
  */
+/**
+ * The stepper is the same disc as the back control — one icon button in the
+ * product, not two that resemble each other. It was a bare glyph that grew a
+ * ring on hover, which meant a pointer device had to find it before it looked
+ * like anything.
+ *
+ * Smaller, though. 52px is a thumb; this pair only ever exists on a pointer
+ * device — it is hidden below 620px, where swiping does the same job — and a
+ * cursor lands inside 40px without aiming. The glyph scales with the disc so
+ * the mark keeps its proportions rather than growing chunky in a smaller
+ * circle.
+ */
 .deck-nav button {
   display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  /* No container until it is wanted. Scrolling is the navigation here and these
-     are the second way of doing it, so at rest they are a glyph and nothing
-     else. The 44px box stays for the pointer. */
-  border: 1px solid transparent;
-  border-radius: var(--r-pill);
-  background: transparent;
-  color: var(--ink-3);
-  cursor: pointer;
-  transition:
-    border-color 0.18s,
-    color 0.18s;
+  width: 40px;
+  height: 40px;
+}
+.deck-nav button svg {
+  width: 18px;
+  height: 18px;
 }
 
 
@@ -2952,10 +2978,7 @@ dialog::backdrop {
   /* the same hover every other quiet control has: the line darkens to ink-3
      and the glyph to ink. No fill arrives — that was one property more than
      anything else in the system changes. */
-  .deck-nav button:hover {
-    border-color: var(--ink-3);
-    color: var(--ink);
-  }
+
 }
 /**
  * The way back to the send screen, while somebody is out fixing one answer.

@@ -33,6 +33,7 @@ Adopted from the source almost unchanged. One accent, no gradients, no decorativ
 --surface-pearl    #fafafc   /* ghost button fill */
 --surface-fill     #dedee1   /* icon-button fill */
 --surface-fill-deep #d4d4d8  /* its hover */
+--surface-fill-press #c8c8cd /* its press */
 --glyph            #5c5c61   /* an icon sitting on that fill */
 --surface-tile-1   #272729   /* dark tile */
 --surface-black    #000000   /* true void — rare */
@@ -267,7 +268,9 @@ Where a primary sits beside a secondary on a phone's floor, the primary takes al
 
 And its fill depends on the surface beneath it. Pearl was chosen against the team app's parchment page; on the client survey's flat page, pearl is all but invisible, so the quiet action there is `--canvas` with a 1px `--hairline` and an `--ink-muted-48` glyph. Same object, same weight, different ground.
 
-**Icon button — a filled disc.** 52px, `pill` radius, `--surface-fill`, **no border**, `--glyph` chevron. Hover deepens the fill to `--surface-fill-deep` and takes the glyph to `--ink`, per the rule below. This is the survey's back control, everywhere it appears.
+**Icon button — a filled disc.** `pill` radius, `--surface-fill`, **no border**, `--glyph` chevron. **52px where a thumb uses it** — the survey's back control, everywhere it appears — and **40px where only a cursor does**, which is the deck's stepper pair, hidden below 620px because swiping already does its job. The glyph scales with the disc (24px at 52, 18px at 40) so the mark holds its proportions instead of growing chunky in a smaller circle.
+
+Three states, no others: hover deepens the fill to `--surface-fill-deep` and takes the glyph to `--ink`; **press** deepens it again to `--surface-fill-press` and shrinks the disc to `scale(0.95)`, the same value the primary button uses. Press matters more here than anywhere else in the system — a touch device has no hover, so without it the only feedback for a tap is the screen changing, which on a poor connection is neither immediate nor obviously caused by the tap.
 
 **The chevron.** 2.5px stroke, round cap and join, **arms at 45° — a right angle between them, 9 wide to 18 tall** — drawn about **a third of the height of the control** it sits in. One geometry, used by every chevron in the product.
 
@@ -275,13 +278,13 @@ And its fill depends on the surface beneath it. Pearl was chosen against the tea
 
 **Corrected 13 August 2026.** This first went 1px the other way, reasoning that the round join fuses two strokes and concentrates ink at the apex. It does, but the effect is far smaller than the area the open end covers, and moving away from the point is the wrong direction twice over: it worsens the clock hand. Judged against a centre line at 1, 0, -1, -1.5, -2 and -2.5 — at 0 the apex sits on the line, and by -2 the mark has visibly overshot. It was a 1.27px hairline at half that presence, which reads as a lighter grey than it is set in, because a hair of a line does; and it opened to about 100°, which was an estimate read off a picture rather than the proportion UIKit actually holds.
 
-`--glyph` exists because `--ink-muted-48` is tuned to the page: on a grey disc it measures 3.83:1 and looks pale. `--glyph` is 4.92:1 there, clearing even the text floor. On the page — the bare stepper — `--ink-muted-48` is still correct. Same object, different ground, again.
+`--glyph` exists because `--ink-muted-48` is tuned to the page: on a grey disc it measures 3.83:1 and looks pale. `--glyph` is 4.92:1 there, clearing even the text floor, and 3.96:1 on the pressed fill. Every chevron in the product now sits on that fill, so `--glyph` is the only value they take.
 
 **Corrected 13 August 2026.** It was the quiet secondary above — `--canvas` inside a hairline. White inside a thin line on an almost-white page gives a control a boundary and no body: the ring reads as the object and the glyph sits in a hole. A control with no label has only its shape to be recognised by, so it gets a shape. It stays quieter than the accented action beside it because it is grey, not because it is barely there.
 
 The glyph measures **3.83:1** on the fill — above the 3:1 floor for a graphical object, which is the thing carrying the meaning. The disc is 1.23:1 against the page and is not asked to carry any.
 
-**The chevron pair is not this.** The stepper on a pointer device stays a bare glyph with no container until hover, because it duplicates a gesture the scroll already offers. Giving it a disc would make the second way of doing something look as loud as the first.
+**Corrected 13 August 2026 — the stepper is this too.** It was specified here as the exception: a bare glyph with no container until hover, on the grounds that it duplicates a gesture the scroll already offers and should not look as loud as the first way. What that produced was a control a pointer had to find before it looked like anything. Quieter is a matter of *size*, not of withholding the shape — so it is the same disc at 40px, and there is one icon button in this product rather than two that resemble each other.
 
 **Dark utility** — `--ink` fill, white text, `caption` (14px), `sm` radius (8px), padding `8px 15px`. Neutral commits in the team app.
 
