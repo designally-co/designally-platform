@@ -456,9 +456,16 @@ function ScaleAnswer({ question, value, onChange, total }: Props) {
     });
 
   return (
-    <div className="sq">
-      <Heading question={question} total={total} />
-      <Alt question={question} />
+    <div className="sq scalesq">
+      {/* Ten scales sharing one rating is a battery, not ten questions: it is
+          answered by calibrating once and rating quickly. So they stay on one
+          slide and the question stays pinned while they scroll under it —
+          rating the eighth pair with no idea what is being rated is the failure
+          mode this avoids. */}
+      <div className="scalehead">
+        <Heading question={question} total={total} />
+        <Alt question={question} />
+      </div>
       {pairs.map((p, i) => (
         <div className="scale" key={`${p.left_en}-${p.right_en}`}>
           <div className="poles" id={`pole-${question.ref}-${i}`}>
