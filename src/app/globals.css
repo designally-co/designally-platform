@@ -2636,19 +2636,41 @@ dialog::backdrop {
 
 @media (max-width: 620px) {
   .slide {
-    padding: 60px 22px 104px;
+    /* the 104px here cleared the corner chevrons, which a phone does not show —
+       the action sits near the floor instead of hovering above dead ground */
+    padding: 56px 22px 28px;
   }
   /* The reference puts the phone's controls on the floor of the slide: a back
-     arrow beside a wide OK. Swiping already moves between questions, so the
+     arrow beside a wide OK, in the same place on every question, so the thumb
+     never hunts. The content takes the space above and centres in it; the
+     action is pushed down by an auto margin rather than being fixed, so a slide
+     taller than the viewport still ends with its button instead of covering
+     the last thing on it. Swiping already moves between questions, so the
      corner chevron pair is redundant chrome here and goes. */
   .deck-nav {
     display: none;
+  }
+  .slide {
+    align-items: stretch;
+  }
+  .slidebody {
+    display: flex;
+    flex-direction: column;
+  }
+  .slidemain {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 0;
   }
   .okback {
     display: grid;
   }
   .okrow {
     gap: 10px;
+    margin-top: auto;
+    padding-top: 26px;
   }
   .btn.ok {
     flex: 1;
@@ -2657,6 +2679,18 @@ dialog::backdrop {
   }
   .okhint {
     display: none;
+  }
+  /* Start, Send answers and the thank-you's action get the same floor, and the
+     line that belongs to each sits above it rather than under the fold. */
+  .btn.start {
+    order: 2;
+    width: 100%;
+    min-height: 52px;
+    margin: 0;
+  }
+  .takes {
+    order: 1;
+    margin: auto 0 14px;
   }
   .savednote {
     display: none;

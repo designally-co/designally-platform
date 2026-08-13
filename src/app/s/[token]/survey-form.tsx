@@ -319,9 +319,10 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
         <div className="survey-shell client-surface">
           <div className="slide">
             <div className="slidebody">
-              <div className="done-mark" aria-hidden="true">
-                ✓
-              </div>
+              <div className="slidemain">
+                <div className="done-mark" aria-hidden="true">
+                  ✓
+                </div>
               <h1>
                 Thank you, <em>{submitted}</em>.
               </h1>
@@ -329,9 +330,10 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                 Your answers are with the Designally team. We&apos;ll bring every perspective
                 together and see you at the kick-off meeting.
               </p>
-              <p className="introth th">
-                คำตอบของคุณถูกส่งถึงทีมแล้ว แล้วพบกันในการประชุมเริ่มโปรเจกต์
-              </p>
+                <p className="introth th">
+                  คำตอบของคุณถูกส่งถึงทีมแล้ว แล้วพบกันในการประชุมเริ่มโปรเจกต์
+                </p>
+              </div>
               <button className="btn btn-quiet start" onClick={answerAsSomeoneElse}>
                 Answer as another stakeholder
               </button>
@@ -353,7 +355,8 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
         <div className="deck" ref={deck}>
           <section className="slide" data-slide={WELCOME}>
             <div className="slidebody">
-              <h1>Let&apos;s shape your brand, together.</h1>
+              <div className="slidemain">
+                <h1>Let&apos;s shape your brand, together.</h1>
               <p className="intro">
                 This questionnaire helps our team understand your brand before we begin designing.
                 There are no wrong answers.
@@ -361,9 +364,10 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
               {/* The two screens with no per-question reveal keep their Thai
                   line, so a Thai-only reader is never stranded at the moment
                   they decide to start or to send. */}
-              <p className="introth th">
-                แบบสอบถามนี้ช่วยให้ทีมเข้าใจแบรนด์ของคุณก่อนเริ่มออกแบบ ไม่มีคำตอบที่ผิด
-              </p>
+                <p className="introth th">
+                  แบบสอบถามนี้ช่วยให้ทีมเข้าใจแบรนด์ของคุณก่อนเริ่มออกแบบ ไม่มีคำตอบที่ผิด
+                </p>
+              </div>
 
               <button className="btn btn-ink start" onClick={() => goTo(1)} disabled={!ready}>
                 {started ? 'Continue' : 'Start'}
@@ -381,7 +385,8 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
             return (
               <section className="slide" data-slide={n} key={n}>
                 <div className="slidebody">
-                  {card.kind === 'fields' ? (
+                  <div className="slidemain">
+                    {card.kind === 'fields' ? (
                     <div className="identitygrid">
                       {card.questions.map((q) => (
                         <div key={q.ref}>
@@ -400,14 +405,15 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                         </div>
                       ))}
                     </div>
-                  ) : (
-                    <Question
-                      question={card.question}
-                      value={values[card.question.ref]}
-                      onChange={(v) => setValue(card.question.ref, v)}
-                      onEnter={() => goTo(n + 1)}
-                    />
-                  )}
+                    ) : (
+                      <Question
+                        question={card.question}
+                        value={values[card.question.ref]}
+                        onChange={(v) => setValue(card.question.ref, v)}
+                        onEnter={() => goTo(n + 1)}
+                      />
+                    )}
+                  </div>
                   <Ok
                     onClick={() => goTo(n + 1)}
                     onBack={() => goTo(n - 1)}
@@ -420,7 +426,8 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
 
           <section className="slide" data-slide={LAST}>
             <div className="slidebody">
-              <h2>Ready to send</h2>
+              <div className="slidemain">
+                <h2>Ready to send</h2>
               {blanks.length === 0 ? (
                 <>
                   <p className="intro">Every question is answered.</p>
@@ -445,7 +452,8 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                   </ul>
                 </>
               )}
-              {error && <p className="qwarn">{error}</p>}
+                {error && <p className="qwarn">{error}</p>}
+              </div>
               <button className="btn btn-primary start" onClick={submit} disabled={submitting}>
                 {submitting ? 'Sending' : 'Send answers'}
               </button>
