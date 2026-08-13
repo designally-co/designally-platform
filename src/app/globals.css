@@ -3057,7 +3057,7 @@ dialog::backdrop {
   cursor: default;
 }
 
-.floorblur {
+.floorfade {
   display: none;
 }
 
@@ -3089,7 +3089,7 @@ dialog::backdrop {
   .toreview {
     right: 22px;
   }
-  .floorblur {
+  .floorfade {
     display: block;
   }
   .slide {
@@ -3139,7 +3139,7 @@ dialog::backdrop {
    * It rides `--kb` with the bar, so it stays under the buttons when the
    * keyboard pushes them up.
    */
-  .floorblur {
+  .floorfade {
     position: fixed;
     left: 0;
     right: 0;
@@ -3147,37 +3147,12 @@ dialog::backdrop {
     height: 152px;
     z-index: 14;
     pointer-events: none;
-    background: linear-gradient(
-      to top,
-      color-mix(in srgb, var(--parchment) 92%, transparent) 0%,
-      transparent 62%
-    );
+    /* Opaque at the floor now that no blur is helping it hide anything, and
+       fading to a transparent *parchment* rather than the `transparent`
+       keyword — that keyword is transparent black, and interpolating toward it
+       can lay a grey cast over the middle of the ramp. */
+    background: linear-gradient(to top, var(--parchment) 0%, rgb(245 245 247 / 0) 62%);
   }
-  .floorblur span {
-    position: absolute;
-    inset: 0;
-  }
-  .floorblur span:nth-child(1) {
-    backdrop-filter: blur(1px);
-    -webkit-mask-image: linear-gradient(to top, #000 0%, transparent 45%);
-    mask-image: linear-gradient(to top, #000 0%, transparent 45%);
-  }
-  .floorblur span:nth-child(2) {
-    backdrop-filter: blur(2px);
-    -webkit-mask-image: linear-gradient(to top, #000 0%, transparent 32%);
-    mask-image: linear-gradient(to top, #000 0%, transparent 32%);
-  }
-  .floorblur span:nth-child(3) {
-    backdrop-filter: blur(5px);
-    -webkit-mask-image: linear-gradient(to top, #000 0%, transparent 21%);
-    mask-image: linear-gradient(to top, #000 0%, transparent 21%);
-  }
-  .floorblur span:nth-child(4) {
-    backdrop-filter: blur(11px);
-    -webkit-mask-image: linear-gradient(to top, #000 0%, transparent 11%);
-    mask-image: linear-gradient(to top, #000 0%, transparent 11%);
-  }
-
   /**
    * The controls never belong to a slide.
    *
@@ -3202,20 +3177,6 @@ dialog::backdrop {
     opacity: 0;
     pointer-events: none;
     transition: bottom 0.18s var(--ease);
-    /**
-     * On its own compositing layer, or iOS blurs the controls themselves.
-     *
-     * WebKit promotes a backdrop-filter element to its own layer and composites
-     * it over siblings that have not been promoted — z-index does not arbitrate
-     * between a composited layer and an uncomposited one. The ramp is z-index 14
-     * and these are 15, which is enough in Blink and was not on a real iPhone:
-     * the buttons were being sampled into the blur they are supposed to sit on.
-     *
-     * `will-change` rather than `translateZ(0)`, because the press state owns
-     * the transform property and a promotion written there would be dropped for
-     * the duration of every tap — which is exactly when it must not be.
-     */
-    will-change: transform;
   }
   /* cancels the row's own top padding — it must not reach the button, whose
      11px top is what keeps its label off the ceiling */

@@ -206,7 +206,11 @@ This is not the two-volumes idea in section 7 stretched further. It is a second 
 
 The system's vocabulary is ink, line and surface. Two materials are admitted beyond it, and only for the jobs named here.
 
-**A progressive blur** may sit under a control that content scrolls beneath. Not a single blurred pane — one pane only moves the hard cut to where the blur starts. Stack layers with the radius increasing toward the edge, each masked to a narrower band, so the cut becomes a ramp.
+**A fade** sits under a control that content scrolls beneath: the page's own colour, opaque at the floor, ramping to nothing over about 150px. Not a hard band — that only moves the cut to where the band starts.
+
+**Removed 13 August 2026 — it was a progressive blur.** Four stacked backdrop-filter layers, radius doubling toward the edge, each masked to a narrower strip. On a real iPhone it painted over the buttons and blurred them, and the cause was not the blur. **A `position: fixed` element inside a scrolling container is attached to that scroller's compositing layer**, and the survey's controls live inside the deck; the blur, a sibling of the deck, composited above the entire scroller. z-index does not arbitrate across compositing layers — which is exactly why the send screen, whose controls are not inside the deck, never showed the fault. `will-change: transform` on the controls did not help; it is a hint, and WebKit declined it.
+
+So a blur here costs a structural change: the control row has to be lifted out of the deck to the shell, which on a surface where scrolling *is* the navigation is not a small move. A painted gradient is never promoted to a layer of its own and cannot hit this at all. **If a blur is wanted again, move the controls out of the scroller first.**
 
 **A scrim** may sit under text that falls on imagery, and it must be strong enough to guarantee 4.5:1 against the *palest* image the slot can ever hold — not the ones currently in it. On the mood boards a 0.82 black left the Thai line at 2.84:1; 0.92 gives 5.03:1 and holds whatever the picture does.
 

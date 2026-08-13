@@ -647,12 +647,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
           </div>
 
           {/* the same ramp the deck's controls sit on — the list runs under it */}
-          <div className="floorblur" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-            <span />
-          </div>
+          <div className="floorfade" aria-hidden="true" />
         </div>
       </LangContext.Provider>
     );
@@ -756,16 +751,22 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
 
         </div>
 
-        {/* The ramp the controls sit on. Four stacked layers, blur doubling
-            downward, each masked to a lower band — a single blurred pane would
-            put a hard horizontal seam across the slide. Purely presentational
-            and never in the way of a tap. */}
-        <div className="floorblur" aria-hidden="true">
-          <span />
-          <span />
-          <span />
-          <span />
-        </div>
+        {/* The ramp the controls sit on: the page's own colour, fading up to
+            nothing, so a question scrolling past does not collide with them.
+
+            It was that gradient plus four stacked backdrop-filter layers. On
+            iOS the blur painted over the buttons and blurred them — and the
+            cause was never the blur. A `position: fixed` element inside a
+            scrolling container is attached to that scroller's compositing
+            layer, and these controls live inside the deck; the blur, a sibling
+            of the deck, composited above the whole scroller. z-index does not
+            arbitrate across that, which is why the send screen — whose controls
+            are not inside the deck — was always fine.
+
+            A painted gradient is not promoted to a layer of its own, so it
+            cannot hit this. The fade survives; the blur was the part that could
+            not be had without moving the controls out of the deck. */}
+        <div className="floorfade" aria-hidden="true" />
 
 
         <nav className="deck-nav" aria-label="Move between questions">
