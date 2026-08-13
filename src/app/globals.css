@@ -28,6 +28,9 @@
   --canvas: #ffffff;
   --parchment: #f5f5f7;
   --pearl: #fafafc;
+  /* the neutral control fill — an icon button with no label to carry it */
+  --fill: #dedee1;
+  --fill-deep: #d4d4d8;
   --tile: #272729;
 
   /* line */
@@ -2841,24 +2844,38 @@ dialog::backdrop {
  * slide (DESIGN.md §8), so back steps down to an outline: the hairline and the
  * muted chevron say it is available without asking to be pressed.
  */
+/**
+ * Back — a filled disc, not an outlined one.
+ *
+ * It was `--canvas` inside a hairline, the same object as the quiet secondary
+ * elsewhere. White inside a thin line on an almost-white page gave it a
+ * boundary and no body: the ring read as the control and the glyph sat in a
+ * hole. A soft fill gives it a shape at a glance, and it stays quieter than the
+ * accented action beside it because it is grey, not because it is barely there.
+ *
+ * The glyph measures 3.83:1 on this fill — above the 3:1 floor for a graphical
+ * object, which is what carries the meaning here. The disc itself is 1.23:1
+ * against the page and is not asked to carry any.
+ */
 .okback {
   display: none;
   place-items: center;
   width: 52px;
   height: 52px;
   flex: 0 0 auto;
-  border: 1px solid var(--hairline);
+  border: 0;
   border-radius: var(--r-pill);
-  background: var(--canvas);
+  background: var(--fill);
   color: var(--ink-3);
   cursor: pointer;
   transition:
-    border-color 0.18s,
+    background-color 0.18s,
     color 0.18s;
 }
 @media (hover: hover) {
+  /* a filled control deepens its own fill — DESIGN.md section 5, Hover */
   .okback:hover {
-    border-color: var(--ink-3);
+    background: var(--fill-deep);
     color: var(--ink);
   }
 }

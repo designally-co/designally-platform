@@ -31,6 +31,8 @@ Adopted from the source almost unchanged. One accent, no gradients, no decorativ
 --canvas           #ffffff   /* raised: cards, sheets, inputs */
 --canvas-parchment #f5f5f7   /* the page */
 --surface-pearl    #fafafc   /* ghost button fill */
+--surface-fill     #dedee1   /* icon-button fill */
+--surface-fill-deep #d4d4d8  /* its hover */
 --surface-tile-1   #272729   /* dark tile */
 --surface-black    #000000   /* true void — rare */
 
@@ -262,7 +264,15 @@ Where a primary sits beside a secondary on a phone's floor, the primary takes al
 
 **Corrected 13 August 2026, twice over.** Its radius was `md` (11px), which contradicts the rule in section 3 that anything reading as an action is a pill — and a quiet secondary action is still an action. It is `pill`.
 
-And its fill depends on the surface beneath it. Pearl was chosen against the team app's parchment page; on the client survey's flat page, pearl is all but invisible, so the quiet action there is `--canvas` with a 1px `--hairline` and an `--ink-muted-48` glyph. Same object, same weight, different ground. The survey's back arrow and its chevron pair are both this.
+And its fill depends on the surface beneath it. Pearl was chosen against the team app's parchment page; on the client survey's flat page, pearl is all but invisible, so the quiet action there is `--canvas` with a 1px `--hairline` and an `--ink-muted-48` glyph. Same object, same weight, different ground.
+
+**Icon button — a filled disc.** 52px, `pill` radius, `--surface-fill`, **no border**, `--ink-muted-48` glyph. Hover deepens the fill to `--surface-fill-deep` and takes the glyph to `--ink`, per the rule below. This is the survey's back control, everywhere it appears.
+
+**Corrected 13 August 2026.** It was the quiet secondary above — `--canvas` inside a hairline. White inside a thin line on an almost-white page gives a control a boundary and no body: the ring reads as the object and the glyph sits in a hole. A control with no label has only its shape to be recognised by, so it gets a shape. It stays quieter than the accented action beside it because it is grey, not because it is barely there.
+
+The glyph measures **3.83:1** on the fill — above the 3:1 floor for a graphical object, which is the thing carrying the meaning. The disc is 1.23:1 against the page and is not asked to carry any.
+
+**The chevron pair is not this.** The stepper on a pointer device stays a bare glyph with no container until hover, because it duplicates a gesture the scroll already offers. Giving it a disc would make the second way of doing something look as loud as the first.
 
 **Dark utility** — `--ink` fill, white text, `caption` (14px), `sm` radius (8px), padding `8px 15px`. Neutral commits in the team app.
 
