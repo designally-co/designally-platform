@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 
 import type { QuestionConfig } from '@/lib/db/schema';
 import type { RawValue } from '@/lib/survey/answers';
@@ -88,6 +88,30 @@ function Alt({ question }: { question: SurveyQuestion }) {
   );
 }
 
+/**
+ * Grow the field to fit what is in it, up to the ceiling CSS sets.
+ *
+ * This was `field-sizing: content`, which Chrome supports and **Safari does
+ * not** — so on the iPhones most of this survey is answered on, a 552-character
+ * brand story sat in a 58px box with fourteen lines hidden inside it, scrolling
+ * a one-line slot. Measured, not assumed.
+ *
+ * Height is cleared before reading scrollHeight so the field shrinks when text
+ * is deleted, and `max-height` in CSS caps it at about half the screen; past
+ * that the field scrolls internally and the question above and the button below
+ * stop moving.
+ */
+function useAutosize(value: string) {
+  const ref = useRef<HTMLTextAreaElement | null>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  }, [value]);
+  return ref;
+}
+
 /* ── paragraph and short_text ─────────────────────────────────────── */
 
 function TextAnswer({ question, value, onChange, onEnter, total }: Props) {
@@ -97,8 +121,14 @@ function TextAnswer({ question, value, onChange, onEnter, total }: Props) {
   const t = useText();
   const placeholder = t('Type your answer here...', 'พิมพ์คำตอบของคุณที่นี่...');
 
+  const box = useAutosize(text);
+
   const advance = (e: React.KeyboardEvent) => {
     if (e.key !== 'Enter' || e.shiftKey) return;
+    /* On a touch keyboard Return is how you make a line break, and there is no
+       Shift to hold. Enter only advances where a real keyboard is attached —
+       which is also the only place the hint beside OK is shown. */
+    if (long && window.matchMedia('(pointer: coarse)').matches) return;
     e.preventDefault();
     (e.target as HTMLElement).blur();
     onEnter?.();
@@ -113,6 +143,7 @@ function TextAnswer({ question, value, onChange, onEnter, total }: Props) {
       {long ? (
         <textarea
           id={id}
+          ref={box}
           className="textarea"
           rows={1}
           value={text}

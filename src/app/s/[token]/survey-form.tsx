@@ -231,6 +231,31 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
    * position is theirs to set and ours to follow; a `step` that tried to drive
    * the scroller would fight every swipe.
    */
+  /**
+   * How much of the screen the phone keyboard is covering, as a CSS variable.
+   *
+   * The visual viewport shrinks when the keyboard opens; the layout viewport
+   * does not. Measuring the difference is the only way to keep the OK button
+   * sitting on top of the keyboard rather than underneath it — and OK is the
+   * one control on the slide, so losing it mid-answer strands the respondent.
+   */
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => {
+      const covered = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      document.documentElement.style.setProperty('--kb', `${Math.round(covered)}px`);
+    };
+    update();
+    vv.addEventListener('resize', update);
+    vv.addEventListener('scroll', update);
+    return () => {
+      vv.removeEventListener('resize', update);
+      vv.removeEventListener('scroll', update);
+      document.documentElement.style.removeProperty('--kb');
+    };
+  }, []);
+
   const goTo = useCallback((index: number) => {
     const el = deck.current?.querySelector<HTMLElement>(`[data-slide="${index}"]`);
     el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -383,7 +408,12 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
           {cards.map((card, i) => {
             const n = i + 1;
             return (
-              <section className="slide" data-slide={n} key={n}>
+              <section
+                className="slide"
+                data-slide={n}
+                data-active={step === n ? '' : undefined}
+                key={n}
+              >
                 <div className="slidebody">
                   <div className="slidemain">
                     {card.kind === 'fields' ? (

@@ -2511,10 +2511,15 @@ dialog::backdrop {
   color: var(--ink);
   transition: border-color 0.18s;
 }
+/* Grows with its content (useAutosize) to about half the screen, then scrolls
+   inside itself so the question above and OK below stop moving. field-sizing
+   is deliberately not used: Safari does not support it, and this survey is
+   mostly answered on iPhones. */
 .slide .textarea {
   min-height: 58px;
+  max-height: 46dvh;
+  overflow-y: auto;
   resize: none;
-  field-sizing: content;
 }
 .slide .input:focus,
 .slide .textarea:focus {
@@ -2713,6 +2718,27 @@ dialog::backdrop {
     gap: 10px;
     margin-top: auto;
     padding-top: 26px;
+  }
+  /**
+   * On the slide being answered, the controls ride above the keyboard.
+   *
+   * `--kb` is how much of the screen the keyboard is covering, measured from
+   * the visual viewport. Only the active slide is fixed — twenty-one fixed
+   * rows would stack on top of each other — and the slide reserves the room
+   * below so a long slide's last item can still scroll clear of the bar.
+   */
+  .slide[data-active] .okrow {
+    position: fixed;
+    left: 22px;
+    right: 22px;
+    bottom: calc(var(--kb, 0px) + 22px);
+    z-index: 15;
+    margin: 0;
+    padding-top: 0;
+    transition: bottom 0.18s var(--ease);
+  }
+  .slide {
+    padding-bottom: 104px;
   }
   .btn.ok {
     flex: 1;
