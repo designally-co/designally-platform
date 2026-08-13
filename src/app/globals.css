@@ -2574,48 +2574,34 @@ dialog::backdrop {
  * top offset — it sits on the first line's own baseline whatever the type size
  * or the language does.
  */
-.slide .sq {
-  position: relative;
-  padding-left: 56px;
-}
 /**
- * The question number is a tag, and tags are pills (DESIGN.md §5).
+ * The question number is a line of text above the question, not an object
+ * beside it.
  *
- * It was a solid ink block, which made a label look like a control and gave
- * the loudest mark on the slide to the least important thing on it. Quiet now:
- * white on the flat page, a hairline, muted ink.
+ * It has been an ink block, an 8px block, a filled pill and an outlined pill,
+ * and every one of those needed the same machinery to keep the question's text
+ * aligned with the answer beneath it: a fixed 40px width, a -56px margin, and
+ * the identity margin-left + width + margin-right = 0. That arithmetic produced
+ * three separate defects — "1/21" ten pixels left of "10/21" because the width
+ * was content-sized, no padding on the phone so the digits touched the curve,
+ * and a hanging indent a seventh of a phone wide.
  *
- * Not the neutral tag's documented fill. `--divider-soft` under
- * `--ink-muted-48` measures 4.45:1, just under the 4.5:1 this product commits
- * to, and 12px is not large text. On white the same ink measures 5.07:1.
+ * As a line of its own it needs none of it. Question, help, reveal, answer and
+ * the button all start at the container's edge because nothing is pulled out of
+ * it, and the desktop and the phone stop being two layouts.
  *
- * A fixed width, not a content width: the hang only lands on the text edge if
- * margin-left + width + margin-right is exactly zero, and "1/21" is narrower
- * than "10/21" — a content-width tag would put question 1 ten pixels left of
- * question 10. 40px holds the widest case, 21/21.
+ * It is an eyebrow above a heading, which is usually a defect. It earns its
+ * place because position within twenty-one is something the person answering
+ * needs to know, not a label put there for decoration.
  */
 .qnum {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 22px;
-  padding: 0;
-  margin-left: -56px;
-  margin-right: 16px;
-  border-radius: var(--r-pill);
-  border: 1px solid var(--hairline);
-  background: var(--canvas);
+  display: block;
+  margin-bottom: 9px;
   color: var(--ink-3);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 400;
   letter-spacing: 0.01em;
-  line-height: 1;
-  vertical-align: 4px;
-}
-/* OK sits under the answer it belongs to, on the same edge */
-.slidebody:has(.qnum) .okrow {
-  padding-left: 56px;
+  line-height: 1.4;
 }
 .slide .qhelp {
   display: block;
@@ -2892,26 +2878,6 @@ dialog::backdrop {
     flex-direction: column;
     justify-content: center;
     min-height: 0;
-  }
-  /* On a phone the badge takes its own line above the question — 34px of
-     hanging indent is a tenth of the screen, and the question needs the width
-     more than the badge needs the margin. Everything then starts at the same
-     edge without any indent at all. */
-  .slide .sq {
-    padding-left: 0;
-  }
-  /* On its own line the tag sizes to its content, and content-width with no
-     padding puts the digits against the curve — a pill with no ends reads as a
-     squashed rectangle. The fixed 40px belongs to the desktop hang, where the
-     arithmetic has to land on the text edge; here nothing depends on it. */
-  .qnum {
-    display: flex;
-    width: fit-content;
-    padding: 0 11px;
-    margin: 0 0 13px;
-  }
-  .slidebody:has(.qnum) .okrow {
-    padding-left: 0;
   }
   .okback {
     display: grid;

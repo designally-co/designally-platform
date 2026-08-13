@@ -357,16 +357,13 @@ The system had no spec for either, which is why the survey's question number mov
 
 **The bar.** 3px, sticky at the top of the scroller, `--divider` track and `--primary` fill. It animates `transform: scaleX()`, never `width` — width relayouts the page, and this moves on all twenty-odd advances. It is hidden on the welcome screen: a bar at zero reads as something broken rather than as nothing yet done.
 
-**The number.** `18/21` in a pill, `--canvas` with a 1px `--hairline`, `--ink-muted-48`, 12px, weight 400.
+**The number.** `6/21` as a line of muted text above the question — `--ink-muted-48`, 13px, weight 400, 9px clear of the heading. No container, no fill, no border, no fixed width, and the same on every breakpoint.
 
-**This element is not from Apple, and that is deliberate.** Apple has no such thing. Its badge means unread or pending — attention, which is the opposite of position — and its answer for "where am I" is the progress indicator alone; its own survey product shows a bar, a question, and no number. The number here is borrowed from Typeform, the reference the client survey's interaction pattern comes from, and it is kept for one reason: twenty-one questions is long enough that people want to know how many are left, and a 3px bar cannot tell them.
+**Why it is not an object.** It has been an ink block, an 8px block, a filled pill and an outlined pill. Every one of those sat beside the question, and every one needed the same machinery to keep the question's own text aligned with the answer beneath it: a fixed width, a negative margin, and the identity `margin-left + width + margin-right = 0`. That arithmetic produced three defects in a day — `1/21` sitting ten pixels left of `10/21` because the width was content-sized, digits touching the curve on the phone because the padding was zero, and a hanging indent a seventh of a phone wide. As a line of its own it needs none of it: the number, the question, its wrapped lines, the help text, the language reveal, the answer and the button all begin at the container's edge because nothing is pulled out of it.
 
-Because it is a label and not a control, it obeys the tag rules absolutely: never filled with ink or the accent, never the loudest thing on the slide. It is the quietest mark on a screen that has only three.
+**This element is not from Apple, and that is deliberate.** Apple has no such thing. Its badge means unread or pending — attention, which is the opposite of position — and its answer for "where am I" is the progress indicator alone; its own survey product shows a bar, a question, and no number. The count is kept because twenty-one questions is long enough that people want to know how many are left, and a 3px bar cannot tell them. As plain text above the heading it is closer to a navigation subtitle than to a badge, which is the nearest thing Apple's system does have.
 
-Two mechanics that are not decoration:
-
-- **Desktop: a fixed 40px width.** It hangs in the left margin so the question, its wrapped lines, the language reveal, the answer and OK all share one left edge. The hang only lands there if `margin-left + width + margin-right` is exactly zero, so a content width — `1/21` is narrower than `10/21` — would put question 1 ten pixels left of question 10.
-- **Mobile: its own line, sized to content with 11px ends.** 56px of hanging indent is a seventh of a phone; the question needs the width more than the badge needs the margin. Content width with no padding puts the digits against the curve, and a pill with no ends is a squashed rectangle.
+It is an eyebrow above a heading, a pattern that is usually a defect. It earns its place under the one condition that redeems it: the sequence itself carries information the reader needs.
 
 ### Sticky bars
 
