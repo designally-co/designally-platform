@@ -136,23 +136,29 @@ textarea {
   background: var(--primary);
   color: #fff;
 }
-.btn-primary:hover {
-  background: var(--primary-deep);
+@media (hover: hover) {
+  .btn-primary:hover {
+    background: var(--primary-deep);
+  }
 }
 .btn-ink {
   background: var(--ink);
   color: #fff;
 }
-.btn-ink:hover {
-  background: #000;
+@media (hover: hover) {
+  .btn-ink:hover {
+    background: #000;
+  }
 }
 .btn-quiet {
   background: transparent;
   border-color: var(--primary);
   color: var(--primary);
 }
-.btn-quiet:hover {
-  background: var(--primary-tint);
+@media (hover: hover) {
+  .btn-quiet:hover {
+    background: var(--primary-tint);
+  }
 }
 .btn[disabled] {
   opacity: 0.5;
@@ -620,8 +626,10 @@ label.f span {
   width: 28px;
   height: 28px;
 }
-.pts button:hover i {
-  border-color: var(--primary);
+@media (hover: hover) {
+  .pts button:hover i {
+    border-color: var(--primary);
+  }
 }
 .pts button[aria-pressed="true"] i {
   background: var(--primary);
@@ -742,8 +750,10 @@ label.f span {
   min-height: 32px;
   cursor: pointer;
 }
-.qlangbtn:hover {
-  border-bottom-color: var(--primary);
+@media (hover: hover) {
+  .qlangbtn:hover {
+    border-bottom-color: var(--primary);
+  }
 }
 .qaltbody {
   display: block;
@@ -792,8 +802,10 @@ label.f span {
   color: var(--ink);
   font-weight: 600;
 }
-.langswitch button:not([aria-pressed='true']):hover {
-  color: var(--ink);
+@media (hover: hover) {
+  .langswitch button:not([aria-pressed='true']):hover {
+    color: var(--ink);
+  }
 }
 .langswitch.big button {
   font-size: 15px;
@@ -998,8 +1010,10 @@ label.f span {
   opacity: 0.45;
   cursor: default;
 }
-.board:has(input:disabled):hover {
-  border-color: var(--hairline);
+@media (hover: hover) {
+  .board:has(input:disabled):hover {
+    border-color: var(--hairline);
+  }
 }
 .board:has(input:focus-visible) {
   outline: 4px solid var(--primary-focus);
@@ -1189,8 +1203,10 @@ label.f span {
   padding: 8px 4px;
   min-height: 44px;
 }
-.linkish:hover {
-  color: var(--ink);
+@media (hover: hover) {
+  .linkish:hover {
+    color: var(--ink);
+  }
 }
 
 .page {
@@ -1354,8 +1370,10 @@ label.f span {
   transition: background 0.18s;
 }
 /* the same white-on-parchment lift used everywhere else — no zebra, no fills */
-.ptable tbody tr:hover {
-  background: var(--canvas);
+@media (hover: hover) {
+  .ptable tbody tr:hover {
+    background: var(--canvas);
+  }
 }
 .ptable td {
   padding: 18px 12px;
@@ -1470,8 +1488,10 @@ label.f span {
   border-radius: var(--r-sm);
   transition: background 0.18s;
 }
-.elsewhere button:hover {
-  background: var(--canvas);
+@media (hover: hover) {
+  .elsewhere button:hover {
+    background: var(--canvas);
+  }
 }
 .elsewhere .et {
   display: block;
@@ -1542,8 +1562,10 @@ dialog::backdrop {
   cursor: pointer;
   transition: border-color 0.18s;
 }
-.sheet-top .x:hover {
-  border-color: var(--ink);
+@media (hover: hover) {
+  .sheet-top .x:hover {
+    border-color: var(--ink);
+  }
 }
 .sheet-body {
   padding: 32px 28px 72px;
@@ -1922,8 +1944,10 @@ dialog::backdrop {
   padding: 10px;
   min-height: 44px;
 }
-.past .o:hover {
-  color: var(--primary);
+@media (hover: hover) {
+  .past .o:hover {
+    color: var(--primary);
+  }
 }
 
 /* ---- what's coming ---- */
@@ -2462,8 +2486,10 @@ dialog::backdrop {
     border-color 0.18s,
     color 0.18s;
 }
-.pts-wide button:hover span {
-  border-color: var(--primary);
+@media (hover: hover) {
+  .pts-wide button:hover span {
+    border-color: var(--primary);
+  }
 }
 .pts-wide button[aria-pressed='true'] span {
   background: var(--primary);
@@ -2651,8 +2677,20 @@ dialog::backdrop {
   margin-top: 34px;
   flex-wrap: wrap;
 }
-/* the pill is the action signal and OK is the action (DESIGN.md §3) */
-.btn.ok {
+/**
+ * The survey's floor action, defined once.
+ *
+ * Start, Continue, Send answers and the thank-you's secondary are the same
+ * object appearing on different slides, so they share one rule. They had drifted
+ * apart — Continue carried its own weight and padding while Start inherited the
+ * base button's, which is 400 against 600 and a different horizontal inset. Two
+ * buttons doing the same job in the same place looked like two components.
+ *
+ * Only the fill varies, and it varies by variant class: accent for the way
+ * forward, ghost for the way sideways.
+ */
+.btn.ok,
+.btn.start {
   padding: 10px 28px;
   font-weight: 600;
 }
@@ -2761,16 +2799,33 @@ dialog::backdrop {
   gap: 1px;
   z-index: 20;
 }
+/**
+ * Quiet, and the same object as the phone's back arrow.
+ *
+ * These were solid ink with white glyphs — the dark utility treatment, which
+ * belongs to neutral commits in the team app, not to moving between questions.
+ * Two pairs of arrows doing one job in two weights across two breakpoints.
+ *
+ * They take the quiet-action treatment instead: canvas, a hairline, a muted
+ * glyph. Pearl rather than canvas would be the letter of section 5's pearl
+ * capsule, but pearl on parchment is nearly invisible and the survey's page is
+ * flat — the hairline is what carries the shape here.
+ */
 .deck-nav button {
   display: grid;
   place-items: center;
   width: 44px;
   height: 44px;
-  border: 0;
-  background: var(--ink);
-  color: var(--on-dark);
+  border: 1px solid var(--hairline);
+  background: var(--canvas);
+  color: var(--ink-3);
   cursor: pointer;
-  transition: opacity 0.18s;
+  transition:
+    border-color 0.18s,
+    color 0.18s;
+}
+.deck-nav button:first-child {
+  border-right: 0;
 }
 .deck-nav button:first-child {
   border-radius: var(--r-pill) 0 0 var(--r-pill);
@@ -2780,11 +2835,15 @@ dialog::backdrop {
   border-radius: 0 var(--r-pill) var(--r-pill) 0;
   padding-right: 4px;
 }
-.deck-nav button:hover {
-  opacity: 0.86;
+@media (hover: hover) {
+  .deck-nav button:hover {
+    border-color: var(--ink-3);
+    color: var(--ink);
+    z-index: 1;
+  }
 }
 .deck-nav button:disabled {
-  opacity: 0.3;
+  opacity: 0.45;
   cursor: default;
 }
 
@@ -2968,10 +3027,13 @@ dialog::backdrop {
   .slide {
     padding-bottom: 104px;
   }
-  .btn.ok {
-    flex: 1;
+  .btn.ok,
+  .btn.start {
     min-height: 52px;
     font-size: 17px;
+  }
+  .btn.ok {
+    flex: 1;
   }
   .okhint {
     display: none;
@@ -2982,7 +3044,6 @@ dialog::backdrop {
     /* the desktop rule sizes it to its label; anchored left and right on the
        phone's floor it has to take the width instead */
     width: auto;
-    min-height: 52px;
   }
   /* the button is out of flow now, so this has to clear the space it occupies */
   .takes {
