@@ -77,8 +77,21 @@ export async function buildTranscript(surveyId: string) {
     byResponse.set(a.responseId, m);
   }
 
+  /**
+   * The identity block is dropped from the transcript entirely.
+   *
+   * Taking the email off the `### heading` line was not enough — it is also
+   * stored as an ordinary answer row, so it came straight back as
+   * "Q: Your email / A: …" and reached the API anyway. The dry run caught it
+   * (`npm run dev:analyse`), which is the whole reason that check exists.
+   *
+   * Nothing is lost. The block is a name and an email: the name is already the
+   * section heading, and the email is contact detail, not evidence.
+   */
+  const evidence = questionRows.filter((q) => blockById.get(q.blockId)?.key !== 'identity');
+
   /* Order questions the way they were asked, block by block. */
-  const ordered = [...questionRows].sort((a, b) => {
+  const ordered = [...evidence].sort((a, b) => {
     const ka = blockById.get(a.blockId)!.key;
     const kb = blockById.get(b.blockId)!.key;
     const bi = survey.blockKeys.indexOf(ka) - survey.blockKeys.indexOf(kb);

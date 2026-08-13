@@ -82,6 +82,8 @@ production bundle and still refuses every other domain.
 | `npm run db:inspect` | print what a survey has collected |
 | `npm run db:reset` | throw the local database away and rebuild it |
 | `npm run db:generate` | regenerate SQL after a schema change |
+| `npm run dev:fixture` | write a synthetic five-respondent survey with deliberately planted findings |
+| `npm run dev:analyse` | run the real analysis against it and print the brief — no team app, nothing stored |
 | `npm run dev:backdate -- <token> <days>` | move a survey back in time, to see the quiet-survey prompt without waiting five days |
 
 **The database.** With `DATABASE_URL` set, everything runs on Neon Postgres through postgres-js — that is what Vercel runs. Without it, the app falls back to [PGlite](https://pglite.dev), real Postgres compiled to WASM, kept in `.pglite/`. Same schema, same migrations, no credentials needed to work on the survey. In production the fallback is refused outright: a serverless instance's `.pglite/` is discarded with the instance, and a client's answers would go nowhere.
@@ -155,11 +157,19 @@ build time.
 
 Confirming the brief and the deck handoff are gates 2 and 3 — milestone 4.
 
-**Not yet validated.** `docs/first-session-brief.md` makes the real ARUN+ (28 responses,
-6 departments) and PCE-TH data the acceptance test: the brief must find the B2B/B2C split, the
-mutual-avoid tone contradiction and the clarity gaps without being prompted for them. That data is
-not in the repo, so the prompt in `src/lib/analysis/prompt.ts` is untuned. Expect the time to go
-there, not on the code around it.
+**How the analysis is tested.** `npm run dev:fixture` writes five synthetic respondents carrying
+the findings `docs/first-session-brief.md` names as the acceptance test — an audience split, a
+mutual-avoid tone contradiction, clarity gaps, an outlier, and a stated–revealed gap. `npm run
+dev:analyse` runs the real prompt against them and prints the brief.
+
+The split is planted with **no signal outside the answers themselves**. Version 1 gave the analysis
+a role and a decision-maker flag for every respondent and the original ARUN+ test was passed by
+grouping on them; version 3 gives it a name. The fixture is how we know the prompt survived that.
+It currently finds all five.
+
+Passing here is weaker evidence than passing on real data — the conflicts are cleaner than life —
+but failing here means it would certainly fail there. The real ARUN+ and PCE-TH data is still the
+acceptance test and is still not in the repo.
 
 ## First move
 

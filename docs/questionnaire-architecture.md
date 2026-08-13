@@ -56,9 +56,14 @@ name alone the brief must find its clusters in the answers themselves. That is a
 or two respondents and a real loss at ten; if a project ever collects ten again, this is the
 question to revisit.
 
-**The email is never sent to the Anthropic API.** It is contact detail, not evidence — it tells
-the analysis nothing, and it is the one field here that identifies a real person off this system.
-`transcript.ts` sends the name and the answers.
+**The whole identity block is kept out of the Anthropic API call.** The email is contact detail,
+not evidence — it tells the analysis nothing, and it is the one field here that identifies a real
+person off this system. The name is the section heading already.
+
+Taking the email off the heading line was not enough the first time: it is also stored as an
+ordinary answer row, so it came back as "Q: Your email / A: …" and reached the API anyway. That is
+why `transcript.ts` now drops the block rather than the field, and why `npm run dev:analyse`
+asserts on it — the leak was invisible in the brief's output and only showed in its input.
 
 `responses.decision_maker` and `responses.role` both stay in the database. Surveys sent at
 version 2 collected real answers into them, and rule 5 means those surveys keep asking the

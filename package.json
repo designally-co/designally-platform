@@ -13,7 +13,8 @@
     "db:reset": "rm -rf .pglite && npm run db:migrate && npm run db:seed",
     "db:inspect": "node --env-file-if-exists=.env.local --import tsx scripts/inspect.ts",
     "dev:backdate": "node --env-file-if-exists=.env.local --import tsx scripts/dev-backdate.ts",
-    "dev:fixture": "node --env-file-if-exists=.env.local --import tsx scripts/dev-fixture.ts"
+    "dev:fixture": "node --env-file-if-exists=.env.local --import tsx scripts/dev-fixture.ts",
+    "dev:analyse": "node --env-file-if-exists=.env.local --require ./scripts/no-server-only.cjs --import tsx scripts/dev-analyse.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.116.0",

@@ -1,26 +1,34 @@
 /**
- * Development only. Builds a synthetic branding survey whose answers contain
- * deliberately planted findings, so the analysis can be tested without the real
- * ARUN+ data.
+ * Development only. Builds a synthetic Brand survey at the current question
+ * version whose answers contain deliberately planted findings, so the analysis
+ * can be tested without a real client.
  *
  *   npm run dev:fixture
  *
  * What is planted, and why each one:
  *
- *   1. A B2B/B2C audience split          — the highest-severity conflict shape
- *   2. A mutual-avoid tone contradiction — wants bold and disruptive, and also
- *                                          says avoid anything provocative
- *   3. Clarity gaps                      — blanks and "ยังไม่มี" on competitors
- *                                          and existing guidelines
- *   4. An outlier                        — one person answering against all others
- *   5. A stated–revealed contradiction   — calls itself accessible and friendly
- *                                          while admiring exclusive brands
- *   6. A near-unanimous scale + two split ones
+ *   1. An audience split                 — three describe industrial buyers, two
+ *                                          describe walk-in consumers
+ *   2. A mutual-avoid tone contradiction — each camp's chosen mood sits on the
+ *                                          other camp's avoid list
+ *   3. Clarity gaps                      — blanks and "ยังไม่มี" on the promise
+ *                                          and the limitations
+ *   4. An outlier                        — one person against everyone else
+ *   5. A stated–revealed contradiction   — calls itself accessible and everyday
+ *                                          while admiring only exclusive brands
+ *   6. A near-unanimous scale, and two split ones
  *
- * These mirror the findings docs/first-session-brief.md names as the acceptance
- * test. Passing here is weaker evidence than passing on the real data — the
- * conflicts are cleaner than life — but failing here means it would certainly
- * fail there.
+ * **The point of this fixture at version 3.** Version 1 gave the analysis a
+ * department and a decision-maker flag for every respondent, and the ARUN+
+ * acceptance test was passed by grouping on them. Version 3 gives it a name and
+ * nothing else. So the audience split here is planted with *no* signal outside
+ * the answers themselves: the two camps are not marked, not ordered together,
+ * and not distinguishable by anything but what they wrote. If the brief still
+ * finds them, the prompt survived losing the roles. If it doesn't, that is the
+ * regression and it is better found here than on a client.
+ *
+ * Passing here is weaker evidence than passing on real data — the conflicts are
+ * cleaner than life — but failing here means it would certainly fail there.
  */
 import { inArray } from 'drizzle-orm';
 
@@ -35,7 +43,7 @@ import {
   surveys,
   type AnswerValue,
 } from '../src/lib/db/schema';
-import { PACKAGE_BLOCKS } from '../src/lib/survey/packages';
+import { CURRENT_QUESTION_VERSION, PACKAGE_BLOCKS } from '../src/lib/survey/packages';
 import { makeToken } from '../src/lib/survey/token';
 
 type Person = {
@@ -47,150 +55,183 @@ type Person = {
 
 const t = (text: string): AnswerValue => ({ kind: 'text', text });
 const multi = (...choices: string[]): AnswerValue => ({ kind: 'multi', choices });
+const other = (choices: string[], note: string): AnswerValue => ({ kind: 'multi', choices, other: note });
 const scale = (values: Record<string, number>): AnswerValue => ({ kind: 'scale', points: 5, values });
 
 /* Scale pair indices, in seed order:
    0 Traditional–Modern · 1 Exclusive–Accessible · 2 Serious–Fun
    3 Corporate–Friendly · 4 Simple–Sophisticated · 5 Subtle–Bold
    6 Cosmopolitan–Natural · 7 Calm–Dynamic · 8 Familiar–Disruptive
-   9 Realistic–Idealistic */
+   9 Realistic–Idealistic
+
+   Every respondent puts Traditional–Modern at 4 or 5 — that is the settled one.
+   Exclusive–Accessible and Serious–Fun are split down the middle. */
 
 const PEOPLE: Person[] = [
+  /* ── camp A · industrial buyers, formal ──────────────────────────── */
   {
     name: 'คุณธนวัฒน์ วงศ์สกุล',
     email: 'tanawat@example.co.th',
     answers: {
-      'core.1': t('เราผลิตชิ้นส่วนอิเล็กทรอนิกส์สำหรับผู้ผลิตรถยนต์ OEM รายใหญ่ในไทยและอาเซียน'),
-      'core.2': t('We supply precision electronic components to automotive manufacturers.'),
-      'core.3': t('Denso, Aisin, และผู้ผลิตชิ้นส่วนรายใหญ่จากญี่ปุ่น'),
-      'core.4': t('เราส่งมอบตรงเวลา 100% มาสิบสองปีติดต่อกัน ไม่เคยมีสายการผลิตของลูกค้าหยุดเพราะเรา'),
-      /* planted: the B2B side of the audience split */
-      'core.5': t('ลูกค้าของเราคือฝ่ายจัดซื้อของโรงงานประกอบรถยนต์ เป็นวิศวกรและผู้จัดการโรงงาน B2B ล้วน ๆ'),
-      'core.6': t('ความแม่นยำและความน่าเชื่อถือของสายการผลิต'),
-      'core.7': t('ยังไม่มี'),
-      'core.8': t('น่าเชื่อถือ มั่นคง เป็นมืออาชีพ'),
-      'core.9': scale({ '0': 4, '1': 1, '2': 1, '3': 1, '4': 4, '5': 2, '6': 2, '7': 3, '8': 2, '9': 1 }),
-      'core.10': t('ไม่ต้องการให้ดูเล่น ๆ หรือไม่จริงจัง'),
-      'branding.1': t('เริ่มจากโรงกลึงเล็ก ๆ ของคุณพ่อเมื่อปี 2531 ขยายมาเป็นโรงงานสามแห่ง'),
-      'branding.2': t('งานที่ส่งมอบต้องดีกว่าที่สัญญาไว้เสมอ'),
-      'branding.3': t('โรงงานประกอบหยุดสายการผลิตไม่ได้ เราทำให้เขาไม่ต้องกังวลเรื่องชิ้นส่วน'),
-      /* planted: stated–revealed — admires exclusive, premium brands */
-      'branding.4': t('Bosch เพราะมาตรฐานวิศวกรรม และ Hermès เพราะเขาไม่เคยลดคุณภาพเพื่อขายให้มากขึ้น'),
-      'branding.5': t('Denso ทำแบรนด์ได้นิ่งและน่าเชื่อถือมาก'),
-      'branding.6': t('แบรนด์จีนราคาถูกที่โฆษณาเกินจริง'),
-      'branding.7': t('รายงานประจำปีของ Siemens'),
-      'branding.8': t('ไม่เอาสีสันฉูดฉาด'),
-      'branding.9': t('น่าจะเป็นวิศวกรอาวุโสที่พูดน้อยแต่ทำได้จริง'),
-      'branding.10': multi('Trustworthy', 'Professional', 'Smart', 'Frank', 'Authoritative', 'Respectful'),
-      'branding.11': t('อยากได้อะไรที่ดูมั่นคง ใช้ได้อีกยี่สิบปี'),
-    },
-  },
-  {
-    name: 'คุณศิริพร ตั้งจิตต์',
-    email: 'siriporn@example.co.th',
-    answers: {
-      'core.1': t('ชิ้นส่วนอิเล็กทรอนิกส์ และกำลังจะมีสายผลิตภัณฑ์สำหรับผู้บริโภคด้วย'),
-      'core.2': t('We make electronics — and we are moving into consumer products.'),
-      'core.3': t('ยังไม่มี'),
-      'core.4': t('ทีมงานที่อยู่กับเรามานาน'),
-      /* planted: the B2C side of the same split */
-      'core.5': t(
-        'กลุ่มเป้าหมายคือคนรุ่นใหม่ Gen Y และ Gen Z ที่ซื้อของออนไลน์ เราต้องเข้าถึงผู้บริโภคทั่วไปให้ได้',
+      'strategy.1': t(
+        'เราผลิตชิ้นส่วนความแม่นยำสูงให้โรงงานประกอบรถยนต์ ส่งมอบตรงเวลามาสิบสองปี ไม่เคยมีสายการผลิตของลูกค้าหยุดเพราะเรา',
       ),
-      'core.6': t('เราปรับตัวเร็วกว่าโรงงานเก่า ๆ'),
-      'core.7': t('ไม่มี'),
-      'core.8': t('ทันสมัย เข้าถึงง่าย เป็นกันเอง'),
-      'core.9': scale({ '0': 5, '1': 5, '2': 4, '3': 5, '4': 2, '5': 5, '6': 3, '7': 5, '8': 5, '9': 4 }),
-      /* planted: mutual-avoid contradiction — wants bold, avoids provocative */
-      'core.10': t('ไม่อยากให้ดูก้าวร้าวหรือเร้าใจเกินไป'),
-      'branding.1': t('โรงงานครอบครัว แต่ตอนนี้ต้องเปลี่ยนเป็นแบรนด์ที่คนทั่วไปรู้จัก'),
-      'branding.2': t('เราเชื่อว่าเทคโนโลยีควรเข้าถึงได้ทุกคน'),
-      'branding.3': t('ช่วยให้คนใช้ชีวิตง่ายขึ้น'),
-      'branding.4': t('Tesla เพราะสื่อสารเร็วมากและกล้านำเทรนด์ ไม่รอใคร'),
-      'branding.5': t('Xiaomi ทำการตลาดเก่ง'),
-      'branding.6': t('แบรนด์ที่ดูเก่าและไม่ยอมเปลี่ยน'),
-      'branding.7': t('งานโฆษณาของ Apple'),
-      /* planted: reinforces the avoid contradiction */
-      'branding.8': t('ไม่เอาอะไรที่ดูยั่วยุหรือแรงเกินไป'),
-      'branding.9': t('Elon Musk — กล้าคิดกล้าทำ'),
-      'branding.10': multi('Friendly', 'Fun', 'Trendy', 'Enthusiastic', 'Playful', 'Casual', 'Provocative'),
-      'branding.11': t('อยากได้แบรนด์ที่วัยรุ่นรู้สึกว่าเป็นของเขา'),
+      'strategy.2': t('ผู้ผลิตชิ้นส่วนที่โรงงานระดับโลกไว้ใจ'),
+      'strategy.3': t(
+        'ฝ่ายจัดซื้อกลัวของมาช้าแล้วสายการผลิตหยุด เราลดความกลัวนั้นด้วยสัญญาและประวัติการส่งมอบ',
+      ),
+      'strategy.4': t(
+        'คู่แข่งขายราคา เราขายความแน่นอน วิศวกรของเราเข้าไปแก้ปัญหาที่หน้างานของลูกค้าได้ภายในวันเดียว',
+      ),
+      'strategy.5': scale({ '0': 4, '1': 1, '2': 1, '3': 2, '4': 4, '5': 2, '6': 2, '7': 3, '8': 2, '9': 2 }),
+      'strategy.6': t('คุณภาพที่วัดได้ · การส่งมอบตรงเวลา · ความสัมพันธ์ระยะยาวกับวิศวกรของลูกค้า'),
+      'strategy.7': t(
+        'เริ่มจากโรงกลึงเล็ก ๆ ของคุณพ่อ จุดเปลี่ยนคือปี 2014 ที่ได้ออร์เดอร์แรกจากผู้ผลิตญี่ปุ่น ทุกวันนี้ส่งออกหกประเทศ',
+      ),
+      'strategy.8': t('ของถึงตรงเวลา ทุกครั้ง'),
+      'strategy.9': t('อยากให้จำว่าเราเป็นคนที่เขาโทรหาได้ตอนตีสองแล้วมีคนรับ'),
+      /* the split — this camp describes procurement engineers */
+      'strategy.10': t(
+        'ลูกค้าหลักคือฝ่ายจัดซื้อและวิศวกรโรงงานประกอบรถยนต์ ตัดสินใจกันเป็นคณะ ใช้เวลาสามถึงหกเดือน ดูสเปกกับประวัติการส่งมอบก่อนราคา',
+      ),
+      'strategy.11': t('ทีมเราพูดถึงตัวเลข รอบการผลิต ค่าความคลาดเคลื่อน ไม่ค่อยพูดเรื่องแบรนด์'),
+      'strategy.12': t('ความสบายใจว่าไม่ต้องกังวลเรื่องนี้อีก'),
+      /* clarity gap — left blank on purpose */
+      'strategy.14': t('สุภาพ ตรงไปตรงมา เป็นมืออาชีพ ไม่ต้องหวือหวา'),
+
+      'visual.1': multi('Elegant', 'Innovative', 'Natural'),
+      'visual.2': t('น่าเชื่อถือ แม่นยำ นิ่ง'),
+      'visual.3': t(
+        'ชอบงานของ Siemens และ Bosch — mood ที่สะอาด layout ที่มีระเบียบ ใช้พื้นที่ว่างเยอะ อ่านง่ายแม้เป็นข้อมูลเทคนิค',
+      ),
+      /* mutual avoid — this camp rejects exactly what camp B chose */
+      'visual.4': multi('Too Playful', 'Too Trendy', 'Cheap'),
+      'visual.5': multi('Character', 'Colorful Palette', '3D'),
+      /* clarity gap */
+      'visual.7': t('ต้องใช้กับ catalogue พิมพ์ นามบัตร และ presentation ให้ลูกค้าองค์กร ขอไฟล์ AI และ PDF'),
     },
   },
   {
-    name: 'คุณกฤษณ์ ภักดีวงศ์',
+    name: 'คุณกฤต ชัยพัฒน์',
     email: 'krit@example.co.th',
     answers: {
-      'core.1': t('ผลิตชิ้นส่วนตามสเปกลูกค้า'),
-      'core.2': t('We build to spec.'),
-      /* planted: clarity gap — cannot name competitors */
-      'core.3': t('ไม่มี'),
-      'core.4': t('เครื่องจักรใหม่ที่เพิ่งลงทุนไป'),
-      'core.5': t('โรงงานที่สั่งของเรา'),
-      'core.6': t('ยังไม่มี'),
-      'core.7': t('ไม่มี'),
-      'core.8': t('มั่นคง'),
-      'core.9': scale({ '0': 4, '1': 2, '2': 2, '3': 2, '4': 3, '5': 2, '6': 3, '7': 3, '8': 2, '9': 2 }),
-      'core.10': t(''),
-      'branding.1': t('ไม่ทราบรายละเอียด'),
-      'branding.2': t('ทำงานให้ดี'),
-      'branding.3': t('ยังไม่มี'),
-      'branding.4': t('ไม่มี'),
-      'branding.9': t('ไม่ทราบ'),
-      'branding.10': multi('Trustworthy', 'Professional', 'Serious', 'Formal', 'Respectful', 'Informative'),
-      /* branding.5–8 and 11 deliberately absent — blanks are data */
+      'strategy.1': t('งานเราคือความแม่นยำระดับไมครอน และเอกสารรับรองที่ผ่านการตรวจของลูกค้าญี่ปุ่น'),
+      'strategy.2': t('เจ้าที่ไม่เคยทำให้ไลน์หยุด'),
+      'strategy.3': t('ความกังวลว่าซัพพลายเออร์ไทยจะคุมคุณภาพไม่ได้ เราลบข้อกังวลนั้นด้วยตัวเลข'),
+      'strategy.4': t('เราเปิดโรงงานให้ลูกค้าเข้ามาตรวจได้ทุกเมื่อ คู่แข่งส่วนใหญ่ไม่ยอม'),
+      'strategy.5': scale({ '0': 5, '1': 2, '2': 1, '3': 2, '4': 4, '5': 2, '6': 2, '7': 2, '8': 2, '9': 2 }),
+      'strategy.6': t('มาตรฐาน ISO · ความโปร่งใสเรื่องต้นทุน · ไม่รับงานที่ทำไม่ได้'),
+      'strategy.7': t('โรงกลึงเล็ก ๆ เมื่อยี่สิบปีก่อน ตอนนี้มีสามสายการผลิต'),
+      'strategy.8': t('เอกสารครบ ตรวจสอบย้อนกลับได้ทุกล็อต'),
+      'strategy.9': t('เป็นซัพพลายเออร์ที่ไม่ต้องคอยตาม'),
+      'strategy.10': t(
+        'ลูกค้าคือโรงงานประกอบ ซื้อผ่านระบบจัดซื้อ มีการประมูล ต้องผ่าน audit ก่อนถึงจะเป็นคู่ค้าได้',
+      ),
+      'strategy.11': t('เราพูดเรื่องสเปกเป็นหลัก'),
+      'strategy.12': t('ความไว้ใจ'),
+      'strategy.13': t('ยังไม่มี ยังไม่เคยคุยกันเรื่องนี้'),
+      'strategy.14': t('เป็นทางการ กระชับ'),
+
+      'visual.1': multi('Elegant', 'Innovative', 'Bold'),
+      'visual.2': t('แม่นยำ มั่นคง สะอาด'),
+      'visual.3': t('ชอบ layout แบบ catalogue เยอรมัน อ่านง่าย ไม่มีอะไรเกิน'),
+      'visual.4': multi('Too Playful', 'Too Cute', 'Cheap'),
+      'visual.5': multi('Character', 'Illustration', 'Colorful Palette'),
+      'visual.7': t('ขอไฟล์ต้นฉบับทั้งหมด และคู่มือการใช้โลโก้'),
     },
   },
   {
-    name: 'คุณพลอย รัตนาภรณ์',
-    email: 'napat@example.co.th',
+    name: 'คุณสิริพร มณีรัตน์',
+    email: 'siriporn@example.co.th',
     answers: {
-      'core.1': t('ชิ้นส่วนสำหรับอุตสาหกรรมยานยนต์'),
-      'core.2': t('Automotive components for OEM assembly lines.'),
-      'core.3': t('ผู้ผลิตชิ้นส่วนจากญี่ปุ่นและเกาหลี'),
-      'core.4': t('ความสัมพันธ์กับลูกค้าที่ยาวนาน'),
-      /* planted: sides with B2B */
-      'core.5': t('ฝ่ายจัดซื้อของโรงงานประกอบ เป็นงาน B2B ที่ต้องใช้ความสัมพันธ์'),
-      'core.6': t('เราแก้ปัญหาให้ลูกค้าได้เร็ว'),
-      'core.7': t('ยังไม่มี'),
-      'core.8': t('ไว้ใจได้'),
-      'core.9': scale({ '0': 4, '1': 2, '2': 2, '3': 3, '4': 3, '5': 2, '6': 3, '7': 3, '8': 2, '9': 2 }),
-      'core.10': t('ไม่อยากดูเหมือนโรงงานทั่วไป'),
-      'branding.1': t('เริ่มจากธุรกิจครอบครัว'),
-      'branding.2': t('รักษาคำพูด'),
-      'branding.3': t('ทำให้ลูกค้าไม่ต้องกังวลเรื่องคุณภาพ'),
-      'branding.4': t('Toyota เพราะระบบการผลิตที่ทุกคนเลียนแบบ'),
-      'branding.5': t('Denso'),
-      'branding.6': t('แบรนด์ที่สัญญาแล้วไม่ทำ'),
-      'branding.8': t('ไม่เอาอะไรที่ดูไม่จริงจัง'),
-      'branding.9': t('คนที่ทำงานเงียบ ๆ แต่ผลงานพูดแทน'),
-      'branding.10': multi('Trustworthy', 'Professional', 'Frank', 'Caring', 'Respectful', 'Smart'),
+      'strategy.1': t('ความแม่นยำและการส่งมอบ เป็นสองอย่างที่เราไม่เคยพลาด'),
+      'strategy.2': t('แบรนด์ที่โรงงานระดับโลกเลือก'),
+      'strategy.3': t('ลูกค้ากลัวเปลี่ยนซัพพลายเออร์แล้วเจอปัญหา เราทำให้การเปลี่ยนมาหาเราไม่เจ็บ'),
+      'strategy.4': t('เราตอบอีเมลภายในสองชั่วโมง คู่แข่งใช้เวลาสองวัน'),
+      'strategy.5': scale({ '0': 4, '1': 2, '2': 2, '3': 3, '4': 3, '5': 3, '6': 2, '7': 3, '8': 2, '9': 3 }),
+      'strategy.6': t('ความตรงเวลา · ความซื่อสัตย์เรื่องปัญหา · คุณภาพคงที่'),
+      'strategy.7': t('เริ่มปี 2004 จุดเปลี่ยนคือได้ลูกค้าญี่ปุ่นรายแรก'),
+      'strategy.8': t('การตอบกลับที่เร็ว'),
+      'strategy.9': t('อยากให้รู้สึกว่าเลือกถูกแล้ว'),
+      'strategy.10': t(
+        'กลุ่มหลักคือผู้จัดการฝ่ายจัดซื้อของโรงงานขนาดใหญ่ ทำงานกับเราแบบสัญญายาว',
+      ),
+      'strategy.11': t('เราพูดถึงความน่าเชื่อถือ'),
+      'strategy.12': t('ความมั่นใจ'),
+      'strategy.14': t('มืออาชีพ อบอุ่นได้แต่ไม่เล่น'),
+
+      'visual.1': multi('Elegant', 'Natural', 'Innovative'),
+      'visual.2': t('สะอาด เชื่อถือได้ ทันสมัย'),
+      'visual.3': t('ชอบเว็บของแบรนด์ญี่ปุ่นที่ใช้สีน้อย ตัวอักษรอ่านง่าย และรูปโรงงานจริง'),
+      'visual.4': multi('Too Playful', 'Too Trendy'),
+      'visual.5': multi('3D', 'Character'),
+      'visual.6': t('สีน้ำเงินเดิมของบริษัทต้องเก็บไว้ ลูกค้าญี่ปุ่นจำสีนี้ได้'),
+      'visual.7': t('ใช้กับ print เป็นหลัก'),
+    },
+  },
+
+  /* ── camp B · walk-in consumers, playful ─────────────────────────── */
+  {
+    name: 'คุณพลอย เจริญสุข',
+    email: 'ploy@example.co.th',
+    answers: {
+      'strategy.1': t('เราเปิดหน้าร้านขายอะไหล่แต่งรถให้คนทั่วไป เข้ามาเลือกเองได้ จับได้ ลองได้'),
+      'strategy.2': t('ร้านที่วัยรุ่นนึกถึงก่อนเวลาจะแต่งรถ'),
+      'strategy.3': t('ลูกค้ากลัวซื้อของปลอม เราให้ลองของจริงหน้าร้าน'),
+      'strategy.4': t('คู่แข่งขายออนไลน์อย่างเดียว เรามีหน้าร้านให้มาเล่นได้'),
+      'strategy.5': scale({ '0': 5, '1': 5, '2': 5, '3': 5, '4': 2, '5': 5, '6': 3, '7': 5, '8': 4, '9': 4 }),
+      'strategy.6': t('ราคาที่บอกตรง ๆ · ของแท้ · บรรยากาศร้านที่เข้ามาแล้วสนุก'),
+      'strategy.7': t('เริ่มจากขายในเฟซบุ๊ก จุดเปลี่ยนคือเปิดหน้าร้านปี 2021 แล้วคนมาถ่ายรูปลงไอจี'),
+      'strategy.8': t('ของแท้ ราคาไม่หลอก'),
+      'strategy.9': t('อยากให้จำว่าเป็นร้านที่คุยสนุก ไม่กดดันให้ซื้อ'),
+      /* the other side of the split — walk-in consumers, decided in minutes */
+      'strategy.10': t(
+        'ลูกค้าเราคือคนทั่วไปอายุ 18-30 เดินเข้าร้านเอง ตัดสินใจซื้อภายในสิบนาที ดูจากหน้าตาของกับรีวิวในติ๊กต๊อก',
+      ),
+      'strategy.11': t('เราคุยกับลูกค้าเหมือนเพื่อน ใช้คำแบบที่วัยรุ่นใช้'),
+      'strategy.12': t('ความรู้สึกว่าร้านนี้เป็นพวกเดียวกับเรา'),
+      'strategy.13': t('อยากให้ทีมจำว่าเราขายความสนุก ไม่ได้ขายอะไหล่'),
+      'strategy.14': t('เป็นกันเอง ขำได้ ใช้ภาษาพูด'),
+
+      'visual.1': multi('Playful', 'Bold', 'Friendly'),
+      'visual.2': t('สนุก แรง จำได้'),
+      'visual.3': t('ชอบงานของ Red Bull กับพวกแบรนด์สเก็ต — สีจัด ตัวหนังสือใหญ่ ดูมีพลัง'),
+      /* mutual avoid — exactly camp A's chosen mood */
+      'visual.4': multi('Too Corporate', 'Too Serious', 'Too Luxury'),
+      'visual.5': multi('Serif Font', 'Minimal Style'),
+      'visual.7': t('ใช้กับไอจี ติ๊กต๊อก สติกเกอร์ติดรถ เสื้อ'),
     },
   },
   {
-    /* planted: the outlier — answers against everyone on nearly everything */
-    name: 'คุณวินัย เจริญสุข',
-    email: 'preeda@example.co.th',
+    /* the outlier and the stated–revealed gap in one person: says accessible
+       and everyday, admires only exclusive brands */
+    name: 'คุณวิน อารีย์',
+    email: 'win@example.co.th',
     answers: {
-      'core.1': t('เราควรเลิกทำชิ้นส่วนแล้วไปทำแพลตฟอร์มซอฟต์แวร์'),
-      'core.2': t('We should be a software company.'),
-      'core.3': t('บริษัทเทคโนโลยีทั่วโลก'),
-      'core.4': t('ไม่มีอะไรที่ภูมิใจเป็นพิเศษ'),
-      'core.5': t('ใครก็ได้ที่ใช้อินเทอร์เน็ต'),
-      'core.6': t('ยังไม่มี'),
-      'core.7': t('ไม่มี'),
-      'core.8': t('ตื่นเต้น แปลกใหม่'),
-      /* planted: the outlier's scale answers run opposite to everyone */
-      'core.9': scale({ '0': 1, '1': 5, '2': 5, '3': 5, '4': 1, '5': 5, '6': 5, '7': 5, '8': 5, '9': 5 }),
-      'core.10': t('ไม่อยากให้ดูน่าเบื่อแบบโรงงาน'),
-      'branding.1': t('ไม่สำคัญแล้ว'),
-      'branding.2': t('ต้องเปลี่ยนทุกอย่าง'),
-      'branding.3': t('ยังไม่รู้'),
-      'branding.4': t('OpenAI เพราะเปลี่ยนโลกได้เร็ว'),
-      'branding.6': t('แบรนด์อุตสาหกรรมทุกแบรนด์'),
-      'branding.9': t('Steve Jobs'),
-      'branding.10': multi('Provocative', 'Trendy', 'Witty', 'Humourous', 'Casual', 'Playful'),
-      'branding.11': t('อยากให้ดูเหมือนสตาร์ทอัพ ไม่ใช่โรงงาน'),
+      'strategy.1': t('เราขายให้ทุกคน ใครก็เข้าถึงได้ ไม่ต้องรู้เรื่องรถก็เดินเข้ามาได้'),
+      'strategy.2': t('แบรนด์ที่ใคร ๆ ก็ใช้'),
+      'strategy.3': t('คนกลัวว่าจะโดนหลอกเพราะไม่มีความรู้ เราอธิบายให้ฟังจนเข้าใจ'),
+      'strategy.4': t('เราเป็นมิตรกว่า ไม่ทำให้ใครรู้สึกโง่'),
+      /* against everyone on almost every pair */
+      'strategy.5': scale({ '0': 1, '1': 5, '2': 5, '3': 5, '4': 1, '5': 1, '6': 5, '7': 1, '8': 1, '9': 5 }),
+      'strategy.6': t('ความเป็นกันเอง · ราคาที่ทุกคนจ่ายได้ · ไม่ดูถูกใคร'),
+      'strategy.7': t('ยังไม่มี'),
+      'strategy.8': t('ความรู้สึกว่าไม่โดนเอาเปรียบ'),
+      'strategy.9': t('อยากให้รู้สึกว่าเป็นร้านของทุกคน'),
+      'strategy.10': t('ลูกค้าคือคนธรรมดา เดินผ่านแล้วแวะ ไม่ได้วางแผนมาก่อน'),
+      'strategy.11': t('เราพูดง่าย ๆ ไม่ใช้ศัพท์เทคนิค'),
+      'strategy.12': t('ความอบอุ่น'),
+      'strategy.14': t('อบอุ่น เข้าถึงง่าย เหมือนคุยกับคนรู้จัก'),
+
+      'visual.1': multi('Friendly', 'Natural', 'Playful'),
+      'visual.2': t('อบอุ่น เข้าถึงง่าย ไม่หรู'),
+      /* the reveal — every reference is a luxury house */
+      'visual.3': t(
+        'ชอบงานของ Hermès, Aesop และ Apple มาก ๆ ชอบที่มันดูแพงและสงบ ชอบการใช้พื้นที่ว่างและกระดาษดี ๆ',
+      ),
+      'visual.4': other(['Cheap', 'Too Cute'], 'ไม่อยากให้ดูเหมือนร้านข้างทาง'),
+      'visual.5': multi('Colorful Palette'),
+      'visual.6': t('ยังไม่มี'),
     },
   },
 ];
@@ -220,29 +261,34 @@ async function main() {
       projectId: project.id,
       kind: 'discovery',
       token: makeToken(),
-      questionVersion: 1,
+      questionVersion: CURRENT_QUESTION_VERSION,
       blockKeys: [...PACKAGE_BLOCKS.brand],
     })
     .returning();
 
-  /* resolve "core.5" style refs to question ids */
+  /* resolve "strategy.10" style refs to question ids, at this survey's version */
   const blocks = await db
     .select()
     .from(questionBlocks)
     .where(inArray(questionBlocks.key, survey.blockKeys));
-  const qs = await db
-    .select()
-    .from(questions)
-    .where(
-      inArray(
-        questions.blockId,
-        blocks.map((b) => b.id),
-      ),
-    );
+  const qs = (
+    await db
+      .select()
+      .from(questions)
+      .where(
+        inArray(
+          questions.blockId,
+          blocks.map((b) => b.id),
+        ),
+      )
+  ).filter((q) => q.version === survey.questionVersion);
+
   const keyOf = new Map(blocks.map((b) => [b.id, b.key]));
   const idByRef = new Map(qs.map((q) => [`${keyOf.get(q.blockId)}.${q.order}`, q.id]));
 
-  const identity = qs.filter((q) => keyOf.get(q.blockId) === 'identity').sort((a, b) => a.order - b.order);
+  const identity = qs
+    .filter((q) => keyOf.get(q.blockId) === 'identity')
+    .sort((a, b) => a.order - b.order);
 
   for (const person of PEOPLE) {
     const [response] = await db
@@ -269,8 +315,10 @@ async function main() {
   }
 
   console.log(`Fixture survey created: /s/${survey.token}`);
-  console.log(`${PEOPLE.length} respondents · project ${project.id}`);
-  console.log('Planted: B2B/B2C split · mutual-avoid contradiction · clarity gaps · outlier · stated–revealed gap');
+  console.log(`${PEOPLE.length} respondents at question version ${survey.questionVersion} · project ${project.id}`);
+  console.log(
+    'Planted: audience split (unmarked) · mutual-avoid contradiction · clarity gaps · outlier · stated–revealed gap',
+  );
   process.exit(0);
 }
 
