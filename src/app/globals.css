@@ -676,8 +676,21 @@ label.f span {
   opacity: 0.4;
   cursor: default;
 }
-.chip:hover {
-  border-color: var(--primary);
+/**
+ * Hover on a choice darkens the line; it does not turn blue.
+ *
+ * Two faults in one rule. The accent means "a person is needed here", and a
+ * chip you are merely pointing at needs nothing — with selection now marked in
+ * ink, a blue hover made the unselected chip look more chosen than the chosen
+ * one. And on a touch screen hover has no way to end: tapping a chip to
+ * deselect it left the blue behind, which is exactly what it looked like.
+ *
+ * `(hover: hover)` keeps it off devices that cannot hover at all.
+ */
+@media (hover: hover) {
+  .chip:hover {
+    border-color: var(--ink-3);
+  }
 }
 .chip[aria-pressed="true"] {
   border: 2px solid var(--ink);
@@ -821,8 +834,12 @@ label.f span {
   min-height: 44px;
   cursor: pointer;
 }
-.blanklist button:hover span {
-  color: var(--primary);
+/* this one keeps the accent — it is a link back to an unanswered question, and
+   an unanswered question is precisely "a person is needed here" */
+@media (hover: hover) {
+  .blanklist button:hover span {
+    color: var(--primary);
+  }
 }
 .blanklist b {
   flex-shrink: 0;
@@ -867,8 +884,10 @@ label.f span {
     border-color 0.18s,
     background 0.18s;
 }
-.board:hover {
-  border-color: var(--primary);
+@media (hover: hover) {
+  .board:hover {
+    border-color: var(--ink-3);
+  }
 }
 /* Selection is a 2px border, as everywhere else. The padding compensates so
    nothing shifts when it thickens (DESIGN.md §5). */
@@ -2798,9 +2817,14 @@ dialog::backdrop {
   .slide .sq {
     padding-left: 0;
   }
+  /* On its own line the tag sizes to its content, and content-width with no
+     padding puts the digits against the curve — a pill with no ends reads as a
+     squashed rectangle. The fixed 40px belongs to the desktop hang, where the
+     arithmetic has to land on the text edge; here nothing depends on it. */
   .qnum {
     display: flex;
     width: fit-content;
+    padding: 0 11px;
     margin: 0 0 13px;
   }
   .slidebody:has(.qnum) .okrow {
