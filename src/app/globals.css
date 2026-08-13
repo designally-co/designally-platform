@@ -3202,6 +3202,20 @@ dialog::backdrop {
     opacity: 0;
     pointer-events: none;
     transition: bottom 0.18s var(--ease);
+    /**
+     * On its own compositing layer, or iOS blurs the controls themselves.
+     *
+     * WebKit promotes a backdrop-filter element to its own layer and composites
+     * it over siblings that have not been promoted — z-index does not arbitrate
+     * between a composited layer and an uncomposited one. The ramp is z-index 14
+     * and these are 15, which is enough in Blink and was not on a real iPhone:
+     * the buttons were being sampled into the blur they are supposed to sit on.
+     *
+     * `will-change` rather than `translateZ(0)`, because the press state owns
+     * the transform property and a promotion written there would be dropped for
+     * the duration of every tap — which is exactly when it must not be.
+     */
+    will-change: transform;
   }
   /* cancels the row's own top padding — it must not reach the button, whose
      11px top is what keeps its label off the ceiling */

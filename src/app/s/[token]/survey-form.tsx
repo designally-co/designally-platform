@@ -72,21 +72,20 @@ type Card =
   | { kind: 'question'; question: SurveyQuestion; slice?: Slice };
 
 /**
- * A rating battery longer than this is dealt out over several slides.
+ * How many scale pairs share a slide.
  *
- * Ten bipolar scales on one slide ran 1.45 screens even after the rows were
- * compressed. Splitting keeps enough of the battery on screen to calibrate
- * against — you can see the ones you just rated — which is the whole reason
- * these stay together rather than becoming ten separate questions.
+ * It was four, measured against a 390x844 browser window. A real iPhone is not
+ * that: Safari's address bar takes roughly a hundred points off the bottom, and
+ * with the Thai reveal open — which is the state a Thai reader is in for the
+ * whole survey — the fourth pair sat behind the Continue button and could not
+ * be reached. The deck snaps mandatorily by design, so a slide taller than the
+ * viewport cannot be rested inside: the scroll returns to a snap point on
+ * release. Nothing can be allowed to overflow a slide.
  *
- * Four, not five: with the Thai pole label set under the English rather than
- * beside it, a row is 113px, and five rows plus the pinned question overran the
- * screen by 63px — enough that the button bar started covering the last row.
- *
- * It remains one question: one row in the seed, one number on the badge, one
- * answer in the database. Only the presentation is split.
+ * Three makes the ten pairs 3 · 3 · 2 · 2 rather than 4 · 3 · 3 — one more
+ * slide, and every one of them fits a phone held by a Thai reader.
  */
-const PAIRS_PER_SLIDE = 4;
+const PAIRS_PER_SLIDE = 3;
 
 /**
  * How many pairs each part holds, balanced rather than greedy.
@@ -373,7 +372,11 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
        and handed straight back. */
     const previous = root.style.scrollBehavior;
     root.style.scrollBehavior = 'auto';
-    root.scrollTop = el.offsetTop;
+    /* Measured, not `offsetTop`: the deck is not positioned, so a slide's
+       offsetParent is the body and its offsetTop is not the deck's scroll
+       offset. Mandatory snapping was correcting the difference and hiding it —
+       and snapping is now switched off on any slide taller than the screen. */
+    root.scrollTop += el.getBoundingClientRect().top - root.getBoundingClientRect().top;
     root.style.scrollBehavior = previous;
     setStep(index);
   }, [sending]);
@@ -397,6 +400,31 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
     const slides = Array.from(root.querySelectorAll<HTMLElement>('[data-slide]'));
     let frame = 0;
 
+    /**
+     * A slide taller than the screen has to be restable inside.
+     *
+     * `mandatory` means the deck must always come to rest on a snap point, and
+     * the only snap point in a slide is its top — so on a screen shorter than
+     * the slide, the bottom of it cannot be reached at all. The scroll goes
+     * there and springs back. On a real iPhone, where Safari's address bar
+     * takes about a hundred points that a desktop browser window at the same
+     * nominal size does not, that hid the last row of the personality battery
+     * behind the Continue button with no way to get at it — and seven other
+     * slides besides, once a Thai reader opens the reveal.
+     *
+     * So the deck stops snapping while the slide it is on is taller than it,
+     * and takes `mandatory` back the moment it is not. Between two slides that
+     * fit — which is nearly all of them — nothing changes and there is still no
+     * resting between questions; and scrolling off a tall slide restores
+     * `mandatory` as soon as the next one takes the middle of the screen, which
+     * completes the transition in the usual way.
+     *
+     * `proximity` was the obvious first answer and does not work: a slide 70px
+     * taller than the screen is 70px from its own snap point, which is well
+     * inside the threshold the browser uses, so it springs back exactly as
+     * before. Only `none` actually lets go.
+     */
+    let snapping = '';
     const measure = () => {
       frame = 0;
       const middle = root.clientHeight / 2;
@@ -405,7 +433,14 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
         const r = s.getBoundingClientRect();
         return r.top - rootTop <= middle && r.bottom - rootTop > middle;
       });
-      if (found) setStep(Number(found.dataset.slide));
+      if (!found) return;
+      setStep(Number(found.dataset.slide));
+
+      const wanted = found.scrollHeight > root.clientHeight + 1 ? 'none' : 'y mandatory';
+      if (wanted !== snapping) {
+        snapping = wanted;
+        root.style.scrollSnapType = wanted;
+      }
     };
 
     const onScroll = () => {
