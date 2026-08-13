@@ -89,6 +89,70 @@ function CopyOutline({
   );
 }
 
+/**
+ * Whose answers this version read.
+ *
+ * Every count below is counted from these and no others, so it belongs above
+ * them rather than in a footnote — a reader who meets "2 of 3" first and learns
+ * afterwards that it was three of five has already drawn the wrong conclusion.
+ *
+ * Names come from the brief's own snapshot rather than from the project, so a
+ * respondent deleted since still appears. When they do, say so: otherwise
+ * somebody hunting for that person in "Who answered" finds nothing and has no
+ * way to tell whether the brief is wrong or the answers are gone.
+ */
+function Sources({
+  version,
+  onProject,
+  writtenOn,
+}: {
+  version: ProjectView['briefVersions'][number] | undefined;
+  onProject: { id: string }[];
+  writtenOn: string | null;
+}) {
+  const when = writtenOn ? ` · ${writtenOn}` : '';
+
+  /* briefs written before sources were stored. Saying so is more use than a
+     guess that happens to be right most of the time. */
+  if (!version?.sources) {
+    return (
+      <p className="lede">
+        Whose answers this read was not recorded — it was written before that was kept{when}
+      </p>
+    );
+  }
+
+  const live = new Set(onProject.map((p) => p.id));
+  const gone = version.sources.filter((s) => !live.has(s.id)).length;
+
+  return (
+    <p className="lede">
+      Written from {version.sources.length === 1 ? '1 answer' : `${version.sources.length} answers`}
+      {when}
+      <span className="sourcenames">
+        {version.sources.map((s) => (
+          <span key={s.id} className={live.has(s.id) ? undefined : 'gone'}>
+            {s.name}
+            {!live.has(s.id) && ' · deleted since'}
+          </span>
+        ))}
+      </span>
+      {version.sources.length < onProject.length && (
+        <span className="sourcenote">
+          This project now has {onProject.length} answers. This version read{' '}
+          {version.sources.length} of them.
+        </span>
+      )}
+      {gone > 0 && (
+        <span className="sourcenote">
+          {gone === 1 ? 'One answer it read has' : `${gone} answers it read have`} been deleted
+          since.
+        </span>
+      )}
+    </p>
+  );
+}
+
 function Quotes({ quotes }: { quotes: string[] }) {
   if (!quotes.length) return null;
   return (
@@ -134,11 +198,11 @@ export default function BriefSheet({
       <div className="brief">
         {/* 1 · read this first */}
         <h1>{brief.headline}</h1>
-        <p className="lede">
-          Written from the {people === 1 ? 'single answer' : `${people} answers`} collected before
-          the team closed this survey
-          {project.briefWrittenOn ? ` · ${project.briefWrittenOn}` : ''}
-        </p>
+        <Sources
+          version={openVersion}
+          onProject={project.people}
+          writtenOn={openVersion?.writtenOn ?? project.briefWrittenOn}
+        />
         <p className="firstpara">{brief.headlineBody}</p>
 
         {/* 2 · settled */}

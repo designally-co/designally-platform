@@ -1589,6 +1589,35 @@ label.f span {
   font-size: 12px;
 }
 
+/**
+ * Whose answers a brief read, under its headline.
+ *
+ * Names on their own line rather than run into the sentence: three to twenty of
+ * them, often Thai, and a sentence that long stops being read.
+ */
+.sourcenames {
+  display: block;
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--ink-3);
+  /* Thai never below 1.6 in a line that can hold a name */
+  line-height: 1.7;
+}
+.sourcenames span + span::before {
+  content: ' · ';
+  color: var(--hairline);
+}
+.sourcenames .gone {
+  color: var(--caution);
+}
+.sourcenote {
+  display: block;
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--ink-3);
+  line-height: 1.7;
+}
+
 /* Delete sits on the respondent's own row, quiet until pointed at — it removes
    twenty minutes of somebody's work and should not read as a primary action. */
 .person .drop {

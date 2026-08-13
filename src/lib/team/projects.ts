@@ -111,6 +111,8 @@ export type ProjectView = {
     confirmedOn: string | null;
     confirmedBy: string | null;
     isNewest: boolean;
+    /** whose answers it read — null on briefs written before that was stored */
+    sources: { id: string; name: string }[] | null;
   }[];
   /**
    * A brief was confirmed, and answers arrived afterwards.
@@ -349,6 +351,7 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
         confirmedOn: formatDay(b.confirmedAt ?? null),
         confirmedBy: b.confirmedBy ? (actorName.get(b.confirmedBy) ?? null) : null,
         isNewest: i === 0,
+        sources: b.sources ?? null,
       })),
       /* the confirmed version, not the newest — a newer unconfirmed run does not
          make the signed one stale, more answers do */
