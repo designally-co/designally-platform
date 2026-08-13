@@ -3130,7 +3130,17 @@ dialog::backdrop {
   /* the page wash is near-white at the top of the viewport, which is the only
      place this element is ever seen */
   background: var(--parchment);
-  padding: 12px 0 10px;
+  /**
+   * The top padding is the pinned state's breathing room, not decoration.
+   *
+   * Pinned, this box starts at the viewport's top edge and the 3px progress bar
+   * sits inside its first three pixels, so the padding is all that stands
+   * between the question number and the edge of the screen. At 12px that left
+   * 9px, and the tag read as jammed against the top on a phone — it is 18px
+   * now, which clears the bar by 15. Unpinned it costs six pixels nobody will
+   * notice.
+   */
+  padding: 18px 0 10px;
 }
 .scalehead::after {
   content: '';
