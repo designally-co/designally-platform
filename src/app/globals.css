@@ -2380,3 +2380,278 @@ dialog::backdrop {
   color: #fff;
   font-weight: 600;
 }
+
+
+/* ============================================================
+   The deck — one question, one slide, scrolling is the
+   navigation. Patterned on the Typeform reference the team
+   pinned: no chrome repeated per slide, an underlined answer
+   rather than a filled field, a number badge, OK plus Enter.
+
+   DIVERGENCE from DESIGN.md section 5: survey inputs are a
+   baseline rule, not a 44px pill. The pinned reference is the
+   authority for this surface; the pill remains correct in the
+   team app.
+   ============================================================ */
+
+.deck {
+  height: 100dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+/* While a field has focus the phone keyboard is resizing the viewport, and a
+   mandatory snap fights it on every keystroke. Snapping resumes on blur. */
+.deck:focus-within {
+  scroll-snap-type: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .deck {
+    scroll-behavior: auto;
+  }
+}
+
+.slide {
+  min-height: 100dvh;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: flex;
+  align-items: center;
+  padding: 72px 26px 96px;
+}
+.slidebody {
+  width: 100%;
+  max-width: 660px;
+  margin: 0 auto;
+}
+
+/* the question */
+.slide .sq {
+  margin: 0;
+}
+.slide .qq {
+  display: block;
+  font-size: clamp(1.4rem, 3.1vw, 2.05rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  /* Thai never below 1.6 at body sizes; above 32px the floor is 44px of
+     absolute leading — DESIGN.md section 2. */
+  line-height: 1.4;
+  color: var(--ink);
+  text-wrap: pretty;
+  margin-bottom: 0;
+}
+.qnum {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  margin-right: 11px;
+  border-radius: 5px;
+  background: var(--ink);
+  color: var(--on-dark);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  vertical-align: 5px;
+}
+.slide .qhelp {
+  display: block;
+  margin-top: 12px;
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--ink-3);
+  max-width: 60ch;
+}
+
+/* the answer — a rule, not a box */
+.slide .input,
+.slide .textarea {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--hairline);
+  border-radius: 0;
+  padding: 6px 2px;
+  height: auto;
+  min-height: 52px;
+  margin-top: 26px;
+  font-size: clamp(1.25rem, 2.6vw, 1.6rem);
+  line-height: 1.5;
+  color: var(--ink);
+  transition: border-color 0.18s;
+}
+.slide .textarea {
+  min-height: 58px;
+  resize: none;
+  field-sizing: content;
+}
+.slide .input:focus,
+.slide .textarea:focus {
+  outline: 0;
+  border-bottom-color: var(--primary);
+}
+.slide .input::placeholder,
+.slide .textarea::placeholder {
+  color: #b6b6bb;
+}
+/* the focus ring is the system's one shadow, and removing it outright would
+   strand a keyboard user — it moves to the field's rule instead */
+.slide .input:focus-visible,
+.slide .textarea:focus-visible {
+  border-bottom-width: 2px;
+  padding-bottom: 5px;
+}
+
+/* OK, and the shortcut beside it */
+.okrow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 34px;
+  flex-wrap: wrap;
+}
+.btn.ok {
+  border-radius: var(--r-sm);
+  padding: 10px 26px;
+  font-weight: 600;
+}
+.okhint {
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+/* welcome and send share the slide, centred and bare */
+.slide h1 {
+  font-size: clamp(2rem, 4.6vw, 3.1rem);
+  line-height: 1.28;
+  font-weight: 600;
+  letter-spacing: -0.028em;
+  text-wrap: balance;
+  margin-bottom: 16px;
+}
+.slide h2 {
+  font-size: clamp(1.5rem, 3.2vw, 2.05rem);
+  line-height: 1.3;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+.slide .intro {
+  color: var(--ink-3);
+  max-width: 52ch;
+  margin-bottom: 0;
+}
+.slide[data-slide='0'] .slidebody {
+  text-align: center;
+}
+.slide[data-slide='0'] .intro {
+  margin-left: auto;
+  margin-right: auto;
+}
+.slide[data-slide='0'] .langswitch {
+  margin: 30px 0 4px;
+}
+/* its own line — an inline-flex switch beside an inline-block button put the
+   language choice and the only action on the screen shoulder to shoulder */
+.btn.start {
+  display: block;
+  margin: 26px auto 0;
+}
+.takes {
+  margin-top: 14px;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+/* the phone's back arrow, beside OK on the floor of the slide */
+.okback {
+  display: none;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: var(--ink);
+  color: var(--on-dark);
+  cursor: pointer;
+}
+
+/* the chevron pair, bottom right on a pointer device */
+.deck-nav {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  display: flex;
+  gap: 1px;
+  z-index: 20;
+}
+.deck-nav button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: var(--ink);
+  color: var(--on-dark);
+  cursor: pointer;
+  transition: opacity 0.18s;
+}
+.deck-nav button:first-child {
+  border-radius: var(--r-sm) 0 0 var(--r-sm);
+}
+.deck-nav button:last-child {
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+}
+.deck-nav button:hover {
+  opacity: 0.86;
+}
+.deck-nav button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.savednote {
+  position: fixed;
+  left: 20px;
+  bottom: 32px;
+  font-size: 12px;
+  color: var(--ink-3);
+  z-index: 20;
+}
+
+@media (max-width: 620px) {
+  .slide {
+    padding: 60px 22px 104px;
+  }
+  /* The reference puts the phone's controls on the floor of the slide: a back
+     arrow beside a wide OK. Swiping already moves between questions, so the
+     corner chevron pair is redundant chrome here and goes. */
+  .deck-nav {
+    display: none;
+  }
+  .okback {
+    display: grid;
+  }
+  .okrow {
+    gap: 10px;
+  }
+  .btn.ok {
+    flex: 1;
+    min-height: 52px;
+    font-size: 17px;
+  }
+  .okhint {
+    display: none;
+  }
+  .savednote {
+    display: none;
+  }
+  .okrow {
+    margin-top: 28px;
+  }
+}

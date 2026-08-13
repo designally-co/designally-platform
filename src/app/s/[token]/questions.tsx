@@ -21,14 +21,18 @@ type Props = {
   question: SurveyQuestion;
   value: RawValue | undefined;
   onChange: (value: ValueUpdate) => void;
+  /** Enter moves on; Shift+Enter still makes a line break in a paragraph. */
+  onEnter?: () => void;
 };
 
 /* ── the question, in the language that leads ─────────────────────── */
 
 /**
- * No number beside the question any more. One question holds the screen and the
- * progress line above it already says which one this is; printing "15." next to
- * it as well made the position look like part of the sentence.
+ * The number is a badge, not a prefix.
+ *
+ * Set inline in the sentence it would read as part of the question; set as a
+ * small block beside it, it reads as position — which is the only thing left
+ * saying where in twenty-one you are, now that the slides carry no chrome.
  */
 function Heading({ question }: { question: SurveyQuestion }) {
   const t = useText();
@@ -36,7 +40,10 @@ function Heading({ question }: { question: SurveyQuestion }) {
 
   return (
     <>
-      <span className="qq">{t(question.textEn, question.textTh)}</span>
+      <span className="qq">
+        {question.number !== null && <span className="qnum">{question.number}</span>}
+        {t(question.textEn, question.textTh)}
+      </span>
       {help && <span className="qhelp">{help}</span>}
     </>
   );
@@ -76,12 +83,19 @@ function Alt({ question }: { question: SurveyQuestion }) {
 
 /* ── paragraph and short_text ─────────────────────────────────────── */
 
-function TextAnswer({ question, value, onChange }: Props) {
+function TextAnswer({ question, value, onChange, onEnter }: Props) {
   const text = typeof value === 'string' ? value : '';
   const long = question.type === 'paragraph';
   const id = useId();
   const t = useText();
-  const placeholder = t('Your answer', 'คำตอบของคุณ');
+  const placeholder = t('Type your answer here...', 'พิมพ์คำตอบของคุณที่นี่...');
+
+  const advance = (e: React.KeyboardEvent) => {
+    if (e.key !== 'Enter' || e.shiftKey) return;
+    e.preventDefault();
+    (e.target as HTMLElement).blur();
+    onEnter?.();
+  };
 
   return (
     <div className="sq">
@@ -93,8 +107,10 @@ function TextAnswer({ question, value, onChange }: Props) {
         <textarea
           id={id}
           className="textarea"
+          rows={1}
           value={text}
           onChange={(e) => onChange(e.target.value)}
+          onKeyDown={advance}
           placeholder={placeholder}
         />
       ) : (
@@ -104,6 +120,7 @@ function TextAnswer({ question, value, onChange }: Props) {
           className="input"
           value={text}
           onChange={(e) => onChange(e.target.value)}
+          onKeyDown={advance}
           placeholder={placeholder}
         />
       )}
@@ -115,7 +132,7 @@ function TextAnswer({ question, value, onChange }: Props) {
  * The identity block's name and email. Unnumbered, compact, side by side — the
  * layout in reference/designally-app.html step 1.
  */
-export function IdentityField({ question, value, onChange }: Props) {
+export function IdentityField({ question, value, onChange, onEnter }: Props) {
   const text = typeof value === 'string' ? value : '';
   const id = useId();
   const t = useText();
@@ -141,6 +158,12 @@ export function IdentityField({ question, value, onChange }: Props) {
         className="input"
         value={text}
         onChange={(e) => onChange(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key !== 'Enter') return;
+          e.preventDefault();
+          (e.target as HTMLElement).blur();
+          onEnter?.();
+        }}
       />
       {email && help && <span className="fhelp">{help}</span>}
     </div>

@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { isAnswered, type DraftValues } from '@/lib/survey/answers';
 import type { SurveyPayload, SurveyQuestion, SurveyStep } from '@/lib/survey/load';
-import { packageFull } from '@/lib/team/labels';
 import { LangContext, LANG_LABEL, type Lang } from './lang';
 import Question, { IdentityField, type ValueUpdate } from './questions';
 
@@ -54,20 +53,14 @@ function stepIsVisible(step: SurveyStep, values: DraftValues, all: SurveyStep[])
 }
 
 /**
- * One screen.
+ * One slide.
  *
- * Measured at 390px, the old grouped steps ran 2.1 to 5.4 phone screens each —
- * Visual direction alone was seven questions in one continuous scroll. A step
- * is now a rhythm rather than a page: each question holds the screen on its
- * own, and the step's framing sentence appears once, on its first question,
- * instead of being repeated or lost.
- *
- * The identity block is the one exception. Name and email are a single thought
- * and neither is numbered, so consecutive unnumbered short answers share a card.
+ * The identity block is the one slide holding two fields — name and email are a
+ * single thought and neither is numbered.
  */
 type Card =
-  | { kind: 'fields'; questions: SurveyQuestion[]; step: SurveyStep; stepFirst: boolean }
-  | { kind: 'question'; question: SurveyQuestion; step: SurveyStep; stepFirst: boolean };
+  | { kind: 'fields'; questions: SurveyQuestion[] }
+  | { kind: 'question'; question: SurveyQuestion };
 
 export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   const [ready, setReady] = useState(false);
@@ -81,6 +74,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   const [lang, setLang] = useState<Lang>('th');
 
   const draftKey = useRef<string>('');
+  const deck = useRef<HTMLDivElement | null>(null);
   const storageKey = draftStorageKey(survey.token);
 
   const steps = useMemo(
@@ -91,12 +85,10 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   const cards = useMemo(() => {
     const out: Card[] = [];
     for (const s of steps) {
-      let first = true;
       let pending: SurveyQuestion[] = [];
       const flush = () => {
         if (!pending.length) return;
-        out.push({ kind: 'fields', questions: pending, step: s, stepFirst: first });
-        first = false;
+        out.push({ kind: 'fields', questions: pending });
         pending = [];
       };
       for (const q of s.questions) {
@@ -105,16 +97,14 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
           continue;
         }
         flush();
-        out.push({ kind: 'question', question: q, step: s, stepFirst: first });
-        first = false;
+        out.push({ kind: 'question', question: q });
       }
       flush();
     }
     return out;
   }, [steps]);
 
-  const REVIEW = cards.length + 1;
-  const DONE = cards.length + 2;
+  const LAST = cards.length + 1;
 
   /* ── restore ────────────────────────────────────────────────────── */
 
@@ -156,10 +146,6 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
 
       if (winner) {
         setValues(winner.values ?? {});
-        /* A draft written before the survey became one-question-per-screen holds
-           a step index that no longer means anything. Anything past the end
-           lands on the review screen rather than on a blank page. */
-        setStep(Math.min(winner.step ?? WELCOME, REVIEW));
         setSavedAt(winner.updatedAt ?? null);
       }
       setReady(true);
@@ -169,8 +155,6 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
     return () => {
       cancelled = true;
     };
-    // REVIEW is derived from the question list, which does not change mid-session
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storageKey, survey.token]);
 
   /* ── save ───────────────────────────────────────────────────────── */
@@ -218,10 +202,8 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
     }
   };
 
-  /** Nothing has been answered yet — don't claim a draft exists. */
   const started = Object.keys(values).length > 0;
 
-  // Local save is immediate-ish; the server copy follows a few seconds behind.
   const serverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (!ready || submitted || !started) return;
@@ -239,16 +221,44 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
       [ref]: typeof value === 'function' ? value(prev[ref]) : value,
     }));
 
-  /* ── navigation ─────────────────────────────────────────────────── */
+  /* ── the deck ───────────────────────────────────────────────────── */
 
-  const go = (next: number) => {
-    setStep(next);
-    if (Object.keys(values).length) {
-      persistLocal(next, values);
-      void persistServer(next, values);
-    }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  /**
+   * Scrolling is the navigation.
+   *
+   * Every slide is one viewport tall and snaps, so a wheel, a swipe, Page
+   * Up/Down and the chevrons are all the same gesture — and any question stays
+   * reachable by scrolling back to it instead of stepping through the ones in
+   * between.
+   *
+   * The active slide is read from the scroll position rather than held in state
+   * and pushed at it. A person can scroll anywhere at any moment, so the
+   * position is theirs to set and ours to follow; a `step` that tried to drive
+   * the scroller would fight every swipe.
+   */
+  const goTo = useCallback((index: number) => {
+    const el = deck.current?.querySelector<HTMLElement>(`[data-slide="${index}"]`);
+    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, []);
+
+  useEffect(() => {
+    const root = deck.current;
+    if (!root || submitted) return;
+
+    const slides = Array.from(root.querySelectorAll<HTMLElement>('[data-slide]'));
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting && e.intersectionRatio > 0.55) {
+            setStep(Number((e.target as HTMLElement).dataset.slide));
+          }
+        }
+      },
+      { root, threshold: [0.56] },
+    );
+    slides.forEach((s) => observer.observe(s));
+    return () => observer.disconnect();
+  }, [cards.length, submitted]);
 
   /* ── submit ─────────────────────────────────────────────────────── */
 
@@ -258,7 +268,6 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
       ? (values[nameQuestion.ref] as string).trim()
       : '';
 
-  /** Blank required questions, with the card each one lives on. */
   const blanks = useMemo(
     () =>
       cards
@@ -274,7 +283,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   async function submit() {
     if (!respondentName) {
       setNameMissing(true);
-      go(1);
+      goTo(1);
       return;
     }
     setSubmitting(true);
@@ -288,8 +297,6 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
       if (!res.ok) throw new Error(await res.text());
       window.localStorage.removeItem(storageKey);
       setSubmitted(respondentName);
-      setStep(DONE);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch {
       setError(
         lang === 'th'
@@ -308,189 +315,149 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
     setNameMissing(false);
     setSavedAt(null);
     setStep(WELCOME);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    requestAnimationFrame(() => goTo(WELCOME));
   }
 
   /* ── render ─────────────────────────────────────────────────────── */
 
   const t = (en: string, th: string) => (lang === 'th' ? th : en);
-  const card = step >= 1 && step <= cards.length ? cards[step - 1] : null;
-  const progress = Math.min(step / (cards.length + 1), 1) * 100;
-  const hero = step === WELCOME || step === DONE;
-  /* question and send screens anchor their nav to the floor of the viewport */
-  const carded = Boolean(card) || step === REVIEW;
+
+  if (submitted) {
+    return (
+      <LangContext.Provider value={lang}>
+        <div className="survey-shell client-surface">
+          <div className="slide">
+            <div className="slidebody">
+              <div className="done-mark" aria-hidden="true">
+                ✓
+              </div>
+              <h1>
+                Thank you, <em>{submitted}</em>.
+              </h1>
+              <p className="intro">
+                {t(
+                  "Your answers are with the Designally team. We'll bring every perspective together and see you at the kick-off meeting.",
+                  'คำตอบของคุณถูกส่งถึงทีมแล้ว เราจะรวบรวมทุกมุมมองเข้าด้วยกัน แล้วพบกันในการประชุมเริ่มโปรเจกต์',
+                )}
+              </p>
+              <button className="btn btn-quiet start" onClick={answerAsSomeoneElse}>
+                Answer as another stakeholder
+              </button>
+              <p className="takes">
+                {t(
+                  'Know someone else who should answer? Forward the same link.',
+                  'มีคนอื่นที่ควรตอบด้วยไหม ส่งลิงก์เดิมต่อได้เลย',
+                )}
+              </p>
+            </div>
+          </div>
+        </div>
+      </LangContext.Provider>
+    );
+  }
 
   return (
     <LangContext.Provider value={lang}>
-      <div className={`survey-shell client-surface${step === WELCOME ? ' at-welcome' : ''}`}>
-        <div className="bar">
-          <i style={{ transform: `scaleX(${progress / 100})` }} />
+      <div className="survey-shell client-surface">
+        <div className="bar" aria-hidden="true">
+          <i style={{ transform: `scaleX(${Math.min(step / LAST, 1)})` }} />
         </div>
 
-        <div className={`sform${hero ? ' hero' : ''}${carded ? ' card' : ''}`}>
-          <div className="head">
-            <span className="wordmark">
-              Design<em>ally</em>
-            </span>
-            <span className="proj">
-              {survey.clientName} · {packageFull(survey.package)}
-            </span>
-            {step !== WELCOME && step !== DONE && (
-              <div className="langswitch" role="group" aria-label="Language · ภาษา">
+        <div className="deck" ref={deck}>
+          <section className="slide" data-slide={WELCOME}>
+            <div className="slidebody">
+              <h1>Let&apos;s shape your brand, together.</h1>
+              <p className="intro">
+                {t(
+                  'This questionnaire helps our team understand your brand before we begin designing. There are no wrong answers.',
+                  'แบบสอบถามนี้ช่วยให้ทีมเข้าใจแบรนด์ของคุณก่อนเริ่มออกแบบ ไม่มีคำตอบที่ผิด',
+                )}
+              </p>
+
+              <div className="langswitch big" role="group" aria-label="Language · ภาษา">
                 {(['th', 'en'] as Lang[]).map((l) => (
-                  <button
-                    key={l}
-                    type="button"
-                    aria-pressed={lang === l}
-                    onClick={() => chooseLang(l)}
-                  >
+                  <button key={l} type="button" aria-pressed={lang === l} onClick={() => chooseLang(l)}>
                     {LANG_LABEL[l]}
                   </button>
                 ))}
               </div>
-            )}
-          </div>
 
-          {step === WELCOME && (
-            <section className="step">
-              <h1>
-                Let&apos;s shape your brand, <em>together</em>.
-              </h1>
-              <p className="th" style={{ marginBottom: 26 }}>
-                มาร่วมกันสร้างตัวตนของแบรนด์คุณ — คำตอบของคุณคือรากฐานของงานออกแบบ
-              </p>
-              <p className="intro">
-                This questionnaire helps our team understand your brand deeply before we begin
-                designing. There are no wrong answers — please answer honestly, in your own words.
-              </p>
-              <p className="th" style={{ maxWidth: '58ch' }}>
-                แบบสอบถามนี้ช่วยให้ทีมเข้าใจแบรนด์ของคุณก่อนเริ่มออกแบบ ไม่มีคำตอบที่ผิด
-              </p>
-
-              {/* The one place both languages must appear side by side: each
-                  option has to be legible to the person it is for. */}
-              <div className="langpick">
-                <span className="langpicklabel">Answer in · ตอบเป็นภาษา</span>
-                <div className="langswitch big" role="group" aria-label="Language · ภาษา">
-                  {(['th', 'en'] as Lang[]).map((l) => (
-                    <button
-                      key={l}
-                      type="button"
-                      aria-pressed={lang === l}
-                      onClick={() => chooseLang(l)}
-                    >
-                      {LANG_LABEL[l]}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="facts">
-                <div>
-                  <b>≈ 20 minutes</b> เวลาโดยประมาณ
-                </div>
-                <div>
-                  <b>{survey.questionCount} questions</b> จำนวนคำถาม
-                </div>
-                <div>
-                  <b>Share freely</b> ส่งต่อให้เพื่อนร่วมงานได้
-                </div>
-              </div>
-              <button className="btn btn-ink" onClick={() => go(1)} disabled={!ready}>
+              <button className="btn btn-ink start" onClick={() => goTo(1)} disabled={!ready}>
                 {started ? 'Continue' : 'Start'}
               </button>
-              {started && (
-                <p className="saved">
-                  Your answers on this device were saved. · คำตอบของคุณถูกบันทึกไว้ในเครื่องนี้แล้ว
-                </p>
-              )}
-            </section>
-          )}
+              <p className="takes">
+                {started
+                  ? t('Your answers were saved on this device.', 'คำตอบของคุณถูกบันทึกไว้ในเครื่องนี้')
+                  : t(
+                      `About 20 minutes · ${survey.questionCount} questions`,
+                      `ประมาณ 20 นาที · ${survey.questionCount} คำถาม`,
+                    )}
+              </p>
+            </div>
+          </section>
 
-          {card && (
-            <section className="step" key={step}>
-              {/* The step's framing sentence, once, on the question that opens
-                  it — not repeated on every card and not lost. */}
-              {card.stepFirst && (card.step.descEn || card.step.descTh) && (
-                <p className="stepframe">{t(card.step.descEn ?? '', card.step.descTh ?? '')}</p>
-              )}
-
-              {card.kind === 'fields' ? (
-                <div className="identitygrid">
-                  {card.questions.map((q) => (
-                    <div key={q.ref}>
-                      <IdentityField
-                        question={q}
-                        value={values[q.ref]}
-                        onChange={(v) => setValue(q.ref, v)}
-                      />
-                      {nameMissing && q.ref === nameQuestion?.ref && (
-                        <span className="qwarn">
-                          {t(
-                            'Please tell us your name so we know whose perspective this is.',
-                            'กรุณากรอกชื่อของคุณ เพื่อให้เรารู้ว่านี่คือมุมมองของใคร',
+          {cards.map((card, i) => {
+            const n = i + 1;
+            return (
+              <section className="slide" data-slide={n} key={n}>
+                <div className="slidebody">
+                  {card.kind === 'fields' ? (
+                    <div className="identitygrid">
+                      {card.questions.map((q) => (
+                        <div key={q.ref}>
+                          <IdentityField
+                            question={q}
+                            value={values[q.ref]}
+                            onChange={(v) => setValue(q.ref, v)}
+                            onEnter={() => goTo(n + 1)}
+                          />
+                          {nameMissing && q.ref === nameQuestion?.ref && (
+                            <span className="qwarn">
+                              {t(
+                                'Please tell us your name so we know whose perspective this is.',
+                                'กรุณากรอกชื่อของคุณ เพื่อให้เรารู้ว่านี่คือมุมมองของใคร',
+                              )}
+                            </span>
                           )}
-                        </span>
-                      )}
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <Question
-                  question={card.question}
-                  value={values[card.question.ref]}
-                  onChange={(v) => setValue(card.question.ref, v)}
-                />
-              )}
-
-              <div className="nav">
-                <button className="btn btn-quiet" onClick={() => go(step - 1)}>
-                  Back
-                </button>
-                <span className="of">
-                  {card.kind === 'question' && card.question.number
-                    ? `${card.question.number} / ${survey.questionCount}`
-                    : t('About you', 'เกี่ยวกับคุณ')}
-                </span>
-                <button className="btn btn-ink" onClick={() => go(step + 1)}>
-                  Continue
-                </button>
-              </div>
-
-              {started && savedAt && (
-                <p className="saved" aria-live="polite">
-                  {t(
-                    'Saved — you can close this and come back.',
-                    'บันทึกแล้ว ปิดหน้านี้แล้วกลับมาทำต่อได้',
+                  ) : (
+                    <Question
+                      question={card.question}
+                      value={values[card.question.ref]}
+                      onChange={(v) => setValue(card.question.ref, v)}
+                      onEnter={() => goTo(n + 1)}
+                    />
                   )}
-                </p>
-              )}
-            </section>
-          )}
+                  <Ok
+                    onClick={() => goTo(n + 1)}
+                    onBack={() => goTo(n - 1)}
+                    hint={card.kind === 'question' && card.question.type === 'paragraph'}
+                  />
+                </div>
+              </section>
+            );
+          })}
 
-          {step === REVIEW && (
-            <section className="step">
+          <section className="slide" data-slide={LAST}>
+            <div className="slidebody">
               <h2>{t('Ready to send', 'พร้อมส่งคำตอบ')}</h2>
               {blanks.length === 0 ? (
-                <p className="desc">
-                  {t(
-                    'Every question is answered. Send it whenever you are ready.',
-                    'ตอบครบทุกข้อแล้ว ส่งได้เลยเมื่อพร้อม',
-                  )}
-                </p>
+                <p className="intro">{t('Every question is answered.', 'ตอบครบทุกข้อแล้ว')}</p>
               ) : (
                 <>
-                  <p className="desc">
+                  <p className="intro">
                     {t(
-                      `${blanks.length} ${blanks.length === 1 ? 'question is' : 'questions are'} still blank. You can send anyway, or go back to any of them.`,
-                      `ยังไม่ได้ตอบ ${blanks.length} ข้อ ส่งเลยก็ได้ หรือกลับไปตอบก่อนก็ได้`,
+                      `${blanks.length} ${blanks.length === 1 ? 'question is' : 'questions are'} still blank.`,
+                      `ยังไม่ได้ตอบ ${blanks.length} ข้อ`,
                     )}
                   </p>
                   <ul className="blanklist">
                     {blanks.map(({ question, index }) => (
                       <li key={question.ref}>
-                        <button type="button" onClick={() => go(index)}>
-                          <b>{question.number ? `${question.number}.` : '·'}</b>
+                        <button type="button" onClick={() => goTo(index)}>
+                          <b>{question.number ?? '·'}</b>
                           <span>{t(question.textEn, question.textTh)}</span>
                         </button>
                       </li>
@@ -498,55 +465,80 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                   </ul>
                 </>
               )}
-
-              {error && (
-                <p className="sq" style={{ color: 'var(--caution)', marginTop: 18 }}>
-                  {error}
-                </p>
-              )}
-
-              <div className="nav">
-                <button className="btn btn-quiet" onClick={() => go(step - 1)}>
-                  Back
-                </button>
-                <span className="of">
-                  {survey.questionCount - blanks.length} / {survey.questionCount}
-                </span>
-                <button className="btn btn-primary" onClick={submit} disabled={submitting}>
-                  {submitting ? 'Sending' : 'Send answers'}
-                </button>
-              </div>
-            </section>
-          )}
-
-          {step === DONE && (
-            <section className="step">
-              <div className="done-mark" aria-hidden="true">
-                ✓
-              </div>
-              <h1>
-                Thank you, <em>{submitted || 'friend'}</em>.
-              </h1>
-              <p className="intro">
-                Your answers are with the Designally team. We&apos;ll bring every perspective
-                together and see you at the kick-off meeting.
-              </p>
-              <p className="th" style={{ maxWidth: '58ch', marginTop: 8 }}>
-                คำตอบของคุณถูกส่งถึงทีมแล้ว แล้วพบกันในการประชุมเริ่มโปรเจกต์
-              </p>
-              <div className="facts">
-                <div>
-                  <b>Know someone else who should answer?</b> Just forward the same link —
-                  we&apos;ll include their voice too. · ส่งลิงก์เดิมต่อให้เพื่อนร่วมงานได้เลย
-                </div>
-              </div>
-              <button className="btn btn-quiet" onClick={answerAsSomeoneElse}>
-                Answer as another stakeholder
+              {error && <p className="qwarn">{error}</p>}
+              <button className="btn btn-primary start" onClick={submit} disabled={submitting}>
+                {submitting ? 'Sending' : 'Send answers'}
               </button>
-            </section>
-          )}
+            </div>
+          </section>
         </div>
+
+        <nav className="deck-nav" aria-label="Move between questions">
+          <button
+            type="button"
+            onClick={() => goTo(Math.max(step - 1, 0))}
+            disabled={step === 0}
+            aria-label="Previous question"
+          >
+            <Chevron up />
+          </button>
+          <button
+            type="button"
+            onClick={() => goTo(Math.min(step + 1, LAST))}
+            disabled={step === LAST}
+            aria-label="Next question"
+          >
+            <Chevron />
+          </button>
+        </nav>
+
+        {savedAt && step > 0 && (
+          <p className="savednote" aria-live="polite">
+            {t('Saved', 'บันทึกแล้ว')}
+          </p>
+        )}
       </div>
     </LangContext.Provider>
+  );
+}
+
+/**
+ * OK, the shortcut beside it, and — on a phone — the back arrow the reference
+ * puts on the floor next to it. On a pointer device the chevron pair in the
+ * corner does that job instead, so the arrow here is hidden.
+ */
+function Ok({
+  onClick,
+  onBack,
+  hint,
+}: {
+  onClick: () => void;
+  onBack: () => void;
+  hint?: boolean;
+}) {
+  return (
+    <div className="okrow">
+      <button className="okback" onClick={onBack} type="button" aria-label="Previous question">
+        <Chevron back />
+      </button>
+      <button className="btn btn-ink ok" onClick={onClick}>
+        OK
+      </button>
+      <span className="okhint">{hint ? 'Shift + Enter for a line break' : 'or press Enter'}</span>
+    </div>
+  );
+}
+
+function Chevron({ up, back }: { up?: boolean; back?: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" width="19" height="19" fill="none" aria-hidden="true">
+      <path
+        d={back ? 'M14 6l-6 6 6 6' : up ? 'M6 14l6-6 6 6' : 'M6 10l6 6 6-6'}
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
