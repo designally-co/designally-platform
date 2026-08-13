@@ -494,6 +494,45 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
 
   /* ── render ─────────────────────────────────────────────────────── */
 
+  /* Terminal, so it is tested before every other screen. It was tested after
+     `sending`, which is still true when the send succeeds — the answers reached
+     the server, the response row was written, and the respondent was left
+     looking at the same Ready to send screen with a live button. The obvious
+     thing to do next is press it again. */
+  if (submitted) {
+    return (
+      <LangContext.Provider value={LEAD}>
+        <div className="survey-shell client-surface">
+          {/* the floor controls are revealed by data-active; off the deck this
+              slide always is — without it the only action here was invisible */}
+          <div className="slide" data-active="">
+            <div className="slidebody">
+              <div className="slidemain">
+                <div className="done-mark" aria-hidden="true">
+                  ✓
+                </div>
+              <h1>
+                Thank you, <em>{submitted}</em>.
+              </h1>
+              <p className="intro">
+                Your answers are with the Designally team. We&apos;ll bring every perspective
+                together and see you at the kick-off meeting.
+              </p>
+                <p className="introth th">
+                  คำตอบของคุณถูกส่งถึงทีมแล้ว แล้วพบกันในการประชุมเริ่มโปรเจกต์
+                </p>
+              </div>
+              <button className="btn btn-quiet start" onClick={answerAsSomeoneElse}>
+                Answer as another stakeholder
+              </button>
+              <p className="takes">Know someone else who should answer? Forward the same link.</p>
+            </div>
+          </div>
+        </div>
+      </LangContext.Provider>
+    );
+  }
+
   if (sending) {
     return (
       <LangContext.Provider value={LEAD}>
@@ -578,38 +617,6 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
             <span />
             <span />
             <span />
-          </div>
-        </div>
-      </LangContext.Provider>
-    );
-  }
-
-  if (submitted) {
-    return (
-      <LangContext.Provider value={LEAD}>
-        <div className="survey-shell client-surface">
-          <div className="slide">
-            <div className="slidebody">
-              <div className="slidemain">
-                <div className="done-mark" aria-hidden="true">
-                  ✓
-                </div>
-              <h1>
-                Thank you, <em>{submitted}</em>.
-              </h1>
-              <p className="intro">
-                Your answers are with the Designally team. We&apos;ll bring every perspective
-                together and see you at the kick-off meeting.
-              </p>
-                <p className="introth th">
-                  คำตอบของคุณถูกส่งถึงทีมแล้ว แล้วพบกันในการประชุมเริ่มโปรเจกต์
-                </p>
-              </div>
-              <button className="btn btn-quiet start" onClick={answerAsSomeoneElse}>
-                Answer as another stakeholder
-              </button>
-              <p className="takes">Know someone else who should answer? Forward the same link.</p>
-            </div>
           </div>
         </div>
       </LangContext.Provider>

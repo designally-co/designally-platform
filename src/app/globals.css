@@ -758,7 +758,21 @@ label.f span {
 .qalt {
   margin: -2px 0 14px;
 }
+/**
+ * The control that shows the question in the other language.
+ *
+ * Its hit area is bigger than it looks. The word is 20px wide — "ไทย" is three
+ * glyphs — which made a 20x32 target on a phone: under the 24x24 floor, let
+ * alone a comfortable one, and this is the control every Thai reader needs on
+ * every one of twenty-one questions. It cannot simply be padded, because it
+ * sits on the column's left edge and padding would push the word off it, and
+ * the underline is the width of the word by design.
+ *
+ * So the box stays and an invisible one is laid over it: 48x48, centred on the
+ * word, no effect on layout. Nothing else is near enough to swallow.
+ */
 .qlangbtn {
+  position: relative;
   font-family: inherit;
   font-size: 13px;
   color: var(--primary);
@@ -768,6 +782,15 @@ label.f span {
   padding: 4px 0;
   min-height: 32px;
   cursor: pointer;
+}
+.qlangbtn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(48px, 100%);
+  height: 48px;
+  transform: translate(-50%, -50%);
 }
 @media (hover: hover) {
   .qlangbtn:hover {
@@ -2771,6 +2794,21 @@ dialog::backdrop {
 }
 
 /* welcome and send share the slide, centred and bare */
+/**
+ * No slant, in either script.
+ *
+ * The respondent's name is set in <em> on the thank-you screen, and a browser's
+ * default for that is italic. Neither font here ships one: Inter and Noto Sans
+ * Thai are loaded at 300/400/600/700 upright only, so the browser was shearing
+ * the glyphs itself. On Latin that is merely poor; on Thai it drags the tone
+ * marks and vowel signs off the stems they belong to, and Thai has no italic
+ * tradition to appeal to anyway. Both fonts do carry a real 700.
+ */
+.survey-shell em {
+  font-style: normal;
+  font-weight: 700;
+}
+
 .slide h1 {
   font-size: clamp(2rem, 4.6vw, 3.1rem);
   line-height: 1.28;
@@ -3121,25 +3159,21 @@ dialog::backdrop {
   }
   .floorblur span:nth-child(1) {
     backdrop-filter: blur(1px);
-    -webkit-backdrop-filter: blur(1px);
     -webkit-mask-image: linear-gradient(to top, #000 0%, transparent 45%);
     mask-image: linear-gradient(to top, #000 0%, transparent 45%);
   }
   .floorblur span:nth-child(2) {
     backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
     -webkit-mask-image: linear-gradient(to top, #000 0%, transparent 32%);
     mask-image: linear-gradient(to top, #000 0%, transparent 32%);
   }
   .floorblur span:nth-child(3) {
     backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
     -webkit-mask-image: linear-gradient(to top, #000 0%, transparent 21%);
     mask-image: linear-gradient(to top, #000 0%, transparent 21%);
   }
   .floorblur span:nth-child(4) {
     backdrop-filter: blur(11px);
-    -webkit-backdrop-filter: blur(11px);
     -webkit-mask-image: linear-gradient(to top, #000 0%, transparent 11%);
     mask-image: linear-gradient(to top, #000 0%, transparent 11%);
   }
