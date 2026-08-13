@@ -126,10 +126,13 @@ export function condenseTranscript(transcript: string, limit = MAX_ANSWER_CHARS)
 }
 
 /**
- * Pass two. The findings from pass one are given back so the creative notes,
- * the deck outline and the facilitation notes are built on what was actually
- * found — the spec's own order: the deck outline comes from the settled and
- * unsettled sections.
+ * Pass two. The findings from pass one are given back so the deck outline and
+ * the facilitation notes are built on what was actually found — the spec's own
+ * order: the deck outline comes from the settled and unsettled sections.
+ *
+ * It used to write the creative reading too — the repeated vocabulary, the
+ * references decoded, every scale pair interpreted. That is the team's job, and
+ * they can read the answers themselves now.
  */
 export function buildCreativePrompt(
   input: { clientName: string; packageLabel: string; respondentCount: number; transcript: string },
@@ -170,5 +173,11 @@ ${conflicts}
 Not decided by the client yet:
 ${gaps}
 
-Now write the rest: what the creative team needs, the kick-off deck outline, and the internal notes on running the room.`;
+Now write only two things, and nothing else.
+
+**The deck outline.** A running order the team will build in Canva by hand, at most ten slides. Every unsettled item above becomes a DECIDE slide and belongs early, while the room is still fresh. A title and one line saying what the slide is for — not its content, which the designer writes.
+
+**How to run the room.** At most four notes, internal and never shown to a client: what to open with, what not to let the room move past, what to handle gently and why.
+
+Do not interpret the answers. Do not decode what the references mean, do not read the personality scales back, do not collect the client's vocabulary, and do not describe adjective clusters. The team reads the answers in full themselves; your job is what they cannot get by reading — the order to take it in, and what to watch for in the room.`;
 }

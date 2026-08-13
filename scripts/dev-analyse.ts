@@ -109,8 +109,6 @@ async function main() {
 
   console.log(`\nALIGNMENT: ${brief.alignment} — ${brief.alignmentReason}`);
 
-  console.log(`\nFOR THE CREATIVE TEAM (${brief.creativeNotes.length})`);
-  for (const n of brief.creativeNotes) console.log(`  · ${n.heading}: ${n.body}`);
 
   /* Did the planted findings survive? A keyword hit is weak evidence — it says
      the subject was mentioned, not that the reading was right. Read the output

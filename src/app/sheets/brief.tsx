@@ -134,65 +134,6 @@ export default function BriefSheet({
           )}
         </section>
 
-        {/* 5 · for the creative team */}
-        <section className="bsec">
-          <h3>For the creative team</h3>
-
-          {brief.vocabulary.length > 0 && (
-            <>
-              <h4>Their own words</h4>
-              <ul className="vocab">
-                {brief.vocabulary.map((v, i) => (
-                  <li key={i}>
-                    <b>{v.phrase}</b>
-                    <span className="who">{outOf(v.respondents.length, people)}</span>
-                    <span className="note">{v.note}</span>
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-
-          {brief.references.length > 0 && (
-            <>
-              <h4>What the references actually mean</h4>
-              <ul className="refs">
-                {brief.references.map((r, i) => (
-                  <li key={i}>
-                    <b>
-                      {r.brand} <span className="tag">{r.admiredOrDisliked}</span>
-                    </b>
-                    <span className="reasons">Reasons given: {r.reasonsGiven.join(' · ')}</span>
-                    <span className="note">{r.whatItMeans}</span>
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-
-          {brief.scales.length > 0 && (
-            <>
-              <h4>Personality — the splits are the finding</h4>
-              <ul className="scales">
-                {brief.scales.map((s, i) => (
-                  <li key={i} className={s.split ? 'split' : ''}>
-                    <b>{s.pair}</b>
-                    <span>{s.reading}</span>
-                    {s.split && <span className="tag">needs a decision</span>}
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-
-          {brief.creativeNotes.map((n, i) => (
-            <div key={i}>
-              <h4>{n.heading}</h4>
-              <p>{n.body}</p>
-            </div>
-          ))}
-        </section>
-
         {/* 6 · signals */}
         <section className="bsec">
           <h3>Signals</h3>

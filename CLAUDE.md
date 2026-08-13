@@ -165,7 +165,7 @@ Each one ends with something usable. Do not start the next before the previous h
 
 1. **One survey link that works** — public bilingual form, saves to Postgres. No auth, no team app.
 2. **The team can see it** — auth, Projects list, create survey, view responses. Already replaces Google Forms.
-3. **The brief writes itself** — close and analyse, Anthropic API, structured output. Test against the real ARUN+ (28 responses) and PCE-TH data.
+3. **The team can prepare in ten minutes** — close and analyse, Anthropic API, structured output. The engine reports what they might miss or must be careful about; it does not read the answers for them. The team sees the full answers, that summary, and a deck outline they build in Canva. Narrowed 13 August 2026 after the first real brief returned fifty items — see `docs/insight-engine-spec.md`.
 4. **The human gate and the decisions** — review, confirm, deck handoff, record decisions.
 5. ~~The website track~~ — retired 11 August 2026 with the website package.
 6. **The template editor** — until then, questions live in a seed file.

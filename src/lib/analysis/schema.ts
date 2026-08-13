@@ -135,72 +135,37 @@ export const FindingsSchema = z.object({
     ),
 });
 
-/** Pass two — written with the findings above already in hand. */
+/**
+ * Pass two — preparation, not interpretation.
+ *
+ * **Narrowed 13 August 2026.** This carried four more fields: the client's
+ * repeated vocabulary, the named references decoded by the reason behind them,
+ * a reading of every scale pair, and creative notes on adjective clusters. They
+ * were the engine reading the answers *for* the team.
+ *
+ * That is the team's job, and doing it here cost them twice over: it buried the
+ * handful of things they would genuinely have missed under fifty items, and the
+ * team had no way to see the raw answers to check any of it against. The spec's
+ * own filter — "if we removed this, would the team make a worse decision?" —
+ * rules them out now that the answers are readable in the app.
+ *
+ * What survives is what a person cannot get by reading: a running order for the
+ * room, and a deck skeleton built from the conflicts.
+ */
 export const CreativeSchema = z.object({
-  /* 5 · for the creative team */
-  vocabulary: z
-    .array(
-      z.object({
-        phrase: z.string().describe("The client's own word or phrase, verbatim, in their language."),
-        respondents: RespondentNames,
-        note: z.string().describe('Why it matters — usually that the client already believes it, so nobody has to be persuaded.'),
-      }),
-    )
-    .describe('Words and phrases the stakeholders repeat. Copy written in the client\'s own language gets approved faster.'),
-
-  references: z
-    .array(
-      z.object({
-        brand: z.string(),
-        admiredOrDisliked: z.enum(['admired', 'disliked']),
-        reasonsGiven: z
-          .array(z.string())
-          .describe('The reasons respondents actually gave. This is the data; the name is only the label.'),
-        respondents: RespondentNames,
-        whatItMeans: z
-          .string()
-          .describe(
-            'The decoded direction. If people named a brand for its speed and boldness and nobody mentioned how it looks, it means behave boldly — not look like them.',
-          ),
-      }),
-    )
-    .describe('Brands named, decoded by the reason rather than the name.'),
-
-  scales: z
-    .array(
-      z.object({
-        pair: z.string().describe('The pair, e.g. "Traditional – Modern".'),
-        reading: z
-          .string()
-          .describe('Where respondents sit and, more importantly, whether they agree. The disagreement width is the finding, not the average.'),
-        split: z.boolean().describe('True when respondents genuinely disagree and the kick-off must resolve it.'),
-      }),
-    )
-    .describe('Only where a linear scale was answered. Lead with the splits and say plainly how many were near-unanimous.'),
-
-  creativeNotes: z
-    .array(
-      z.object({
-        heading: z.string(),
-        body: z
-          .string()
-          .describe(
-            "Report what the client said and what it implies — never choose the design direction, that is the designer's work.",
-          ),
-      }),
-    )
-    .describe('Adjective clusters, archetype signal, the avoid list and any contradiction between what they want and what they say to avoid.'),
-
   /* 7 · deck outline — built from settled, unsettled and the creative notes */
-  deckOutline: z.array(
-    z.object({
-      title: z.string(),
-      purpose: z.string().describe('What this slide is for, in one line.'),
-      needsDecision: z
-        .boolean()
-        .describe('True when this slide asks the room to decide something. Conflicts become DECIDE slides and belong early.'),
-    }),
-  ),
+  deckOutline: z
+    .array(
+      z.object({
+        title: z.string(),
+        purpose: z.string().describe('What this slide is for, in one line.'),
+        needsDecision: z
+          .boolean()
+          .describe('True when this slide asks the room to decide something. Conflicts become DECIDE slides and belong early.'),
+      }),
+    )
+    .max(10)
+    .describe('The running order the team builds the Canva deck from. Ten slides is a kick-off; thirteen is a reading.'),
 
   /**
    * Rule 8 — internal facilitation notes never render on a client-facing
@@ -209,6 +174,7 @@ export const CreativeSchema = z.object({
    */
   howToRunTheRoom: z
     .array(z.object({ heading: z.string(), body: z.string() }))
+    .max(4)
     .describe(
       'Internal only, never shown to a client. How to handle the room — what to open with, what not to move past, what to handle gently and why. It can be blunt about people in a way the rest cannot.',
     ),

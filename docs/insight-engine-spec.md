@@ -10,6 +10,42 @@
 
 ---
 
+## Narrowed, 13 August 2026 — the engine prepares, it does not interpret
+
+The first brief from real answers came back with fourteen fields and about fifty
+items. The team's verdict was that it told them too much: they wanted **the
+things they might miss, or have to be careful about**, and the reading of the
+answers is their own work.
+
+So four sections were removed — the client's repeated **vocabulary**, the
+**references decoded** by the reason behind them, a **reading of every scale
+pair**, and the **creative notes** on adjective clusters. Layer 1 items 4 and 5
+below, and the creative layer, describe what the engine used to do and are kept
+for the reasoning, not as a specification.
+
+**This is not a reversal of the filter below — it is the filter being enforced.**
+That section already warned that "a brief with 40 observations costs as much
+reading as the raw survey did", and the engine wrote fifty. What changed is who
+does the reading: the team can now see every answer in the app, so anything the
+engine says *about* an answer is a second copy of something they are holding.
+
+What the engine produces now:
+
+| Kept | Why |
+|---|---|
+| Settled ground | Stops the kick-off re-opening decided questions |
+| Unsettled, ranked by cost | The expensive disagreements, found before revision round three |
+| Not decided yet | The clarity gaps — the thing the spec calls pure gold, and the hardest to see by reading |
+| Flags | Outliers, low-effort answers, single-respondent risk |
+| Alignment | One honest read, with its reason |
+| Deck outline | At most ten slides, built from the conflicts — the team builds it in Canva by hand |
+| How to run the room | Internal, at most four notes |
+
+The team surface is three things, in this order: **the full answers**, this
+summary, and the deck outline with a copy button.
+
+---
+
 ## The filter: an insight changes a decision
 
 A summary tells the team what the client said. An insight tells them **what to do differently**. Everything below has to pass one test:
