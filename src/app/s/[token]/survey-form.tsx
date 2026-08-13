@@ -106,6 +106,15 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
    * pressing Continue past every question already answered.
    */
   const [resumeAt, setResumeAt] = useState(1);
+  /**
+   * Which way the survey just moved, so the next screen can arrive from there.
+   *
+   * Every caller states its own direction rather than it being inferred from
+   * the step numbers, because the numbers lie: leaving the send screen to fix a
+   * blank is a step *backwards* even when the question is number 3 and you came
+   * from number 21.
+   */
+  const [dir, setDir] = useState<'next' | 'back'>('next');
 
   const draftKey = useRef<string>('');
   const storageKey = draftStorageKey(survey.token);
@@ -306,17 +315,20 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   /* the questions end at the last card; past it is the send screen */
   const advance = (n: number) => (n >= cards.length ? openSend() : setStep(n + 1));
 
-  const goTo = useCallback((index: number) => {
+  const goTo = useCallback((index: number, direction: 'next' | 'back' = 'next') => {
+    setDir(direction);
     setStep(index);
   }, []);
 
   const leaveSend = useCallback((index: number) => {
+    setDir('back');
     setFromSend(true);
     setSending(false);
     setStep(index);
   }, []);
 
   const openSend = useCallback(() => {
+    setDir('next');
     setFromSend(false);
     setSending(true);
   }, []);
@@ -412,7 +424,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
         <div className="survey-shell client-surface">
           {/* the floor controls are revealed by data-active, and there is only
               ever one screen — without it the only action here was invisible */}
-          <div className="slide" data-active="">
+          <div className="slide" data-active="" data-dir="next">
             <div className="slidebody">
               <div className="slidemain">
                 <div className="done-mark" aria-hidden="true">
@@ -447,7 +459,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
           <div className="bar" aria-hidden="true">
             <i style={{ transform: 'scaleX(1)' }} />
           </div>
-          <div className="slide sendslide" data-active="">
+          <div className="slide sendslide" data-active="" data-dir={dir}>
             <div className="slidebody">
               <div className="slidemain">
                 <h2>Ready to send</h2>
@@ -537,7 +549,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
         )}
 
         {card ? (
-          <section className="slide" data-active="" key={step}>
+          <section className="slide" data-active="" data-dir={dir} key={step}>
             <div className="slidebody">
               <div className="slidemain">
                 {card.kind === 'fields' ? (
@@ -571,13 +583,13 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
               </div>
               <Ok
                 onClick={() => advance(step)}
-                onBack={() => goTo(step - 1)}
+                onBack={() => goTo(step - 1, 'back')}
                 hint={card.kind === 'question' && card.question.type === 'paragraph'}
               />
             </div>
           </section>
         ) : (
-          <section className="slide" data-active="">
+          <section className="slide" data-active="" data-dir={dir} key="welcome">
             <div className="slidebody">
               <div className="slidemain">
                 <h1>Let&apos;s shape your brand, together.</h1>

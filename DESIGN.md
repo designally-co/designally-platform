@@ -242,6 +242,12 @@ button:active { transform: scale(0.95); }
 
 Everything else stays quiet. Panel entrance 420ms, list stagger 70ms, state changes 300ms, feedback 180ms — all on `cubic-bezier(0.22, 1, 0.36, 1)`. No bounce, no spring.
 
+**The survey's question change** — a state change, so 300ms on that curve. The content arrives 16px from the direction the survey just moved: forward from below, back from above. Added 13 August 2026 when scrolling stopped being the navigation, and it is not decoration — scrolling used to carry that information for free. On a screen where every question looks like the last one, direction is the only thing telling a respondent whether they went forward or back.
+
+**The controls do not move.** Continue and Back are furniture, anchored to the floor of a phone precisely so that twenty-one advances are not twenty-one small re-aims; a control that slid on every press would undo that. Only the content column animates.
+
+Sixteen pixels, not a viewport. A full-height slide is a different product's motion and cannot be read inside the 300ms this system allows anyway. And the fill is `backwards`, never `forwards` or `both`: the personality battery's question is `position: sticky` inside the animated element, and a transform retained on its ancestor would give it a new containing block and break the pinning it depends on.
+
 Document default and pressed states only. The source analysis explicitly declines to document hover; follow that — hover may tint, but no layout may depend on it.
 
 ```css

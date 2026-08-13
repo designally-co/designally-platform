@@ -2609,6 +2609,47 @@ dialog::backdrop {
 }
 
 /* the question */
+/**
+ * The question arrives from the direction the survey just moved.
+ *
+ * Scrolling used to do this. A question rose into place because you pushed it
+ * there, and letting one replace another with no motion at all loses the only
+ * thing that told a respondent whether they had gone forward or back — on a
+ * screen where every question looks like the last one, that is the whole
+ * signal.
+ *
+ * **The content moves; the controls do not.** Continue and Back are furniture,
+ * fixed to the floor of a phone precisely so that twenty-one advances are not
+ * twenty-one small re-aims. A control that slid on every press would undo that.
+ *
+ * 16px, not a viewport. DESIGN.md section 4 allows 300ms on this curve for a
+ * state change and says everything else stays quiet — a full-height slide would
+ * be a different product's motion, and it cannot be read in 300ms anyway.
+ *
+ * `backwards` fill and not `both`: the battery's question is `position: sticky`
+ * inside this element, and a transform retained on its ancestor would give it a
+ * new containing block and break the pinning it depends on.
+ */
+.slidemain {
+  animation: qnext 0.3s var(--ease) backwards;
+}
+.slide[data-dir='back'] .slidemain {
+  animation-name: qprev;
+}
+
+@keyframes qnext {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+@keyframes qprev {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+}
+
 .slide .sq {
   margin: 0;
 }
