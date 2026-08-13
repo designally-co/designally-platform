@@ -399,20 +399,40 @@ pre.handoff{
 }
 
 /* ============ client survey ============ */
-.survey{ display:none; } .survey.on{ display:block; }
+.survey{ display:none; } .survey.on{ display:block; background-image:linear-gradient(to bottom,var(--surface) 0,var(--bg) 340px); background-repeat:no-repeat; }
 .bar{ position:sticky; top:0; z-index:var(--z-sticky); height:3px; background:var(--line); }
 .bar i{ display:block; height:100%; width:0; background:var(--accent); transition:width .55s var(--ease); }
 .sform{ max-width:660px; margin:0 auto; padding:44px 26px 90px; }
+/* Welcome and thank-you hold the viewport and settle their content against it;
+   a top-aligned block left a few hundred pixels of dead ground on a phone. */
+.sform.hero{ display:flex; flex-direction:column; min-height:100dvh; padding-bottom:44px; }
+.sform.hero .step{ flex:1; display:flex; flex-direction:column; justify-content:center; }
 .sform .head{ display:flex; align-items:baseline; gap:11px; margin-bottom:38px; }
 .sform .head .proj{ font-size:12.5px; color:var(--ink-3); border-left:1px solid var(--line-2); padding-left:11px; }
 .step{ display:none; } .step.on{ display:block; animation:rise .45s var(--ease); }
-.step h1{ font-size:clamp(1.9rem,5vw,2.7rem); line-height:1.14; font-weight:600; letter-spacing:-0.024em; text-wrap:balance; margin-bottom:10px; }
+/* 1.28, not 1.14 — the thank-you heading always carries a Thai name, and below
+   ~44px of absolute leading the lower vowel of one line meets the tone mark of
+   the next. Measured; see the display clause in DESIGN.md section 2. */
+.step h1{ font-size:clamp(2.35rem,6.4vw,4.1rem); line-height:1.28; font-weight:600; letter-spacing:-0.03em; text-wrap:balance; max-width:15ch; margin-bottom:14px; }
 .step h1 em{ font-style:normal; font-weight:600; letter-spacing:0; }
 .step h2{ font-size:clamp(1.4rem,3.6vw,1.85rem); font-weight:600; letter-spacing:-0.02em; line-height:1.22; text-wrap:balance; }
 .stepno{ font-size:13px; font-weight:600; color:var(--accent-deep); margin-bottom:7px; }
-.th{ color:var(--ink-2); font-size:15px; }
-.intro{ font-size:16.5px; max-width:58ch; margin-bottom:8px; text-wrap:pretty; }
-.facts{ display:flex; gap:26px; flex-wrap:wrap; margin:30px 0 34px; font-size:13.5px; color:var(--ink-3); }
+/* Thai is half the audience, not a caption under the real line */
+.th{ color:var(--ink-2); font-size:15px; line-height:1.72; }
+.step h1 + .th{ font-size:clamp(16.5px,2.6vw,19px); line-height:1.75; max-width:42ch; }
+.intro{ font-size:clamp(16.5px,1.9vw,18px); line-height:1.55; max-width:54ch; margin-bottom:8px; text-wrap:pretty; }
+/* What to expect before committing twenty minutes — practical expectations,
+   not statistics, so they sit as a ruled rail rather than a row of trophies. */
+.facts{ display:grid; grid-template-columns:repeat(3,1fr); gap:0; margin:34px 0 30px; font-size:13px; color:var(--ink-3); border-top:1px solid var(--line-2); }
+.facts>div{ padding:16px 14px 0 0; }
+.facts>div+div{ padding-left:16px; border-left:1px solid var(--line-2); }
+.facts>div:only-child{ grid-column:1/-1; padding-right:0; font-size:13.5px; line-height:1.65; }
+@media(max-width:460px){
+  .facts{ grid-template-columns:1fr; }
+  .facts>div{ display:flex; align-items:baseline; justify-content:space-between; gap:14px; padding:11px 0; }
+  .facts>div+div{ padding-left:0; border-left:0; border-top:1px solid var(--line); }
+  .facts>div:only-child{ display:block; padding:16px 0 0; }
+}
 .facts b{ display:block; color:var(--ink); font-size:15px; font-weight:600; }
 .desc{ color:var(--ink-2); margin:8px 0 30px; max-width:60ch; text-wrap:pretty; }
 .sq{ margin-bottom:28px; }
@@ -582,7 +602,7 @@ pre.handoff{
         <div><b>24 questions</b> จำนวนคำถาม</div>
         <div><b>Share freely</b> ส่งต่อให้เพื่อนร่วมงานได้</div>
       </div>
-      <button class="btn btn-ink" onclick="go(1)">Start · เริ่มทำแบบสอบถาม</button>
+      <button class="btn btn-ink" onclick="go(1)">Start</button>
     </section>
 
     <section class="step" data-s="1">
@@ -647,7 +667,7 @@ pre.handoff{
         <span class="qth">ไม่อยากให้แบรนด์ดูมีภาพลักษณ์แบบไหน</span>
         <div class="checks" id="avoid"></div>
       </div>
-      <div class="nav"><button class="btn btn-quiet" onclick="go(4)">Back</button><span class="of">5 / 5</span><button class="btn btn-primary" onclick="go(6)">Send answers · ส่งคำตอบ</button></div>
+      <div class="nav"><button class="btn btn-quiet" onclick="go(4)">Back</button><span class="of">5 / 5</span><button class="btn btn-primary" onclick="go(6)">Send answers</button></div>
     </section>
 
     <section class="step" data-s="6">
@@ -656,7 +676,7 @@ pre.handoff{
       <p class="intro">Your answers are with the Designally team. We'll bring every perspective together and see you at the kick-off meeting.</p>
       <p class="th" style="max-width:58ch; margin-top:8px;">คำตอบของคุณถูกส่งถึงทีมแล้ว แล้วพบกันในการประชุมเริ่มโปรเจกต์</p>
       <div class="facts"><div><b>Know someone else who should answer?</b> Just forward the same link — we'll include their voice too. · ส่งลิงก์เดิมต่อให้เพื่อนร่วมงานได้เลย</div></div>
-      <button class="btn btn-quiet" onclick="go(0)">Answer as another stakeholder · ตอบในฐานะผู้อื่น</button>
+      <button class="btn btn-quiet" onclick="go(0)">Answer as another stakeholder</button>
     </section>
   </div>
 </div>
@@ -1511,6 +1531,9 @@ document.querySelectorAll('#dm input').forEach(r=>r.onchange=()=>{
 });
 function go(step){
   document.querySelectorAll('.step').forEach(s=>s.classList.toggle('on', +s.dataset.s === step));
+  /* welcome and thank-you are compositions and hold the viewport; the question
+     steps between them stay documents and scroll normally */
+  document.querySelector('.sform').classList.toggle('hero', step === 0 || step === 6);
   document.getElementById('progBar').style.width = (step/6*100)+'%';
   if(step===6){ const n=document.getElementById('f-name').value.trim(); document.getElementById('doneName').textContent = n||'friend'; }
   window.scrollTo({top:0, behavior:'smooth'});

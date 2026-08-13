@@ -243,14 +243,17 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   /* ── render ─────────────────────────────────────────────────────── */
 
   const progress = Math.min(step / (total + 1), 1) * 100;
+  /* The welcome and thank-you screens are compositions and hold the viewport;
+     every question step in between stays a document and scrolls normally. */
+  const hero = step === WELCOME || step === DONE;
 
   return (
-    <div className="survey-shell client-surface">
+    <div className={`survey-shell client-surface${step === WELCOME ? ' at-welcome' : ''}`}>
       <div className="bar">
         <i style={{ width: `${progress}%` }} />
       </div>
 
-      <div className="sform">
+      <div className={`sform${hero ? ' hero' : ''}`}>
         <div className="head">
           <span className="wordmark">
             Design<em>ally</em>
@@ -287,7 +290,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
               </div>
             </div>
             <button className="btn btn-ink" onClick={() => go(1)} disabled={!ready}>
-              {started ? 'Continue · ทำต่อ' : 'Start · เริ่มทำแบบสอบถาม'}
+              {started ? 'Continue' : 'Start'}
             </button>
             {started && (
               <p className="saved">
@@ -337,18 +340,18 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
 
               <div className="nav">
                 <button className="btn btn-quiet" onClick={() => go(n - 1)}>
-                  Back · ย้อนกลับ
+                  Back
                 </button>
                 <span className="of">
                   {n} / {total}
                 </span>
                 {last ? (
                   <button className="btn btn-primary" onClick={submit} disabled={submitting}>
-                    {submitting ? 'Sending · กำลังส่ง' : 'Send answers · ส่งคำตอบ'}
+                    {submitting ? 'Sending' : 'Send answers'}
                   </button>
                 ) : (
                   <button className="btn btn-ink" onClick={() => go(n + 1)}>
-                    Continue · ถัดไป
+                    Continue
                   </button>
                 )}
               </div>
@@ -384,7 +387,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
               </div>
             </div>
             <button className="btn btn-quiet" onClick={answerAsSomeoneElse}>
-              Answer as another stakeholder · ตอบในฐานะผู้อื่น
+              Answer as another stakeholder
             </button>
           </section>
         )}

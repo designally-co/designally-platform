@@ -129,6 +129,18 @@ Never tighten tracking below `-0.02em` on a line containing Thai — negative tr
 
 **In practice, milestone 1.** The table's body tracking of `-0.374px` is `-0.022em` at 17px — just past that floor — and on a client surface *any* line can carry Thai, including a heading holding a respondent's name ("Thank you, คุณสมชาย ใจดี"). Chasing this string by string does not hold up. So the client surface runs **untracked throughout**, and only `step h1` and `step h2` take the floor value of `-0.02em`. The Latin tracking in the table stays in force in the team app, where lines are English-only.
 
+**Display sizes — the clause, added 13 August 2026.** The 1.6 floor is calibrated for body text, where it buys 27px of leading at 17px. What protects the Thai stack is the *absolute* room between baselines, not the ratio. A heading at 37.6px set to 1.6 would take 60px and read as two unrelated lines.
+
+Rendered the worst case — `ที่ปรึกษาญี่ปุ่น ผู้ใหญ่ ปฏิรูป`, which stacks an upper tone mark and a lower vowel on adjacent lines — at 37.6px and three leadings:
+
+| Leading | Absolute | Result |
+|---|---|---|
+| 1.06 | 39.9px | The lower vowel of `ปุ่น` meets the tone mark on `ใหญ่` below. Collides. |
+| **1.28** | **48.1px** | **Clear. Adopted for `step h1`.** |
+| 1.6 | 60.2px | Clear, and visibly loose for display type. |
+
+So: **1.6 stays the floor for anything at body size. Above 32px, the floor is 44px of absolute leading**, which 1.28 clears at every size `step h1` reaches. Nothing else in the system is above 32px. `step h1` shipped at 1.14 before this was measured, which was inside the collision range.
+
 `--ink-muted-48` also carries the Thai sub-line under every question, which is why the contrast correction in §1 matters more here than the number alone suggests.
 
 ---
