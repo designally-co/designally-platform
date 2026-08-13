@@ -159,6 +159,27 @@ Rendered the worst case — `ที่ปรึกษาญี่ปุ่น �
 
 So: **1.6 stays the floor for anything at body size. Above 32px, the floor is 44px of absolute leading**, which 1.28 clears at every size `step h1` reaches. Nothing else in the system is above 32px. `step h1` shipped at 1.14 before this was measured, which was inside the collision range.
 
+**Single lines — the clause, added 13 August 2026 after auditing the team app.**
+
+The floor above is a *paragraph* rule, and applying it to everything makes it useless: measured against the whole stylesheet, **32 sized text rules sit under 1.6 — including `body` itself at 1.44.** A rule that condemns the foundation of the system cannot be used to find a defect in it, and for two days it was not finding the two that were real.
+
+A paragraph needs 1.6 for two reasons: reading a four-level script densely is hard, and one line's lower vowel must clear the next line's tone mark. **A name, a heading, a label or a table cell has no next line.** Its only requirement is that the line box contains the ink.
+
+Rendered `ตั๋วปื้ญฤๅ ที่สุด` — upper vowel, tone mark and lower vowel on one line — the ink measures about **1.20× the font size**. So:
+
+| Element | Set at | Box | Ink | |
+|---|---|---|---|---|
+| `body` | 17 / 1.44 | 24.5px | 20.5px | 4.0px clear |
+| `.person` — a respondent's name | 13.5 / 1.45 | 19.6px | 16.5px | 3.1px clear |
+| `.work .name` — a client's name | 21 / **1.19** | 25.0px | 25.5px | **clipped** |
+| `.brief h1` — a client's name | 32 / **1.2** | 38.4px | 38.5px | **clipped** |
+
+> **A line that can hold Thai and stands alone uses a minimum line-height of 1.25.** The ink measures 1.20–1.22 of the font size across every size tested, so 1.25 is that plus a little room for a taller stack than the sample. Paragraphs keep 1.6, and 1.7 when the paragraph is Thai.
+
+The margin is deliberately small. A floor of 1.35 was tried first and condemned `slide h1` at 1.28 and `step h1` at 1.28 — both of which this section had already measured as clear, and one of which it adopted by name. A rule that overrules its own evidence is the failure this clause exists to correct, in the other direction.
+
+Both defects were client and respondent **names** — which is the pattern worth remembering. Wherever somebody thought about Thai they set 1.7 and it is correct; Thai arrived unannounced in the places that hold a person's name, where a Latin-tuned heading value had been chosen and never revisited.
+
 `--ink-muted-48` also carries the Thai sub-line under every question, which is why the contrast correction in §1 matters more here than the number alone suggests.
 
 ---

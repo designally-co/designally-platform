@@ -92,7 +92,7 @@ with the website track. `reference/flow-map.html` still draws the old branch aft
 Three things from it that are easy to get wrong:
 
 - **The accent means "a person is needed here."** Never decorative. Accent on something nobody must act on is a defect.
-- **Thai line-height is never below 1.6.** Thai stacks four levels vertically; Latin-tuned values clip tone marks.
+- **Thai leading: 1.6 in a paragraph, 1.25 on a line that stands alone.** Thai stacks four levels vertically and Latin-tuned values clip tone marks — but the flat 1.6 condemned `body` itself and so caught nothing. Measure the ink; see `DESIGN.md` §2.
 - **Borders, not shadows.** The focus ring is the only shadow in the system.
 
 ## Rules that must not be broken
