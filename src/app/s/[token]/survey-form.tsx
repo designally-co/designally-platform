@@ -111,6 +111,16 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   const [submitted, setSubmitted] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [nameMissing, setNameMissing] = useState(false);
+  /**
+   * The send screen is a page, not a slide.
+   *
+   * It was the last card in the deck, which made it something a person could
+   * scroll onto by accident and, worse, put the review of every answer inside
+   * a mandatory scroll-snap container that could not reach its own bottom.
+   * Leaving the deck is a decision, so it is a state change, not a scroll
+   * position.
+   */
+  const [sending, setSending] = useState(false);
 
   const draftKey = useRef<string>('');
   const deck = useRef<HTMLDivElement | null>(null);
@@ -159,7 +169,10 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
     return out;
   }, [steps]);
 
-  const LAST = cards.length + 1;
+  /* the last slide in the deck — the send screen is no longer one of them */
+  const LAST = cards.length;
+  /* the send screen is still a position for the progress bar to count towards */
+  const STOPS = LAST + 1;
 
   /* ── restore ────────────────────────────────────────────────────── */
 
@@ -305,14 +318,53 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
     };
   }, []);
 
+  /* the deck ends at the last question; past it is the send screen */
+  const advance = (n: number) => (n >= cards.length ? setSending(true) : goTo(n + 1));
+
   const goTo = useCallback((index: number) => {
     const el = deck.current?.querySelector<HTMLElement>(`[data-slide="${index}"]`);
     el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, []);
 
+  /**
+   * Back out of the send screen and land on a question.
+   *
+   * The deck is unmounted while the send screen is up, so the scroll cannot be
+   * set until React has put it back. The target is parked here and an effect
+   * places it on the render that follows — without smoothing, because this is a
+   * page changing rather than a scroll being made.
+   */
+  const pendingSlide = useRef<number | null>(null);
+  const leaveSend = useCallback((index: number) => {
+    pendingSlide.current = index;
+    setSending(false);
+  }, []);
+
+  useEffect(() => {
+    if (sending || pendingSlide.current === null) return;
+    const index = pendingSlide.current;
+    pendingSlide.current = null;
+    const root = deck.current;
+    const el = root?.querySelector<HTMLElement>(`[data-slide="${index}"]`);
+    if (!root || !el) return;
+
+    /* The deck sets `scroll-behavior: smooth`, which applies to scrollTop and
+       scrollIntoView alike — so leaving the send screen animated a scroll
+       through every slide between, and Chrome's duration grows with distance:
+       from the top of a 24-slide deck it was still travelling seconds later and
+       came to rest wherever it had got to. This is a page arriving, not a
+       scroll being made, so the behaviour is suspended for the one assignment
+       and handed straight back. */
+    const previous = root.style.scrollBehavior;
+    root.style.scrollBehavior = 'auto';
+    root.scrollTop = el.offsetTop;
+    root.style.scrollBehavior = previous;
+    setStep(index);
+  }, [sending]);
+
   useEffect(() => {
     const root = deck.current;
-    if (!root || submitted) return;
+    if (!root || submitted || sending) return;
 
     /**
      * The active slide is the one covering the middle of the screen.
@@ -353,14 +405,19 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
       root.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
     };
-  }, [cards.length, submitted]);
+  }, [cards.length, submitted, sending]);
 
   /* ── submit ─────────────────────────────────────────────────────── */
 
   const nameQuestion = survey.steps[0]?.questions[0];
+  const emailQuestion = survey.steps[0]?.questions.find((q) => q.config.maps_to === 'email');
   const respondentName =
     nameQuestion && typeof values[nameQuestion.ref] === 'string'
       ? (values[nameQuestion.ref] as string).trim()
+      : '';
+  const respondentEmail =
+    emailQuestion && typeof values[emailQuestion.ref] === 'string'
+      ? (values[emailQuestion.ref] as string).trim()
       : '';
 
   const blanks = useMemo(() => {
@@ -377,10 +434,14 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
       );
   }, [cards, values]);
 
+  /* numbered questions only — name and email are not numbered anywhere else */
+  const answered =
+    survey.questionCount - blanks.filter(({ question }) => question.number !== null).length;
+
   async function submit() {
     if (!respondentName) {
       setNameMissing(true);
-      goTo(1);
+      leaveSend(1);
       return;
     }
     setSubmitting(true);
@@ -409,11 +470,98 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
     setSubmitted(null);
     setNameMissing(false);
     setSavedAt(null);
+    setSending(false);
     setStep(WELCOME);
     requestAnimationFrame(() => goTo(WELCOME));
   }
 
   /* ── render ─────────────────────────────────────────────────────── */
+
+  if (sending) {
+    return (
+      <LangContext.Provider value={LEAD}>
+        <div className="survey-shell client-surface">
+          <div className="bar" aria-hidden="true">
+            <i style={{ transform: 'scaleX(1)' }} />
+          </div>
+          <div className="slide sendslide" data-active="">
+            <div className="slidebody">
+              <div className="slidemain">
+                <h2>Ready to send</h2>
+                <p className="intro">
+                  {answered} of {survey.questionCount} answered
+                </p>
+                <p className="introth th">
+                  ตอบแล้ว {answered} จาก {survey.questionCount} ข้อ
+                </p>
+
+                {/* The link is forwardable, so somebody can reach this screen
+                    having answered as the wrong person. This is the last place
+                    it can be caught, and the only place it is shown. */}
+                <dl className="sendwho">
+                  <div>
+                    <dt>Sending as · ส่งในชื่อ</dt>
+                    <dd className={respondentName ? undefined : 'missing'}>
+                      {respondentName || 'not given · ยังไม่ได้กรอก'}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>We&rsquo;ll reach you at · ติดต่อกลับที่</dt>
+                    <dd className={respondentEmail ? undefined : 'missing'}>
+                      {respondentEmail || 'not given · ยังไม่ได้กรอก'}
+                    </dd>
+                  </div>
+                </dl>
+
+                {blanks.length > 0 && (
+                  <>
+                    <p className="blankcount">
+                      {blanks.length} still blank · ยังไม่ได้ตอบ {blanks.length} ข้อ
+                    </p>
+                    <ul className="blanklist">
+                      {blanks.map(({ question, index }) => (
+                        <li key={question.ref}>
+                          <button type="button" onClick={() => leaveSend(index)}>
+                            <b>{question.number ?? '·'}</b>
+                            <span>{question.textEn}</span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+                {error && <p className="qwarn">{error}</p>}
+              </div>
+              {/* Back is the same round arrow as every other back on this
+                  survey. Off the deck the stepper does not exist, so here it
+                  shows at every width rather than on a phone only. */}
+              <div className="okrow">
+                <button
+                  className="okback"
+                  type="button"
+                  onClick={() => leaveSend(LAST)}
+                  aria-label="Back to the questions"
+                >
+                  <Chevron back />
+                </button>
+                <button className="btn btn-primary ok" onClick={submit} disabled={submitting}>
+                  {submitting ? 'Sending' : 'Send answers'}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* the same ramp the deck's controls sit on — the list runs under it */}
+          <div className="floorblur" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+            <span />
+          </div>
+        </div>
+      </LangContext.Provider>
+    );
+  }
 
   if (submitted) {
     return (
@@ -451,7 +599,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
     <LangContext.Provider value={LEAD}>
       <div className={`survey-shell client-surface${step === WELCOME ? ' at-welcome' : ''}`}>
         <div className="bar" aria-hidden="true">
-          <i style={{ transform: `scaleX(${Math.min(step / LAST, 1)})` }} />
+          <i style={{ transform: `scaleX(${Math.min(step / STOPS, 1)})` }} />
         </div>
 
         <div className="deck" ref={deck}>
@@ -505,7 +653,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                             question={q}
                             value={values[q.ref]}
                             onChange={(v) => setValue(q.ref, v)}
-                            onEnter={() => goTo(n + 1)}
+                            onEnter={() => advance(n)}
                           />
                           {nameMissing && q.ref === nameQuestion?.ref && (
                             <span className="qwarn">
@@ -521,14 +669,14 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                         question={card.question}
                         value={values[card.question.ref]}
                         onChange={(v) => setValue(card.question.ref, v)}
-                        onEnter={() => goTo(n + 1)}
+                        onEnter={() => advance(n)}
                         total={survey.questionCount}
                         slice={card.slice}
                       />
                     )}
                   </div>
                   <Ok
-                    onClick={() => goTo(n + 1)}
+                    onClick={() => advance(n)}
                     onBack={() => goTo(n - 1)}
                     hint={card.kind === 'question' && card.question.type === 'paragraph'}
                   />
@@ -537,41 +685,6 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
             );
           })}
 
-          <section className="slide" data-slide={LAST} data-active={step === LAST ? '' : undefined}>
-            <div className="slidebody">
-              <div className="slidemain">
-                <h2>Ready to send</h2>
-              {blanks.length === 0 ? (
-                <>
-                  <p className="intro">Every question is answered.</p>
-                  <p className="introth th">ตอบครบทุกข้อแล้ว</p>
-                </>
-              ) : (
-                <>
-                  <p className="intro">
-                    {blanks.length} {blanks.length === 1 ? 'question is' : 'questions are'} still
-                    blank.
-                  </p>
-                  <p className="introth th">ยังไม่ได้ตอบ {blanks.length} ข้อ</p>
-                  <ul className="blanklist">
-                    {blanks.map(({ question, index }) => (
-                      <li key={question.ref}>
-                        <button type="button" onClick={() => goTo(index)}>
-                          <b>{question.number ?? '·'}</b>
-                          <span>{question.textEn}</span>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
-                {error && <p className="qwarn">{error}</p>}
-              </div>
-              <button className="btn btn-primary start" onClick={submit} disabled={submitting}>
-                {submitting ? 'Sending' : 'Send answers'}
-              </button>
-            </div>
-          </section>
         </div>
 
         {/* The ramp the controls sit on. Four stacked layers, blur doubling
@@ -585,6 +698,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
           <span />
         </div>
 
+
         <nav className="deck-nav" aria-label="Move between questions">
           <button
             type="button"
@@ -596,8 +710,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
           </button>
           <button
             type="button"
-            onClick={() => goTo(Math.min(step + 1, LAST))}
-            disabled={step === LAST}
+            onClick={() => (step >= LAST ? setSending(true) : goTo(step + 1))}
             aria-label="Next question"
           >
             <Chevron />

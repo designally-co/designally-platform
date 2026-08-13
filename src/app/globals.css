@@ -834,6 +834,72 @@ label.f span {
   margin-bottom: 9px;
 }
 
+/**
+ * The send screen, which is a page rather than a slide.
+ *
+ * It carries no stepper, because the stepper belongs to the deck it just left —
+ * so the round back arrow, which a phone alone shows on a question, shows here
+ * at every width. Without it a pointer device would have no way back into the
+ * answers at all.
+ */
+.sendslide .okback {
+  display: grid;
+}
+.sendslide .okrow {
+  margin-top: 34px;
+}
+
+/**
+ * What is about to be sent, and who it will arrive from.
+ *
+ * The survey link is meant to be forwarded, so a person can reach this screen
+ * having answered as somebody else. This is the last place that can be seen,
+ * and sending cannot be taken back.
+ *
+ * A ruled list, not a card: the survey's page is flat and nothing lifts off it.
+ */
+.sendwho {
+  margin: 30px 0 0;
+  border-top: 1px solid var(--hairline);
+}
+.sendwho > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--divider);
+}
+.sendwho dt {
+  flex: 0 0 auto;
+  font-size: 13px;
+  color: var(--ink-3);
+  /* Thai never below 1.6 */
+  line-height: 1.7;
+}
+.sendwho dd {
+  margin: 0;
+  min-width: 0;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--ink);
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+/* an empty row reads as a layout fault; say it is missing instead */
+.sendwho dd.missing {
+  color: var(--caution);
+}
+@media (hover: hover) {
+}
+
+.blankcount {
+  margin-top: 26px;
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--ink-3);
+}
+
 /* the send screen's list of what is still blank — each one goes back to it */
 .blanklist {
   list-style: none;
@@ -2725,6 +2791,11 @@ dialog::backdrop {
   margin-left: auto;
   margin-right: auto;
 }
+/* the welcome is the one centred composition, so its action centres with it */
+.slide[data-slide='0'] .btn.start {
+  margin-inline: auto;
+}
+
 /* the Thai line under the English one, on the two screens that carry no
    per-question reveal */
 .introth {
@@ -2750,7 +2821,11 @@ dialog::backdrop {
   align-items: center;
   justify-content: center;
   width: fit-content;
-  margin: 26px auto 0;
+  /* Left, on the column's edge, like everything above it. The auto margin here
+     was written for the welcome screen, which is a centred composition; it
+     followed the button onto the send and thank-you screens, which are not,
+     leaving the one element not on the edge. */
+  margin: 26px 0 0;
 }
 .takes {
   margin-top: 14px;
@@ -3023,6 +3098,12 @@ dialog::backdrop {
   .slide[data-active] .btn.start {
     opacity: 1;
     pointer-events: auto;
+  }
+
+  /* the review can run long, so the floor the controls are pinned to has to be
+     kept clear at the end of the list rather than only under a short slide */
+  .slide.sendslide {
+    padding-bottom: 116px;
   }
   .slide {
     padding-bottom: 104px;
