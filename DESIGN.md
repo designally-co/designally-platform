@@ -324,9 +324,13 @@ Note that Apple signals selection with border weight, not fill — quieter and b
 ### Tags
 
 `fine` (12px), `pill` radius, padding `3px 9px`, uppercase with `0.04em` tracking.
-Severity high `--critical-tint`/`--critical` · medium `--caution-tint`/`--caution` · live or decide `#e8f1fb`/`--primary` · neutral `--divider-soft`/`--ink-muted-48`.
+Severity high `--critical-tint`/`--critical` · medium `--caution-tint`/`--caution` · live or decide `#e8f1fb`/`--primary`.
+
+**Correction, 13 August 2026 — the neutral tag.** It was `--divider-soft` under `--ink-muted-48`, which measures **4.45:1**: under this product's own 4.5:1 floor, and 12px is not large text. The neutral tag is now `--canvas` with a 1px `--hairline` and `--ink-muted-48`, which measures **5.07:1**. Any tint checked only against white will fail on the parchment page; this one failed against its own tint.
 
 Always accompanied by text — the tag is the label.
+
+A tag is not an action. It shares the pill with buttons because it is a label with ends, not because it can be pressed — which is why a tag is never filled with ink or the accent. Filled pill plus accent or ink means press me; outlined pill in muted ink means this is what that is. The survey's question number is the latter: `11/21`, quiet, on a fixed 40px width so that every question's text starts on the same left edge.
 
 ### Sticky bars
 

@@ -2533,26 +2533,40 @@ dialog::backdrop {
   position: relative;
   padding-left: 56px;
 }
+/**
+ * The question number is a tag, and tags are pills (DESIGN.md §5).
+ *
+ * It was a solid ink block, which made a label look like a control and gave
+ * the loudest mark on the slide to the least important thing on it. Quiet now:
+ * white on the flat page, a hairline, muted ink.
+ *
+ * Not the neutral tag's documented fill. `--divider-soft` under
+ * `--ink-muted-48` measures 4.45:1, just under the 4.5:1 this product commits
+ * to, and 12px is not large text. On white the same ink measures 5.07:1.
+ *
+ * A fixed width, not a content width: the hang only lands on the text edge if
+ * margin-left + width + margin-right is exactly zero, and "1/21" is narrower
+ * than "10/21" — a content-width tag would put question 1 ten pixels left of
+ * question 10. 40px holds the widest case, 21/21.
+ */
 .qnum {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  /* A fixed width, not a content width. The hang only lands on the text edge
-     if margin-left + width + margin-right is exactly zero, and "1/21" is
-     narrower than "10/21" — a content-width badge would put question 1 ten
-     pixels left of question 10. 40px holds the widest case, 21/21. */
   width: 40px;
   height: 22px;
   padding: 0;
   margin-left: -56px;
   margin-right: 16px;
-  border-radius: var(--r-sm);
-  background: var(--ink);
-  color: var(--on-dark);
+  border-radius: var(--r-pill);
+  border: 1px solid var(--hairline);
+  background: var(--canvas);
+  color: var(--ink-3);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 400;
+  letter-spacing: 0.01em;
   line-height: 1;
-  vertical-align: 5px;
+  vertical-align: 4px;
 }
 /* OK sits under the answer it belongs to, on the same edge */
 .slidebody:has(.qnum) .okrow {
