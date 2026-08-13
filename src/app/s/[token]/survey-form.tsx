@@ -786,9 +786,13 @@ function Ok({
  *
  * It was a 1.6 stroke in a 24 viewBox rendered at 19px — 1.27px on screen,
  * which at a distance reads as a lighter grey than it is set in, because a hair
- * of a line does. It is 2.5px now, and the arms open to about 100 degrees
- * across roughly a third of the control they sit in, which is the proportion
- * the reference holds.
+ * of a line does. It is 2.5px now, across roughly a third of the height of the
+ * control it sits in.
+ *
+ * The arms are at 45 degrees, a right angle between them: 9 wide to 18 tall.
+ * They opened to about 100 degrees first, which was an estimate read off a
+ * picture; this is the proportion UIKit's own chevron holds, and it is a
+ * squarer, less splayed mark.
  */
 function Chevron({ up, back }: { up?: boolean; back?: boolean }) {
   return (
@@ -796,10 +800,10 @@ function Chevron({ up, back }: { up?: boolean; back?: boolean }) {
       <path
         d={
           back
-            ? 'M16.5 3 L5.5 12 L16.5 21'
+            ? 'M16.5 3 L7.5 12 L16.5 21'
             : up
-              ? 'M3 17.5 L12 6.5 L21 17.5'
-              : 'M3 6.5 L12 17.5 L21 6.5'
+              ? 'M3 16.5 L12 7.5 L21 16.5'
+              : 'M3 7.5 L12 16.5 L21 7.5'
         }
         stroke="currentColor"
         strokeWidth="2.5"
