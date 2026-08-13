@@ -539,8 +539,8 @@ label.f span {
   flex-shrink: 0;
 }
 .pickone.sel {
-  border-color: var(--primary);
-  background: var(--primary-tint);
+  border-color: var(--ink);
+  background: var(--pearl);
 }
 .pickone b {
   display: block;
@@ -629,7 +629,9 @@ label.f span {
   transform: scale(1.14);
 }
 
-/* word chips — selection is border weight, not fill (DESIGN.md §5) */
+/* Word chips. Selection is border weight, not fill — and the border is ink,
+   not the accent: choosing is not the same as being called on, and the accent
+   answers only "a person is needed here" (DESIGN.md §1). */
 .chips {
   display: flex;
   flex-wrap: wrap;
@@ -659,7 +661,7 @@ label.f span {
     background 0.18s;
 }
 .chip b {
-  font-weight: 500;
+  font-weight: 600;
 }
 .chip small {
   font-size: 13px;
@@ -678,8 +680,8 @@ label.f span {
   border-color: var(--primary);
 }
 .chip[aria-pressed="true"] {
-  border: 2px solid var(--primary-focus);
-  padding: 11px 15px;
+  border: 2px solid var(--ink);
+  padding: 9px 16px;
 }
 .chipn {
   margin-top: 11px;
@@ -871,7 +873,7 @@ label.f span {
 /* Selection is a 2px border, as everywhere else. The padding compensates so
    nothing shifts when it thickens (DESIGN.md §5). */
 .board.sel {
-  border: 2px solid var(--primary-focus);
+  border: 2px solid var(--ink);
 }
 .board img {
   display: block;
@@ -910,7 +912,7 @@ label.f span {
     border-color 0.18s var(--ease);
 }
 .board input:checked {
-  background: var(--primary);
+  background: var(--ink);
   border-color: #fff;
 }
 .board:has(input:checked)::after {
@@ -1385,7 +1387,9 @@ label.f span {
 .stage i {
   height: 4px;
   flex: 1;
-  border-radius: 2px;
+  /* on a 4px bar the pill and a 2px radius are the same shape; this one is on
+     the scale */
+  border-radius: var(--r-pill);
   background: var(--hairline);
 }
 .stage i.on {
@@ -2502,7 +2506,7 @@ dialog::backdrop {
 .slide .qq {
   display: block;
   font-size: clamp(1.4rem, 3.1vw, 2.05rem);
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: -0.02em;
   /* Thai never below 1.6 at body sizes; above 32px the floor is 44px of
      absolute leading — DESIGN.md section 2. */
@@ -2542,7 +2546,7 @@ dialog::backdrop {
   padding: 0;
   margin-left: -56px;
   margin-right: 16px;
-  border-radius: 5px;
+  border-radius: var(--r-sm);
   background: var(--ink);
   color: var(--on-dark);
   font-size: 12px;
@@ -2614,9 +2618,9 @@ dialog::backdrop {
   margin-top: 34px;
   flex-wrap: wrap;
 }
+/* the pill is the action signal and OK is the action (DESIGN.md §3) */
 .btn.ok {
-  border-radius: var(--r-sm);
-  padding: 10px 26px;
+  padding: 10px 28px;
   font-weight: 600;
 }
 .okhint {
@@ -2685,7 +2689,7 @@ dialog::backdrop {
   height: 52px;
   flex: 0 0 auto;
   border: 0;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-pill);
   background: var(--ink);
   color: var(--on-dark);
   cursor: pointer;
@@ -2712,10 +2716,12 @@ dialog::backdrop {
   transition: opacity 0.18s;
 }
 .deck-nav button:first-child {
-  border-radius: var(--r-sm) 0 0 var(--r-sm);
+  border-radius: var(--r-pill) 0 0 var(--r-pill);
+  padding-left: 4px;
 }
 .deck-nav button:last-child {
-  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  border-radius: 0 var(--r-pill) var(--r-pill) 0;
+  padding-right: 4px;
 }
 .deck-nav button:hover {
   opacity: 0.86;

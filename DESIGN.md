@@ -43,6 +43,15 @@ Adopted from the source almost unchanged. One accent, no gradients, no decorativ
 
 **Action Blue is the only accent, and it means "a person is needed here."** Every interactive element uses it; nothing decorative does. This survives unchanged from the previous system and matches Apple's own rule exactly.
 
+**Selection is not the accent — it is ink.** Decided 13 August 2026, after the survey had quietly spent the accent on chosen chips, chosen mood boards and the tick inside a checkbox. Being asked and having answered are different states, and if both are blue the blue stops meaning either. So:
+
+| | |
+|---|---|
+| **Accent** | this needs you: buttons, links, controls, the focus ring, the dot beside a project that is waiting |
+| **Ink** | you have chosen this: a selected chip's 2px border, a selected card's border, the fill behind a tick |
+
+A selected thing is already dealt with. It should read as settled, not as unfinished business.
+
 **Correction, milestone 1.** `--ink-muted-48` was `#7a7a7a`, described below as meeting 4.5:1. Measured, it does not: **3.94:1 on parchment and 4.29:1 on white**. Since the meta colour carries the Thai sub-line under every question, that failed the WCAG 2.2 AA baseline in `PRODUCT.md` for exactly the readers who most need it. It is now `#6e6e73` — Apple's own secondary label colour — which measures **4.66:1 on parchment and 5.07:1 on white**. Do not lighten it, and note that any grey checked only against white will fail on the parchment page.
 
 ### Semantic tones — the one addition
@@ -173,6 +182,27 @@ none 0 · sm 8 · md 11 · lg 18 · pill 9999
 
 Do not use values between these. No 12px, no 16px.
 
+### Two surfaces
+
+The parchment inversion above is the **team app's** rule and stays exactly as written: a grey page, white cards, hierarchy carried by which surface something sits on.
+
+**The client survey is flat.** One colour, no cards, decided 13 August 2026. Two reasons, and the first is the one that matters:
+
+1. **Anything that overlays a page has to match it, and only a flat surface allows that.** The survey pins a question while its scales scroll under it, and lays a blur under its controls. Both paint a colour onto the page. There was a wash here — white ramping into parchment over the first 340px — and the pinned question drew a visible white box around itself at whatever height it happened to be, because a solid colour cannot match a gradient.
+2. A survey shows **one question at a time**. Nothing needs lifting off anything, so a card would be a container with nothing to contain.
+
+This is not the two-volumes idea in section 7 stretched further. It is a second surface rule, and the reason it is allowed is that each surface earns its own: a worklist has layers, a single question does not.
+
+### Materials — blur and scrim
+
+The system's vocabulary is ink, line and surface. Two materials are admitted beyond it, and only for the jobs named here.
+
+**A progressive blur** may sit under a control that content scrolls beneath. Not a single blurred pane — one pane only moves the hard cut to where the blur starts. Stack layers with the radius increasing toward the edge, each masked to a narrower band, so the cut becomes a ramp.
+
+**A scrim** may sit under text that falls on imagery, and it must be strong enough to guarantee 4.5:1 against the *palest* image the slot can ever hold — not the ones currently in it. On the mood boards a 0.82 black left the Thai line at 2.84:1; 0.92 gives 5.03:1 and holds whatever the picture does.
+
+Neither is ever decoration. Glass for the look of glass is still banned, and both are still forbidden in the team app, which has no imagery and no floating controls.
+
 ### Elevation — zero shadows
 
 Apple uses exactly one drop-shadow, and it exists only under product photography resting on a surface. **This product has no product photography, so it has no shadows at all.**
@@ -266,6 +296,14 @@ Segment meter: N segments, 4px tall, 2px radius, 3px gap. Done `--ink-muted-80`,
 Below **820px** the `<thead>` is visually hidden (`clip: rect(0 0 0 0)`) and each row becomes a stacked block; `td[data-label]::before` reprints the column name as a `fine` label above each value. No horizontal scrolling on a phone.
 
 An empty cell is a defect. Where there is nothing to report, say so — "none yet", "nobody named".
+
+### Inputs — two forms
+
+The **team app** uses the pill: 44px tall, 1px hairline, `--r-pill`, white on parchment. It sits in dense forms beside other controls and needs an edge.
+
+The **client survey** uses a rule: no border but a 1px baseline, transparent, type at `clamp(1.25rem, 2.6vw, 1.6rem)`, growing with its content to about half the screen and then scrolling inside itself. One question holds the screen there, so the field needs no edge to separate it from anything — and a box around the only thing on the page is a box around nothing.
+
+Both take the same focus treatment: the ring is the accent, and it is the single exception to zero shadows.
 
 ### Inputs
 
@@ -378,8 +416,10 @@ Touch targets minimum 44 × 44px. Inputs are exactly 44px tall, matching Apple's
 4. Keyboard reachable; focus ring is `2px --primary-focus`
 5. `prefers-reduced-motion` honoured
 6. Exactly one primary button visible
-7. Action Blue appears only where a person must act
-8. No shadows anywhere
-9. Radii are only 8, 11, 18 or pill
-10. Spacing uses the token scale
-11. No line of text carries two colours
+7. Action Blue appears only where a person must act — selection is ink
+8. No shadows anywhere; blur and scrim only for the two jobs in section 3
+9. Radii are only 8, 11, 18 or pill, and anything that reads as an action is a pill
+10. Weights are 300 / 400 / 600 / 700 — 500 is not in the ladder
+11. Spacing uses the token scale
+12. No line of text carries two colours
+13. The right surface for the surface: flat on the client survey, cards in the team app
