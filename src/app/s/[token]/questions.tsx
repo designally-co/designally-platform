@@ -23,6 +23,8 @@ type Props = {
   onChange: (value: ValueUpdate) => void;
   /** Enter moves on; Shift+Enter still makes a line break in a paragraph. */
   onEnter?: () => void;
+  /** how many numbered questions there are, for the badge */
+  total?: number;
 };
 
 /* ── the question, in the language that leads ─────────────────────── */
@@ -34,14 +36,19 @@ type Props = {
  * small block beside it, it reads as position — which is the only thing left
  * saying where in twenty-one you are, now that the slides carry no chrome.
  */
-function Heading({ question }: { question: SurveyQuestion }) {
+function Heading({ question, total }: { question: SurveyQuestion; total?: number }) {
   const t = useText();
   const help = t(question.helpEn, question.helpTh);
 
   return (
     <>
       <span className="qq">
-        {question.number !== null && <span className="qnum">{question.number}</span>}
+        {question.number !== null && (
+          <span className="qnum">
+            {question.number}
+            {total ? `/${total}` : ''}
+          </span>
+        )}
         {t(question.textEn, question.textTh)}
       </span>
       {help && <span className="qhelp">{help}</span>}
@@ -83,7 +90,7 @@ function Alt({ question }: { question: SurveyQuestion }) {
 
 /* ── paragraph and short_text ─────────────────────────────────────── */
 
-function TextAnswer({ question, value, onChange, onEnter }: Props) {
+function TextAnswer({ question, value, onChange, onEnter, total }: Props) {
   const text = typeof value === 'string' ? value : '';
   const long = question.type === 'paragraph';
   const id = useId();
@@ -100,7 +107,7 @@ function TextAnswer({ question, value, onChange, onEnter }: Props) {
   return (
     <div className="sq">
       <label htmlFor={id}>
-        <Heading question={question} />
+        <Heading question={question} total={total} />
       </label>
       <Alt question={question} />
       {long ? (
@@ -172,7 +179,7 @@ export function IdentityField({ question, value, onChange, onEnter }: Props) {
 
 /* ── multiple_choice ──────────────────────────────────────────────── */
 
-function ChoiceAnswer({ question, value, onChange }: Props) {
+function ChoiceAnswer({ question, value, onChange, total }: Props) {
   const v = (value ?? { choice: '' }) as { choice: string; other?: string };
   const config = question.config;
   const name = useId();
@@ -187,7 +194,7 @@ function ChoiceAnswer({ question, value, onChange }: Props) {
   return (
     <fieldset className="sq">
       <legend>
-        <Heading question={question} />
+        <Heading question={question} total={total} />
       </legend>
       <Alt question={question} />
       <div className="pick">
@@ -247,7 +254,7 @@ function asBoards(config: QuestionConfig) {
   return (config.choices ?? []).some((c) => Boolean(c.image));
 }
 
-function CheckboxAnswer({ question, value, onChange }: Props) {
+function CheckboxAnswer({ question, value, onChange, total }: Props) {
   const v = (value ?? { choices: [] }) as { choices: string[]; other?: string };
   const config = question.config;
   const chosen = new Set(v.choices);
@@ -285,7 +292,7 @@ function CheckboxAnswer({ question, value, onChange }: Props) {
   return (
     <fieldset className="sq">
       <legend>
-        <Heading question={question} />
+        <Heading question={question} total={total} />
       </legend>
       <Alt question={question} />
 
@@ -388,7 +395,7 @@ function CheckboxAnswer({ question, value, onChange }: Props) {
 
 /* ── linear_scale ─────────────────────────────────────────────────── */
 
-function ScaleAnswer({ question, value, onChange }: Props) {
+function ScaleAnswer({ question, value, onChange, total }: Props) {
   const v = (value ?? { scale: {} }) as { scale: Record<string, number> };
   const points = question.config.points ?? 5;
   /* Version 1 scales run 1..points; the version-2 personality scales run 0..10,
@@ -407,7 +414,7 @@ function ScaleAnswer({ question, value, onChange }: Props) {
 
   return (
     <div className="sq">
-      <Heading question={question} />
+      <Heading question={question} total={total} />
       <Alt question={question} />
       {pairs.map((p, i) => (
         <div className="scale" key={`${p.left_en}-${p.right_en}`}>

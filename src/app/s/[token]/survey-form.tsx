@@ -411,6 +411,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                         value={values[card.question.ref]}
                         onChange={(v) => setValue(card.question.ref, v)}
                         onEnter={() => goTo(n + 1)}
+                        total={survey.questionCount}
                       />
                     )}
                   </div>

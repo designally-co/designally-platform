@@ -2443,14 +2443,37 @@ dialog::backdrop {
   text-wrap: pretty;
   margin-bottom: 0;
 }
+/**
+ * The badge hangs; the question does not.
+ *
+ * Inline with a margin it indented only the first line, so the question started
+ * one place, its own second line started another, and the answer beneath
+ * started a third. The eye reads that as three columns. A negative margin equal
+ * to the badge and its gap pulls it back into the padding instead, and every
+ * line of the question, the help text, the reveal and the answer share one left
+ * edge.
+ *
+ * Staying in flow rather than positioned absolutely means it needs no guessed
+ * top offset — it sits on the first line's own baseline whatever the type size
+ * or the language does.
+ */
+.slide .sq {
+  position: relative;
+  padding-left: 56px;
+}
 .qnum {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 22px;
+  /* A fixed width, not a content width. The hang only lands on the text edge
+     if margin-left + width + margin-right is exactly zero, and "1/21" is
+     narrower than "10/21" — a content-width badge would put question 1 ten
+     pixels left of question 10. 40px holds the widest case, 21/21. */
+  width: 40px;
   height: 22px;
-  padding: 0 5px;
-  margin-right: 11px;
+  padding: 0;
+  margin-left: -56px;
+  margin-right: 16px;
   border-radius: 5px;
   background: var(--ink);
   color: var(--on-dark);
@@ -2458,6 +2481,10 @@ dialog::backdrop {
   font-weight: 600;
   line-height: 1;
   vertical-align: 5px;
+}
+/* OK sits under the answer it belongs to, on the same edge */
+.slidebody:has(.qnum) .okrow {
+  padding-left: 56px;
 }
 .slide .qhelp {
   display: block;
@@ -2663,6 +2690,21 @@ dialog::backdrop {
     flex-direction: column;
     justify-content: center;
     min-height: 0;
+  }
+  /* On a phone the badge takes its own line above the question — 34px of
+     hanging indent is a tenth of the screen, and the question needs the width
+     more than the badge needs the margin. Everything then starts at the same
+     edge without any indent at all. */
+  .slide .sq {
+    padding-left: 0;
+  }
+  .qnum {
+    display: flex;
+    width: fit-content;
+    margin: 0 0 13px;
+  }
+  .slidebody:has(.qnum) .okrow {
+    padding-left: 0;
   }
   .okback {
     display: grid;
