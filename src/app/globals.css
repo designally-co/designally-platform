@@ -2806,17 +2806,19 @@ dialog::backdrop {
   bottom: 20px;
   display: flex;
   flex-direction: column;
-  /* two buttons, not one segmented control — each is the same round, hairline
-     object as the phone's back arrow */
-  gap: 10px;
+  gap: 2px;
   z-index: 20;
 }
-@media (min-width: 900px) {
+/* The column is 660px centred, so its right edge is 50% + 330px. The pair sits
+   56px clear of that — close enough to belong to the question, far enough not
+   to crowd its longest line. Below 1000px there is no room for that gap and it
+   returns to the corner. */
+@media (min-width: 1000px) {
   .deck-nav {
     top: 50%;
     right: auto;
     bottom: auto;
-    left: calc(50% + 348px);
+    left: calc(50% + 386px);
     transform: translateY(-50%);
   }
 }
@@ -2837,9 +2839,12 @@ dialog::backdrop {
   place-items: center;
   width: 44px;
   height: 44px;
-  border: 1px solid var(--hairline);
+  /* No container until it is wanted. Scrolling is the navigation here and these
+     are the second way of doing it, so at rest they are a glyph and nothing
+     else. The 44px box stays for the pointer. */
+  border: 1px solid transparent;
   border-radius: var(--r-pill);
-  background: var(--canvas);
+  background: transparent;
   color: var(--ink-3);
   cursor: pointer;
   transition:
@@ -2850,7 +2855,8 @@ dialog::backdrop {
 
 @media (hover: hover) {
   .deck-nav button:hover {
-    border-color: var(--ink-3);
+    background: var(--canvas);
+    border-color: var(--hairline);
     color: var(--ink);
   }
 }

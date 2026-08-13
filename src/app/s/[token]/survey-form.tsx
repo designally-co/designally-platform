@@ -647,7 +647,7 @@ function Chevron({ up, back }: { up?: boolean; back?: boolean }) {
       <path
         d={back ? 'M14 6l-6 6 6 6' : up ? 'M6 14l6-6 6 6' : 'M6 10l6 6 6-6'}
         stroke="currentColor"
-        strokeWidth="2"
+        strokeWidth="1.6"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
