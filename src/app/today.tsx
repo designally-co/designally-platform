@@ -3,9 +3,12 @@
 import { useMemo, useState, useTransition } from 'react';
 
 import type { LibraryBlock } from '@/lib/team/library-types';
+import type { ProjectAnswers } from '@/lib/team/answers';
 import type { ProjectView } from '@/lib/team/projects';
+import { readAnswers } from '@/lib/team/actions';
 import NewSurveySheet from './sheets/new-survey';
 import ProjectSheet from './sheets/project';
+import AnswersSheet from './sheets/answers';
 import BriefSheet from './sheets/brief';
 import TemplatesSheet from './sheets/templates';
 import PastSheet from './sheets/past';
@@ -36,6 +39,8 @@ export default function Today({
   const [panel, setPanel] = useState<Panel>(null);
   const [openProject, setOpenProject] = useState<string | null>(null);
   const [openBrief, setOpenBrief] = useState<string | null>(null);
+  /* answers are fetched when asked for, not shipped with the page */
+  const [answers, setAnswers] = useState<{ name: string; data: ProjectAnswers } | null>(null);
   const toast = useToast();
   const [writing, startWriting] = useTransition();
 
@@ -265,6 +270,13 @@ export default function Today({
       {briefProject?.brief && (
         <BriefSheet project={briefProject} onClose={() => setOpenBrief(null)} />
       )}
+      {answers && (
+        <AnswersSheet
+          data={answers.data}
+          clientName={answers.name}
+          onClose={() => setAnswers(null)}
+        />
+      )}
       {project && (
         <ProjectSheet
           project={project}
@@ -272,6 +284,12 @@ export default function Today({
           onOpenBrief={() => {
             setOpenProject(null);
             setOpenBrief(project.id);
+          }}
+          onReadAnswers={async () => {
+            const data = await readAnswers(project.id);
+            if (!data) return;
+            setOpenProject(null);
+            setAnswers({ name: project.clientName, data });
           }}
           onClose={() => setOpenProject(null)}
           onActed={(msg) => {

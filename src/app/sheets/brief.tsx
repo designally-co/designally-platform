@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import type { Brief } from '@/lib/analysis/schema';
 import type { ProjectView } from '@/lib/team/projects';
 import Sheet from './sheet';
@@ -23,6 +25,42 @@ function names(list: string[]) {
 /** "3 of 5" is honest; a percentage is not. */
 function outOf(some: number, all: number) {
   return `${some} of ${all}`;
+}
+
+/**
+ * The outline, as plain text, for the deck the team builds in Canva by hand.
+ *
+ * Canva has no import worth the integration — its Connect API autofills brand
+ * templates on a paid plan and would tie this platform to somebody else's API
+ * staying still. A copy button costs nothing and the team keeps the design.
+ *
+ * DECIDE slides keep their marker in the pasted text: their position early in
+ * the deck is the whole point of the running order, and a plain list of titles
+ * loses it.
+ */
+function CopyOutline({ slides }: { slides: Brief['deckOutline'] }) {
+  const [copied, setCopied] = useState(false);
+
+  const text = slides
+    .map((s, i) => `${i + 1}. ${s.needsDecision ? 'DECIDE: ' : ''}${s.title}\n   ${s.purpose}`)
+    .join('\n\n');
+
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 3000);
+    } catch {
+      /* a refused clipboard is not an error state — select it by hand */
+      setCopied(false);
+    }
+  }
+
+  return (
+    <button className="btn btn-quiet copyoutline" onClick={copy} aria-live="polite">
+      {copied ? 'Copied' : 'Copy outline'}
+    </button>
+  );
 }
 
 function Quotes({ quotes }: { quotes: string[] }) {
@@ -153,7 +191,10 @@ export default function BriefSheet({
 
         {/* 7 · deck outline */}
         <section className="bsec">
-          <h3>Kick-off deck outline</h3>
+          <div className="bsechead">
+            <h3>Kick-off deck outline</h3>
+            <CopyOutline slides={brief.deckOutline} />
+          </div>
           <ul className="slides">
             {brief.deckOutline.map((s, i) => (
               <li key={i}>

@@ -20,12 +20,14 @@ export default function ProjectSheet({
   project: p,
   origin,
   onOpenBrief,
+  onReadAnswers,
   onClose,
   onActed,
 }: {
   project: ProjectView;
   origin: string;
   onOpenBrief: () => void;
+  onReadAnswers: () => void;
   onClose: () => void;
   onActed: (message: string) => void;
 }) {
@@ -139,14 +141,21 @@ export default function ProjectSheet({
       <div className="pd-sec">
         <h3>Who answered</h3>
         {p.people.length ? (
-          <div className="pd-people">
-            {p.people.map((person, i) => (
-              <div className="person" key={`${person.name}-${i}`}>
-                <b>{person.name}</b>
-                <span className="role">{person.email || 'no email given'}</span>
-              </div>
-            ))}
-          </div>
+          <>
+            <div className="pd-people">
+              {p.people.map((person, i) => (
+                <div className="person" key={`${person.name}-${i}`}>
+                  <b>{person.name}</b>
+                  <span className="role">{person.email || 'no email given'}</span>
+                </div>
+              ))}
+            </div>
+            {/* the analysis reports what the team might miss; reading what was
+                actually said is their own work, and this is where they do it */}
+            <button className="btn btn-quiet" onClick={onReadAnswers}>
+              Read what they said
+            </button>
+          </>
         ) : (
           <p className="quiet">Nobody has answered yet.</p>
         )}

@@ -1442,6 +1442,164 @@ label.f span {
   color: var(--ink);
 }
 
+/* ============================================================
+   What the client said — the full answers, one respondent at a
+   time. DESIGN.md: borders not shadows, canvas on parchment.
+   ============================================================ */
+
+.anspeople {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: var(--sp-lg);
+}
+.anspeople button {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+  padding: 10px 16px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-pill);
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.18s;
+}
+.anspeople button b {
+  font-size: 15px;
+  font-weight: 600;
+}
+.anspeople button span {
+  font-size: 12px;
+  color: var(--ink-3);
+  line-height: 1.7;
+}
+@media (hover: hover) {
+  .anspeople button:hover {
+    border-color: var(--ink-3);
+  }
+}
+/* the accent marks the selection, never the hover — DESIGN.md section 5 */
+.anspeople button.on {
+  border: 2px solid var(--primary-focus);
+  padding: 9px 15px;
+}
+
+.anssum {
+  margin-bottom: var(--sp-lg);
+}
+
+.anslist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.ansrow {
+  padding: 18px 0;
+  border-top: 1px solid var(--divider);
+}
+.ansq {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.ansq .num {
+  flex: 0 0 22px;
+  font-size: 13px;
+  color: var(--ink-3);
+  line-height: 1.7;
+}
+.ansq .qt {
+  font-size: 14px;
+  color: var(--ink-3);
+  /* Thai never below 1.6 */
+  line-height: 1.7;
+}
+.ansq .qt .th {
+  display: block;
+  font-style: normal;
+  font-size: 13px;
+}
+.anstext,
+.anschoice,
+.noanswer {
+  margin: 0 0 0 34px;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--ink);
+  /* the client's own words, wrapped as they wrote them */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.anschoice .other {
+  display: block;
+  font-size: 14px;
+  color: var(--ink-3);
+}
+/* a blank is a finding, so it is legible rather than hidden — but it is not the
+   caution colour, because nobody did anything wrong */
+.ansrow.blank .noanswer {
+  color: var(--ink-3);
+  font-size: 14px;
+}
+.anschips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 0 34px;
+  padding: 0;
+  list-style: none;
+}
+.anschips li {
+  padding: 5px 12px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-pill);
+  background: var(--canvas);
+  font-size: 14px;
+}
+.ansscale {
+  margin: 0 0 0 34px;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+}
+.ansscale li {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 14px;
+}
+.ansscale .pos {
+  font-weight: 600;
+}
+.ansscale .pos i {
+  font-style: normal;
+  font-weight: 400;
+  color: var(--ink-3);
+}
+.ansscale .pair {
+  color: var(--ink-3);
+  font-size: 12px;
+}
+
+/* the deck outline's copy control sits on the section's own heading line */
+.bsechead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-md);
+  flex-wrap: wrap;
+}
+.copyoutline {
+  font-size: 14px;
+  padding: 7px 16px;
+  min-height: 0;
+}
+
 /* ---- All projects ---- */
 .ptable {
   width: 100%;

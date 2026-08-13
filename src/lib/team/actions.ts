@@ -254,3 +254,17 @@ export async function restoreProject(projectId: string): Promise<ActionResult> {
   revalidatePath('/');
   return { ok: true };
 }
+
+/**
+ * Read a project's answers, on demand.
+ *
+ * Not loaded with the projects list: every answer of every respondent on every
+ * live project is a great deal of text to ship to a browser that will show one
+ * project's worth, and only when somebody asks.
+ */
+export async function readAnswers(projectId: string) {
+  const session = await auth();
+  if (!session?.user) return null;
+  const { loadProjectAnswers } = await import('@/lib/team/answers');
+  return loadProjectAnswers(projectId);
+}
