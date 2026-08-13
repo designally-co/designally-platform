@@ -805,6 +805,14 @@ function Chevron({ up, back }: { up?: boolean; back?: boolean }) {
               ? 'M3 16.5 L12 7.5 L21 16.5'
               : 'M3 7.5 L12 16.5 L21 7.5'
         }
+        /* Centred by eye, not by box.
+           A chevron is not symmetrical about its own bounding box: the round
+           join at the apex fuses two strokes into one node, while the far ends
+           are two thin separated caps. The ink sits toward the point, so a
+           mathematically centred chevron looks pushed that way — and inside a
+           disc, which is perfectly symmetrical, there is nothing to hide it.
+           One pixel away from the point puts the weight in the middle. */
+        transform={back ? 'translate(1 0)' : up ? 'translate(0 1)' : 'translate(0 -1)'}
         stroke="currentColor"
         strokeWidth="2.5"
         strokeLinecap="round"

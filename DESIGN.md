@@ -269,7 +269,9 @@ And its fill depends on the surface beneath it. Pearl was chosen against the tea
 
 **Icon button — a filled disc.** 52px, `pill` radius, `--surface-fill`, **no border**, `--glyph` chevron. Hover deepens the fill to `--surface-fill-deep` and takes the glyph to `--ink`, per the rule below. This is the survey's back control, everywhere it appears.
 
-**The chevron.** 2.5px stroke, round cap and join, **arms at 45° — a right angle between them, 9 wide to 18 tall** — drawn about **a third of the height of the control** it sits in. One geometry, used by every chevron in the product. It was a 1.27px hairline at half that presence, which reads as a lighter grey than it is set in, because a hair of a line does; and it opened to about 100°, which was an estimate read off a picture rather than the proportion UIKit actually holds.
+**The chevron.** 2.5px stroke, round cap and join, **arms at 45° — a right angle between them, 9 wide to 18 tall** — drawn about **a third of the height of the control** it sits in. One geometry, used by every chevron in the product.
+
+**It is centred by eye, not by box** — 1px away from its point, on whichever axis it points along. A chevron is not symmetrical about its own bounding box: the round join at the apex fuses two strokes into one node, while the far ends are two thin separated caps, so the ink sits toward the point and a mathematically centred chevron looks pushed that way. Inside a disc, which is perfectly symmetrical, there is nothing to hide it. It was a 1.27px hairline at half that presence, which reads as a lighter grey than it is set in, because a hair of a line does; and it opened to about 100°, which was an estimate read off a picture rather than the proportion UIKit actually holds.
 
 `--glyph` exists because `--ink-muted-48` is tuned to the page: on a grey disc it measures 3.83:1 and looks pale. `--glyph` is 4.92:1 there, clearing even the text floor. On the page — the bare stepper — `--ink-muted-48` is still correct. Same object, different ground, again.
 
