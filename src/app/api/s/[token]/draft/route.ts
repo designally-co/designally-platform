@@ -2,7 +2,7 @@ import { and, eq } from 'drizzle-orm';
 import { NextResponse, type NextRequest } from 'next/server';
 
 import { getDb } from '@/lib/db';
-import { surveyDrafts, surveys } from '@/lib/db/schema';
+import { projects, surveyDrafts, surveys } from '@/lib/db/schema';
 import type { DraftValues } from '@/lib/survey/answers';
 import { normaliseToken } from '@/lib/survey/token';
 
@@ -16,14 +16,22 @@ export const dynamic = 'force-dynamic';
  * A draft is never promoted to a response. Only a submit writes one.
  */
 
+/**
+ * The survey and whether its project is still live.
+ *
+ * Joined rather than fetched separately because both doors this route guards —
+ * a closed survey and an archived project — are one question to the caller:
+ * is this link still taking anything?
+ */
 async function openSurvey(token: string) {
   const db = await getDb();
-  const [survey] = await db
-    .select()
+  const [row] = await db
+    .select({ survey: surveys, archived: projects.archived })
     .from(surveys)
+    .innerJoin(projects, eq(surveys.projectId, projects.id))
     .where(eq(surveys.token, normaliseToken(token)))
     .limit(1);
-  return { db, survey };
+  return { db, survey: row?.survey, archived: row?.archived ?? false };
 }
 
 export async function GET(req: NextRequest, ctx: RouteContext<'/api/s/[token]/draft'>) {
@@ -57,11 +65,12 @@ export async function PUT(req: NextRequest, ctx: RouteContext<'/api/s/[token]/dr
 
   if (!body.key) return NextResponse.json({ error: 'missing key' }, { status: 400 });
 
-  const { db, survey } = await openSurvey(token);
+  const { db, survey, archived } = await openSurvey(token);
   if (!survey) return NextResponse.json({ error: 'no such survey' }, { status: 404 });
 
-  // Rule 1 — the survey closed because a person closed it. Stop accepting drafts.
+  // Rule 1 — both of these happened because a person did them. Stop saving.
   if (survey.closedAt) return NextResponse.json({ error: 'survey closed' }, { status: 409 });
+  if (archived) return NextResponse.json({ error: 'project finished' }, { status: 409 });
 
   await db
     .insert(surveyDrafts)

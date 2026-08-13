@@ -21,7 +21,11 @@ export default async function SurveyPage(props: PageProps<'/s/[token]'>) {
   const survey = await loadSurvey(token);
 
   if (!survey) notFound();
-  if (survey.closed) return <Closed clientName={survey.clientName} />;
+  if (survey.closed || survey.archived) {
+    return (
+      <Closed clientName={survey.clientName} reason={survey.archived ? 'finished' : 'closed'} />
+    );
+  }
 
   /**
    * A survey that resolves to no questions must never be shown to a client.

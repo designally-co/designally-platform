@@ -60,6 +60,11 @@ export async function POST(req: NextRequest, ctx: RouteContext<'/api/s/[token]/s
   const payload = await loadSurvey(token);
   if (!payload) return NextResponse.json({ error: 'no such survey' }, { status: 404 });
 
+  /* Gate 4 — the project is finished. A tab opened before it was archived can
+     still be sitting on somebody's phone, and the link is forwardable by
+     design, so the page guard is not the only door. */
+  if (payload.archived) return NextResponse.json({ error: 'project finished' }, { status: 409 });
+
   const questions = payload.steps.flatMap((s) => s.questions);
   const { name, email } = identityOf(questions, values);
 

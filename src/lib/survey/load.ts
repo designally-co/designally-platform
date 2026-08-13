@@ -49,6 +49,16 @@ export type SurveyPayload = {
   clientName: string;
   package: Package;
   closed: boolean;
+  /**
+   * The project was archived — gate 4.
+   *
+   * A survey link is meant to be forwarded, and archiving is the team saying
+   * the project is finished. Without this the two facts never met: an archived
+   * project's link stayed fully open, so answers could arrive months later into
+   * a row nobody is watching. Closing collection and archiving are different
+   * acts and a team can do either without the other.
+   */
+  archived: boolean;
   steps: SurveyStep[];
   questionCount: number;
 };
@@ -168,6 +178,7 @@ export async function loadSurvey(rawToken: string): Promise<SurveyPayload | null
     clientName: row.client.name,
     package: row.project.package,
     closed: row.survey.closedAt !== null,
+    archived: row.project.archived,
     steps,
     /* Numbered questions only, so the welcome screen's promise and the last
        number the respondent reaches are the same figure. Name and email are
