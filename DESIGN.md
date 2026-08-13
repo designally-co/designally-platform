@@ -252,13 +252,17 @@ Document default and pressed states only. The source analysis explicitly decline
 ### Buttons
 
 **Primary** — `--primary` fill, white text, `body` (17px/400), `pill` radius, padding `11px 22px`. Focus `2px solid --primary-focus`. Active `scale(0.95)`.
-Only one visible per region.
+Only one visible per region — and on the client survey, only once in the whole flow.
+
+Where a primary sits beside a secondary on a phone's floor, the row is a three-column grid — secondary, primary, and an empty column matching the secondary — so the primary's label lands on the screen's centreline. A two-item row centres the label in its button but not on the screen, and the bar reads as one object.
 
 **Ghost pill** — transparent fill, `--primary` text, 1px `--primary` border, same size and radius. The second CTA when two appear together.
 
 **Pearl capsule** — `--surface-pearl` fill, `--ink-muted-80` text, `caption` (14px), 3px `--divider-soft` ring, `md` radius (11px), padding `8px 14px`. Quiet secondary actions.
 
-**Dark utility** — `--ink` fill, white text, `caption` (14px), `sm` radius (8px), padding `8px 15px`. Neutral commits — survey navigation.
+**Dark utility** — `--ink` fill, white text. Neutral commits: stepping through the survey. `caption` (14px), `sm` radius (8px), padding `8px 15px` in the team app; `body` (17px), `pill` radius, 52px tall and full width on the survey's floor, where it is the only action on the screen.
+
+**Ink or accent — the survey's answer.** Every OK is ink and only **Send answers** is the accent. Twenty-one blue buttons would spend the accent on every screen and leave nothing for the one action that cannot be taken back. The ink step and the blue commit are the same hierarchy the team app uses between navigating and closing a survey.
 
 **Text link** — `--primary`, no background. On dark surfaces use `--primary-on-dark`.
 
@@ -337,6 +341,23 @@ Always accompanied by text — the tag is the label.
 
 A tag is not an action. It shares the pill with buttons because it is a label with ends, not because it can be pressed — which is why a tag is never filled with ink or the accent. Filled pill plus accent or ink means press me; outlined pill in muted ink means this is what that is. The survey's question number is the latter: `11/21`, quiet, on a fixed 40px width so that every question's text starts on the same left edge.
 
+### Progress and position
+
+The system had no spec for either, which is why the survey's question number moved through four different treatments in one day. Both are specified here now.
+
+**The bar.** 3px, sticky at the top of the scroller, `--divider` track and `--primary` fill. It animates `transform: scaleX()`, never `width` — width relayouts the page, and this moves on all twenty-odd advances. It is hidden on the welcome screen: a bar at zero reads as something broken rather than as nothing yet done.
+
+**The number.** `18/21` in a pill, `--canvas` with a 1px `--hairline`, `--ink-muted-48`, 12px, weight 400.
+
+**This element is not from Apple, and that is deliberate.** Apple has no such thing. Its badge means unread or pending — attention, which is the opposite of position — and its answer for "where am I" is the progress indicator alone; its own survey product shows a bar, a question, and no number. The number here is borrowed from Typeform, the reference the client survey's interaction pattern comes from, and it is kept for one reason: twenty-one questions is long enough that people want to know how many are left, and a 3px bar cannot tell them.
+
+Because it is a label and not a control, it obeys the tag rules absolutely: never filled with ink or the accent, never the loudest thing on the slide. It is the quietest mark on a screen that has only three.
+
+Two mechanics that are not decoration:
+
+- **Desktop: a fixed 40px width.** It hangs in the left margin so the question, its wrapped lines, the language reveal, the answer and OK all share one left edge. The hang only lands there if `margin-left + width + margin-right` is exactly zero, so a content width — `1/21` is narrower than `10/21` — would put question 1 ten pixels left of question 10.
+- **Mobile: its own line, sized to content with 11px ends.** 56px of hanging indent is a seventh of a phone; the question needs the width more than the badge needs the margin. Content width with no padding puts the digits against the curve, and a pill with no ends is a squashed rectangle.
+
 ### Sticky bars
 
 Sub-nav, sheet headers, brief action bars: `rgba(245,245,247,0.8)` with `saturate(180%) blur(20px)`, 1px `--hairline` edge, height 52–64px.
@@ -371,6 +392,14 @@ The two project sections are not redundant: the first answers *what do I do now*
 | Purpose | answer "is anything waiting on me" in 15 seconds | make a first impression worth 20 minutes |
 
 Same tokens, same accent, same pill grammar. Different volume.
+
+**Amended 13 August 2026 — the survey is no longer only Apple at a different volume.** Its interaction pattern is now Typeform's: one question per screen, scroll-snap as the navigation, an underlined answer rather than a filled field, OK plus Enter, and a numbered tag beside the question. That was a deliberate choice against a pinned reference, not drift.
+
+What stayed Apple: the palette and the accent's meaning, the type ramp and the Thai leading rule, the pill as the action signal, the radii, the spacing scale, zero shadows, and the rule that one screen has one primary action.
+
+What is Typeform's: the pacing, the underlined input, and the question tag.
+
+Recording it because an undocumented borrowing looks like an oversight, and the next person to open this file should be able to tell a decision from a mistake.
 
 ---
 

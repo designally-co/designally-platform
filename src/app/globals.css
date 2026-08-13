@@ -2849,7 +2849,18 @@ dialog::backdrop {
   .okback {
     display: grid;
   }
+  /**
+   * Back, OK, and an empty column the width of back.
+   *
+   * As a two-item flex row the label sat 31px right of the screen's
+   * centreline — centred in its own button, but the button was pushed over by
+   * the back arrow and nothing balanced it. The bar reads as one object, so the
+   * label has to sit on the centreline of the thing it appears to belong to.
+   * The empty column costs 52px of button width and buys that.
+   */
   .okrow {
+    display: grid;
+    grid-template-columns: 52px 1fr 52px;
     gap: 10px;
     margin-top: auto;
     padding-top: 26px;

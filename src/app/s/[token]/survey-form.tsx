@@ -449,7 +449,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
 
   return (
     <LangContext.Provider value={LEAD}>
-      <div className="survey-shell client-surface">
+      <div className={`survey-shell client-surface${step === WELCOME ? ' at-welcome' : ''}`}>
         <div className="bar" aria-hidden="true">
           <i style={{ transform: `scaleX(${Math.min(step / LAST, 1)})` }} />
         </div>
