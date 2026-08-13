@@ -492,6 +492,17 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
           </section>
         </div>
 
+        {/* The ramp the controls sit on. Four stacked layers, blur doubling
+            downward, each masked to a lower band — a single blurred pane would
+            put a hard horizontal seam across the slide. Purely presentational
+            and never in the way of a tap. */}
+        <div className="floorblur" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+          <span />
+        </div>
+
         <nav className="deck-nav" aria-label="Move between questions">
           <button
             type="button"

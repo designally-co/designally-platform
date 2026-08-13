@@ -2680,6 +2680,10 @@ dialog::backdrop {
   cursor: default;
 }
 
+.floorblur {
+  display: none;
+}
+
 .savednote {
   position: fixed;
   left: 20px;
@@ -2704,6 +2708,9 @@ dialog::backdrop {
      corner chevron pair is redundant chrome here and goes. */
   .deck-nav {
     display: none;
+  }
+  .floorblur {
+    display: block;
   }
   .slide {
     align-items: stretch;
@@ -2750,6 +2757,66 @@ dialog::backdrop {
    * rows would stack on top of each other — and the slide reserves the room
    * below so a long slide's last item can still scroll clear of the bar.
    */
+  /**
+   * A progressive blur under the controls.
+   *
+   * The bar floats over the slide, so an answer scrolling beneath it used to
+   * hard-cut at the button's top edge. One blurred pane would only move the cut
+   * — the seam becomes a sharp line where the blur starts. Four layers with the
+   * radius doubling downward, each masked to a lower band, ramp it instead, so
+   * content dissolves into the floor rather than being sliced by it.
+   *
+   * DIVERGENCE from DESIGN.md section 3: the system has no material but ink,
+   * line and surface, and the focus ring is its only shadow. This is a blur,
+   * and it earns its place by doing a job — it is not glass for the look of
+   * glass. It exists only on the phone, only under the controls.
+   *
+   * It rides `--kb` with the bar, so it stays under the buttons when the
+   * keyboard pushes them up.
+   */
+  .floorblur {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: var(--kb, 0px);
+    height: 152px;
+    z-index: 14;
+    pointer-events: none;
+    background: linear-gradient(
+      to top,
+      color-mix(in srgb, var(--parchment) 92%, transparent) 0%,
+      transparent 62%
+    );
+  }
+  .floorblur span {
+    position: absolute;
+    inset: 0;
+  }
+  .floorblur span:nth-child(1) {
+    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px);
+    -webkit-mask-image: linear-gradient(to top, #000 0%, transparent 45%);
+    mask-image: linear-gradient(to top, #000 0%, transparent 45%);
+  }
+  .floorblur span:nth-child(2) {
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    -webkit-mask-image: linear-gradient(to top, #000 0%, transparent 32%);
+    mask-image: linear-gradient(to top, #000 0%, transparent 32%);
+  }
+  .floorblur span:nth-child(3) {
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    -webkit-mask-image: linear-gradient(to top, #000 0%, transparent 21%);
+    mask-image: linear-gradient(to top, #000 0%, transparent 21%);
+  }
+  .floorblur span:nth-child(4) {
+    backdrop-filter: blur(11px);
+    -webkit-backdrop-filter: blur(11px);
+    -webkit-mask-image: linear-gradient(to top, #000 0%, transparent 11%);
+    mask-image: linear-gradient(to top, #000 0%, transparent 11%);
+  }
+
   .slide[data-active] .okrow {
     position: fixed;
     left: 22px;
