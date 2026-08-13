@@ -2937,6 +2937,40 @@ dialog::backdrop {
     color: var(--ink);
   }
 }
+/**
+ * The way back to the send screen, while somebody is out fixing one answer.
+ *
+ * Jumping from the review to a blank question left the send screen twenty
+ * slides away — Continue was the only road back, twenty times. This does not
+ * touch Continue, which still means the next question: somebody who went back
+ * to re-read one is free to carry on forward from there.
+ *
+ * It exists only on that return trip, so it sits above the questions rather
+ * than in the control row, which on a phone already holds a back arrow and a
+ * full-width Continue and has no room for a third.
+ */
+.toreview {
+  position: fixed;
+  top: 8px;
+  right: 26px;
+  z-index: 20;
+  /* no container: this is a way out, not the thing to do next, and a bordered
+     pill up here read as loudly as the action on the floor of the slide */
+  padding: 12px 0;
+  border: 0;
+  background: none;
+  color: var(--ink-3);
+  font-size: 14px;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: color 0.18s;
+}
+@media (hover: hover) {
+  .toreview:hover {
+    color: var(--ink);
+  }
+}
+
 .deck-nav button:disabled {
   opacity: 0.45;
   cursor: default;
@@ -2970,6 +3004,9 @@ dialog::backdrop {
      corner chevron pair is redundant chrome here and goes. */
   .deck-nav {
     display: none;
+  }
+  .toreview {
+    right: 22px;
   }
   .floorblur {
     display: block;

@@ -123,6 +123,7 @@ questions        block_id, order, text_en, text_th, type, config, version
 surveys          project_id, kind (discovery), token,
                  opened_at, closed_at, closed_by
 responses        survey_id, respondent_name, email, submitted_at
+                 email — retired at question version 4, kept for surveys sent before it
                  role, decision_maker — both retired at question version 3,
                  kept for surveys sent before it
 answers          response_id, question_id, value
@@ -141,8 +142,8 @@ replaced the questionnaire. A client buys Brand **or** Design, never both.
 
 | Package | Blocks | Questions |
 |---|---|---|
-| **Brand** — Brand Strategy + Brand Identity | identity · strategy · visual | 24 |
-| **Design** | identity · project · visual | 14 |
+| **Brand** — Brand Strategy + Brand Identity | identity · strategy · visual | 22 |
+| **Design** | identity · project · visual | 12 |
 
 Part 2 of the new questionnaire is identical in both packages, word for word, in both languages —
 so `visual` is one shared block. See `docs/questionnaire-architecture.md`.

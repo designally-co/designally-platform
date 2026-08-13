@@ -71,7 +71,7 @@ A single honest read on how unified the client organisation is: high consensus, 
 ## Layer 2 — Depends on the package
 
 _Rewritten 11 August 2026. The website and combined packages were retired; the questionnaire is
-now Brand (24 questions) or Design (14). Both share the Visual Direction block._
+now Brand (22 questions) or Design (12). Both share the Visual Direction block._
 
 ### Both packages — from Visual Direction
 

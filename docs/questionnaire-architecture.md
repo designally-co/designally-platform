@@ -17,15 +17,15 @@ Implemented in `seed/question-blocks.json`, imported by `npm run db:seed`.
 
 | Block | Contents | Used by |
 |---|---|---|
-| `identity` | name · email | both packages |
+| `identity` | name | both packages |
 | `strategy` | Package A Part 1 — 14 questions | Brand |
 | `project` | Package B Part 1 — 4 questions | Design |
 | `visual` | Part 2 — 7 questions | **both packages** |
 
 | Package | Blocks | Questions |
 |---|---|---|
-| **Brand** — Brand Strategy + Brand Identity | identity · strategy · visual | 23 |
-| **Design** | identity · project · visual | 13 |
+| **Brand** — Brand Strategy + Brand Identity | identity · strategy · visual | 22 |
+| **Design** | identity · project · visual | 12 |
 
 **Consequence:** editing a Visual Direction question once updates both questionnaires.
 
@@ -38,6 +38,21 @@ The questionnaire does not ask who is answering. The platform adds it, because a
 names attached is not a finding — the brief has to be able to say *Khun A said this and Khun B
 said that*, and the team has to know whose sentence they are about to put in a deck. Two answers
 without names are one confused answer.
+
+## Version 4 — identity is a name
+
+The contact email was dropped on 13 August 2026, one version after it arrived. Nothing in the
+product read it: one display on the team's project sheet, which already rendered *no email given*.
+It was a second required field on the way in, a second row in the send screen's blank list, and
+respondent PII that the analysis had to be defended against — see the leak below.
+
+**The name stays**, and is not optional. `transcript.ts` uses it as the section heading, so it is
+the only thing grouping answers per person; without it the analysis cannot say that two people
+disagree, only that two answers differ. It is also what the facilitator needs in the room.
+
+Version 3 rows stay in the database and `responses.email` stays on the table. Surveys sent at
+version 3 asked for an address and collected real ones, and rule 5 means they keep asking what
+they were sent with — the send screen shows the row only when the survey has the question.
 
 ## Version 3 — identity is a name and an email
 

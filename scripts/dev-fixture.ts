@@ -300,10 +300,14 @@ async function main() {
       })
       .returning();
 
+    /* the email question was retired at version 4; the name is all the
+       identity block holds now, and older versions still have both */
     const rows: { responseId: string; questionId: string; value: AnswerValue }[] = [
       { responseId: response.id, questionId: identity[0].id, value: t(person.name) },
-      { responseId: response.id, questionId: identity[1].id, value: t(person.email) },
     ];
+    if (identity[1]) {
+      rows.push({ responseId: response.id, questionId: identity[1].id, value: t(person.email) });
+    }
     for (const [ref, value] of Object.entries(person.answers)) {
       const questionId = idByRef.get(ref);
       if (!questionId) throw new Error(`Fixture references an unknown question: ${ref}`);

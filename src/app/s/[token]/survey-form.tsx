@@ -121,6 +121,16 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
    * position.
    */
   const [sending, setSending] = useState(false);
+  /**
+   * Whether the questions were reached from the send screen.
+   *
+   * Jumping back to a blank question left the send screen twenty slides away,
+   * reachable only by pressing Continue through every question in between. The
+   * review is a hub, so while somebody is out on a spoke there is a way
+   * straight back to it. It clears the moment they use it or arrive by any
+   * other route.
+   */
+  const [fromSend, setFromSend] = useState(false);
 
   const draftKey = useRef<string>('');
   const deck = useRef<HTMLDivElement | null>(null);
@@ -319,7 +329,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   }, []);
 
   /* the deck ends at the last question; past it is the send screen */
-  const advance = (n: number) => (n >= cards.length ? setSending(true) : goTo(n + 1));
+  const advance = (n: number) => (n >= cards.length ? openSend() : goTo(n + 1));
 
   const goTo = useCallback((index: number) => {
     const el = deck.current?.querySelector<HTMLElement>(`[data-slide="${index}"]`);
@@ -337,7 +347,13 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   const pendingSlide = useRef<number | null>(null);
   const leaveSend = useCallback((index: number) => {
     pendingSlide.current = index;
+    setFromSend(true);
     setSending(false);
+  }, []);
+
+  const openSend = useCallback(() => {
+    setFromSend(false);
+    setSending(true);
   }, []);
 
   useEffect(() => {
@@ -471,6 +487,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
     setNameMissing(false);
     setSavedAt(null);
     setSending(false);
+    setFromSend(false);
     setStep(WELCOME);
     requestAnimationFrame(() => goTo(WELCOME));
   }
@@ -505,12 +522,16 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                       {respondentName || 'not given · ยังไม่ได้กรอก'}
                     </dd>
                   </div>
-                  <div>
-                    <dt>We&rsquo;ll reach you at · ติดต่อกลับที่</dt>
-                    <dd className={respondentEmail ? undefined : 'missing'}>
-                      {respondentEmail || 'not given · ยังไม่ได้กรอก'}
-                    </dd>
-                  </div>
+                  {/* Retired at question version 4. Surveys sent at 3 still
+                      carry it, and still show it here (rule 5). */}
+                  {emailQuestion && (
+                    <div>
+                      <dt>We&rsquo;ll reach you at · ติดต่อกลับที่</dt>
+                      <dd className={respondentEmail ? undefined : 'missing'}>
+                        {respondentEmail || 'not given · ยังไม่ได้กรอก'}
+                      </dd>
+                    </div>
+                  )}
                 </dl>
 
                 {blanks.length > 0 && (
@@ -601,6 +622,12 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
         <div className="bar" aria-hidden="true">
           <i style={{ transform: `scaleX(${Math.min(step / STOPS, 1)})` }} />
         </div>
+
+        {fromSend && (
+          <button className="toreview" type="button" onClick={openSend}>
+            Back to send
+          </button>
+        )}
 
         <div className="deck" ref={deck}>
           <section
@@ -710,7 +737,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
           </button>
           <button
             type="button"
-            onClick={() => (step >= LAST ? setSending(true) : goTo(step + 1))}
+            onClick={() => (step >= LAST ? openSend() : goTo(step + 1))}
             aria-label="Next question"
           >
             <Chevron />
