@@ -72,18 +72,18 @@ type Card =
   | { kind: 'question'; question: SurveyQuestion; slice?: Slice };
 
 /**
- * How many scale pairs share a slide.
+ * How many scale pairs share a screen.
  *
  * It was four, measured against a 390x844 browser window. A real iPhone is not
  * that: Safari's address bar takes roughly a hundred points off the bottom, and
  * with the Thai reveal open — which is the state a Thai reader is in for the
  * whole survey — the fourth pair sat behind the Continue button and could not
- * be reached. The deck snaps mandatorily by design, so a slide taller than the
- * viewport cannot be rested inside: the scroll returns to a snap point on
- * release. Nothing can be allowed to overflow a slide.
+ * be reached — the deck snapped, so a screen taller than the viewport could not
+ * be rested inside. The deck is gone and a long question now simply scrolls,
+ * but three still reads better than four: a battery you can take in at a glance
+ * is answered more honestly than one you have to scroll through.
  *
- * Three makes the ten pairs 3 · 3 · 2 · 2 rather than 4 · 3 · 3 — one more
- * slide, and every one of them fits a phone held by a Thai reader.
+ * Three makes the ten pairs 3 · 3 · 2 · 2 rather than 4 · 3 · 3.
  */
 const PAIRS_PER_SLIDE = 3;
 
@@ -110,15 +110,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   const [submitted, setSubmitted] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [nameMissing, setNameMissing] = useState(false);
-  /**
-   * The send screen is a page, not a slide.
-   *
-   * It was the last card in the deck, which made it something a person could
-   * scroll onto by accident and, worse, put the review of every answer inside
-   * a mandatory scroll-snap container that could not reach its own bottom.
-   * Leaving the deck is a decision, so it is a state change, not a scroll
-   * position.
-   */
+  /** Whether the send screen is showing rather than a question. */
   const [sending, setSending] = useState(false);
   /**
    * Whether the questions were reached from the send screen.
@@ -130,9 +122,17 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
    * other route.
    */
   const [fromSend, setFromSend] = useState(false);
+  /**
+   * Where Continue on the welcome screen goes for somebody coming back.
+   *
+   * The draft has always recorded which question they were on; nothing read it,
+   * because a returning respondent could simply scroll to where they had got
+   * to. They cannot now — without this, resuming a half-finished survey means
+   * pressing Continue past every question already answered.
+   */
+  const [resumeAt, setResumeAt] = useState(1);
 
   const draftKey = useRef<string>('');
-  const deck = useRef<HTMLDivElement | null>(null);
   const storageKey = draftStorageKey(survey.token);
 
   const steps = useMemo(
@@ -178,7 +178,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
     return out;
   }, [steps]);
 
-  /* the last slide in the deck — the send screen is no longer one of them */
+  /* the last question; past it is the send screen */
   const LAST = cards.length;
   /* the send screen is still a position for the progress bar to count towards */
   const STOPS = LAST + 1;
@@ -222,6 +222,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
       if (winner) {
         setValues(winner.values ?? {});
         setSavedAt(winner.updatedAt ?? null);
+        setResumeAt(winner.step ?? 1);
       }
       setReady(true);
     }
@@ -287,28 +288,43 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
       [ref]: typeof value === 'function' ? value(prev[ref]) : value,
     }));
 
-  /* ── the deck ───────────────────────────────────────────────────── */
+  /* ── one question at a time ──────────────────────────────────────── */
 
   /**
-   * Scrolling is the navigation.
+   * Scrolling used to be the navigation: 25 slides in a `scroll-snap` container,
+   * one viewport tall each, and the active one read back off the scroll
+   * position. It is now one question rendered at a time and a `step` that says
+   * which — and the page scrolls the way a page does.
    *
-   * Every slide is one viewport tall and snaps, so a wheel, a swipe, Page
-   * Up/Down and the chevrons are all the same gesture — and any question stays
-   * reachable by scrolling back to it instead of stepping through the ones in
-   * between.
+   * That was not a preference. Nearly every hard defect on this surface came
+   * from navigation being a *scroll container*:
    *
-   * The active slide is read from the scroll position rather than held in state
-   * and pushed at it. A person can scroll anywhere at any moment, so the
-   * position is theirs to set and ours to follow; a `step` that tried to drive
-   * the scroller would fight every swipe.
+   *   · `scroll-snap-type: mandatory` means the scroller must come to rest on a
+   *     snap point, and a slide's only snap point is its top — so any question
+   *     taller than the screen sprang back and its bottom could not be reached.
+   *     Eight of them did at the height a real Safari leaves.
+   *   · A `position: fixed` element inside a scroller is attached to that
+   *     scroller's compositing layer, so the blur ramp — a sibling of the deck —
+   *     composited over the controls and blurred them on iOS. No z-index can
+   *     reach across that.
+   *   · The send screen had to be lifted out of the deck for the first reason,
+   *     and then the thank-you screen's only action turned out to be invisible,
+   *     because the floor controls are revealed by an attribute the deck sets
+   *     from scroll position.
+   *   · Returning to a question meant restoring a scroll offset, which was being
+   *     computed from `offsetTop` against the wrong element and silently
+   *     corrected by the snap.
+   *
+   * All four are properties of the container, not of the design. A question
+   * longer than the screen is now simply a longer page.
    */
   /**
    * How much of the screen the phone keyboard is covering, as a CSS variable.
    *
    * The visual viewport shrinks when the keyboard opens; the layout viewport
    * does not. Measuring the difference is the only way to keep the OK button
-   * sitting on top of the keyboard rather than underneath it — and OK is the
-   * one control on the slide, so losing it mid-answer strands the respondent.
+   * sitting on top of the keyboard rather than underneath it — and Continue is
+   * the one control here, so losing it mid-answer strands the respondent.
    */
   useEffect(() => {
     const vv = window.visualViewport;
@@ -327,27 +343,17 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
     };
   }, []);
 
-  /* the deck ends at the last question; past it is the send screen */
-  const advance = (n: number) => (n >= cards.length ? openSend() : goTo(n + 1));
+  /* the questions end at the last card; past it is the send screen */
+  const advance = (n: number) => (n >= cards.length ? openSend() : setStep(n + 1));
 
   const goTo = useCallback((index: number) => {
-    const el = deck.current?.querySelector<HTMLElement>(`[data-slide="${index}"]`);
-    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setStep(index);
   }, []);
 
-  /**
-   * Back out of the send screen and land on a question.
-   *
-   * The deck is unmounted while the send screen is up, so the scroll cannot be
-   * set until React has put it back. The target is parked here and an effect
-   * places it on the render that follows — without smoothing, because this is a
-   * page changing rather than a scroll being made.
-   */
-  const pendingSlide = useRef<number | null>(null);
   const leaveSend = useCallback((index: number) => {
-    pendingSlide.current = index;
     setFromSend(true);
     setSending(false);
+    setStep(index);
   }, []);
 
   const openSend = useCallback(() => {
@@ -355,108 +361,11 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
     setSending(true);
   }, []);
 
+  /* Every view starts at its own top. Nothing here restores a scroll position:
+     a question is a page now, and a new page begins at the beginning. */
   useEffect(() => {
-    if (sending || pendingSlide.current === null) return;
-    const index = pendingSlide.current;
-    pendingSlide.current = null;
-    const root = deck.current;
-    const el = root?.querySelector<HTMLElement>(`[data-slide="${index}"]`);
-    if (!root || !el) return;
-
-    /* The deck sets `scroll-behavior: smooth`, which applies to scrollTop and
-       scrollIntoView alike — so leaving the send screen animated a scroll
-       through every slide between, and Chrome's duration grows with distance:
-       from the top of a 24-slide deck it was still travelling seconds later and
-       came to rest wherever it had got to. This is a page arriving, not a
-       scroll being made, so the behaviour is suspended for the one assignment
-       and handed straight back. */
-    const previous = root.style.scrollBehavior;
-    root.style.scrollBehavior = 'auto';
-    /* Measured, not `offsetTop`: the deck is not positioned, so a slide's
-       offsetParent is the body and its offsetTop is not the deck's scroll
-       offset. Mandatory snapping was correcting the difference and hiding it —
-       and snapping is now switched off on any slide taller than the screen. */
-    root.scrollTop += el.getBoundingClientRect().top - root.getBoundingClientRect().top;
-    root.style.scrollBehavior = previous;
-    setStep(index);
-  }, [sending]);
-
-  useEffect(() => {
-    const root = deck.current;
-    if (!root || submitted || sending) return;
-
-    /**
-     * The active slide is the one covering the middle of the screen.
-     *
-     * This was an IntersectionObserver firing above a fixed ratio, which cannot
-     * describe a slide taller than the viewport: the send screen listing every
-     * blank question runs 2,466px, so at most 34% of it is ever visible, it
-     * never crossed the threshold, and it never became active — which meant its
-     * Send answers button never appeared and the survey could not be submitted
-     * by anyone who had left a question blank.
-     *
-     * A midpoint works at any height and has no threshold to tune.
-     */
-    const slides = Array.from(root.querySelectorAll<HTMLElement>('[data-slide]'));
-    let frame = 0;
-
-    /**
-     * A slide taller than the screen has to be restable inside.
-     *
-     * `mandatory` means the deck must always come to rest on a snap point, and
-     * the only snap point in a slide is its top — so on a screen shorter than
-     * the slide, the bottom of it cannot be reached at all. The scroll goes
-     * there and springs back. On a real iPhone, where Safari's address bar
-     * takes about a hundred points that a desktop browser window at the same
-     * nominal size does not, that hid the last row of the personality battery
-     * behind the Continue button with no way to get at it — and seven other
-     * slides besides, once a Thai reader opens the reveal.
-     *
-     * So the deck stops snapping while the slide it is on is taller than it,
-     * and takes `mandatory` back the moment it is not. Between two slides that
-     * fit — which is nearly all of them — nothing changes and there is still no
-     * resting between questions; and scrolling off a tall slide restores
-     * `mandatory` as soon as the next one takes the middle of the screen, which
-     * completes the transition in the usual way.
-     *
-     * `proximity` was the obvious first answer and does not work: a slide 70px
-     * taller than the screen is 70px from its own snap point, which is well
-     * inside the threshold the browser uses, so it springs back exactly as
-     * before. Only `none` actually lets go.
-     */
-    let snapping = '';
-    const measure = () => {
-      frame = 0;
-      const middle = root.clientHeight / 2;
-      const rootTop = root.getBoundingClientRect().top;
-      const found = slides.find((s) => {
-        const r = s.getBoundingClientRect();
-        return r.top - rootTop <= middle && r.bottom - rootTop > middle;
-      });
-      if (!found) return;
-      setStep(Number(found.dataset.slide));
-
-      const wanted = found.scrollHeight > root.clientHeight + 1 ? 'none' : 'y mandatory';
-      if (wanted !== snapping) {
-        snapping = wanted;
-        root.style.scrollSnapType = wanted;
-      }
-    };
-
-    const onScroll = () => {
-      if (frame) return;
-      frame = requestAnimationFrame(measure);
-    };
-
-    measure();
-    root.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
-    return () => {
-      if (frame) cancelAnimationFrame(frame);
-      root.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
-    };
-  }, [cards.length, submitted, sending]);
+    window.scrollTo(0, 0);
+  }, [step, sending, submitted]);
 
   /* ── submit ─────────────────────────────────────────────────────── */
 
@@ -523,11 +432,14 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
     setSavedAt(null);
     setSending(false);
     setFromSend(false);
+    setResumeAt(1);
     setStep(WELCOME);
-    requestAnimationFrame(() => goTo(WELCOME));
   }
 
   /* ── render ─────────────────────────────────────────────────────── */
+
+  /* the welcome is the absence of a card, not a card of its own */
+  const card = step > WELCOME ? cards[step - 1] : undefined;
 
   /* Terminal, so it is tested before every other screen. It was tested after
      `sending`, which is still true when the send succeeds — the answers reached
@@ -538,8 +450,8 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
     return (
       <LangContext.Provider value={LEAD}>
         <div className="survey-shell client-surface">
-          {/* the floor controls are revealed by data-active; off the deck this
-              slide always is — without it the only action here was invisible */}
+          {/* the floor controls are revealed by data-active, and there is only
+              ever one screen — without it the only action here was invisible */}
           <div className="slide" data-active="">
             <div className="slidebody">
               <div className="slidemain">
@@ -627,9 +539,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                 )}
                 {error && <p className="qwarn">{error}</p>}
               </div>
-              {/* Back is the same round arrow as every other back on this
-                  survey. Off the deck the stepper does not exist, so here it
-                  shows at every width rather than on a phone only. */}
+              {/* the same round arrow as every other back on this survey */}
               <div className="okrow">
                 <button
                   className="okback"
@@ -646,7 +556,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
             </div>
           </div>
 
-          {/* the same ramp the deck's controls sit on — the list runs under it */}
+          {/* the same ramp the questions' controls sit on — the list runs under it */}
           <div className="floorfade" aria-hidden="true" />
         </div>
       </LangContext.Provider>
@@ -666,28 +576,73 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
           </button>
         )}
 
-        <div className="deck" ref={deck}>
-          <section
-            className="slide"
-            data-slide={WELCOME}
-            data-active={step === WELCOME ? '' : undefined}
-          >
+        {card ? (
+          <section className="slide" data-active="" key={step}>
+            <div className="slidebody">
+              <div className="slidemain">
+                {card.kind === 'fields' ? (
+                  <div className="identitygrid">
+                    {card.questions.map((q) => (
+                      <div key={q.ref}>
+                        <IdentityField
+                          question={q}
+                          value={values[q.ref]}
+                          onChange={(v) => setValue(q.ref, v)}
+                          onEnter={() => advance(step)}
+                        />
+                        {nameMissing && q.ref === nameQuestion?.ref && (
+                          <span className="qwarn">
+                            Please tell us your name so we know whose perspective this is. ·
+                            กรุณากรอกชื่อของคุณ
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <Question
+                    question={card.question}
+                    value={values[card.question.ref]}
+                    onChange={(v) => setValue(card.question.ref, v)}
+                    onEnter={() => advance(step)}
+                    total={survey.questionCount}
+                    slice={card.slice}
+                  />
+                )}
+              </div>
+              <Ok
+                onClick={() => advance(step)}
+                onBack={() => goTo(step - 1)}
+                hint={card.kind === 'question' && card.question.type === 'paragraph'}
+              />
+            </div>
+          </section>
+        ) : (
+          <section className="slide" data-active="">
             <div className="slidebody">
               <div className="slidemain">
                 <h1>Let&apos;s shape your brand, together.</h1>
-              <p className="intro">
-                This questionnaire helps our team understand your brand before we begin designing.
-                There are no wrong answers.
-              </p>
-              {/* The two screens with no per-question reveal keep their Thai
-                  line, so a Thai-only reader is never stranded at the moment
-                  they decide to start or to send. */}
+                <p className="intro">
+                  This questionnaire helps our team understand your brand before we begin
+                  designing. There are no wrong answers.
+                </p>
+                {/* The two screens with no per-question reveal keep their Thai
+                    line, so a Thai-only reader is never stranded at the moment
+                    they decide to start or to send. */}
                 <p className="introth th">
                   แบบสอบถามนี้ช่วยให้ทีมเข้าใจแบรนด์ของคุณก่อนเริ่มออกแบบ ไม่มีคำตอบที่ผิด
                 </p>
               </div>
 
-              <button className="btn btn-primary start" onClick={() => goTo(1)} disabled={!ready}>
+              <button
+                className="btn btn-primary start"
+                /* clamped here rather than on restore: the card count moves as
+                   conditional steps open and close, and a draft saved before the
+                   questionnaire was re-sliced can name a step that is now past
+                   the end */
+                onClick={() => goTo(Math.min(Math.max(resumeAt, 1), cards.length))}
+                disabled={!ready}
+              >
                 {started ? 'Continue' : 'Start'}
               </button>
               <p className="takes">
@@ -697,95 +652,16 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
               </p>
             </div>
           </section>
-
-          {cards.map((card, i) => {
-            const n = i + 1;
-            return (
-              <section
-                className="slide"
-                data-slide={n}
-                data-active={step === n ? '' : undefined}
-                key={n}
-              >
-                <div className="slidebody">
-                  <div className="slidemain">
-                    {card.kind === 'fields' ? (
-                    <div className="identitygrid">
-                      {card.questions.map((q) => (
-                        <div key={q.ref}>
-                          <IdentityField
-                            question={q}
-                            value={values[q.ref]}
-                            onChange={(v) => setValue(q.ref, v)}
-                            onEnter={() => advance(n)}
-                          />
-                          {nameMissing && q.ref === nameQuestion?.ref && (
-                            <span className="qwarn">
-                              Please tell us your name so we know whose perspective this is. ·
-                              กรุณากรอกชื่อของคุณ
-                            </span>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                    ) : (
-                      <Question
-                        question={card.question}
-                        value={values[card.question.ref]}
-                        onChange={(v) => setValue(card.question.ref, v)}
-                        onEnter={() => advance(n)}
-                        total={survey.questionCount}
-                        slice={card.slice}
-                      />
-                    )}
-                  </div>
-                  <Ok
-                    onClick={() => advance(n)}
-                    onBack={() => goTo(n - 1)}
-                    hint={card.kind === 'question' && card.question.type === 'paragraph'}
-                  />
-                </div>
-              </section>
-            );
-          })}
-
-        </div>
+        )}
 
         {/* The ramp the controls sit on: the page's own colour, fading up to
-            nothing, so a question scrolling past does not collide with them.
-
-            It was that gradient plus four stacked backdrop-filter layers. On
-            iOS the blur painted over the buttons and blurred them — and the
-            cause was never the blur. A `position: fixed` element inside a
-            scrolling container is attached to that scroller's compositing
-            layer, and these controls live inside the deck; the blur, a sibling
-            of the deck, composited above the whole scroller. z-index does not
-            arbitrate across that, which is why the send screen — whose controls
-            are not inside the deck — was always fine.
-
-            A painted gradient is not promoted to a layer of its own, so it
-            cannot hit this. The fade survives; the blur was the part that could
-            not be had without moving the controls out of the deck. */}
+            nothing, so a long question scrolling past does not collide with
+            them. A blur here used to composite over the buttons on iOS because
+            they were fixed inside a scroller; there is no scroller now, so that
+            constraint is lifted if the blur is ever wanted back. */}
         <div className="floorfade" aria-hidden="true" />
 
 
-        <nav className="deck-nav" aria-label="Move between questions">
-          <button
-            type="button"
-            onClick={() => goTo(Math.max(step - 1, 0))}
-            disabled={step === 0}
-            aria-label="Previous question"
-          >
-            <Chevron up />
-          </button>
-          <button
-            type="button"
-            onClick={() => (step >= LAST ? openSend() : goTo(step + 1))}
-            aria-label="Next question"
-          >
-            <Chevron />
-          </button>
-        </nav>
 
         {savedAt && step > 0 && (
           <p className="savednote" aria-live="polite">

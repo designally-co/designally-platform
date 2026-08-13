@@ -262,9 +262,6 @@ label.f span {
 .survey-shell.at-welcome .bar {
   background: transparent;
 }
-.survey-shell.at-welcome .deck-nav {
-  display: none;
-}
 /* scaleX rather than width: this now moves on every one of twenty-one
    advances instead of five, and animating width relayouts the page each time. */
 .bar i {
@@ -744,7 +741,7 @@ label.f span {
  *
  * They were side by side wherever there was room, which made the one slide that
  * holds two fields the only one that reads across instead of down. Every other
- * question in the deck is a single column, and these are underlined fields —
+ * question is a single column, and these are underlined fields —
  * two rules side by side read as one broken rule.
  */
 .identitygrid {
@@ -864,17 +861,6 @@ label.f span {
   margin-bottom: 9px;
 }
 
-/**
- * The send screen, which is a page rather than a slide.
- *
- * It carries no stepper, because the stepper belongs to the deck it just left —
- * so the round back arrow, which a phone alone shows on a question, shows here
- * at every width. Without it a pointer device would have no way back into the
- * answers at all.
- */
-.sendslide .okback {
-  display: grid;
-}
 .sendslide .okrow {
   margin-top: 34px;
 }
@@ -2489,7 +2475,7 @@ dialog::backdrop {
   font-weight: 600;
 }
 
-/* deck outline */
+/* survey outline */
 .slides {
   list-style: none;
   border: 1px solid var(--hairline);
@@ -2607,41 +2593,11 @@ dialog::backdrop {
 }
 
 
-/* ============================================================
-   The deck — one question, one slide, scrolling is the
-   navigation. Patterned on the Typeform reference the team
-   pinned: no chrome repeated per slide, an underlined answer
-   rather than a filled field, a number badge, OK plus Enter.
-
-   DIVERGENCE from DESIGN.md section 5: survey inputs are a
-   baseline rule, not a 44px pill. The pinned reference is the
-   authority for this surface; the pill remains correct in the
-   team app.
-   ============================================================ */
-
-.deck {
-  height: 100dvh;
-  overflow-y: auto;
-  overflow-x: hidden;
-  scroll-snap-type: y mandatory;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-}
-/* While a field has focus the phone keyboard is resizing the viewport, and a
-   mandatory snap fights it on every keystroke. Snapping resumes on blur. */
-.deck:focus-within {
-  scroll-snap-type: none;
-}
 @media (prefers-reduced-motion: reduce) {
-  .deck {
-    scroll-behavior: auto;
-  }
 }
 
 .slide {
   min-height: 100dvh;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
   display: flex;
   align-items: center;
   padding: 72px 26px 96px;
@@ -2899,8 +2855,7 @@ dialog::backdrop {
  * object, which is what carries the meaning here. The disc itself is 1.23:1
  * against the page and is not asked to carry any.
  */
-.okback,
-.deck-nav button {
+.okback {
   place-items: center;
   width: 52px;
   height: 52px;
@@ -2915,8 +2870,11 @@ dialog::backdrop {
     color 0.18s,
     transform 0.12s var(--ease);
 }
+/* the only way back, so it shows at every width — the chevron pair that did
+   this on a pointer device was a second way to scroll, and scrolling is no
+   longer how you move between questions */
 .okback {
-  display: none;
+  display: grid;
 }
 
 /**
@@ -2927,55 +2885,24 @@ dialog::backdrop {
  * obviously caused by the tap. The fill goes one step deeper than hover and the
  * disc shrinks, the same 0.95 the primary button uses.
  */
-.okback:active,
-.deck-nav button:not(:disabled):active {
+.okback:active {
   background: var(--fill-press);
   color: var(--ink);
   transform: scale(0.95);
 }
 @media (hover: hover) {
   /* a filled control deepens its own fill — DESIGN.md section 5, Hover */
-  .okback:hover,
-  .deck-nav button:not(:disabled):hover {
+  .okback:hover {
     background: var(--fill-deep);
     color: var(--ink);
   }
 }
 
-/**
- * The chevron pair, stacked, alongside the question.
- *
- * Up over down matches what the control does — the axis of the buttons is the
- * axis of the movement, which a side-by-side pair had to be read to work out.
- *
- * It sits beside the reading column rather than in the corner, so the eye finds
- * it where the question is instead of hunting the far edge of a 1280px screen.
- * The column is 660px centred, so the pair is anchored off the centre line and
- * tracks it at any width. Below 900px there is no room for anything beside the
- * column, and it returns to the corner.
- */
-.deck-nav {
-  position: fixed;
-  right: 20px;
-  bottom: 20px;
-  display: flex;
-  flex-direction: column;
-  /* two discs at 2px read as one pill with a crease */
-  gap: 8px;
-  z-index: 20;
-}
 /* The column is 660px centred, so its right edge is 50% + 330px. The pair sits
    56px clear of that — close enough to belong to the question, far enough not
    to crowd its longest line. Below 1000px there is no room for that gap and it
    returns to the corner. */
 @media (min-width: 1000px) {
-  .deck-nav {
-    top: 50%;
-    right: auto;
-    bottom: auto;
-    left: calc(50% + 386px);
-    transform: translateY(-50%);
-  }
 }
 /**
  * Quiet, and the same object as the phone's back arrow.
@@ -2989,29 +2916,6 @@ dialog::backdrop {
  * capsule, but pearl on parchment is nearly invisible and the survey's page is
  * flat — the hairline is what carries the shape here.
  */
-/**
- * The stepper is the same disc as the back control — one icon button in the
- * product, not two that resemble each other. It was a bare glyph that grew a
- * ring on hover, which meant a pointer device had to find it before it looked
- * like anything.
- *
- * Smaller, though. 52px is a thumb; this pair only ever exists on a pointer
- * device — it is hidden below 620px, where swiping does the same job — and a
- * cursor lands inside 40px without aiming. The glyph scales with the disc so
- * the mark keeps its proportions rather than growing chunky in a smaller
- * circle.
- */
-.deck-nav button {
-  display: grid;
-  width: 40px;
-  height: 40px;
-}
-.deck-nav button svg {
-  width: 18px;
-  height: 18px;
-}
-
-
 @media (hover: hover) {
   /* the same hover every other quiet control has: the line darkens to ink-3
      and the glyph to ink. No fill arrives — that was one property more than
@@ -3052,11 +2956,6 @@ dialog::backdrop {
   }
 }
 
-.deck-nav button:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
-
 .floorfade {
   display: none;
 }
@@ -3075,16 +2974,6 @@ dialog::backdrop {
     /* the 104px here cleared the corner chevrons, which a phone does not show —
        the action sits near the floor instead of hovering above dead ground */
     padding: 56px 22px 28px;
-  }
-  /* The reference puts the phone's controls on the floor of the slide: a back
-     arrow beside a wide OK, in the same place on every question, so the thumb
-     never hunts. The content takes the space above and centres in it; the
-     action is pushed down by an auto margin rather than being fixed, so a slide
-     taller than the viewport still ends with its button instead of covering
-     the last thing on it. Swiping already moves between questions, so the
-     corner chevron pair is redundant chrome here and goes. */
-  .deck-nav {
-    display: none;
   }
   .toreview {
     right: 22px;
