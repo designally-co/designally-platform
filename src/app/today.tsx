@@ -268,7 +268,14 @@ export default function Today({
       )}
       {panel === 'coming' && <ComingSheet onClose={() => setPanel(null)} />}
       {briefProject?.brief && (
-        <BriefSheet project={briefProject} onClose={() => setOpenBrief(null)} />
+        <BriefSheet
+          project={briefProject}
+          onClose={() => setOpenBrief(null)}
+          onConfirmed={(msg) => {
+            setOpenBrief(null);
+            toast.show(msg);
+          }}
+        />
       )}
       {answers && (
         <AnswersSheet

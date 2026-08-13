@@ -1,6 +1,6 @@
 'use server';
 
-import { and, count, eq, inArray, isNull } from 'drizzle-orm';
+import { and, count, desc, eq, inArray, isNull } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 
 import { auth } from '@/auth';
@@ -200,6 +200,22 @@ export async function reanalyse(projectId: string): Promise<ActionResult> {
     return { ok: false, error: 'Close collection first — the analysis reads a closed survey.' };
   }
 
+  /* A new run becomes the newest brief, which would quietly demote one somebody
+     has already signed their name to. Gate 2 has to be undone deliberately, and
+     there is no undo yet — so this refuses rather than deciding for them. */
+  const [current] = await db
+    .select({ confirmedAt: briefs.confirmedAt })
+    .from(briefs)
+    .where(eq(briefs.projectId, projectId))
+    .orderBy(desc(briefs.generatedAt))
+    .limit(1);
+  if (current?.confirmedAt) {
+    return {
+      ok: false,
+      error: 'That brief is confirmed. Re-analysing would replace what somebody signed off.',
+    };
+  }
+
   const { buildTranscript } = await import('@/lib/analysis/transcript');
   const { analyse } = await import('@/lib/analysis/run');
 
@@ -216,6 +232,48 @@ export async function reanalyse(projectId: string): Promise<ActionResult> {
   if (!result.ok) return { ok: false, error: result.error };
 
   await db.insert(briefs).values({ projectId, content: result.brief });
+
+  revalidatePath('/');
+  return { ok: true };
+}
+
+/**
+ * Gate 2 — confirm the brief.
+ *
+ * Rule 6: nothing reaches a client before a human confirms it. Rule 2: the gate
+ * records who acted. Rule 1: it is never on a timer — a brief sits unconfirmed
+ * for as long as it takes, and the Needs You list keeps saying so.
+ *
+ * **The newest brief, not any brief.** Re-analysing inserts a new row and keeps
+ * the earlier runs, so confirming by project id alone could sign off a brief
+ * that was superseded before anyone read it.
+ *
+ * The `isNull` in the update is not decoration: two people opening the same
+ * brief and pressing at the same moment would otherwise both write, and the
+ * second would overwrite the first person's name on a gate whose entire purpose
+ * is recording who acted.
+ */
+export async function confirmBrief(projectId: string): Promise<ActionResult> {
+  const userId = await actingUser();
+  const db = await getDb();
+
+  const [latest] = await db
+    .select()
+    .from(briefs)
+    .where(eq(briefs.projectId, projectId))
+    .orderBy(desc(briefs.generatedAt))
+    .limit(1);
+
+  if (!latest) return { ok: false, error: 'There is no brief to confirm.' };
+  if (latest.confirmedAt) return { ok: false, error: 'That brief is already confirmed.' };
+
+  const [row] = await db
+    .update(briefs)
+    .set({ confirmedAt: new Date(), confirmedBy: userId })
+    .where(and(eq(briefs.id, latest.id), isNull(briefs.confirmedAt)))
+    .returning();
+
+  if (!row) return { ok: false, error: 'Somebody else confirmed it a moment ago.' };
 
   revalidatePath('/');
   return { ok: true };

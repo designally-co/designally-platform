@@ -93,6 +93,8 @@ export type ProjectView = {
   brief: import('@/lib/analysis/schema').Brief | null;
   briefWrittenOn: string | null;
   briefConfirmedOn: string | null;
+  /** gate 2 records who acted, and a gate whose actor is not shown records nothing useful */
+  briefConfirmedBy: string | null;
 
   action: ProjectAction | null;
   /** the two lines of the Latest column */
@@ -244,7 +246,11 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
   const actorIds = [
     ...new Set(
       rows
-        .flatMap((r) => [r.project.archivedBy, r.survey?.closedBy])
+        .flatMap((r) => [
+          r.project.archivedBy,
+          r.survey?.closedBy,
+          briefByProject.get(r.project.id)?.confirmedBy,
+        ])
         .filter((id): id is string => Boolean(id)),
     ),
   ];
@@ -304,6 +310,7 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
       brief,
       briefWrittenOn: formatDay(briefRow?.generatedAt ?? null),
       briefConfirmedOn: formatDay(briefRow?.confirmedAt ?? null),
+      briefConfirmedBy: briefRow?.confirmedBy ? (actorName.get(briefRow.confirmedBy) ?? null) : null,
 
       action: buildAction({
         closedOn,

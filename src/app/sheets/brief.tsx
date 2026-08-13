@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
+
+import { confirmBrief } from '@/lib/team/actions';
 
 import type { Brief } from '@/lib/analysis/schema';
 import type { ProjectView } from '@/lib/team/projects';
@@ -38,7 +40,13 @@ function outOf(some: number, all: number) {
  * the deck is the whole point of the running order, and a plain list of titles
  * loses it.
  */
-function CopyOutline({ slides }: { slides: Brief['deckOutline'] }) {
+function CopyOutline({
+  slides,
+  confirmed,
+}: {
+  slides: Brief['deckOutline'];
+  confirmed: boolean;
+}) {
   const [copied, setCopied] = useState(false);
 
   const text = slides
@@ -54,6 +62,19 @@ function CopyOutline({ slides }: { slides: Brief['deckOutline'] }) {
       /* a refused clipboard is not an error state — select it by hand */
       setCopied(false);
     }
+  }
+
+  /**
+   * Rule 6 — nothing reaches a client before a human confirms it.
+   *
+   * This outline becomes the deck the client is sat in front of, so copying it
+   * out is the moment it leaves the building. Confirming is a gate, not a
+   * formality, and a gate you can walk around is decoration.
+   */
+  if (!confirmed) {
+    return (
+      <span className="copylocked">Confirm the brief to copy this</span>
+    );
   }
 
   return (
@@ -80,12 +101,15 @@ function Quotes({ quotes }: { quotes: string[] }) {
 export default function BriefSheet({
   project,
   onClose,
+  onConfirmed,
 }: {
   project: ProjectView;
   onClose: () => void;
+  onConfirmed: (message: string) => void;
 }) {
   const brief = project.brief as Brief;
   const people = project.answers;
+  const [busy, start] = useTransition();
 
   return (
     <Sheet title={`${project.clientName} — survey analysis`} onClose={onClose}>
@@ -193,7 +217,7 @@ export default function BriefSheet({
         <section className="bsec">
           <div className="bsechead">
             <h3>Kick-off deck outline</h3>
-            <CopyOutline slides={brief.deckOutline} />
+            <CopyOutline slides={brief.deckOutline} confirmed={!!project.briefConfirmedOn} />
           </div>
           <ul className="slides">
             {brief.deckOutline.map((s, i) => (
@@ -222,10 +246,37 @@ export default function BriefSheet({
           </div>
         </section>
 
-        <p className="hintline">
-          Nothing here has reached the client. Confirming the brief and building the deck arrive in
-          milestone 4.
-        </p>
+        {/* gate 2 — rule 2 records who acted, rule 1 never does it on a timer */}
+        <section className="bsec gate">
+          {project.briefConfirmedOn ? (
+            <p className="confirmed">
+              Confirmed {project.briefConfirmedOn}
+              {project.briefConfirmedBy && <> by {project.briefConfirmedBy}</>}. The deck outline can
+              be copied.
+            </p>
+          ) : (
+            <>
+              <h3>Is this right?</h3>
+              <p>
+                Nothing here has reached the client. Confirming says a person has read it and stands
+                behind it — the analysis mistakes two wordings of one idea for a disagreement often
+                enough that this step cannot be skipped. Your name is recorded against it.
+              </p>
+              <button
+                className="btn btn-primary"
+                disabled={busy}
+                onClick={() =>
+                  start(async () => {
+                    const res = await confirmBrief(project.id);
+                    onConfirmed(res.ok ? 'Brief confirmed.' : res.error);
+                  })
+                }
+              >
+                {busy ? 'Confirming' : 'Confirm the brief'}
+              </button>
+            </>
+          )}
+        </section>
       </div>
     </Sheet>
   );
