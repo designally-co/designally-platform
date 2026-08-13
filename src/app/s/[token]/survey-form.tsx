@@ -131,6 +131,8 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
    * other route.
    */
   const [fromSend, setFromSend] = useState(false);
+  /** 'idle' until the link is on the clipboard, or 'manual' when it cannot be. */
+  const [copy, setCopy] = useState<'idle' | 'done' | 'manual'>('idle');
 
   const draftKey = useRef<string>('');
   const deck = useRef<HTMLDivElement | null>(null);
@@ -480,6 +482,34 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
     }
   }
 
+  /**
+   * Put the survey link on the clipboard.
+   *
+   * The thank-you screen is where this product asks a client to bring their
+   * colleagues in — collection is open-ended and the link is meant to be passed
+   * on — and up to now that was a sentence with nothing to press. Selecting a
+   * URL out of a phone's address bar is exactly the friction that ends with
+   * nobody else answering.
+   *
+   * The Clipboard API needs a secure context and a permission the browser can
+   * refuse, so a refusal is not an error state: it falls back to showing the
+   * link, selectable, which is what the respondent would otherwise have gone
+   * hunting for.
+   */
+  const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => { if (copyTimer.current) clearTimeout(copyTimer.current); }, []);
+
+  async function copyLink() {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopy('done');
+      if (copyTimer.current) clearTimeout(copyTimer.current);
+      copyTimer.current = setTimeout(() => setCopy('idle'), 3000);
+    } catch {
+      setCopy('manual');
+    }
+  }
+
   function answerAsSomeoneElse() {
     draftKey.current = newDraftKey();
     setValues({});
@@ -488,6 +518,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
     setSavedAt(null);
     setSending(false);
     setFromSend(false);
+    setCopy('idle');
     setStep(WELCOME);
     requestAnimationFrame(() => goTo(WELCOME));
   }
@@ -500,12 +531,13 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
      looking at the same Ready to send screen with a live button. The obvious
      thing to do next is press it again. */
   if (submitted) {
+    const surveyUrl = typeof window === 'undefined' ? '' : window.location.href;
     return (
       <LangContext.Provider value={LEAD}>
         <div className="survey-shell client-surface">
           {/* the floor controls are revealed by data-active; off the deck this
               slide always is — without it the only action here was invisible */}
-          <div className="slide" data-active="">
+          <div className="slide endslide" data-active="">
             <div className="slidebody">
               <div className="slidemain">
                 <div className="done-mark" aria-hidden="true">
@@ -522,10 +554,30 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                   คำตอบของคุณถูกส่งถึงทีมแล้ว แล้วพบกันในการประชุมเริ่มโปรเจกต์
                 </p>
               </div>
-              <button className="btn btn-quiet start" onClick={answerAsSomeoneElse}>
-                Answer as another stakeholder
-              </button>
-              <p className="takes">Know someone else who should answer? Forward the same link.</p>
+              {/* One block, because on a phone `.takes` carries the auto margin
+                  that pushes it to the floor — two of them would each claim a
+                  share of the free space and drift apart. */}
+              <div className="takesblock">
+                <p className="takes">Know someone else who should answer? Forward the same link.</p>
+                <p className="takes th">รู้จักใครที่ควรตอบอีกไหม ส่งลิงก์เดิมนี้ต่อได้เลย</p>
+              </div>
+              {copy === 'manual' && (
+                <p className="copymanual">
+                  <span>Copy this link · คัดลอกลิงก์นี้</span>
+                  <code>{surveyUrl}</code>
+                </p>
+              )}
+              {/* Stacked, not side by side: on a phone they are the floor, and
+                  two full-width controls beat two half-width ones whose labels
+                  would each wrap to three lines. */}
+              <div className="okrow endrow">
+                <button className="btn btn-quiet" onClick={answerAsSomeoneElse}>
+                  Answer as another stakeholder
+                </button>
+                <button className="btn btn-plain" onClick={copyLink} aria-live="polite">
+                  {copy === 'done' ? 'Link copied' : 'Copy link'}
+                </button>
+              </div>
             </div>
           </div>
         </div>

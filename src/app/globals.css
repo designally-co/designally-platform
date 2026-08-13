@@ -157,6 +157,71 @@ textarea {
     background: #000;
   }
 }
+/**
+ * The neutral quiet action — the survey's flat page version of the pearl
+ * capsule, per DESIGN.md section 5.
+ *
+ * It is not a second `btn-quiet`. Two blue outlines stacked read as one action
+ * repeated, and these are different things: one starts the survey over as
+ * somebody else, the other hands the link on. Ink against the blue says so
+ * without ranking them.
+ */
+.btn-plain {
+  background: var(--canvas);
+  border-color: var(--hairline);
+  color: var(--ink-2);
+}
+@media (hover: hover) {
+  .btn-plain:hover {
+    border-color: var(--ink-3);
+  }
+}
+.btn-plain:active {
+  background: var(--fill);
+  transform: scale(0.98);
+}
+
+/* the forwarding invitation, English then Thai, as one unit */
+.takesblock {
+  margin-top: 14px;
+}
+.takesblock .takes {
+  margin-top: 0;
+}
+.takesblock .takes + .takes {
+  margin-top: 3px;
+}
+
+/* The thank-you screen's pair, stacked — .okrow carries the phone's floor, so
+   this only turns the axis. Both classes, because .okrow is declared later in
+   this file and its `align-items: center` would otherwise win and centre the
+   pair against a left-aligned column. */
+.okrow.endrow {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+/* shown only when the clipboard is refused, so the link is still gettable */
+.copymanual {
+  margin-top: 18px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--ink-3);
+}
+.copymanual code {
+  display: block;
+  margin-top: 6px;
+  padding: 10px 14px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  background: var(--canvas);
+  color: var(--ink);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
 .btn-quiet {
   background: transparent;
   border-color: var(--primary);
@@ -3212,6 +3277,26 @@ dialog::backdrop {
   .slide[data-active] .btn.start {
     opacity: 1;
     pointer-events: auto;
+  }
+
+  .slide .okrow.endrow {
+    align-items: stretch;
+    gap: 10px;
+  }
+  /* the block takes the auto margin the single line used to, and the floor it
+     has to clear is two stacked 52px controls rather than one */
+  .takesblock {
+    margin: auto 0 0;
+  }
+  .takesblock .takes {
+    margin-bottom: 0;
+  }
+  .slide.endslide {
+    padding-bottom: 152px;
+  }
+  .endrow .btn {
+    min-height: 52px;
+    font-size: 17px;
   }
 
   /* the review can run long, so the floor the controls are pinned to has to be
