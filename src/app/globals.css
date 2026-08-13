@@ -2898,12 +2898,14 @@ dialog::backdrop {
   border-bottom: 0;
   margin-bottom: 0;
 }
-/* one line per pole, not two — the Thai sits beside the English rather than
-   under it, which is 22px a row across ten rows */
+/* Thai under the English, not beside it. Inlining them saved 22px a row, but
+   the pair is two labels and the Thai reads as part of the label above it —
+   side by side, "Traditional ดั้งเดิม" scans as one long phrase. The battery is
+   split over two slides now, so the height is affordable. */
 .slide .poles {
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 .slide .poles small {
-  display: inline;
-  margin-left: 6px;
+  display: block;
+  margin-left: 0;
 }

@@ -75,15 +75,32 @@ type Card =
  * A rating battery longer than this is dealt out over several slides.
  *
  * Ten bipolar scales on one slide ran 1.45 screens even after the rows were
- * compressed. Five fit a phone with nothing to scroll, and five is still enough
- * of the battery to calibrate against — you can see the ones you just rated,
- * which is the whole reason these stay together rather than becoming ten
- * questions.
+ * compressed. Splitting keeps enough of the battery on screen to calibrate
+ * against — you can see the ones you just rated — which is the whole reason
+ * these stay together rather than becoming ten separate questions.
+ *
+ * Four, not five: with the Thai pole label set under the English rather than
+ * beside it, a row is 113px, and five rows plus the pinned question overran the
+ * screen by 63px — enough that the button bar started covering the last row.
  *
  * It remains one question: one row in the seed, one number on the badge, one
  * answer in the database. Only the presentation is split.
  */
-const PAIRS_PER_SLIDE = 5;
+const PAIRS_PER_SLIDE = 4;
+
+/**
+ * How many pairs each part holds, balanced rather than greedy.
+ *
+ * Ten pairs at four a slide is three parts. Filling them greedily gives 4-4-2,
+ * and a final slide holding two rows under a pinned question looks like
+ * something went wrong. Spreading the remainder gives 4-3-3.
+ */
+function sliceSizes(count: number, max: number) {
+  const parts = Math.ceil(count / max);
+  const base = Math.floor(count / parts);
+  const extra = count % parts;
+  return Array.from({ length: parts }, (_, i) => base + (i < extra ? 1 : 0));
+}
 
 export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   const [ready, setReady] = useState(false);
@@ -122,19 +139,16 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
 
         const pairs = q.config.pairs?.length ?? 0;
         if (q.type === 'linear_scale' && pairs > PAIRS_PER_SLIDE) {
-          const parts = Math.ceil(pairs / PAIRS_PER_SLIDE);
-          for (let i = 0; i < parts; i++) {
+          const sizes = sliceSizes(pairs, PAIRS_PER_SLIDE);
+          let from = 0;
+          sizes.forEach((size, i) => {
             out.push({
               kind: 'question',
               question: q,
-              slice: {
-                from: i * PAIRS_PER_SLIDE,
-                to: Math.min((i + 1) * PAIRS_PER_SLIDE, pairs),
-                part: i + 1,
-                parts,
-              },
+              slice: { from, to: from + size, part: i + 1, parts: sizes.length },
             });
-          }
+            from += size;
+          });
           continue;
         }
 
