@@ -1,6 +1,6 @@
 'use server';
 
-import { and, count, desc, eq, inArray, isNull } from 'drizzle-orm';
+import { and, count, desc, eq, inArray, isNotNull, isNull } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 
 import { auth } from '@/auth';
@@ -200,21 +200,9 @@ export async function reanalyse(projectId: string): Promise<ActionResult> {
     return { ok: false, error: 'Close collection first — the analysis reads a closed survey.' };
   }
 
-  /* A new run becomes the newest brief, which would quietly demote one somebody
-     has already signed their name to. Gate 2 has to be undone deliberately, and
-     there is no undo yet — so this refuses rather than deciding for them. */
-  const [current] = await db
-    .select({ confirmedAt: briefs.confirmedAt })
-    .from(briefs)
-    .where(eq(briefs.projectId, projectId))
-    .orderBy(desc(briefs.generatedAt))
-    .limit(1);
-  if (current?.confirmedAt) {
-    return {
-      ok: false,
-      error: 'That brief is confirmed. Re-analysing would replace what somebody signed off.',
-    };
-  }
+  /* A confirmed brief is not replaced by a new run — it keeps its signature and
+     stays in the history, and the new analysis becomes an unconfirmed version
+     above it. Nothing is demoted, so nothing needs blocking. */
 
   const { buildTranscript } = await import('@/lib/analysis/transcript');
   const { analyse } = await import('@/lib/analysis/run');
@@ -325,4 +313,86 @@ export async function readAnswers(projectId: string) {
   if (!session?.user) return null;
   const { loadProjectAnswers } = await import('@/lib/team/answers');
   return loadProjectAnswers(projectId);
+}
+
+/**
+ * Undo gate 1 — take answers again.
+ *
+ * A stakeholder replying the day after collection closed is not an edge case,
+ * and until now the only answer was "too late". Reopening is a human act like
+ * closing was, and it leaves the brief alone: what was analysed from the
+ * answers of the time stays true about the answers of the time.
+ *
+ * It does clear who closed the survey, because the survey is no longer closed
+ * and there is nowhere else to keep that. Re-closing records the actor again.
+ * An events table would hold the whole sequence; there isn't one, and inventing
+ * it for this would be building the audit log before the audit.
+ */
+export async function reopenCollection(projectId: string): Promise<ActionResult> {
+  await actingUser();
+  const db = await getDb();
+
+  const [row] = await db
+    .update(surveys)
+    .set({ closedAt: null, closedBy: null })
+    /* only a closed survey can be reopened, and the returning row proves it —
+       two people pressing at once must not both report success */
+    .where(and(eq(surveys.projectId, projectId), isNotNull(surveys.closedAt)))
+    .returning();
+
+  if (!row) return { ok: false, error: 'That survey is already open.' };
+
+  revalidatePath('/');
+  return { ok: true };
+}
+
+/**
+ * Undo gate 2.
+ *
+ * Deleting a brief somebody signed takes two deliberate steps, and this is the
+ * first: a signature should not disappear because a delete button was next to
+ * the wrong row. It is also what makes a wrong brief fixable — permanence and
+ * correctability pull against each other and this is where the line landed.
+ */
+export async function unconfirmBrief(briefId: string): Promise<ActionResult> {
+  await actingUser();
+  const db = await getDb();
+
+  const [row] = await db
+    .update(briefs)
+    .set({ confirmedAt: null, confirmedBy: null })
+    .where(eq(briefs.id, briefId))
+    .returning();
+
+  if (!row) return { ok: false, error: 'No such brief.' };
+
+  revalidatePath('/');
+  return { ok: true };
+}
+
+/** A version nobody has signed. Confirmed ones must be un-confirmed first. */
+export async function deleteBrief(briefId: string): Promise<ActionResult> {
+  await actingUser();
+  const db = await getDb();
+
+  const [row] = await db
+    .delete(briefs)
+    .where(and(eq(briefs.id, briefId), isNull(briefs.confirmedAt)))
+    .returning();
+
+  if (!row) {
+    return { ok: false, error: 'That version is confirmed. Un-confirm it first, then delete it.' };
+  }
+
+  revalidatePath('/');
+  return { ok: true };
+}
+
+/** An older version's content, fetched when somebody opens it. */
+export async function readBriefVersion(briefId: string) {
+  const session = await auth();
+  if (!session?.user) return null;
+  const db = await getDb();
+  const [row] = await db.select().from(briefs).where(eq(briefs.id, briefId)).limit(1);
+  return row ? (row.content as import('@/lib/analysis/schema').Brief) : null;
 }

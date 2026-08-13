@@ -93,6 +93,29 @@ export type ProjectView = {
   brief: import('@/lib/analysis/schema').Brief | null;
   briefWrittenOn: string | null;
   briefConfirmedOn: string | null;
+  /**
+   * Every run, newest first — the content of the newest only.
+   *
+   * Re-analysing keeps the earlier runs and always did; nothing ever showed
+   * them. Carrying every version's content would ship a great deal of text to
+   * a browser that will read one, so an older version's content is fetched when
+   * somebody opens it.
+   */
+  briefVersions: {
+    id: string;
+    writtenOn: string;
+    confirmedOn: string | null;
+    confirmedBy: string | null;
+    isNewest: boolean;
+  }[];
+  /**
+   * A brief was confirmed, and answers arrived afterwards.
+   *
+   * Reopening collection leaves a confirmed brief alone — its signature stays
+   * valid for the answers it was written from. What it cannot do is stay the
+   * whole truth, and somebody working from it would never know.
+   */
+  briefStale: boolean;
   /** gate 2 records who acted, and a gate whose actor is not shown records nothing useful */
   briefConfirmedBy: string | null;
 
@@ -240,7 +263,11 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
         .orderBy(desc(briefs.generatedAt))
     : [];
   const briefByProject = new Map<string, (typeof briefRows)[number]>();
-  for (const b of briefRows) if (!briefByProject.has(b.projectId)) briefByProject.set(b.projectId, b);
+  const briefsByProject = new Map<string, typeof briefRows>();
+  for (const b of briefRows) {
+    if (!briefByProject.has(b.projectId)) briefByProject.set(b.projectId, b);
+    briefsByProject.set(b.projectId, [...(briefsByProject.get(b.projectId) ?? []), b]);
+  }
 
   /* who acted on the gates */
   const actorIds = [
@@ -249,7 +276,7 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
         .flatMap((r) => [
           r.project.archivedBy,
           r.survey?.closedBy,
-          briefByProject.get(r.project.id)?.confirmedBy,
+          ...(briefsByProject.get(r.project.id) ?? []).map((b) => b.confirmedBy),
         ])
         .filter((id): id is string => Boolean(id)),
     ),
@@ -311,6 +338,19 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
       briefWrittenOn: formatDay(briefRow?.generatedAt ?? null),
       briefConfirmedOn: formatDay(briefRow?.confirmedAt ?? null),
       briefConfirmedBy: briefRow?.confirmedBy ? (actorName.get(briefRow.confirmedBy) ?? null) : null,
+      briefVersions: (briefsByProject.get(project.id) ?? []).map((b, i) => ({
+        id: b.id,
+        writtenOn: formatDay(b.generatedAt) ?? '',
+        confirmedOn: formatDay(b.confirmedAt ?? null),
+        confirmedBy: b.confirmedBy ? (actorName.get(b.confirmedBy) ?? null) : null,
+        isNewest: i === 0,
+      })),
+      /* the confirmed version, not the newest — a newer unconfirmed run does not
+         make the signed one stale, more answers do */
+      briefStale: (() => {
+        const signed = (briefsByProject.get(project.id) ?? []).find((b) => b.confirmedAt);
+        return !!(signed?.confirmedAt && lastAnswer && lastAnswer > signed.confirmedAt);
+      })(),
 
       action: buildAction({
         closedOn,

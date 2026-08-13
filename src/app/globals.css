@@ -1590,6 +1590,84 @@ label.f span {
 }
 
 /**
+ * The versions this project's analysis has been through.
+ *
+ * Re-analysing has always kept the earlier runs; nothing ever showed them, so a
+ * project that had been analysed twice looked like a project analysed once.
+ */
+.bversions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.bversions li {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  border-top: 1px solid var(--divider);
+}
+.bversions .pick {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+  padding: 12px 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  color: var(--ink);
+  cursor: pointer;
+}
+.bversions .pick b {
+  font-size: 15px;
+  font-weight: 600;
+}
+.bversions .pick span {
+  font-size: 13px;
+  color: var(--ink-3);
+  line-height: 1.7;
+}
+/* the accent marks what is chosen, never what is hovered */
+.bversions li.on .pick b {
+  color: var(--primary);
+}
+.bversions .drop {
+  border: 0;
+  background: none;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--ink-3);
+  cursor: pointer;
+  padding: 8px 4px;
+}
+@media (hover: hover) {
+  .bversions .drop:hover {
+    color: var(--critical);
+  }
+}
+
+/* a confirmed brief the answers have moved past */
+.stale {
+  border-left: 2px solid var(--caution);
+  padding-left: var(--sp-md);
+  color: var(--ink-2);
+  margin-bottom: var(--sp-md);
+}
+
+/* un-confirm sits inside a sentence, so it reads as a word, not a control */
+.linky {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: var(--primary);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/**
  * Gate 2 — the confirm step.
  *
  * The accent means a person is needed here (DESIGN.md section 1), which is

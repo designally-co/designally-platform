@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react';
 
-import { archiveProject, closeCollection } from '@/lib/team/actions';
+import { archiveProject, closeCollection, reopenCollection } from '@/lib/team/actions';
 import type { ProjectView } from '@/lib/team/projects';
 import { forDisplay } from '@/lib/survey/link';
 import Sheet from './sheet';
@@ -173,6 +173,18 @@ export default function ProjectSheet({
               ? 'Closed — anyone opening it now is told so.'
               : 'Still open. Forward it to anyone who should have a say.'}
           </p>
+          {/* A stakeholder replying the day after collection closed is not an
+              edge case. Reopening leaves the brief alone: what it says was true
+              of the answers it was written from, and it keeps saying so. */}
+          {p.closedOn && (
+            <button
+              className="btn btn-quiet btn-sm"
+              disabled={pending}
+              onClick={() => run(() => reopenCollection(p.id), 'Collection reopened.')}
+            >
+              {pending ? 'Reopening…' : 'Reopen for more answers'}
+            </button>
+          )}
         </div>
       )}
 

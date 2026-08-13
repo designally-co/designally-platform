@@ -2,7 +2,12 @@
 
 import { useState, useTransition } from 'react';
 
-import { confirmBrief } from '@/lib/team/actions';
+import {
+  confirmBrief,
+  deleteBrief,
+  readBriefVersion,
+  unconfirmBrief,
+} from '@/lib/team/actions';
 
 import type { Brief } from '@/lib/analysis/schema';
 import type { ProjectView } from '@/lib/team/projects';
@@ -107,9 +112,22 @@ export default function BriefSheet({
   onClose: () => void;
   onConfirmed: (message: string) => void;
 }) {
-  const brief = project.brief as Brief;
-  const people = project.answers;
   const [busy, start] = useTransition();
+  /* which version is on screen — the newest until somebody opens an older one */
+  const [shown, setShown] = useState<{ id: string; brief: Brief } | null>(null);
+  const versions = project.briefVersions;
+  const current = versions.find((v) => v.isNewest) ?? versions[0];
+  const openId = shown?.id ?? current?.id;
+  const openVersion = versions.find((v) => v.id === openId) ?? current;
+  const brief = (shown?.brief ?? project.brief) as Brief;
+  const people = project.answers;
+
+  function act(run: () => Promise<{ ok: boolean; error?: string }>, done: string) {
+    start(async () => {
+      const res = await run();
+      onConfirmed(res.ok ? done : (res.error ?? 'That did not work.'));
+    });
+  }
 
   return (
     <Sheet title={`${project.clientName} — survey analysis`} onClose={onClose}>
@@ -217,7 +235,7 @@ export default function BriefSheet({
         <section className="bsec">
           <div className="bsechead">
             <h3>Kick-off deck outline</h3>
-            <CopyOutline slides={brief.deckOutline} confirmed={!!project.briefConfirmedOn} />
+            <CopyOutline slides={brief.deckOutline} confirmed={!!openVersion?.confirmedOn} />
           </div>
           <ul className="slides">
             {brief.deckOutline.map((s, i) => (
@@ -246,13 +264,70 @@ export default function BriefSheet({
           </div>
         </section>
 
+        {/* every run this project has had. Re-analysing has always kept them;
+            nothing ever showed them. */}
+        {versions.length > 1 && (
+          <section className="bsec">
+            <h3>Versions</h3>
+            <ul className="bversions">
+              {versions.map((v) => (
+                <li key={v.id} className={v.id === openId ? 'on' : undefined}>
+                  <button
+                    className="pick"
+                    onClick={() =>
+                      v.isNewest
+                        ? setShown(null)
+                        : start(async () => {
+                            const b = await readBriefVersion(v.id);
+                            if (b) setShown({ id: v.id, brief: b });
+                          })
+                    }
+                  >
+                    <b>{v.writtenOn}</b>
+                    <span>
+                      {v.isNewest && 'newest'}
+                      {v.isNewest && v.confirmedOn && ' · '}
+                      {v.confirmedOn
+                        ? `confirmed ${v.confirmedOn}${v.confirmedBy ? ` by ${v.confirmedBy}` : ''}`
+                        : !v.isNewest && 'not confirmed'}
+                    </span>
+                  </button>
+                  {/* deleting takes two deliberate steps once somebody has signed it */}
+                  {!v.confirmedOn && versions.length > 1 && (
+                    <button
+                      className="drop"
+                      disabled={busy}
+                      onClick={() => act(() => deleteBrief(v.id), 'Version deleted.')}
+                    >
+                      Delete
+                    </button>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
         {/* gate 2 — rule 2 records who acted, rule 1 never does it on a timer */}
         <section className="bsec gate">
-          {project.briefConfirmedOn ? (
+          {project.briefStale && (
+            <p className="stale">
+              Answers arrived after this was confirmed. What it says was true of the answers it was
+              written from — regenerate to take the newer ones in.
+            </p>
+          )}
+          {openVersion?.confirmedOn ? (
             <p className="confirmed">
-              Confirmed {project.briefConfirmedOn}
-              {project.briefConfirmedBy && <> by {project.briefConfirmedBy}</>}. The deck outline can
-              be copied.
+              Confirmed {openVersion.confirmedOn}
+              {openVersion.confirmedBy && <> by {openVersion.confirmedBy}</>}. The deck outline can
+              be copied.{' '}
+              <button
+                className="linky"
+                disabled={busy}
+                onClick={() => act(() => unconfirmBrief(openVersion.id), 'Confirmation removed.')}
+              >
+                Un-confirm
+              </button>
             </p>
           ) : (
             <>
@@ -265,12 +340,7 @@ export default function BriefSheet({
               <button
                 className="btn btn-primary"
                 disabled={busy}
-                onClick={() =>
-                  start(async () => {
-                    const res = await confirmBrief(project.id);
-                    onConfirmed(res.ok ? 'Brief confirmed.' : res.error);
-                  })
-                }
+                onClick={() => act(() => confirmBrief(project.id), 'Brief confirmed.')}
               >
                 {busy ? 'Confirming' : 'Confirm the brief'}
               </button>
