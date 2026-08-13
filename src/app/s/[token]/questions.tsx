@@ -25,6 +25,8 @@ type Props = {
   onEnter?: () => void;
   /** how many numbered questions there are, for the badge */
   total?: number;
+  /** a rating battery dealt over several slides — which pairs this one holds */
+  slice?: { from: number; to: number; part: number; parts: number };
 };
 
 /* ── the question, in the language that leads ─────────────────────── */
@@ -438,13 +440,18 @@ function CheckboxAnswer({ question, value, onChange, total }: Props) {
 
 /* ── linear_scale ─────────────────────────────────────────────────── */
 
-function ScaleAnswer({ question, value, onChange, total }: Props) {
+function ScaleAnswer({ question, value, onChange, total, slice }: Props) {
   const v = (value ?? { scale: {} }) as { scale: Record<string, number> };
   const points = question.config.points ?? 5;
   /* Version 1 scales run 1..points; the version-2 personality scales run 0..10,
      where 0 is a position and not an absence of one. */
   const start = question.config.start ?? 1;
-  const pairs = question.config.pairs ?? [];
+  const all = question.config.pairs ?? [];
+  /* The slice this slide shows. Indices stay the battery's own, so every part
+     writes into the same answer under the same keys — split for reading, whole
+     in the database. */
+  const from = slice?.from ?? 0;
+  const pairs = all.slice(from, slice?.to ?? all.length);
   /* more points than fit one row of 44px targets on a 390px screen */
   const wide = points > 7;
 
@@ -465,8 +472,15 @@ function ScaleAnswer({ question, value, onChange, total }: Props) {
       <div className="scalehead">
         <Heading question={question} total={total} />
         <Alt question={question} />
+        {slice && slice.parts > 1 && (
+          <p className="qpart">
+            Part {slice.part} of {slice.parts}
+          </p>
+        )}
       </div>
-      {pairs.map((p, i) => (
+      {pairs.map((p, offset) => {
+        const i = from + offset;
+        return (
         <div className="scale" key={`${p.left_en}-${p.right_en}`}>
           <div className="poles" id={`pole-${question.ref}-${i}`}>
             <span>
@@ -504,7 +518,8 @@ function ScaleAnswer({ question, value, onChange, total }: Props) {
             ))}
           </div>
         </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

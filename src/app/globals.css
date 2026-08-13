@@ -2873,6 +2873,13 @@ dialog::backdrop {
   background: var(--parchment);
   padding: 12px 0 10px;
 }
+/* said in words, under the question, so the badge keeps meaning exactly one
+   thing: which question of twenty-one this is */
+.qpart {
+  margin-top: 9px;
+  font-size: 13px;
+  color: var(--ink-3);
+}
 .scalehead::after {
   content: '';
   position: absolute;

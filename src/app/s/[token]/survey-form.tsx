@@ -65,9 +65,25 @@ function stepIsVisible(step: SurveyStep, values: DraftValues, all: SurveyStep[])
  * The identity block is the one slide holding two fields — name and email are a
  * single thought and neither is numbered.
  */
+type Slice = { from: number; to: number; part: number; parts: number };
+
 type Card =
   | { kind: 'fields'; questions: SurveyQuestion[] }
-  | { kind: 'question'; question: SurveyQuestion };
+  | { kind: 'question'; question: SurveyQuestion; slice?: Slice };
+
+/**
+ * A rating battery longer than this is dealt out over several slides.
+ *
+ * Ten bipolar scales on one slide ran 1.45 screens even after the rows were
+ * compressed. Five fit a phone with nothing to scroll, and five is still enough
+ * of the battery to calibrate against — you can see the ones you just rated,
+ * which is the whole reason these stay together rather than becoming ten
+ * questions.
+ *
+ * It remains one question: one row in the seed, one number on the badge, one
+ * answer in the database. Only the presentation is split.
+ */
+const PAIRS_PER_SLIDE = 5;
 
 export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   const [ready, setReady] = useState(false);
@@ -103,6 +119,25 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
           continue;
         }
         flush();
+
+        const pairs = q.config.pairs?.length ?? 0;
+        if (q.type === 'linear_scale' && pairs > PAIRS_PER_SLIDE) {
+          const parts = Math.ceil(pairs / PAIRS_PER_SLIDE);
+          for (let i = 0; i < parts; i++) {
+            out.push({
+              kind: 'question',
+              question: q,
+              slice: {
+                from: i * PAIRS_PER_SLIDE,
+                to: Math.min((i + 1) * PAIRS_PER_SLIDE, pairs),
+                part: i + 1,
+                parts,
+              },
+            });
+          }
+          continue;
+        }
+
         out.push({ kind: 'question', question: q });
       }
       flush();
@@ -288,17 +323,19 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
       ? (values[nameQuestion.ref] as string).trim()
       : '';
 
-  const blanks = useMemo(
-    () =>
-      cards
-        .map((c, i) => ({ card: c, index: i + 1 }))
-        .flatMap(({ card, index }) =>
-          (card.kind === 'question' ? [card.question] : card.questions)
-            .filter((q) => q.required && !isAnswered(q.type, values[q.ref]))
-            .map((q) => ({ question: q, index })),
-        ),
-    [cards, values],
-  );
+  const blanks = useMemo(() => {
+    /* A split battery occupies several cards but is still one question — it is
+       listed once, pointing at the slide it starts on. */
+    const seen = new Set<string>();
+    return cards
+      .map((c, i) => ({ card: c, index: i + 1 }))
+      .flatMap(({ card, index }) =>
+        (card.kind === 'question' ? [card.question] : card.questions)
+          .filter((q) => q.required && !isAnswered(q.type, values[q.ref]))
+          .filter((q) => !seen.has(q.ref) && seen.add(q.ref))
+          .map((q) => ({ question: q, index })),
+      );
+  }, [cards, values]);
 
   async function submit() {
     if (!respondentName) {
@@ -442,6 +479,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                         onChange={(v) => setValue(card.question.ref, v)}
                         onEnter={() => goTo(n + 1)}
                         total={survey.questionCount}
+                        slice={card.slice}
                       />
                     )}
                   </div>
