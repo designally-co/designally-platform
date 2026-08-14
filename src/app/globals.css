@@ -149,6 +149,9 @@
   --r-lg: 18px;
   --r-pill: 9999px;
 
+  /* where the rail and the question column both begin on a wide screen */
+  --rail-top: 88px;
+
   /* motion — calm and mechanical. Nothing overshoots, nothing bounces. */
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-standard: cubic-bezier(0.22, 0.61, 0.36, 1);
@@ -3182,6 +3185,99 @@ dialog::backdrop {
   }
   .survey-shell:has(> .qmast) > .slide {
     padding-bottom: 26px;
+  }
+}
+
+/* ============================================================
+   The rail — the masthead beside the question, not above it.
+
+   Below this width the survey is a single column with the
+   masthead pinned across the top. That is right on a phone and
+   on a small laptop. It is wrong on a wide screen, where a
+   660px column left a third of the display empty on either
+   side and the metadata sat in a full-width band it did not
+   need: three short lines spanning 1400px.
+
+   Set as a margin note the proportions come back. The count and
+   the section become a rail the question is measured against,
+   the composition spans ~940px instead of 660, and the CI's
+   editorial reading — a figure in the margin, the text beside
+   it — is the one the type was drawn for.
+
+   1080px is where 220 + 56 + 640 plus page margins fits without
+   crowding. Below it the stacked header is still the better
+   shape, so nothing about the phone changes.
+   ============================================================ */
+@media (min-width: 1080px) {
+  .survey-shell:has(> .qmast) {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 640px);
+    column-gap: 56px;
+    justify-content: center;
+    /* content-height rows, so the sticky rail has somewhere to travel */
+    align-items: start;
+    padding-inline: 40px;
+  }
+
+  .survey-shell:has(> .qmast) > .qmast {
+    grid-column: 1;
+    grid-row: 1;
+    /* not `stretch`: an item filling its own grid area has no room left to
+       stick inside it, and the rail would scroll away with the question */
+    align-self: start;
+    padding: var(--rail-top) 0 0;
+  }
+
+  /* the rail stacks what the header laid out in a row */
+  .survey-shell:has(> .qmast) .qhead {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 13px;
+  }
+  .survey-shell:has(> .qmast) .qfig {
+    font-size: 64px;
+  }
+  .survey-shell:has(> .qmast) .qsection {
+    padding-top: 0;
+    flex: none;
+  }
+  .survey-shell:has(> .qmast) .qhead .toreview {
+    margin-top: 2px;
+  }
+
+  .survey-shell:has(> .qmast) > .slide {
+    grid-column: 2;
+    grid-row: 1;
+    padding: var(--rail-top) 0 40px;
+  }
+  /* the grid owns the column width and the centring now */
+  .survey-shell:has(> .qmast) .slidebody {
+    max-width: none;
+    margin: 0;
+  }
+  /* the question gets the display size the CI's scale was drawn for. No `ch`
+     cap on top of the column: at 19ch this wrapped a real question to six
+     lines while using half the width it had been given. The 640px column is
+     the measure — about 34 characters at this size, which is three lines for
+     the longest question in the set. */
+  .survey-shell:has(> .qmast) .slide .qq {
+    font-size: clamp(2.05rem, 2.6vw, 2.55rem);
+  }
+
+  /**
+   * The scales card's own pinned question stops offsetting by the masthead.
+   *
+   * `--mast-h` is the height of a header that sat *above* the content. Beside
+   * it that offset is a hole — and in the rail the masthead measures 238px, so
+   * the question would have pinned nearly a quarter of the screen down for no
+   * reason. It aligns with the top of the rail instead.
+   *
+   * Scoped through the shell rather than written as `.scalehead`: the base
+   * rule has the same specificity and sits later in the file, so a bare
+   * override here loses on source order. It measured 238px until it did not.
+   */
+  .survey-shell:has(> .qmast) .scalehead {
+    top: var(--rail-top);
   }
 }
 

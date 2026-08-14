@@ -249,6 +249,32 @@ Free space is handed to the margins, so a short card centres in the area the mas
 leaves; when the space runs negative they resolve to zero and the card starts at the top,
 fully scrollable.
 
+### Above 1080px the masthead is a rail, not a header
+
+Three layouts, and the third is the one the CI's type was drawn for.
+
+Below 1080 the masthead is a band pinned across the top. That is right on a phone and on a
+small laptop. On a wide screen it was wrong twice over: a 640px column left a third of the
+display empty on either side, and three short lines of metadata spanned 1400px of a band
+they did not need.
+
+Set as a **margin note** the proportions come back — a 220px rail, a 56px gutter, and the
+question in a 640px column. The composition spans **916px instead of 640**, the numeral
+grows to 64px, and the question takes `clamp(2.05rem, 2.6vw, 2.55rem)`. A figure in the
+margin with the text beside it is the editorial reading the CI describes.
+
+Two things the rail changes that are easy to miss:
+
+- **The rail must be `align-self: start`.** A grid item that fills its own area has no room
+  left to stick inside it, and the rail would scroll away with the question.
+- **`.scalehead` stops offsetting by `--mast-h`.** That variable is the height of a header
+  that sat *above* the content; beside it, the offset is a hole — and in the rail the
+  masthead measures 238px, so the scales card's pinned question would have started a
+  quarter of the way down the screen. It aligns to `--rail-top` instead.
+
+**No `ch` cap on the question.** The mock set `max-width: 20ch`, which wrapped a real
+question to six lines while using half the column it had. The column is the measure.
+
 ### The masthead holds the top at both widths, and stands off the edge on a laptop
 
 It is pinned everywhere — the Cut measures progress and has to stay in sight. What differs
