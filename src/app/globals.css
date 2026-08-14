@@ -993,14 +993,18 @@ label.f span {
  * question than "which number am I on", and a reader takes the coarser one
  * first.
  */
+/* beside the figure now, and stacked EN over TH rather than joined with a
+   middot: on a rail this narrow the joined string wrapped anyway, and it wrapped
+   in the middle of the Thai */
 .qsection {
+  flex: 1;
+  min-width: 0;
+  padding-top: 7px;
   display: block;
-  margin-bottom: 4px;
-  font-size: 13px;
+  font-size: 12.5px;
   color: var(--ink-3);
-  letter-spacing: 0.02em;
   /* Thai never below 1.6 in a line that can hold it */
-  line-height: 1.7;
+  line-height: 1.6;
 }
 
 /* not a count any more — a condition. It reads in the caution colour because
@@ -3047,14 +3051,69 @@ dialog::backdrop {
  * place because position within twenty-one is something the person answering
  * needs to know, not a label put there for decoration.
  */
-.qnum {
-  display: block;
-  margin-bottom: 9px;
+/**
+ * The question masthead — the count as a figure, the section beside it.
+ *
+ * The section, the count, the question and the language button used to be four
+ * stacked blocks, so most of the top of every card was preamble. Two of them
+ * are now one object, and the object is composed rather than listed: the
+ * numeral takes the display size, the section stays at label size beside it,
+ * and the difference between them is scale instead of two more rows.
+ *
+ * The numeral is Light 300. At 54px a bold figure would outweigh the question
+ * it introduces, which is the opposite of what the size is for — the size is
+ * there to make the count stop being a line of text, not to make it loud.
+ */
+.qhead {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  margin-bottom: 17px;
+}
+.qfig {
+  flex: none;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(46px, 12vw, 58px);
+  /* the CI's own --leading-tight. An earlier 0.84 made the box 18px shorter
+     than the line box, so the ink sat outside it and the digits crowded the
+     card's top padding. 0.96 still reads as display leading and keeps the
+     figures inside their own box. */
+  line-height: 0.96;
+  letter-spacing: -0.05em;
+  color: var(--ink);
+  /* the figures must not jitter as the count climbs past 9 and 19 */
+  font-variant-numeric: tabular-nums;
+}
+.qfig i {
+  font-style: normal;
+  font-size: 18px;
   color: var(--ink-3);
-  font-size: 13px;
-  font-weight: 400;
-  letter-spacing: 0.01em;
-  line-height: 1.4;
+  letter-spacing: -0.02em;
+}
+/**
+ * The Thai half of the section label.
+ *
+ * `.th` is a global rule for Thai *body* paragraphs — 15px, --ink-2 — and it
+ * outranks an inherited label size, so the two halves of this one label were
+ * setting at different sizes and weights of colour. Scoped past both it and
+ * `.client-surface .th`, which would otherwise win the leading on source order.
+ *
+ * 1.6 rather than the 1.7 body value: this is one line, and DESIGN.md's floor
+ * for a line that stands alone is 1.25 against measured ink of about 1.22.
+ */
+.client-surface .qsection .th {
+  font-size: inherit;
+  color: inherit;
+  line-height: 1.6;
+}
+
+/* the Edge doing the work the two blank lines were doing */
+.qrule {
+  display: block;
+  height: 1px;
+  background: var(--hairline);
+  margin-bottom: 17px;
 }
 .slide .qhelp {
   display: block;

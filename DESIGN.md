@@ -142,6 +142,32 @@ studio decision, 14 August 2026. The moodboard is the one card where the client 
 choosing the brand's *feeling*, and the answer should read as the brand's colour rather
 than as structure. It knowingly spends five orange marks on that card. Confined there.
 
+### The question masthead
+
+The section, the count, the question and the language button were four stacked blocks, so
+most of the top of every card was preamble — twenty-one times over, and two of the four
+were metadata rather than the question.
+
+Two of them are now one object. The count is set as a **figure** at `clamp(46px, 12vw,
+58px)` in Light 300, with the section beside it at label size, stacked EN over TH. The
+difference between them is scale rather than two more rows, and a hairline Edge closes the
+masthead where two blank lines used to.
+
+Three decisions inside that are worth keeping:
+
+- **The numeral is Light, not Bold.** At 58px a bold figure outweighs the question it
+  introduces. The size is there to stop the count being a line of text, not to make it loud.
+- **The rule is the Edge, not the Cut.** An orange line here would be a fourth accent on
+  the card and would spend the one thing the Cut is saved for. The Cut stays on the welcome
+  and completion screens.
+- **The language button belongs to the question, not to the masthead.** It acts on the
+  question, so it sits under it. It cannot be nested *inside* the question either — the
+  question is a `<label>`, and a button inside one inherits the label's click target and
+  would toggle the control it names every time somebody asked to read it again.
+
+`font-variant-numeric: tabular-nums` so the figures do not jitter as the count passes 9
+and 19.
+
 ### The five named pieces, and where they are
 
 | Piece | Where |

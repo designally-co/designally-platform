@@ -54,23 +54,51 @@ function Heading({
      follow (lang.tsx). Two words each, so it costs almost no height, and there
      is no per-question reveal for it: an English-only section label would be
      invisible to exactly the reader it is meant to orient. */
-  const sectionLabel = [section?.en, section?.th].filter(Boolean).join(' · ');
-
   return (
     <>
-      {/* the shape of the survey, stated on every question rather than once at
-          the top of a part — somebody landing on question fifteen from the
-          review screen has not seen the top of anything */}
-      {sectionLabel && <span className="qsection">{sectionLabel}</span>}
-      <span className="qq">
-        {question.number !== null && (
-          <span className="qnum">
-            {question.number}
-            {total ? `/${total}` : ''}
+      {/**
+       * The masthead: the count set as a figure, the section beside it.
+       *
+       * These were two stacked lines above the question, which with the
+       * language button made four blocks of text before a client reached
+       * anything they could answer — most of the top of the card spent on
+       * preamble, twenty-one times over.
+       *
+       * Set as one object they stop competing with the question: a large light
+       * numeral against a small label is a difference of scale rather than a
+       * third and fourth row. The CI's graphic system is the point and the line
+       * in sequence, and a position in a run of twenty-one is that, so the
+       * count is the right thing to give the size to.
+       *
+       * Still stated on every question rather than once at the top of a part —
+       * somebody landing on question fifteen from the review screen has not
+       * seen the top of anything.
+       */}
+      {/* a block with neither a number nor a section would otherwise render an
+          empty masthead and a rule under nothing */}
+      {(question.number !== null || section?.en || section?.th) && (
+        <>
+          <span className="qhead">
+            {question.number !== null && (
+              <span className="qfig">
+                {question.number}
+                {total ? <i>/{total}</i> : null}
+              </span>
+            )}
+            {(section?.en || section?.th) && (
+              <span className="qsection">
+                {section?.en}
+                {section?.en && section?.th && <br />}
+                {section?.th && <span className="th">{section.th}</span>}
+              </span>
+            )}
           </span>
-        )}
-        {t(question.textEn, question.textTh)}
-      </span>
+          {/* the Edge, not the Cut — an orange rule here would be the fourth
+              accent on the card and would spend the one the Cut is saved for */}
+          <span className="qrule" aria-hidden="true" />
+        </>
+      )}
+      <span className="qq">{t(question.textEn, question.textTh)}</span>
       {help && <span className="qhelp">{help}</span>}
     </>
   );
