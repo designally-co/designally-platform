@@ -152,13 +152,15 @@
   /**
    * Where a wide screen starts reading.
    *
-   * --rail-top is the floor: the least a column may sit from the top edge.
-   * --eye is where a short card opens, a little under a fifth of the way down,
-   * which is where the eye lands rather than where the viewport begins. A tall
-   * card falls back to --rail-top so its own length is not pushed off-screen by
-   * an offset it cannot afford.
+   * One line, and everything on the rail layout hangs off it: the rail's
+   * numeral, the question beside it, and the scales card's own pinned header
+   * when it comes up to meet them. A little under a fifth of the way down,
+   * which is where the eye lands rather than where the viewport begins.
+   *
+   * There was briefly a second token for tall cards to open higher. It bought
+   * them 82px and cost the thing the rail is for — a fixed point that appeared
+   * to move as a client advanced.
    */
-  --rail-top: 88px;
   --eye: clamp(96px, 18vh, 170px);
 
   /* motion — calm and mechanical. Nothing overshoots, nothing bounces. */
@@ -3258,27 +3260,23 @@ dialog::backdrop {
   }
 
   /**
-   * The question opens at eye level, and at the top when it is long.
+   * Every question opens at eye level, whatever its length.
    *
    * A short card starting at the viewport's top edge left most of the screen
    * empty underneath it. Opening at --eye puts the first line where the eye
    * already is and turns that emptiness into margin.
    *
-   * A long card cannot afford the same offset — 170px spent above the ten
-   * personality scales is 170px of the battery pushed off the first screen —
-   * so the tall cards open at --rail-top instead. Keyed off what the card
-   * *contains* rather than a measured height: `.pts` is the scale battery and
-   * `.board` is the six-image grid, and those are the two that run long. A
-   * declaration that names the thing is easier to keep true than a number.
+   * The tall cards briefly opened higher, on the reasoning that an offset costs
+   * them screen. It is not worth what it breaks: the numeral would sit level
+   * with the question on eighteen cards and above it on three, so the one fixed
+   * point on the screen would appear to move as a client advanced. A long card
+   * scrolls, and its own pinned question header keeps the top of it in reach.
+   * One line, every question.
    */
   .survey-shell:has(> .qmast) > .slide {
     grid-column: 2;
     grid-row: 1;
     padding: var(--eye) 0 40px;
-  }
-  .survey-shell:has(> .qmast) > .slide:has(.pts),
-  .survey-shell:has(> .qmast) > .slide:has(.board) {
-    padding-top: var(--rail-top);
   }
   /* the grid owns the column width; the padding above owns the vertical start,
      so the card itself neither centres nor stretches */
@@ -3306,9 +3304,12 @@ dialog::backdrop {
    * Scoped through the shell rather than written as `.scalehead`: the base
    * rule has the same specificity and sits later in the file, so a bare
    * override here loses on source order. It measured 238px until it did not.
+   *
+   * It pins at --eye, the same line the rail's numeral holds, so a question
+   * that has come up to meet the header sits level with the count beside it.
    */
   .survey-shell:has(> .qmast) .scalehead {
-    top: var(--rail-top);
+    top: var(--eye);
   }
 }
 

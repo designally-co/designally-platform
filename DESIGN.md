@@ -275,27 +275,24 @@ Two things the rail changes that are easy to miss:
 **No `ch` cap on the question.** The mock set `max-width: 20ch`, which wrapped a real
 question to six lines while using half the column it had. The column is the measure.
 
-**The rail holds eye level; the question opens there and gives it up when it is long.**
-Two tokens: `--rail-top` (88px) is the least a column may sit from the top edge, and
-`--eye` — `clamp(96px, 18vh, 170px)` — is where a short card opens, a fifth of the way
-down, where the eye already is rather than where the viewport begins.
-
-A short card starting at the top edge left most of the screen empty beneath it. Opening at
-`--eye` turns that emptiness into margin and puts the question's first line level with the
-numeral. A long card cannot afford the same offset — 170px above the ten scales is 170px
-of the battery pushed off the first screen — so the tall cards open at `--rail-top`.
-
-**The rail does not move either way.** It is the one fixed thing on the screen, and a
-margin note that shifted per question would be the opposite of a reference point.
-
-Which cards are tall is declared by what they contain, not by a measured height:
+**Everything on the rail layout opens on one line: `--eye`.**
 
 ```css
-.slide:has(.pts), .slide:has(.board) { padding-top: var(--rail-top); }
+--eye: clamp(96px, 18vh, 170px);
 ```
 
-`.pts` is the scale battery, `.board` is the six-image grid. A rule that names the thing
-stays true longer than a number does.
+A little under a fifth of the way down — where the eye lands, rather than where the
+viewport begins. Three things hang off it: the rail's numeral, the question beside it, and
+the scales card's own pinned header when it comes up to meet them. A short card starting
+at the top edge left most of the screen empty beneath it; opening here turns that
+emptiness into margin.
+
+There was briefly a second token letting tall cards open higher, on the reasoning that an
+offset costs them screen. It bought them 82px and cost the thing the rail is for: the
+numeral would have sat level with the question on eighteen cards and above it on three, so
+the one fixed point on screen appeared to move as a client advanced. One line, every
+question — and a long card still reaches its end, because it scrolls and its own header
+pins at the same line.
 
 ### The masthead holds the top at both widths, and stands off the edge on a laptop
 
