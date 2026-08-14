@@ -15,6 +15,13 @@
       "when": 1786615823707,
       "tag": "0001_wooden_crystal",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1786617463482,
+      "tag": "0002_sour_ultimatum",
+      "breakpoints": true
     }
   ]
 }

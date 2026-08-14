@@ -105,9 +105,9 @@ They were both called "brief" until 13 August 2026, which meant the button said
 one thing, the sheet title said "survey analysis", and the spec said "insight".
 One object, three words, and the second object had no word of its own.
 
-The SQL table is still `briefs`; renaming it needs `drizzle-kit generate` run
-interactively so it can be told the difference between a rename and dropping a
-table with real analyses in it. `src/lib/db/schema.ts` maps the two.
+The SQL table was renamed to `insights` on 14 August 2026, which needed
+`drizzle-kit generate` run interactively — it has to be told the difference
+between a rename and dropping a table with real analyses in it.
 
 ## Rules that must not be broken
 

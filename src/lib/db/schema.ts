@@ -294,12 +294,11 @@ export const surveyDrafts = pgTable(
  * the kick-off decisions are recorded — a different artefact. One word for one
  * thing.
  *
- * **The SQL table is still `briefs`.** Renaming it needs `drizzle-kit generate`
- * run interactively, so it can be told this is a rename and not a drop of a
- * table with real analyses in it. Worth doing in a terminal that can answer the
- * prompt; not worth guessing at.
+ * The SQL table was renamed to match on 14 August 2026 — `drizzle-kit generate`
+ * has to be told that is a rename rather than a drop of a table with real
+ * analyses in it, which it can only ask in an interactive terminal.
  */
-export const insights = pgTable('briefs', {
+export const insights = pgTable('insights', {
   id: uuid('id').primaryKey().defaultRandom(),
   projectId: uuid('project_id')
     .notNull()
