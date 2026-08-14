@@ -3311,6 +3311,42 @@ dialog::backdrop {
   .survey-shell:has(> .qmast) .scalehead {
     top: var(--eye);
   }
+  /**
+   * …and it has to paint the band above itself.
+   *
+   * This is the gap-above-a-pinned-header problem again, and the fix that
+   * worked for the masthead — put the offset in the padding, inside the pinned
+   * box — cannot be reused here: this box is not the top of the column, so
+   * padding would push the question down by --eye again when it is *not*
+   * pinned, on top of the offset the slide already has.
+   *
+   * So the band is painted instead. Pinned at --eye, the scale rows coming up
+   * from below were visible in the 162px above the question — the pole labels
+   * and a chosen dot sitting over the header. On a phone the masthead covers
+   * that strip; in the rail layout the masthead is in the other column and
+   * nothing was.
+   *
+   * Scoped to the rail, where the problem exists, and bounded by the column
+   * rather than the viewport so it never reaches across the gutter.
+   *
+   * The height is a viewport, not `--eye`. Sizing it to the token looks exact
+   * and is not: the sticky line and the painted edge are not the same number —
+   * measured, the box settles 8.4px below its own `top`, so a band of exactly
+   * `--eye` left a sliver at the very top of the screen for the scale rows to
+   * show through. There is nothing above this header in its column but the
+   * slide's own padding, so the band can simply be taller than any gap it
+   * might need to cover.
+   */
+  .survey-shell:has(> .qmast) .scalehead::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 100%;
+    height: 100vh;
+    background: var(--parchment);
+    pointer-events: none;
+  }
 }
 
 .qhead {
