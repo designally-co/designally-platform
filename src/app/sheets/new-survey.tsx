@@ -79,10 +79,14 @@ export default function NewSurveySheet({
       </div>
 
       <div className="field">
-        <label className="f">
+        {/* A <label> with no `for` and no control inside labels nothing — a
+            screen reader heard "Brand, pressed" with no idea what was being
+            chosen, on the screen that decides which questionnaire a client
+            gets. It is a group with a name now. */}
+        <span className="f" id="pkg-label">
           Package <span>· this chooses the questionnaire</span>
-        </label>
-        <div className="opts">
+        </span>
+        <div className="opts" role="group" aria-labelledby="pkg-label">
           {OPTIONS.map((o) => (
             <button
               key={o.key}
@@ -113,7 +117,8 @@ export default function NewSurveySheet({
 
       {link ? (
         <div className="field">
-          <label className="f">Send this link to the client&apos;s main contact</label>
+          {/* a caption, not a label — it names no control */}
+          <p className="f">Send this link to the client&apos;s main contact</p>
           <div className="linkbox">
             <span>{forDisplay(full)}</span>
             <button className="btn btn-quiet btn-sm" style={{ marginLeft: 'auto' }} onClick={copy}>

@@ -207,7 +207,7 @@ export default function InsightsSheet({
 
         {/* 2 · settled */}
         <section className="bsec">
-          <h3>Settled — design on this without asking</h3>
+          <h2>Settled — design on this without asking</h2>
           {insights.settled.length ? (
             <ul className="agree">
               {insights.settled.map((a, i) => (
@@ -232,7 +232,7 @@ export default function InsightsSheet({
 
         {/* 3 · unsettled — these become the DECIDE slides */}
         <section className="bsec">
-          <h3>Unsettled — resolve at the kick-off</h3>
+          <h2>Unsettled — resolve at the kick-off</h2>
           {insights.unsettled.length ? (
             insights.unsettled.map((c, i) => (
               <article className="conflict" key={i}>
@@ -263,7 +263,7 @@ export default function InsightsSheet({
 
         {/* 4 · not decided by the client yet */}
         <section className="bsec">
-          <h3>Not decided by the client yet</h3>
+          <h2>Not decided by the client yet</h2>
           {insights.notDecidedYet.length ? (
             <ul className="gaps">
               {insights.notDecidedYet.map((g, i) => (
@@ -280,7 +280,7 @@ export default function InsightsSheet({
 
         {/* 6 · signals */}
         <section className="bsec">
-          <h3>Signals</h3>
+          <h2>Signals</h2>
           <div className="signal">
             <div className="lab">Internal alignment</div>
             <p>
@@ -298,7 +298,7 @@ export default function InsightsSheet({
         {/* 7 · deck outline */}
         <section className="bsec">
           <div className="bsechead">
-            <h3>Kick-off deck outline</h3>
+            <h2>Kick-off deck outline</h2>
             <CopyOutline slides={insights.deckOutline} confirmed={!!openVersion?.confirmedOn} />
           </div>
           <ul className="slides">
@@ -317,7 +317,7 @@ export default function InsightsSheet({
 
         {/* 8 · internal only — rule 8 */}
         <section className="bsec">
-          <h3>How to run the room</h3>
+          <h2>How to run the room</h2>
           <div className="internal">
             <div className="lock">INTERNAL — NEVER SHOWN TO THE CLIENT</div>
             {insights.howToRunTheRoom.map((n, i) => (
@@ -332,7 +332,7 @@ export default function InsightsSheet({
             nothing ever showed them. */}
         {versions.length > 1 && (
           <section className="bsec">
-            <h3>Versions</h3>
+            <h2>Versions</h2>
             <ul className="bversions">
               {versions.map((v) => (
                 <li key={v.id} className={v.id === openId ? 'on' : undefined}>
@@ -395,7 +395,7 @@ export default function InsightsSheet({
             </p>
           ) : (
             <>
-              <h3>Is this right?</h3>
+              <h2>Is this right?</h2>
               <p>
                 Nothing here has reached the client. Confirming says a person has read it and stands
                 behind it — the analysis mistakes two wordings of one idea for a disagreement often

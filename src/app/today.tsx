@@ -166,11 +166,21 @@ export default function Today({
                 <th scope="col">Latest</th>
               </tr>
             </thead>
+            {/* one shared description for every row */}
+            <caption id="row-hint" className="vh">
+              Every row opens that project. Press Enter or Space on a focused row.
+            </caption>
             <tbody>
               {ordered.map((p) => (
+                /* The row is focusable and opens on Enter or Space, but a
+                   screen reader announces a table row and nothing says it is
+                   activatable. A role would replace the row semantics and an
+                   aria-label would replace the cells a reader needs, so the
+                   affordance is described alongside instead of over them. */
                 <tr
                   key={p.id}
                   tabIndex={0}
+                  aria-describedby="row-hint"
                   onClick={() => setOpenProject(p.id)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {

@@ -182,7 +182,7 @@ export default function ProjectSheet({
 
       {/* where it is */}
       <div className="pd-sec">
-        <h3>Where it is</h3>
+        <h2>Where it is</h2>
         <ul className="tl">
           {p.flow.map((stage, i) => {
             const cls = i < p.stage ? 'done' : i === p.stage ? 'now' : 'next';
@@ -201,7 +201,7 @@ export default function ProjectSheet({
 
       {/* who answered */}
       <div className="pd-sec">
-        <h3>Who answered</h3>
+        <h2>Who answered</h2>
         {p.people.length ? (
           <>
             <div className="pd-people">
@@ -241,7 +241,7 @@ export default function ProjectSheet({
       {/* the survey link, so it can be sent again */}
       {p.token && (
         <div className="pd-sec">
-          <h3>The link</h3>
+          <h2>The link</h2>
           <div className="linkbox">
             <span>{forDisplay(origin)}/s/{p.token}</span>
           </div>
@@ -267,13 +267,13 @@ export default function ProjectSheet({
 
       {/* decided at the kick-off */}
       <div className="pd-sec">
-        <h3>Decided at the kick-off</h3>
+        <h2>Decided at the kick-off</h2>
         <p className="quiet">Nothing recorded yet — this fills in after the kick-off meeting.</p>
       </div>
 
       {/* documents */}
       <div className="pd-sec">
-        <h3>Documents</h3>
+        <h2>Documents</h2>
         {p.insights ? (
           <div className="pd-docs">
             <button className="doc" onClick={onOpenInsights}>
@@ -297,7 +297,7 @@ export default function ProjectSheet({
 
       {/* gate 4 — archive */}
       <div className="pd-sec pd-archive">
-        <h3>Finished with this project?</h3>
+        <h2>Finished with this project?</h2>
         <p>
           Archiving moves it out of your live list. Nothing is deleted — the survey, the answers,
           the insights and the decisions stay searchable. Only your team can do this; the app never

@@ -1819,6 +1819,20 @@ label.f span {
   min-height: 0;
 }
 
+/* Present to a screen reader, absent to everything else. Not `display: none`,
+   which removes it from the accessibility tree along with everything else. */
+.vh {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* ---- All projects ---- */
 .ptable {
   width: 100%;
@@ -2098,7 +2112,9 @@ dialog::backdrop {
 .pd-sec {
   margin-bottom: 30px;
 }
-.pd-sec > h3 {
+/* h2, because these sit under the sheet's h1. A screen reader navigating by
+   heading reads the outline, and h1 → h3 tells it there is a level missing. */
+.pd-sec > h2 {
   font-size: 13px;
   font-weight: 600;
   color: var(--ink-3);
@@ -2583,7 +2599,7 @@ dialog::backdrop {
 .bsec {
   margin-bottom: 34px;
 }
-.bsec > h3 {
+.bsec > h2 {
   font-size: 13.5px;
   font-weight: 600;
   color: var(--ink-3);
