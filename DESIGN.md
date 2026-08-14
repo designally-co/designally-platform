@@ -110,23 +110,37 @@ a tint — and the dark Field's disc is warmed to match, so the control does not
 temperature when the survey crosses from welcome to question one.
 
 Both glyphs are solved against `--fill-press`, the extreme they sit on rather than the
-resting state — the darkest fill on the light Field (4.51) and the lightest on the dark
-one (4.53). Solving against the resting fill would have left the press state at 3.90.
+resting state — the lightest fill on the dark Field, the darkest on the light one (4.55
+and 4.53). Solving against the resting fill would have left the press state at 3.90.
 
-### A radio that is on is orange. A checkbox that is on is charcoal.
+The disc was also **too pale to read as a control**: at its first lightness it measured
+1.28:1 against the page, so beside a saturated orange pill it looked like a smudge rather
+than an object. It is 1.81 now. "Dull" was a measurement, not a mood.
 
-The CI states both halves and this product was using one treatment for both, because a
-single class carries either input.
+### The accent ladder
 
-The rule has a reason under it beyond consistency. The CI budgets roughly **one to three
-orange marks per screen**. A "choose 3" question with three ticked would put three more
-oranges on a card that already spends its budget on the progress bar and the primary
-action — six marks, and the accent stops meaning anything. Charcoal also does real work
-for the client: it says, before they read the help text, whether this question takes one
-answer or several.
+One hue, four rungs, separated by how much orange each one spends. Anything that marks a
+choice sits on this ladder, and nothing may occupy a rung above its importance.
 
-This applies to both multi-select forms — the text list and the image boards. On the
-boards it is the difference between two accents on screen and eight.
+| Rung | Treatment | Means |
+|---|---|---|
+| rest | white field, 1px `--hairline` | nothing yet |
+| **hover** | white field, 1px orange line | you are pointing at this |
+| **selected** | pale orange field, 2px orange line | you chose this |
+| **the action** | solid orange, white label | this is the one action |
+
+A solid orange fill on a selected chip was built and rejected: it reads as a button, so
+eight answered chips looked like eight Continues. The CI's own ChoiceCard names the rung
+that belongs there — *"an orange border on a pale orange field."* The label stays ink at
+15.18:1 on the tint rather than turning orange; the border and the field already say
+chosen, and orange text would be a third signal for one state.
+
+**Radio versus checkbox.** The CI marks a selected radio point in orange and a checkbox
+that is on in charcoal, on the reasoning that it budgets roughly one to three orange
+marks per screen. The text checkbox list follows that. **The image boards do not** —
+studio decision, 14 August 2026. The moodboard is the one card where the client is
+choosing the brand's *feeling*, and the answer should read as the brand's colour rather
+than as structure. It knowingly spends five orange marks on that card. Confined there.
 
 ### The five named pieces, and where they are
 

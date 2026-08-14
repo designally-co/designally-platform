@@ -87,13 +87,18 @@
    * grey that belongs to this brand instead of echoing a Field the survey
    * never shows.
    *
+   * Deepened 14 August 2026 — it read dull. The cause was measurable: at its
+   * first lightness the disc was 1.28:1 against the page, so it barely
+   * separated from the ground and looked like a smudge rather than a control
+   * beside a saturated orange pill. It is 1.81 now, which reads as an object.
+   *
    * The glyph is solved against --fill-press, the darkest ground it ever
-   * sits on, not against the resting fill: 4.51 there, 5.97 at rest.
+   * sits on, not against the resting fill: 4.55 there, 6.29 at rest.
    */
-  --fill: #dfd7d4;
-  --fill-deep: #d3cac6;
-  --fill-press: #c6bbb6;
-  --glyph: #514c49;
+  --fill: #beb5b2;
+  --fill-deep: #b1a7a3;
+  --fill-press: #a49994;
+  --glyph: #373230;
   /* the dark Field. The CI names three; this is the near-black one. */
   --tile: #0b0d12;
   --tile-raised: var(--charcoal-900);
@@ -775,31 +780,49 @@ label.f span {
   /* Thai never below 1.6 */
   line-height: 1.6;
 }
-.chip[aria-pressed='true'] small {
-  color: var(--ink-2);
-}
 .chip:disabled {
   opacity: 0.4;
   cursor: default;
 }
 /**
- * Hover on a choice darkens the line; it does not turn blue.
+ * Hover draws the chip's line in the accent; selection fills it.
  *
- * Two faults in one rule. The accent means "a person is needed here", and a
- * chip you are merely pointing at needs nothing — with selection now marked in
- * ink, a blue hover made the unselected chip look more chosen than the chosen
- * one. And on a touch screen hover has no way to end: tapping a chip to
- * deselect it left the blue behind, which is exactly what it looked like.
+ * An earlier version of this rule kept the accent off hover entirely, because
+ * hover and selection were then the *same* treatment at different strengths —
+ * a chip you were merely pointing at read as more chosen than the one you had
+ * picked. That fault is gone now that the two differ in kind rather than
+ * degree: hover draws an outline, selection paints a field. Nobody confuses an
+ * outlined chip for a filled one.
  *
- * `(hover: hover)` keeps it off devices that cannot hover at all.
+ * `(hover: hover)` still keeps it off devices that cannot hover at all, where
+ * a tap to deselect would otherwise leave the hover state behind.
  */
 @media (hover: hover) {
   .chip:hover {
-    border-color: var(--ink-3);
+    border-color: var(--primary);
   }
 }
+/**
+ * Selection is a rung on a ladder, not the top of it.
+ *
+ * A solid orange fill was tried and reads as a button — the same weight as the
+ * one real action on the card, so eight answered chips looked like eight
+ * Continues. The CI's own ChoiceCard names the rung that belongs here: "an
+ * orange border on a pale orange field."
+ *
+ *   hover      white field, 1px orange line      — you are pointing at this
+ *   selected   pale orange field, 2px orange line — you chose this
+ *   button     solid orange, white label          — this is the action
+ *
+ * Three steps in the same hue, separated by how much orange each one spends.
+ * The label stays ink at 15.18:1 on the tint rather than turning orange; the
+ * border and the field already say chosen, and orange text would be a third
+ * signal for one state. The padding compensates for the thicker line so
+ * nothing shifts on selection (DESIGN.md §5).
+ */
 .chip[aria-pressed="true"] {
-  border: 2px solid var(--primary-mark);
+  background: var(--primary-tint);
+  border: 2px solid var(--primary);
   padding: 9px 16px;
 }
 .chipn {
@@ -1066,15 +1089,24 @@ label.f span {
 }
 @media (hover: hover) {
   .board:hover {
-    border-color: var(--ink-3);
+    border-color: var(--primary);
   }
 }
-/* Selection is a 2px border, as everywhere else. The padding compensates so
-   nothing shifts when it thickens (DESIGN.md §5).
-   Charcoal, not orange: these are checkboxes, and six of them chosen would
-   otherwise put six accents on one card. See .pickone.sel above. */
+/**
+ * Selection is a 2px border, as everywhere else. The padding compensates so
+ * nothing shifts when it thickens (DESIGN.md §5).
+ *
+ * CI-DIVERGENCE, studio decision 14 August 2026: the CI marks a checkbox that
+ * is on in charcoal and reserves orange for a selected radio point, and these
+ * are checkboxes. Built that way first and overruled — the moodboard is the
+ * one card where the client is choosing the brand's feeling, and the answer
+ * should read as the brand's colour rather than as structure. It costs the
+ * accent budget: "choose 3" puts five orange marks on this card against the
+ * CI's stated one-to-three. Accepted knowingly, and confined to the boards —
+ * the text checkbox list stays charcoal.
+ */
 .board.sel {
-  border: 2px solid var(--ink);
+  border: 2px solid var(--primary);
 }
 .board img {
   display: block;
@@ -1113,7 +1145,7 @@ label.f span {
     border-color 0.18s var(--ease);
 }
 .board input:checked {
-  background: var(--ink);
+  background: var(--primary);
   border-color: var(--on-dark);
 }
 .board:has(input:checked)::after {
