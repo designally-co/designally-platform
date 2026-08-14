@@ -3091,7 +3091,20 @@ dialog::backdrop {
  * Top-aligned they read as one composition again, which is what the layout was
  * drawn as, and the floor controls still sit on the floor.
  */
-.qmast + .slide {
+/**
+ * Matched through the shell, not by adjacency.
+ *
+ * This was `.qmast + .slide`, which silently stopped applying whenever anything
+ * sat between them in the DOM — and something does: arriving at a question from
+ * the send screen renders the "Back to send" button there. It is
+ * `position: fixed` and occupies no space, so it was invisible as a cause while
+ * the slide quietly fell back to centred with 72px of top padding and pushed
+ * the question half a screen down.
+ *
+ * `:has()` asks the question that is actually being asked — does this shell
+ * carry a masthead — and cannot be broken by a sibling appearing between them.
+ */
+.survey-shell:has(> .qmast) .slide {
   align-items: flex-start;
   padding-top: 0;
   /* the shell measures the viewport now, so this stops guessing at the
