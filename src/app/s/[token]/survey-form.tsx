@@ -470,10 +470,11 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                 <h1>
                   Thank you, <em>{submitted}</em>.
                 </h1>
+                {/* the same shape as the welcome's, Thai on its own line */}
                 <p className="intro">
-                  We&apos;ll bring every perspective together and see you at the kick-off.
+                  See you at the kick-off
+                  <span className="th">แล้วพบกันในการประชุมเริ่มโปรเจกต์</span>
                 </p>
-                <p className="introth th">แล้วพบกันในการประชุมเริ่มโปรเจกต์</p>
               </div>
               <button className="btn btn-quiet start" onClick={answerAsSomeoneElse}>
                 Answer as another stakeholder
@@ -702,15 +703,27 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                 </div>
                 <span className="qrule" aria-hidden="true" style={{ '--cut-progress': 0 } as CSSProperties} />
                 <h1>Let&apos;s shape your brand, together.</h1>
+                {/**
+                 * One line, and it is the only one that had to be here.
+                 *
+                 * This was a sentence in each language explaining that the
+                 * questionnaire helps the team understand the brand before
+                 * designing — which is what the headline above it already says,
+                 * and what a client who followed a link from their own project
+                 * lead already knows. What they do not know, facing twenty-one
+                 * questions about their own company, is that they cannot get it
+                 * wrong. That is the sentence worth keeping.
+                 *
+                 * The Thai takes its own line rather than following a middot.
+                 * Run together they wrapped mid-phrase — ไม่มีคำตอบ / ที่ผิด —
+                 * and a language that breaks in the middle of its own sentence
+                 * reads as an afterthought. One block each, same size, same
+                 * tone: two languages given the same line, not one queued
+                 * behind the other.
+                 */}
                 <p className="intro">
-                  It helps us understand your brand before we start designing. There are no
-                  wrong answers.
-                </p>
-                {/* The two screens with no per-question reveal keep their Thai
-                    line, so a Thai-only reader is never stranded at the moment
-                    they decide to start or to send. */}
-                <p className="introth th">
-                  แบบสอบถามนี้ช่วยให้ทีมเข้าใจแบรนด์ของคุณก่อนเริ่มออกแบบ ไม่มีคำตอบที่ผิด
+                  There are no wrong answers
+                  <span className="th">ไม่มีคำตอบที่ผิด</span>
                 </p>
               </div>
 
