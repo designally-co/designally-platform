@@ -36,13 +36,21 @@
      grey disc it measures 3.83:1 and reads pale. This is 4.92:1 there. */
   --glyph: #5c5c61;
   --tile: #272729;
+  /* named in DESIGN.md section 1 and never defined here */
+  --surface-black: #000000;
 
   /* line */
   --hairline: #e0e0e0;
   --divider: #f0f0f0;
 
   /* semantic — text and thin tints only, never fills, never buttons */
-  --affirm: #248a3d;
+  /**
+   * Darkened 14 August 2026 from #248a3d, which could not legally carry text
+   * anywhere: 4.40:1 on canvas, 4.04 on parchment, 4.02 on its own tint. The
+   * line above says these tones are for text, and this one was unable to be.
+   * Same hue (135°) and saturation; only lightness moved. Now 5.53 / 5.08 / 5.06.
+   */
+  --affirm: #1f7835;
   --caution: #c93400;
   --critical: #d70015;
   --affirm-tint: #eef7f1;
@@ -141,7 +149,7 @@ textarea {
 }
 .btn-primary {
   background: var(--primary);
-  color: #fff;
+  color: var(--on-dark);
 }
 @media (hover: hover) {
   .btn-primary:hover {
@@ -154,7 +162,7 @@ textarea {
 }
 @media (hover: hover) {
   .btn-ink:hover {
-    background: #000;
+    background: var(--surface-black);
   }
 }
 .btn-quiet {
@@ -1080,7 +1088,7 @@ label.f span {
 }
 .board input:checked {
   background: var(--primary);
-  border-color: #fff;
+  border-color: var(--on-dark);
 }
 .board:has(input:checked)::after {
   content: '';
@@ -1090,7 +1098,7 @@ label.f span {
   z-index: 3;
   width: 6px;
   height: 11px;
-  border: solid #fff;
+  border: solid var(--on-dark);
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
   pointer-events: none;
@@ -2495,7 +2503,7 @@ dialog::backdrop {
   bottom: 26px;
   transform: translateX(-50%) translateY(16px);
   background: var(--ink);
-  color: #fff;
+  color: var(--on-dark);
   font-size: 13.5px;
   line-height: 1.6;
   border-radius: var(--r-pill);
@@ -2709,9 +2717,17 @@ dialog::backdrop {
   background: var(--caution-tint);
   color: var(--caution);
 }
+.sev.ok {
+  background: var(--affirm-tint);
+  color: var(--affirm);
+}
 .sev.lo {
   background: var(--divider);
-  color: var(--ink-3);
+  /* ink-3 on divider measures 4.45 — under the floor by a hair, and invisible
+     until this chip started appearing on flags too. The tone carries the
+     meaning here (grey, not orange, not red), so the text can be darker
+     without reading as more urgent. 10.3:1. */
+  color: var(--ink-2);
 }
 .sides {
   display: grid;
@@ -2853,7 +2869,12 @@ dialog::backdrop {
 .signal:first-of-type {
   border-top: 0;
 }
+/* the label line now carries a chip, so it is a row */
 .signal .lab {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
   font-size: 11.5px;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -2983,7 +3004,7 @@ dialog::backdrop {
 .pts-wide button[aria-pressed='true'] span {
   background: var(--primary);
   border-color: var(--primary);
-  color: #fff;
+  color: var(--on-dark);
   font-weight: 600;
 }
 
@@ -3145,7 +3166,10 @@ dialog::backdrop {
 }
 .slide .input::placeholder,
 .slide .textarea::placeholder {
-  color: #b6b6bb;
+  /* was #b6b6bb — 1.85:1 on parchment, which is not text anyone can read, on
+     every text question of a client-facing survey. ink-3 is this system's own
+     fine-print tone and measures 4.66. */
+  color: var(--ink-3);
 }
 /* the focus ring is the system's one shadow, and removing it outright would
    strand a keyboard user — it moves to the field's rule instead */

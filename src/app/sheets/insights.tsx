@@ -153,6 +153,19 @@ function Sources({
   );
 }
 
+/**
+ * Status to tone. The system has exactly three semantic tones and they already
+ * mean this elsewhere, so nothing new enters the palette — these two readings
+ * simply stop being rendered as grey.
+ */
+const ALIGNMENT_TONE: Record<string, string> = {
+  'high consensus': 'ok',
+  'some divergence': 'md',
+  fragmented: 'hi',
+};
+
+const SEVERITY_TONE: Record<string, string> = { high: 'hi', medium: 'md', low: 'lo' };
+
 function Quotes({ quotes }: { quotes: string[] }) {
   if (!quotes.length) return null;
   return (
@@ -282,14 +295,26 @@ export default function InsightsSheet({
         <section className="bsec">
           <h2>Signals</h2>
           <div className="signal">
-            <div className="lab">Internal alignment</div>
-            <p>
-              <b>{insights.alignment}</b> — {insights.alignmentReason}
-            </p>
+            <div className="lab">
+              Internal alignment
+              {/* Three named states rendered identically until now. This is the
+                  line that sets expectations for revision rounds, so how worried
+                  to be is the whole content of it. The word stays — colour is
+                  never the only cue. */}
+              <span className={`sev ${ALIGNMENT_TONE[insights.alignment] ?? 'lo'}`}>
+                {insights.alignment}
+              </span>
+            </div>
+            <p>{insights.alignmentReason}</p>
           </div>
           {insights.flags.map((f, i) => (
             <div className="signal" key={i}>
-              <div className="lab">{f.label}</div>
+              <div className="lab">
+                {f.label}
+                {/* the engine grades every flag and the sheet used to drop it,
+                    so a single-respondent warning read like a footnote */}
+                <span className={`sev ${SEVERITY_TONE[f.severity] ?? 'lo'}`}>{f.severity}</span>
+              </div>
               <p>{f.finding}</p>
             </div>
           ))}

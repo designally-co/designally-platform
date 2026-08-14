@@ -65,6 +65,16 @@ The accent's ten-percent ceiling still holds, and selection is what makes it eas
 
 ### Semantic tones — the one addition
 
+**Corrected 14 August 2026 — the green could not carry text.** `--affirm` was
+`#248a3d`, which measures 4.40:1 on canvas, 4.04 on parchment and 4.02 on its
+own tint. This section says these tones are for text and thin tints; that one
+was unable to be text anywhere in the system, and only passed review because its
+single use was a decorative `aria-hidden` tick at the 3:1 graphical floor.
+
+It is `#1f7835` — the same hue (135°) and saturation, lightness alone moved. Now
+5.53 / 5.08 / 5.06. **A tone defined for text has to be checked against the
+lightest surface it can land on, which here is its own tint, not white.**
+
 Apple's marketing surfaces have no semantic colour because they never report state. This product reports conflict severity, agreement and waiting, and accessibility requires that state never rely on colour alone — every one of these also carries a text label.
 
 Where the source is silent, use **Apple's own accessible system-colour variants**, the darkened versions published for text on light backgrounds:
