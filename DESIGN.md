@@ -247,9 +247,32 @@ Cross-axis **auto margins** do both, with no media query and no measurement:
 
 Free space is handed to the margins, so a short card centres in the area the masthead
 leaves; when the space runs negative they resolve to zero and the card starts at the top,
-fully scrollable. Above 620px the slide also drops the floor clearance it reserves for the
-controls, which are back in normal flow there — kept behind a `min-width` so it can never
-reach the breakpoint where that padding is the ground a fixed button stands on.
+fully scrollable.
+
+### The masthead pins on a phone and travels on a laptop
+
+Same element, opposite behaviour, and the reason is that only one of them scrolls.
+
+A phone wants it pinned: cards nearly fill the screen, scrolling is constant, and the Cut
+measuring progress has to stay in sight. Pinning it on a 900px laptop puts the count alone
+at the top of the screen with the question it labels somewhere in the middle — and every
+way of closing that distance made something else worse:
+
+| Attempt | What broke |
+|---|---|
+| Centre the card | metadata stranded 173px above the question |
+| Top-align the card | screen empty underneath |
+| Fix the controls to the floor to anchor that | button 200px from the answer it submits |
+
+None of those were the fault. The fault was a header pinned to a viewport edge on a screen
+that does not scroll. Above 620px the masthead, the question and the action **centre
+together as one group** — `margin-top: auto` on the masthead, `margin-bottom: auto` on the
+slide, and the slide dropping `flex: 1` so it takes its content's height. Each thing ends
+up next to the thing it belongs to: 8px from count to question, 34px from field to button,
+and the leftover space split above and below.
+
+`position: sticky` stays on it at every width, so the one card long enough to scroll — the
+ten scales — still pins it on the way down, on a laptop as on a phone.
 
 Before this, the client's first impression of Designally carried no Designally anywhere
 on it — the survey had no wordmark on any of its twenty-three screens.

@@ -3134,15 +3134,37 @@ dialog::backdrop {
   margin-block: auto;
 }
 /**
- * Above 620px the controls are back in normal flow, so the floor clearance the
- * phone reserves for them is dead space — and with the card centred it is dead
- * space on one side only, which reads as the content sitting too high. Scoped
- * to a min-width so it cannot reach the breakpoint where that padding is the
- * ground a fixed button stands on.
+ * Above 620px the masthead travels with the card instead of holding the top.
+ *
+ * A phone wants it pinned: cards nearly fill the screen, scrolling is constant,
+ * and the Cut measuring progress has to stay in sight. A laptop wants the
+ * opposite. Pinning it there puts the count alone at the top of a 900px screen
+ * while the question it labels sits somewhere in the middle, and every way of
+ * closing that distance made something else worse — centring the card stranded
+ * the metadata 173px above it, top-aligning the card left the screen empty
+ * underneath, and fixing the controls to the floor to anchor that emptiness put
+ * the button 200px from the answer it submits.
+ *
+ * None of those are the real fault. The fault is a header pinned to a viewport
+ * edge on a screen that does not scroll. Here the masthead, the question and
+ * the action centre together as one group, each next to the thing it belongs
+ * to. `position: sticky` is still on it, so the one card long enough to scroll
+ * — the ten scales — still pins it on the way down.
  */
 @media (min-width: 621px) {
-  .survey-shell:has(> .qmast) .slide {
+  .survey-shell:has(> .qmast) > .qmast {
+    margin-top: auto;
+  }
+  .survey-shell:has(> .qmast) > .slide {
+    /* not flex:1 — the slide takes its content's height so the auto margins
+       above and below the pair have free space to share */
+    flex: none;
+    margin-bottom: auto;
     padding-bottom: 26px;
+  }
+  /* the group is doing the centring now; the card must not centre inside it */
+  .survey-shell:has(> .qmast) .slidebody {
+    margin-block: 0;
   }
 }
 
