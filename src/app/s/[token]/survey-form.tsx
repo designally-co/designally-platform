@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isAnswered, type DraftValues } from '@/lib/survey/answers';
 import type { SurveyPayload, SurveyQuestion, SurveyStep } from '@/lib/survey/load';
 import { LangContext, type Lang } from './lang';
-import Question, { IdentityField, type ValueUpdate } from './questions';
+import Question, { IdentityField, Masthead, type ValueUpdate } from './questions';
 
 const WELCOME = 0;
 
@@ -570,10 +570,30 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
         /* the welcome only — the questions themselves stay on warm white */
         data-field={step === WELCOME ? 'dark' : undefined}
       >
-        {/* The bar that used to float here is gone: the Cut under each
-            question's masthead measures the same thing, in the brand's own
-            object, at the place the card begins. Two orange marks doing one
-            job was one too many. */}
+        {/**
+         * The masthead sits here, outside the keyed <section>, and the reason
+         * is the Cut.
+         *
+         * The sticky bar it replaced is gone, so the Cut is the only thing
+         * measuring progress and it has to survive a long card — hence pinned.
+         * But it also has to *grow*, and that needs this exact position: the
+         * section carries `key={step}`, so React tears it down and builds it
+         * again on every advance. A freshly mounted element has no previous
+         * width to transition from, so inside the section the Cut would jump to
+         * its new length rather than run to it. Out here the element persists,
+         * only `--cut-progress` changes, and the CI's own `--transition-cut`
+         * finally does what it was written for.
+         *
+         * It is also outside `.slidemain`, so it holds still while the question
+         * animates under it.
+         */}
+        {card?.kind === 'question' && (
+          <Masthead
+            question={card.question}
+            total={survey.questionCount}
+            section={card.section}
+          />
+        )}
 
         {fromSend && (
           <button className="toreview" type="button" onClick={openSend}>

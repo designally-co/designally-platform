@@ -395,6 +395,10 @@ label.f span {
    ============================================================ */
 .survey-shell {
   min-height: 100dvh;
+  /* a column so the slide can take exactly the height the pinned masthead
+     leaves, rather than a hardcoded subtraction of it */
+  display: flex;
+  flex-direction: column;
   background: var(--parchment);
   /**
    * Flat, deliberately.
@@ -2969,10 +2973,13 @@ dialog::backdrop {
   animation-name: qprev;
 }
 
+/* The card's entrance, and now the only thing on the slide that moves — the
+   masthead above it is pinned and holds still. 8px, the CI's cap on how far a
+   reveal may travel; this was 16. */
 @keyframes qnext {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(8px);
   }
 }
 @keyframes qprev {
@@ -3044,6 +3051,55 @@ dialog::backdrop {
  * it introduces, which is the opposite of what the size is for — the size is
  * there to make the count stop being a line of text, not to make it loud.
  */
+/**
+ * The masthead pins, so the Cut that measures progress survives a long card.
+ *
+ * The ten personality scales are taller than any phone, and that is exactly
+ * where a client most wants to know how much is left — the old bar was sticky
+ * for the same reason. Sticky rather than fixed, and with a solid background
+ * rather than a blur: on iOS a `position: fixed` inside a scrolling container
+ * attaches to that scroller's own compositing layer, and `backdrop-filter`
+ * promotes and composites above unpromoted siblings. That combination is what
+ * painted over the survey's controls in August; it is not being invited back
+ * for a decorative reason.
+ *
+ * The negative margin and matching padding let the page colour run to the top
+ * of the viewport, so a line of question text scrolling under the numeral
+ * disappears rather than crossing it.
+ */
+.qmast {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--parchment);
+  /* it sits above .slide now rather than inside it, so it carries the slide's
+     own horizontal rhythm and the column it pins over stays aligned */
+  padding: calc(34px + env(safe-area-inset-top, 0px)) 26px 0;
+  flex: none;
+}
+.qmast .qhead,
+.qmast .qrule {
+  max-width: 660px;
+  margin-inline: auto;
+}
+/**
+ * With the masthead lifted out, the slide stops centring.
+ *
+ * The card used to hold the masthead and centre the pair as one block. Pinned,
+ * the masthead is at the top and a centred question left a void between the two
+ * — the count introduced a question that began three hundred pixels below it.
+ * Top-aligned they read as one composition again, which is what the layout was
+ * drawn as, and the floor controls still sit on the floor.
+ */
+.qmast + .slide {
+  align-items: flex-start;
+  padding-top: 0;
+  /* the shell measures the viewport now, so this stops guessing at the
+     masthead's height with a magic number */
+  min-height: 0;
+  flex: 1;
+}
+
 .qhead {
   display: flex;
   align-items: flex-start;
@@ -3619,24 +3675,28 @@ dialog::backdrop {
    sit closer; the question stays pinned at the top so the eighth pair is still
    answering something.
    ------------------------------------------------------------------ */
+/**
+ * The scales card pins its question — and now pins *under* the masthead.
+ *
+ * Both used to claim `top: 0` with the same z-index, and this one is later in
+ * the DOM, so on the one card long enough to need a progress indicator the
+ * question covered it completely. `--mast-h` is measured and published by the
+ * masthead itself, because the numeral is a `clamp()` and the height is not a
+ * number that can be written down here.
+ *
+ * The old top padding existed to clear the 3px progress bar that used to sit at
+ * the viewport edge. That bar is gone — the Cut replaced it — and this box no
+ * longer touches the edge at all, so the padding is just the gap under the
+ * masthead now.
+ */
 .scalehead {
   position: sticky;
-  top: 0;
-  z-index: 5;
+  top: var(--mast-h, 0px);
+  z-index: 4;
   /* the page wash is near-white at the top of the viewport, which is the only
      place this element is ever seen */
   background: var(--parchment);
-  /**
-   * The top padding is the pinned state's breathing room, not decoration.
-   *
-   * Pinned, this box starts at the viewport's top edge and the 3px progress bar
-   * sits inside its first three pixels, so the padding is all that stands
-   * between the question number and the edge of the screen. At 12px that left
-   * 9px, and the tag read as jammed against the top on a phone — it is 18px
-   * now, which clears the bar by 15. Unpinned it costs six pixels nobody will
-   * notice.
-   */
-  padding: 18px 0 10px;
+  padding: 10px 0;
 }
 .scalehead::after {
   content: '';

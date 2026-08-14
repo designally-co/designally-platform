@@ -33,13 +33,22 @@ type Props = {
 /* ── the question, in the language that leads ─────────────────────── */
 
 /**
- * The number is a badge, not a prefix.
+ * The masthead — pinned, and outside the card that animates.
  *
- * Set inline in the sentence it would read as part of the question; set as a
- * small block beside it, it reads as position — which is the only thing left
- * saying where in twenty-one you are, now that the slides carry no chrome.
+ * It lives at the slide level rather than inside the question's `<label>` for
+ * two reasons that arrived together. It is `position: sticky`, so the Cut that
+ * measures progress stays on screen while a long card scrolls — the ten
+ * personality scales are taller than any phone, and the one thing a client
+ * wants mid-scroll is how much is left. And being outside `.slidemain` it is
+ * outside the per-card entrance animation, so the metadata holds still while
+ * the question moves under it: pinning something that re-animates every time
+ * would be the worst of both.
+ *
+ * A side effect worth having: the count and section are no longer part of the
+ * question's accessible name, so a screen reader stops prefixing every one of
+ * twenty-one questions with "16 of 21, Visual Direction".
  */
-function Heading({
+export function Masthead({
   question,
   total,
   section,
@@ -48,16 +57,44 @@ function Heading({
   total?: number;
   section?: { en?: string; th?: string };
 }) {
-  const t = useText();
-  const help = t(question.helpEn, question.helpTh);
   /* Bilingual whatever the lead language is — the same rule the choice labels
      follow (lang.tsx). Two words each, so it costs almost no height, and there
      is no per-question reveal for it: an English-only section label would be
      invisible to exactly the reader it is meant to orient. */
+  const box = useRef<HTMLDivElement>(null);
+
+  /**
+   * Publish the pinned height so anything else that pins can sit under it.
+   *
+   * The scales card has its own sticky header — it keeps the question on screen
+   * so the eighth pair is still answering something — and it also pinned at
+   * `top: 0`. Two things claiming the same edge meant the question covered the
+   * masthead and the progress vanished on the one card long enough to need it.
+   *
+   * Measured rather than assumed: the numeral is a `clamp()`, so the masthead
+   * is 115px on a small phone and 127px on a large one, and a hardcoded offset
+   * would be wrong on one of them.
+   */
+  useEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    const root = document.documentElement;
+    const set = () => root.style.setProperty('--mast-h', `${el.offsetHeight}px`);
+    set();
+    const ro = new ResizeObserver(set);
+    ro.observe(el);
+    return () => {
+      ro.disconnect();
+      root.style.removeProperty('--mast-h');
+    };
+  }, []);
+
+  if (question.number === null && !section?.en && !section?.th) return null;
+
   return (
-    <>
+    <div className="qmast" ref={box}>
       {/**
-       * The masthead: the count set as a figure, the section beside it.
+       * The count set as a figure, the section beside it.
        *
        * These were two stacked lines above the question, which with the
        * language button made four blocks of text before a client reached
@@ -74,51 +111,54 @@ function Heading({
        * somebody landing on question fifteen from the review screen has not
        * seen the top of anything.
        */}
-      {/* a block with neither a number nor a section would otherwise render an
-          empty masthead and a rule under nothing */}
-      {(question.number !== null || section?.en || section?.th) && (
-        <>
-          <span className="qhead">
-            {question.number !== null && (
-              <span className="qfig">
-                {question.number}
-                {total ? <i>/{total}</i> : null}
-              </span>
-            )}
-            {(section?.en || section?.th) && (
-              <span className="qsection">
-                {section?.en}
-                {section?.en && section?.th && <br />}
-                {section?.th && <span className="th">{section.th}</span>}
-              </span>
-            )}
+      <span className="qhead">
+        {question.number !== null && (
+          <span className="qfig">
+            {question.number}
+            {total ? <i>/{total}</i> : null}
           </span>
-          {/**
-           * The Cut, and it measures how far in you are.
-           *
-           * The CI calls the Cut "one orange line, used once per layout — the
-           * moment of conviction", and its motion tokens ship
-           * `--transition-cut: width …`. A transition defined for the width of
-           * a line that is otherwise a fixed 88px is the system saying this
-           * line was always meant to grow.
-           *
-           * So it does the work the separate bar at the top of the viewport was
-           * doing, and does it better: it is one mark rather than two, it sits
-           * where the card begins instead of floating above it, and it is the
-           * brand's own object rather than a piece of borrowed chrome. The
-           * hairline underneath is its track.
-           */}
-          <span
-            className="qrule"
-            aria-hidden="true"
-            style={
-              question.number !== null && total
-                ? ({ '--cut-progress': question.number / total } as CSSProperties)
-                : undefined
-            }
-          />
-        </>
-      )}
+        )}
+        {(section?.en || section?.th) && (
+          <span className="qsection">
+            {section?.en}
+            {section?.en && section?.th && <br />}
+            {section?.th && <span className="th">{section.th}</span>}
+          </span>
+        )}
+      </span>
+      {/**
+       * The Cut, and it measures how far in you are.
+       *
+       * The CI calls the Cut "one orange line, used once per layout — the
+       * moment of conviction", and its motion tokens ship
+       * `--transition-cut: width …`. A transition defined for the width of a
+       * line that is otherwise a fixed 88px is the system saying this line was
+       * always meant to grow.
+       *
+       * So it does the work the separate bar at the top of the viewport was
+       * doing, and does it better: one mark rather than two, sitting where the
+       * card begins instead of floating above it, and the brand's own object
+       * rather than borrowed chrome. The hairline underneath is its track.
+       */}
+      <span
+        className="qrule"
+        aria-hidden="true"
+        style={
+          question.number !== null && total
+            ? ({ '--cut-progress': question.number / total } as CSSProperties)
+            : undefined
+        }
+      />
+    </div>
+  );
+}
+
+/** The question itself — what the label names, and all that still animates. */
+function Heading({ question }: { question: SurveyQuestion }) {
+  const t = useText();
+  const help = t(question.helpEn, question.helpTh);
+  return (
+    <>
       <span className="qq">{t(question.textEn, question.textTh)}</span>
       {help && <span className="qhelp">{help}</span>}
     </>
@@ -183,7 +223,7 @@ function useAutosize(value: string) {
 
 /* ── paragraph and short_text ─────────────────────────────────────── */
 
-function TextAnswer({ question, value, onChange, onEnter, total, section }: Props) {
+function TextAnswer({ question, value, onChange, onEnter }: Props) {
   const text = typeof value === 'string' ? value : '';
   const long = question.type === 'paragraph';
   const id = useId();
@@ -206,7 +246,7 @@ function TextAnswer({ question, value, onChange, onEnter, total, section }: Prop
   return (
     <div className="sq">
       <label htmlFor={id}>
-        <Heading question={question} total={total} section={section} />
+        <Heading question={question} />
       </label>
       <Alt question={question} />
       {long ? (
@@ -279,7 +319,7 @@ export function IdentityField({ question, value, onChange, onEnter }: Props) {
 
 /* ── multiple_choice ──────────────────────────────────────────────── */
 
-function ChoiceAnswer({ question, value, onChange, total, section }: Props) {
+function ChoiceAnswer({ question, value, onChange }: Props) {
   const v = (value ?? { choice: '' }) as { choice: string; other?: string };
   const config = question.config;
   const name = useId();
@@ -294,7 +334,7 @@ function ChoiceAnswer({ question, value, onChange, total, section }: Props) {
   return (
     <fieldset className="sq">
       <legend>
-        <Heading question={question} total={total} section={section} />
+        <Heading question={question} />
       </legend>
       <Alt question={question} />
       <div className="pick">
@@ -365,7 +405,7 @@ function asBoards(config: QuestionConfig) {
   return (config.choices ?? []).some((c) => Boolean(c.image));
 }
 
-function CheckboxAnswer({ question, value, onChange, total, section }: Props) {
+function CheckboxAnswer({ question, value, onChange }: Props) {
   const v = (value ?? { choices: [] }) as { choices: string[]; other?: string };
   const config = question.config;
   const chosen = new Set(v.choices);
@@ -403,7 +443,7 @@ function CheckboxAnswer({ question, value, onChange, total, section }: Props) {
   return (
     <fieldset className="sq">
       <legend>
-        <Heading question={question} total={total} section={section} />
+        <Heading question={question} />
       </legend>
       <Alt question={question} />
 
@@ -507,7 +547,7 @@ function CheckboxAnswer({ question, value, onChange, total, section }: Props) {
 
 /* ── linear_scale ─────────────────────────────────────────────────── */
 
-function ScaleAnswer({ question, value, onChange, total, section }: Props) {
+function ScaleAnswer({ question, value, onChange }: Props) {
   const v = (value ?? { scale: {} }) as { scale: Record<string, number> };
   const points = question.config.points ?? 5;
   /* Version 1 scales run 1..points; the version-2 personality scales run 0..10,
@@ -534,7 +574,7 @@ function ScaleAnswer({ question, value, onChange, total, section }: Props) {
           it — rating the eighth with no idea what is being rated is the failure
           mode that pinning avoids. */}
       <div className="scalehead">
-        <Heading question={question} total={total} section={section} />
+        <Heading question={question} />
         <Alt question={question} />
       </div>
       {pairs.map((p, i) => {

@@ -213,6 +213,30 @@ reads off it.
 Question cards now carry **two** orange marks — the Cut and the Continue button — against
 the CI's stated one to three.
 
+**The masthead pins, and it is the only thing on the slide that does not move.** It sits
+above `.slide` rather than inside it, for two reasons that have to hold together:
+
+- `position: sticky`, so the Cut stays on screen through a long card. The ten personality
+  scales are taller than any phone, and mid-scroll is exactly when someone wants to know
+  how much is left.
+- Outside the keyed `<section>`, so it *persists*. The section carries `key={step}` and is
+  torn down on every advance; a freshly mounted element has no previous width to
+  transition from, so inside it the Cut would jump to its new length rather than run to
+  it. Outside, only `--cut-progress` changes and the CI's `--transition-cut` works.
+
+It is also outside `.slidemain`, so the entrance animation applies to the question alone —
+metadata that re-animated on every card while pinned would be the worst of both.
+
+**Two sticky things need a stacking order.** The scales card pins its own question so the
+eighth pair is still answering something, and it claimed `top: 0` too. The masthead
+publishes its measured height as `--mast-h` and the question header pins at that offset.
+Measured, not written down: the numeral is a `clamp()`, so the masthead is 115px on a small
+phone and 127px on a large one.
+
+With the masthead lifted out, the slide is **top-aligned rather than centred**. Centring a
+question under a pinned masthead put three hundred pixels between the count and the
+question it introduces.
+
 Before this, the client's first impression of Designally carried no Designally anywhere
 on it — the survey had no wordmark on any of its twenty-three screens.
 
