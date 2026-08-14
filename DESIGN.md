@@ -294,6 +294,23 @@ the one fixed point on screen appeared to move as a client advanced. One line, e
 question — and a long card still reaches its end, because it scrolls and its own header
 pins at the same line.
 
+**The page reserves its scrollbar for the same reason:** `scrollbar-gutter: stable` on
+`html`. Twenty cards fit their screen and the ten personality scales do not, so arriving
+there took the scrollbar from nothing to 15px, narrowed the viewport, and a centred layout
+gives up half of that on each side — the rail stepped from 262 to 255 and back on the way
+out. Seven pixels, on the one element a client reads their position against. Overlay
+scrollbars — every phone, and macOS unless the setting says otherwise — reserve nothing,
+so nothing changes there.
+
+**A pinned header in a column must paint the band above itself.** `position: sticky` with
+a `top` offset leaves that offset's worth of space above the element for content to scroll
+through. The masthead solves this by carrying the offset as *padding*, inside the pinned
+box. The scales card's own header cannot — it is not the top of its column, and padding
+would push it down again when unpinned — so it paints a band with a pseudo-element
+instead. Size that band generously rather than to the offset token: measured, the box
+settles 8.4px below its own `top`, and a band of exactly `--eye` left a sliver for the rows
+to show through.
+
 ### The masthead holds the top at both widths, and stands off the edge on a laptop
 
 It is pinned everywhere — the Cut measures progress and has to stay in sight. What differs

@@ -241,6 +241,22 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  /**
+   * Reserve the scrollbar's width whether or not there is one.
+   *
+   * Twenty of the twenty-one cards fit their screen and one does not — the ten
+   * personality scales. Arriving at it took a scrollbar from nothing to 15px,
+   * which narrowed the viewport, and a centred layout gives up half of that on
+   * each side: the rail stepped from 262 to 255 and back on the way out. Seven
+   * pixels, on the one element whose whole job is to be the fixed point a
+   * client reads their position against.
+   *
+   * Reserving the gutter always is the cheap half of the fix and costs a
+   * scrollbar's width of page on desktop. Overlay scrollbars — every phone, and
+   * macOS unless the setting says otherwise — take no space, so nothing there
+   * changes at all.
+   */
+  scrollbar-gutter: stable;
 }
 
 body {
