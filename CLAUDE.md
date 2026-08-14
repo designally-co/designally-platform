@@ -109,6 +109,12 @@ The SQL table was renamed to `insights` on 14 August 2026, which needed
 `drizzle-kit generate` run interactively — it has to be told the difference
 between a rename and dropping a table with real analyses in it.
 
+The CSS class prefix went the same way on 14 August: `.bsec`, `.bsechead` and
+`.bversions` were "brief section" and "brief versions", the retired word sitting
+in the stylesheet of the sheet that renamed itself. They are `.isec`,
+`.isechead` and `.iversions`. `reference/brief-one-page.html` keeps its name —
+it predates the split, and what it draws is this surface, not the brief.
+
 ## Rules that must not be broken
 
 These are product decisions, not preferences. If a request conflicts with one, say so before building it.

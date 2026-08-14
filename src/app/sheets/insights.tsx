@@ -219,7 +219,7 @@ export default function InsightsSheet({
         <p className="firstpara">{insights.headlineBody}</p>
 
         {/* 2 · settled */}
-        <section className="bsec">
+        <section className="isec">
           <h2>Settled — design on this without asking</h2>
           {insights.settled.length ? (
             <ul className="agree">
@@ -244,7 +244,7 @@ export default function InsightsSheet({
         </section>
 
         {/* 3 · unsettled — these become the DECIDE slides */}
-        <section className="bsec">
+        <section className="isec">
           <h2>Unsettled — resolve at the kick-off</h2>
           {insights.unsettled.length ? (
             insights.unsettled.map((c, i) => (
@@ -275,7 +275,7 @@ export default function InsightsSheet({
         </section>
 
         {/* 4 · not decided by the client yet */}
-        <section className="bsec">
+        <section className="isec">
           <h2>Not decided by the client yet</h2>
           {insights.notDecidedYet.length ? (
             <ul className="gaps">
@@ -292,7 +292,7 @@ export default function InsightsSheet({
         </section>
 
         {/* 6 · signals */}
-        <section className="bsec">
+        <section className="isec">
           <h2>Signals</h2>
           <div className="signal">
             <div className="lab">
@@ -321,8 +321,8 @@ export default function InsightsSheet({
         </section>
 
         {/* 7 · deck outline */}
-        <section className="bsec">
-          <div className="bsechead">
+        <section className="isec">
+          <div className="isechead">
             <h2>Kick-off deck outline</h2>
             <CopyOutline slides={insights.deckOutline} confirmed={!!openVersion?.confirmedOn} />
           </div>
@@ -341,7 +341,7 @@ export default function InsightsSheet({
         </section>
 
         {/* 8 · internal only — rule 8 */}
-        <section className="bsec">
+        <section className="isec">
           <h2>How to run the room</h2>
           <div className="internal">
             <div className="lock">INTERNAL — NEVER SHOWN TO THE CLIENT</div>
@@ -356,9 +356,9 @@ export default function InsightsSheet({
         {/* every run this project has had. Re-analysing has always kept them;
             nothing ever showed them. */}
         {versions.length > 1 && (
-          <section className="bsec">
+          <section className="isec">
             <h2>Versions</h2>
-            <ul className="bversions">
+            <ul className="iversions">
               {versions.map((v) => (
                 <li key={v.id} className={v.id === openId ? 'on' : undefined}>
                   <button
@@ -398,7 +398,7 @@ export default function InsightsSheet({
         )}
 
         {/* gate 2 — rule 2 records who acted, rule 1 never does it on a timer */}
-        <section className="bsec gate">
+        <section className="isec gate">
           {project.insightsStale && (
             <p className="stale">
               Answers arrived after this was confirmed. What it says was true of the answers it was
