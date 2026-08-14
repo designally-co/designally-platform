@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState, type CSSProperties } from 'react';
 
 import type { QuestionConfig } from '@/lib/db/schema';
 import type { RawValue } from '@/lib/survey/answers';
@@ -93,9 +93,30 @@ function Heading({
               </span>
             )}
           </span>
-          {/* the Edge, not the Cut — an orange rule here would be the fourth
-              accent on the card and would spend the one the Cut is saved for */}
-          <span className="qrule" aria-hidden="true" />
+          {/**
+           * The Cut, and it measures how far in you are.
+           *
+           * The CI calls the Cut "one orange line, used once per layout — the
+           * moment of conviction", and its motion tokens ship
+           * `--transition-cut: width …`. A transition defined for the width of
+           * a line that is otherwise a fixed 88px is the system saying this
+           * line was always meant to grow.
+           *
+           * So it does the work the separate bar at the top of the viewport was
+           * doing, and does it better: it is one mark rather than two, it sits
+           * where the card begins instead of floating above it, and it is the
+           * brand's own object rather than a piece of borrowed chrome. The
+           * hairline underneath is its track.
+           */}
+          <span
+            className="qrule"
+            aria-hidden="true"
+            style={
+              question.number !== null && total
+                ? ({ '--cut-progress': question.number / total } as CSSProperties)
+                : undefined
+            }
+          />
         </>
       )}
       <span className="qq">{t(question.textEn, question.textTh)}</span>

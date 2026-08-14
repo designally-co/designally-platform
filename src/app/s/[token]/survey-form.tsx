@@ -470,9 +470,8 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
     return (
       <LangContext.Provider value={LEAD}>
         <div className="survey-shell client-surface">
-          <div className="bar" aria-hidden="true">
-            <i style={{ transform: 'scaleX(1)' }} />
-          </div>
+          {/* no bar here either — this screen says "N of 21 answered" in words,
+              which is what a full bar was trying to say and could not */}
           <div className="slide sendslide" data-active="" data-dir={dir}>
             <div className="slidebody">
               <div className="slidemain">
@@ -567,13 +566,14 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   return (
     <LangContext.Provider value={LEAD}>
       <div
-        className={`survey-shell client-surface${step === WELCOME ? ' at-welcome' : ''}`}
+        className="survey-shell client-surface"
         /* the welcome only — the questions themselves stay on warm white */
         data-field={step === WELCOME ? 'dark' : undefined}
       >
-        <div className="bar" aria-hidden="true">
-          <i style={{ transform: `scaleX(${Math.min(step / STOPS, 1)})` }} />
-        </div>
+        {/* The bar that used to float here is gone: the Cut under each
+            question's masthead measures the same thing, in the brand's own
+            object, at the place the card begins. Two orange marks doing one
+            job was one too many. */}
 
         {fromSend && (
           <button className="toreview" type="button" onClick={openSend}>

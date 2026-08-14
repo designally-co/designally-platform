@@ -157,9 +157,7 @@ Three decisions inside that are worth keeping:
 
 - **The numeral is Light, not Bold.** At 58px a bold figure outweighs the question it
   introduces. The size is there to stop the count being a line of text, not to make it loud.
-- **The rule is the Edge, not the Cut.** An orange line here would be a fourth accent on
-  the card and would spend the one thing the Cut is saved for. The Cut stays on the welcome
-  and completion screens.
+- **The line under the masthead is both — and the Cut is the progress.** See below.
 - **The language button belongs to the question, not to the masthead.** It acts on the
   question, so it sits under it. It cannot be nested *inside* the question either — the
   question is a `<label>`, and a button inside one inherits the label's click target and
@@ -175,13 +173,45 @@ and 19.
 | **The Field** | warm white throughout; near-black on welcome and completion |
 | **The Edge** | every card, input and divider — 1px, never orange |
 | **The Wordmark** | welcome and completion only |
-| **The Cut** | welcome and completion only — **once per layout** |
+| **The Cut** | welcome and completion, and **once on every question card** |
 | **The Mark** | not yet — no vector was supplied, only a 274px PNG |
 
 The Cut earns the pure CI `#ef6148` rather than the measured action orange: nothing sits
 on it, nothing is read from it, and it is not a control, so it carries no contrast
 obligation — only weight. It is the only orange line permitted anywhere. Rules, dividers
 and table borders are never orange, because an orange line means something here.
+
+### The Cut is the progress
+
+**The survey has no progress bar. The Cut is the progress.**
+
+The objection to an orange line under the question masthead was to an orange *divider* —
+which the CI does forbid, and for this reason. It does not reach the Cut, because the Cut
+is not a rule: it is a segment, left-aligned, closing nothing. So the masthead carries
+both, doing the two jobs they are each for. The Edge runs the full width and gives the
+block its floor; the Cut sits on its left end and says the card begins.
+
+And then it grows. The CI's motion tokens define `--transition-cut: width var(--dur-slow)
+var(--ease-out)` — a transition for the width of a line otherwise fixed at 88px, which is
+the system saying this line was always meant to move. So the Cut measures how far in the
+client is, and the sticky bar that used to float at the top of the viewport is gone: one
+mark instead of two, at the place the card begins rather than above it, and the brand's
+own object rather than borrowed chrome.
+
+`--cut-length` is where it **starts**, not a floor:
+
+```css
+width: calc(var(--cut-length) + var(--cut-progress) * (100% - var(--cut-length)));
+```
+
+A truthful 0–100% would put question one at a 16px stub that reads as a rendering fault.
+Clamping with `max(88px, …)` was worse — it froze the Cut for the first five questions, so
+a quarter of the survey gave no feedback. Mapped onto the range it moves about 12px on
+every question and still lands exactly full on the last, which is the part anyone actually
+reads off it.
+
+Question cards now carry **two** orange marks — the Cut and the Continue button — against
+the CI's stated one to three.
 
 Before this, the client's first impression of Designally carried no Designally anywhere
 on it — the survey had no wordmark on any of its twenty-three screens.

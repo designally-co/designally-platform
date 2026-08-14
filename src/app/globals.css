@@ -412,31 +412,11 @@ label.f span {
    */
 }
 
-.bar {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  height: 3px;
-  background: var(--divider);
-}
-/* Nothing on the welcome screen has progressed or can be gone back to, so
-   neither the bar nor the chevrons appear there. A 0% bar reads as something
-   broken, and an up arrow with nowhere to go is a control that lies. Start is
-   the only way out of that slide, which is the point of it. */
-.survey-shell.at-welcome .bar {
-  background: transparent;
-}
-/* scaleX rather than width: this now moves on every one of twenty-one
-   advances instead of five, and animating width relayouts the page each time. */
-.bar i {
-  display: block;
-  height: 100%;
-  width: 100%;
-  transform: scaleX(0);
-  transform-origin: left;
-  background: var(--primary-mark);
-  transition: transform 0.55s var(--ease);
-}
+/* The sticky progress bar is gone — the Cut under each question's masthead
+   measures the same thing in the brand's own object. Its three rules went with
+   it, and so did `.at-welcome`, whose only job was suppressing the bar on the
+   welcome screen: that screen renders its own section with no chevrons, so
+   there was never anything else for the class to hide. */
 
 .sform {
   max-width: 660px;
@@ -3108,12 +3088,74 @@ dialog::backdrop {
   line-height: 1.6;
 }
 
-/* the Edge doing the work the two blank lines were doing */
+/**
+ * The Cut, sitting on the Edge.
+ *
+ * This was a plain hairline, on the reasoning that an orange rule here would
+ * be a fourth accent and would spend what the Cut is saved for. That objection
+ * was to an orange *divider*, which the CI does forbid — "rules are never
+ * orange, because an orange line is the Cut, and the Cut means something."
+ *
+ * It does not apply to the Cut itself, because the Cut is not a rule: it is a
+ * segment, 88px by 2px, left-aligned, and it closes nothing. So both are here,
+ * doing the two different jobs they are each for — the Edge runs the full width
+ * and gives the masthead its floor, and the Cut sits on its left end and says
+ * the card begins. One per layout, which is one per question.
+ *
+ * The Cut keeps the pure CI orange rather than the measured action orange.
+ * Nothing sits on it, nothing is read from it, and it is not a control, so it
+ * carries no contrast obligation — only weight.
+ */
 .qrule {
+  position: relative;
   display: block;
-  height: 1px;
-  background: var(--hairline);
+  height: var(--cut-width);
   margin-bottom: 17px;
+}
+.qrule::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  height: 1px;
+  transform: translateY(-50%);
+  background: var(--hairline);
+}
+/**
+ * …and the Cut is how far in you are.
+ *
+ * The CI's motion tokens define `--transition-cut: width …`, which is the
+ * system saying that a line otherwise fixed at 88px was always meant to grow.
+ * So this replaced the separate bar at the top of the viewport: one mark
+ * instead of two, sitting where the card begins rather than floating above it,
+ * and it is the brand's own object rather than borrowed chrome.
+ *
+ * `--cut-length` is the *start*, not a floor. A truthful 0–100% would put
+ * question one at a 16px stub that reads as a rendering fault rather than a
+ * beginning, but clamping to `max(88px, …)` was worse: it froze the Cut at 88px
+ * for the first five questions, so a quarter of the survey gave no feedback at
+ * all. The progress is mapped onto the range instead — the Cut opens at the
+ * length the CI gives it and grows across what is left, so it moves on every
+ * single question and still lands exactly full on the last one, which is the
+ * part a person actually reads off it.
+ */
+.qrule::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: var(--cut-width);
+  width: calc(
+    var(--cut-length) + var(--cut-progress, 1) * (100% - var(--cut-length))
+  );
+  max-width: 100%;
+  background: var(--cut);
+  transition: width var(--dur-slow, 380ms) var(--ease);
+}
+@media (prefers-reduced-motion: reduce) {
+  .qrule::after {
+    transition: none;
+  }
 }
 .slide .qhelp {
   display: block;
