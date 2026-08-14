@@ -1,61 +1,105 @@
 @import "tailwindcss";
 
 /* ============================================================
-   Tokens — DESIGN.md §1–3.
+   Tokens — the Designally CI, mapped onto this product's names.
+
+   Adopted 14 August 2026 from the branding team's design system.
+   The CI's five named colours are carried verbatim. Everything
+   derived from them is solved rather than copied, because this
+   product holds a 4.5:1 floor on every colour that carries text
+   and three of the system's semantic tones do not clear it.
+
+   Where a value here differs from the design system, the hue and
+   chroma are the system's and only the lightness moved — the same
+   correction this file already applied to its own green. Each one
+   is marked CI-DIVERGENCE with the measurement that forced it.
+
    One accent. It means "a person is needed here". Nothing
    decorative uses it. There are no shadows in this product;
    the focus ring is the single exception.
    ============================================================ */
 :root {
-  /* action */
-  --primary: #0066cc;
-  --primary-focus: #0071e3;
-  --primary-on-dark: #2997ff;
-  --primary-tint: #e8f1fb;
-  --primary-deep: #004f9e;
+  /* ---- the five CI colours, exactly as issued ---- */
+  --orange-500: #ef6148;
+  --charcoal-900: #1b1d23;
+  --steel-500: #112d4a;
+  --warm-white: #f3f3f3;
+  --stone-500: #aaaaaa;
 
-  /* ink */
-  --ink: #1d1d1f;
-  --ink-2: #333333;
-  /* DESIGN.md names #7a7a7a here and says it meets 4.5:1. It does not — 3.94:1
-     on parchment and 4.29:1 on white. This is Apple's own secondary label
-     colour, which clears 4.5:1 on both (4.66 / 5.07). See DESIGN.md §1. */
-  --ink-3: #6e6e73;
+  /* ---- action ----
+     The CI makes orange the primary button. Its own token for the
+     label is #ffffff, which measures 3.24:1 on #ef6148 and cannot
+     carry a 17px label. Charcoal on the same orange is 5.19:1, and
+     the CI already says a control that is *on* goes charcoal rather
+     than orange, so the correction is the system's own logic. */
+  --primary: var(--orange-500);
+  --on-primary: var(--charcoal-900); /* CI-DIVERGENCE: white is 3.24:1 */
+  --primary-deep: #d2472e; /* hover darkens, never lightens */
+
+  /**
+   * The rule this product uses for orange: **a fill is CI-exact, a line or a
+   * mark is measured.**
+   *
+   * The CI orange is 2.92:1 on the warm-white page. As a button or a bar that
+   * is fine — nobody has to resolve its edge to read it, and its own label
+   * carries the contrast. As a 1px control boundary, a 6px status dot or a
+   * line of text it is the only thing carrying the meaning, and 2.92 is under
+   * both the 4.5:1 text floor and the 3:1 a control boundary needs. The Thai
+   * toggle on the survey was exactly this: a button whose only edge measured
+   * 2.92 against the page behind it.
+   *
+   * CI-DIVERGENCE: the system's own --text-accent is orange-600 #d95039 =
+   * 3.67:1 and cannot carry text either. Hue (32°) and chroma held, lightness
+   * 0.612 → 0.562. On a dark Field this lightens instead of darkening.
+   */
+  --primary-mark: #c73f29;
+  --primary-tint: #fff0ec;
+  /* focus is steel, never orange — an orange ring would read as a Cut */
+  --primary-focus: var(--steel-500);
+  --primary-on-dark: #ff8f7a;
+
+  /* ink — the CI's neutral ramp, hued 265° toward the steel Field */
+  --ink: var(--charcoal-900);
+  --ink-2: #262a30;
+  --ink-3: #53575e;
   --on-dark: #ffffff;
-  --body-muted: #cccccc;
+  --body-muted: #b9bcc2;
 
   /* surface */
   --canvas: #ffffff;
-  --parchment: #f5f5f7;
-  --pearl: #fafafc;
+  --parchment: var(--warm-white);
+  --pearl: #fafaf9;
   /* the neutral control fill — an icon button with no label to carry it */
-  --fill: #dedee1;
-  --fill-deep: #d4d4d8;
-  --fill-press: #c8c8cd;
-  /* the glyph that sits on that fill — ink-3 is tuned to the page, and on a
-     grey disc it measures 3.83:1 and reads pale. This is 4.92:1 there. */
-  --glyph: #5c5c61;
-  --tile: #272729;
-  /* named in DESIGN.md section 1 and never defined here */
+  --fill: #dcdee2;
+  --fill-deep: #cecfd3;
+  --fill-press: #bdbfc5;
+  /* the glyph that sits on that fill: 4.99:1 there, 6.54:1 on the page */
+  --glyph: #53575e;
+  /* the dark Field. The CI names three; this is the near-black one. */
+  --tile: #0b0d12;
+  --tile-raised: var(--charcoal-900);
   --surface-black: #000000;
 
-  /* line */
-  --hairline: #e0e0e0;
-  --divider: #f0f0f0;
+  /* line — "The Edge": thin, quiet, just enough structure for order */
+  --hairline: #cecfd3;
+  --divider: #e6e8eb;
+  /* The Cut: one orange line per layout. Never a rule, never a divider. */
+  --cut: var(--orange-500);
+  --cut-width: 2px;
+  --cut-length: 88px;
 
-  /* semantic — text and thin tints only, never fills, never buttons */
-  /**
-   * Darkened 14 August 2026 from #248a3d, which could not legally carry text
-   * anywhere: 4.40:1 on canvas, 4.04 on parchment, 4.02 on its own tint. The
-   * line above says these tones are for text, and this one was unable to be.
-   * Same hue (135°) and saturation; only lightness moved. Now 5.53 / 5.08 / 5.06.
-   */
-  --affirm: #1f7835;
-  --caution: #c93400;
-  --critical: #d70015;
-  --affirm-tint: #eef7f1;
-  --caution-tint: #fdf1ec;
-  --critical-tint: #fdeff0;
+  /* semantic — text and thin tints only, never fills, never buttons.
+     CI-DIVERGENCE, all three: the system's status tones are specified
+     without being measured against the surface they sit on, and none
+     clears 4.5:1 there — done #329568 is 3.36, warn #e39f2c is 2.04,
+     danger #d72d34 is 4.39. Hue and chroma held, lightness solved so
+     each clears 4.5:1 on the page, on white, and on its own tint. */
+  --affirm: #107f54;
+  --caution: #a06000;
+  --critical: #d32830;
+  --affirm-tint: #e5f7ec;
+  --caution-tint: #fff1da;
+  --critical-tint: #ffedeb;
 
   /* space — 8px base, DESIGN.md §3. md is 17px and that is not a mistake. */
   --sp-xxs: 4px;
@@ -67,18 +111,82 @@
   --sp-xxl: 48px;
   --sp-section: 80px;
 
-  /* radii — 8, 11, 18, pill. Nothing between. */
+  /* radii — 8, 11, 18, pill. Nothing between.
+     CI-DIVERGENCE, deliberate and whole: the design system is Swiss-sharp and
+     sets --radius-card and --radius-control to 2px, reserving full rounding
+     for the graphic system's points and for Badge. This product keeps its
+     rounded shape language — the pill primary and the disc back control —
+     because the survey is answered one card at a time on a phone, where the
+     pill is the affordance the thumb aims at. Colour, type and the brand
+     marks carry the CI here; shape is this product's own. Studio decision,
+     14 August 2026. */
   --r-sm: 8px;
   --r-md: 11px;
   --r-lg: 18px;
   --r-pill: 9999px;
 
-  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  /* motion — calm and mechanical. Nothing overshoots, nothing bounces. */
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-standard: cubic-bezier(0.22, 0.61, 0.36, 1);
 
-  /* Latin runs in Inter or genuine SF Pro; Thai codepoints fall through to
-     Noto Sans Thai per glyph. Never split a bilingual string across elements. */
-  --font: var(--font-inter), system-ui, -apple-system, "SF Pro Text",
-    var(--font-noto-thai), "Noto Sans Thai", sans-serif;
+  /* Zalando Sans carries Latin display; it has no Thai, whatever the design
+     system's readme says, so Thai display falls through to IBM Plex Sans Thai
+     per glyph. Poppins carries Latin body and falls through the same way.
+     Never split a bilingual string across elements — the fallback is per
+     codepoint and does the right thing inside one run of text. */
+  --font-display: var(--font-zalando), var(--font-plex-thai), system-ui, sans-serif;
+  --font: var(--font-poppins), var(--font-plex-thai), system-ui, -apple-system, sans-serif;
+}
+
+/* ============================================================
+   The dark Field.
+
+   The CI names three Fields — near-black, warm off-white, steel
+   grey-blue — and scopes them with [data-field], so this uses the
+   system's own attribute rather than a class of our invention:
+   anything built to these tokens can be dropped onto a dark
+   subtree later without knowing it moved.
+
+   Only the semantic names are remapped. No component below reads
+   a Field colour directly, which is what makes one attribute on
+   one wrapper enough.
+
+   CI-DIVERGENCE — the focus ring. The system's dark block remaps
+   the links and the edges but leaves --edge-focus at steel-500,
+   which measures 1.39:1 against the near-black page: the ring is
+   invisible on the one Field the system's own survey kit uses for
+   its welcome screen, where a keyboard user arrives first. Here
+   it lifts to a steel-200 at 10.87:1. Same hue, same role.
+   ============================================================ */
+[data-field="dark"] {
+  /* Remapping the tokens is not enough on its own. Anything that *inherits*
+     its colour — a bare h1 — inherits it from <body>, which is outside this
+     subtree, so it keeps the light Field's charcoal and lands at 1.15:1 on
+     near-black. The Field has to restate the inherited colour itself. */
+  color: var(--ink);
+
+  --parchment: var(--tile);
+  --canvas: var(--tile-raised);
+  --pearl: #262a30;
+
+  --ink: var(--warm-white); /* 17.51:1 */
+  --ink-2: #e0e2e5; /* 14.97:1 */
+  --ink-3: #919399; /* 6.33:1  */
+  --body-muted: var(--stone-500); /* 8.37:1  */
+
+  --hairline: #2b2f35;
+  --divider: #1f2229;
+
+  /* orange lightens on a dark ground rather than darkening */
+  --primary-mark: var(--primary-on-dark); /* 8.76:1 */
+  --primary-tint: #34211d;
+  --primary-focus: #a9c4e8; /* 10.87:1, was 1.39:1 */
+
+  /* the icon disc, inverted: a light glyph on a raised dark fill */
+  --fill: #2b2f35;
+  --fill-deep: #363b42;
+  --fill-press: #434850;
+  --glyph: #cecfd3;
 }
 
 *,
@@ -99,8 +207,27 @@ body {
   color: var(--ink);
   font-size: 17px;
   line-height: 1.44;
-  letter-spacing: -0.374px;
+  /* was -0.374px, which is SF Pro's own optical tracking. Poppins is a
+     geometric sans with wider sidebearings and does not want it, and any
+     negative tracking on a bilingual line collapses Thai tone marks into the
+     glyph above — DESIGN.md §2. Display type takes its tracking below. */
+  letter-spacing: 0;
   -webkit-font-smoothing: antialiased;
+}
+
+/* The CI sets display, headings and button labels in Zalando Sans and body
+   copy in Poppins. Only the family and tracking come from the CI here; every
+   size in this file is this product's own and does not move. */
+h1,
+h2,
+h3,
+h4,
+.btn {
+  font-family: var(--font-display);
+  letter-spacing: -0.015em;
+}
+h1 {
+  letter-spacing: -0.03em;
 }
 
 button,
@@ -125,13 +252,13 @@ textarea {
 
 /* ============================================================
    Buttons — DESIGN.md §5. Pill radius is the action signal.
-   Weights are 300 / 400 / 600 / 700. 500 is absent.
+   The CI sets button labels in Zalando Sans at Medium 500.
    ============================================================ */
 .btn {
-  font-family: inherit;
+  font-family: var(--font-display);
   font-size: 17px;
-  font-weight: 400;
-  letter-spacing: -0.374px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
   cursor: pointer;
   border: 1px solid transparent;
   border-radius: var(--r-pill);
@@ -149,7 +276,9 @@ textarea {
 }
 .btn-primary {
   background: var(--primary);
-  color: var(--on-dark);
+  /* charcoal, not white: white on the CI orange is 3.24:1 and this label runs
+     at 17px. Charcoal on the same orange is 5.19:1. */
+  color: var(--on-primary);
 }
 @media (hover: hover) {
   .btn-primary:hover {
@@ -158,8 +287,8 @@ textarea {
 }
 .btn-quiet {
   background: transparent;
-  border-color: var(--primary);
-  color: var(--primary);
+  border-color: var(--primary-mark);
+  color: var(--primary-mark);
 }
 @media (hover: hover) {
   .btn-quiet:hover {
@@ -269,7 +398,7 @@ label.f span {
   width: 100%;
   transform: scaleX(0);
   transform-origin: left;
-  background: var(--primary);
+  background: var(--primary-mark);
   transition: transform 0.55s var(--ease);
 }
 
@@ -289,16 +418,33 @@ label.f span {
   margin-bottom: 38px;
   flex-wrap: wrap;
 }
+/**
+ * The Wordmark — one of the CI's five named pieces.
+ *
+ * "Always DESIGNALLY. in full caps with an orange period." This was a
+ * two-weight lockup, bold "Design" and regular "ally", which is not a form the
+ * CI has; and it had no period, which the brand treats as content rather than
+ * punctuation — the full stop is the completion the name is claiming.
+ *
+ * The <em> stays in the markup and stops carrying weight, so five call sites
+ * did not have to change to fix one lockup.
+ */
 .wordmark {
+  font-family: var(--font-display);
   font-weight: 700;
-  font-size: 17px;
-  letter-spacing: -0.374px;
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
   white-space: nowrap;
 }
 .wordmark em {
   font-style: normal;
-  font-weight: 400;
+  font-weight: inherit;
   color: inherit;
+}
+.wordmark::after {
+  content: ".";
+  color: var(--primary-mark);
 }
 .sform .head .proj {
   font-size: 13px;
@@ -419,7 +565,7 @@ label.f span {
   flex-shrink: 0;
 }
 .pickone.sel {
-  border-color: var(--primary);
+  border-color: var(--primary-mark);
   background: var(--primary-tint);
 }
 .pickone b {
@@ -502,12 +648,12 @@ label.f span {
 }
 @media (hover: hover) {
   .pts button:hover i {
-    border-color: var(--primary);
+    border-color: var(--primary-mark);
   }
 }
 .pts button[aria-pressed="true"] i {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-mark);
+  border-color: var(--primary-mark);
   transform: scale(1.14);
 }
 
@@ -575,7 +721,7 @@ label.f span {
   }
 }
 .chip[aria-pressed="true"] {
-  border: 2px solid var(--primary);
+  border: 2px solid var(--primary-mark);
   padding: 9px 16px;
 }
 .chipn {
@@ -631,13 +777,13 @@ label.f span {
   align-items: center;
   font-family: inherit;
   font-size: 14px;
-  color: var(--primary);
+  color: var(--primary-mark);
   background: transparent;
   /* The ghost pill from DESIGN.md section 5, which is what this is: the second
      action on the screen. It was a word with a hairline under it — legible if
      you were looking for it, and easy to miss if you were not, which for a Thai
      reader is the difference between a bilingual survey and an English one. */
-  border: 1px solid var(--primary);
+  border: 1px solid var(--primary-mark);
   border-radius: var(--r-pill);
   padding: 6px 14px;
   /* it overlapped the question by 2px as a bare word; as a pill it needs the
@@ -794,7 +940,7 @@ label.f span {
    an unanswered question is precisely "a person is needed here" */
 @media (hover: hover) {
   .blanklist button:hover span {
-    color: var(--primary);
+    color: var(--primary-mark);
   }
 }
 .blanklist b {
@@ -848,7 +994,7 @@ label.f span {
 /* Selection is a 2px border, as everywhere else. The padding compensates so
    nothing shifts when it thickens (DESIGN.md §5). */
 .board.sel {
-  border: 2px solid var(--primary);
+  border: 2px solid var(--primary-mark);
 }
 .board img {
   display: block;
@@ -888,7 +1034,7 @@ label.f span {
 }
 .board input:checked {
   background: var(--primary);
-  border-color: var(--on-dark);
+  border-color: var(--on-primary);
 }
 .board:has(input:checked)::after {
   content: '';
@@ -898,7 +1044,7 @@ label.f span {
   z-index: 3;
   width: 6px;
   height: 11px;
-  border: solid var(--on-dark);
+  border: solid var(--on-primary);
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
   pointer-events: none;
@@ -1041,8 +1187,10 @@ label.f span {
 .client-surface .step h2 {
   letter-spacing: -0.02em;
 }
+/* The wordmark is Latin-only and set in caps, where the tracking is the
+   lockup rather than an optical correction — so it keeps it here. */
 .client-surface .wordmark {
-  letter-spacing: -0.01em;
+  letter-spacing: 0.07em;
 }
 
 /* ============================================================
@@ -1181,7 +1329,7 @@ label.f span {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-mark);
   flex-shrink: 0;
 }
 .work .say {
@@ -1486,7 +1634,7 @@ label.f span {
 }
 /* the accent marks what is chosen, never what is hovered */
 .iversions li.on .pick b {
-  color: var(--primary);
+  color: var(--primary-mark);
 }
 .iversions .drop {
   border: 0;
@@ -1517,7 +1665,7 @@ label.f span {
   background: none;
   padding: 0;
   font: inherit;
-  color: var(--primary);
+  color: var(--primary-mark);
   cursor: pointer;
   text-decoration: underline;
   text-underline-offset: 2px;
@@ -1623,7 +1771,7 @@ label.f span {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-mark);
   flex-shrink: 0;
 }
 .ptable .c-sub {
@@ -1665,7 +1813,7 @@ label.f span {
   background: var(--ink-2);
 }
 .stage i.now {
-  background: var(--primary);
+  background: var(--primary-mark);
 }
 
 @media (max-width: 820px) {
@@ -1729,7 +1877,7 @@ label.f span {
   display: block;
   font-size: 17px;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-mark);
   letter-spacing: -0.374px;
   margin-bottom: 3px;
 }
@@ -1839,7 +1987,7 @@ dialog::backdrop {
   font-size: 11.5px;
   font-weight: 700;
   letter-spacing: 0.05em;
-  color: var(--primary-deep);
+  color: var(--primary-mark);
   margin-bottom: var(--sp-xs);
 }
 .pd-now p {
@@ -1922,7 +2070,7 @@ dialog::backdrop {
   background: var(--ink-2);
 }
 .tl li.now::before {
-  background: var(--primary);
+  background: var(--primary-mark);
 }
 .tl li.next {
   color: var(--ink-3);
@@ -2122,7 +2270,7 @@ dialog::backdrop {
 .q .txt .cfg {
   display: block;
   font-size: 12.5px;
-  color: var(--primary-deep);
+  color: var(--primary-mark);
   margin-top: 2px;
 }
 .qtype {
@@ -2171,7 +2319,7 @@ dialog::backdrop {
 }
 @media (hover: hover) {
   .past .o:hover {
-    color: var(--primary);
+    color: var(--primary-mark);
   }
 }
 
@@ -2187,7 +2335,7 @@ dialog::backdrop {
   padding: 17px 20px;
 }
 .rm.live {
-  border-color: var(--primary);
+  border-color: var(--primary-mark);
 }
 .rmtop {
   display: flex;
@@ -2210,7 +2358,7 @@ dialog::backdrop {
 }
 .rmtag.on {
   background: var(--primary-tint);
-  color: var(--primary-deep);
+  color: var(--primary-mark);
 }
 .rm p {
   font-size: 14px;
@@ -2518,7 +2666,7 @@ dialog::backdrop {
   height: 24px;
   border-radius: 50%;
   background: var(--primary-tint);
-  color: var(--primary-deep);
+  color: var(--primary-mark);
   font-size: 12.5px;
   font-weight: 600;
   display: flex;
@@ -2598,7 +2746,7 @@ dialog::backdrop {
   font-size: 10.5px;
   font-weight: 700;
   letter-spacing: 0.04em;
-  color: var(--primary-deep);
+  color: var(--primary-mark);
   background: var(--primary-tint);
   border-radius: var(--r-pill);
   padding: 3px 9px;
@@ -2669,12 +2817,12 @@ dialog::backdrop {
 }
 @media (hover: hover) {
   .pts-wide button:hover span {
-    border-color: var(--primary);
+    border-color: var(--primary-mark);
   }
 }
 .pts-wide button[aria-pressed='true'] span {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-mark);
+  border-color: var(--primary-mark);
   color: var(--on-dark);
   font-weight: 600;
 }
@@ -2833,7 +2981,7 @@ dialog::backdrop {
 .slide .input:focus,
 .slide .textarea:focus {
   outline: 0;
-  border-bottom-color: var(--primary);
+  border-bottom-color: var(--primary-mark);
 }
 .slide .input::placeholder,
 .slide .textarea::placeholder {

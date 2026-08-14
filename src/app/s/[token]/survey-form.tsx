@@ -427,7 +427,11 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   if (submitted) {
     return (
       <LangContext.Provider value={LEAD}>
-        <div className="survey-shell client-surface">
+        {/* The dark Field. The CI reserves it for a moment of drama, and
+            DESIGN.md independently reserves it for exactly these two screens —
+            the welcome and the completion. Everything between them stays on
+            warm white so the answers are the loudest thing on the page. */}
+        <div className="survey-shell client-surface" data-field="dark">
           {/* the floor controls are revealed by data-active, and there is only
               ever one screen — without it the only action here was invisible */}
           <div className="slide" data-active="" data-dir="next">
@@ -558,7 +562,11 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
 
   return (
     <LangContext.Provider value={LEAD}>
-      <div className={`survey-shell client-surface${step === WELCOME ? ' at-welcome' : ''}`}>
+      <div
+        className={`survey-shell client-surface${step === WELCOME ? ' at-welcome' : ''}`}
+        /* the welcome only — the questions themselves stay on warm white */
+        data-field={step === WELCOME ? 'dark' : undefined}
+      >
         <div className="bar" aria-hidden="true">
           <i style={{ transform: `scaleX(${Math.min(step / STOPS, 1)})` }} />
         </div>

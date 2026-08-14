@@ -1,5 +1,30 @@
 # Design System — Designally Platform
 
+**The brand is the Designally CI. The chassis is the Apple analysis.** 14 August 2026.
+
+The branding team issued a design system built from the 2026 CI spin-off. Its colour, its
+three typefaces, its five named brand pieces and its voice now govern this product, and
+this document records them. What did **not** change is the structure underneath: the
+parchment inversion, one accent meaning "a person is needed here", borders instead of
+shadows, the Thai leading rule, and the two volumes — marketing for the client survey,
+store-and-configurator for the team app. The CI describes itself as *a container, not a
+look*, and its mood is "expansive, intelligent, timeless"; there was no conflict to
+resolve between that and the minimalism already here.
+
+**Shape stayed ours, deliberately.** The CI is Swiss-sharp and sets card and control
+radius to 2px, reserving full rounding for the graphic system's points and for Badge.
+This product keeps the pill primary and the disc back control, because the survey is
+answered one card at a time on a phone where the pill is what the thumb aims at. Studio
+decision. Colour, type and the brand marks carry the CI here; shape does not.
+
+**Every colour derived from the CI is measured, not copied.** This product holds 4.5:1 on
+anything carrying text and 3:1 on any control boundary, and several of the system's own
+derived tokens do not clear that — its accent text tone, all three status tones, and its
+focus ring on its own dark Field. Where a value here differs, the hue and chroma are the
+CI's and only the lightness moved. Each is marked **CI-DIVERGENCE** in `globals.css` with
+the measurement that forced it. These are listed in §1 and are worth sending back to the
+branding team; they are defects in the system, not disagreements with it.
+
 Derived from the Apple design analysis. This document is the build reference; where it departs from the source analysis, the departure is stated and justified.
 
 Two things had to be resolved before the Apple system could be used here:
@@ -12,36 +37,80 @@ Two things had to be resolved before the Apple system could be used here:
 
 ## 1 · Colour
 
-Adopted from the source almost unchanged. One accent, no gradients, no decorative colour.
+The CI's five named colours, and nothing invented beside them. One accent, no gradients,
+no decorative colour.
 
 ```css
-/* action */
---primary          #0066cc   /* Action Blue — every interactive element */
---primary-focus    #0071e3   /* focus ring only */
---primary-on-dark  #2997ff   /* links on dark surfaces */
+/* the five, exactly as the CI issues them */
+--orange-500       #ef6148   /* Designally Orange — energy, originality */
+--charcoal-900     #1b1d23   /* trust and structure; all display type */
+--steel-500        #112d4a   /* the strategic note: links, focus, info */
+--warm-white       #f3f3f3   /* the default page */
+--stone-500        #aaaaaa   /* the resting state of a point or rule */
 
-/* ink */
---ink              #1d1d1f   /* headlines, body, dark buttons */
---ink-muted-80     #333333   /* secondary text */
---ink-muted-48     #6e6e73   /* meta, disabled, fine print */
+/* action */
+--primary          var(--orange-500)     /* fills only: the button, the bar */
+--on-primary       var(--charcoal-900)   /* its label — see below */
+--primary-mark     #c73f29   /* orange as a line, a dot, or text */
+--primary-deep     #d2472e   /* hover darkens, never lightens */
+--primary-focus    var(--steel-500)      /* focus is steel, never orange */
+--primary-on-dark  #ff8f7a
+
+/* ink — the CI's neutral ramp, hued 265° toward the steel Field */
+--ink              var(--charcoal-900)
+--ink-muted-80     #262a30
+--ink-muted-48     #53575e   /* was #6e6e73; the CI ramp is darker here */
 --on-dark          #ffffff
---body-muted       #cccccc   /* secondary text on dark */
+--body-muted       #b9bcc2
 
 /* surface */
 --canvas           #ffffff   /* raised: cards, sheets, inputs */
---canvas-parchment #f5f5f7   /* the page */
---surface-pearl    #fafafc   /* ghost button fill */
---surface-fill     #dedee1   /* icon-button fill */
---surface-fill-deep #d4d4d8  /* its hover */
---surface-fill-press #c8c8cd /* its press */
---glyph            #5c5c61   /* an icon sitting on that fill */
---surface-tile-1   #272729   /* dark tile */
+--canvas-parchment var(--warm-white)     /* the page */
+--surface-pearl    #fafaf9
+--surface-fill     #dcdee2  /* icon-button fill */
+--surface-fill-deep #cecfd3 /* its hover */
+--surface-fill-press #bdbfc5 /* its press */
+--glyph            #53575e   /* an icon sitting on that fill */
+--surface-tile-1   #0b0d12   /* the dark Field */
 --surface-black    #000000   /* true void — rare */
 
-/* line */
---hairline         #e0e0e0   /* card and input borders */
---divider-soft     #f0f0f0   /* internal dividers, ghost button ring */
+/* line — "The Edge" */
+--hairline         #cecfd3   /* card and input borders */
+--divider-soft     #e6e8eb   /* internal dividers, ghost button ring */
+--cut              var(--orange-500)  /* The Cut. Never a rule, never a divider. */
 ```
+
+**A fill is CI-exact; a line or a mark is measured.** The CI orange is 2.92:1 on the warm
+white page. As a button or a progress bar that is fine — nothing has to resolve its edge,
+and its own label carries the contrast. As a 1px control boundary, a 6px status dot, or a
+line of text it *is* the meaning, and 2.92 clears neither the 4.5:1 text floor nor the
+3:1 a control boundary needs. So `--primary` fills and `--primary-mark` draws. The Thai
+toggle on the survey was the case that proved it: a button whose only edge measured 2.92
+against the page behind it.
+
+**The primary button's label is charcoal, not white.** White on `#ef6148` is 3.24:1 and
+this label runs at 17px. Charcoal on the same orange is 5.19:1, and the CI already says a
+control that is *on* goes charcoal rather than orange, so the correction is the system's
+own logic rather than a departure from it.
+
+### CI-DIVERGENCE — five measurements to send back
+
+Hue and chroma are the CI's in every case; only lightness moved.
+
+| CI token | CI value | Measured | Used here |
+|---|---|---|---|
+| `--text-accent` | `#d95039` | 3.67:1 on page | `#c73f29` — 4.54 |
+| `--status-done` | `#329568` | 3.36:1 | `#107f54` — 4.52 |
+| `--status-warn` | `#e39f2c` | **2.04:1** | `#a06000` — 4.54 |
+| `--status-danger` | `#d72d34` | 4.39:1 | `#d32830` — 4.60 |
+| `--edge-focus` on `[data-field="dark"]` | `#112d4a` | **1.39:1** | `#a9c4e8` — 10.87 |
+
+The last one is the one that matters most: the CI's dark Field remaps its links and its
+edges but not its focus ring, so the ring is invisible on the one Field the system's own
+survey kit uses for its welcome screen — where a keyboard user arrives first.
+
+**Zalando Sans has no Thai.** The system's readme says it covers Latin and Thai; Google
+publishes it in latin, latin-ext and vietnamese only. See §2.
 
 **The parchment inversion.** The page is `--canvas-parchment` (#f5f5f7) and raised surfaces are pure white. This is the single most important structural borrowing: *surface change is the hierarchy*. Cards lift off the page because they are lighter, not because they have a shadow.
 
@@ -95,26 +164,42 @@ Use them for text and thin tint backgrounds only. Never as fills, never on butto
 
 ## 2 · Typography
 
-### The pairing
+### The three faces
 
-SF Pro renders no Thai. The stack is:
-
-```css
---font-latin: "Inter", system-ui, -apple-system, "SF Pro Text", sans-serif;
---font-thai:  "Noto Sans Thai", "IBM Plex Sans Thai", sans-serif;
-```
-
-`system-ui, -apple-system` resolves to genuine SF Pro on macOS, iOS and Safari — most of your team and many Thai clients on iPhone get the real face. Inter carries every other platform; the source analysis names it as the correct substitute.
-
-Thai runs in **Noto Sans Thai**, which shares Inter's proportions and x-height closely enough to sit on the same line without a visible step. IBM Plex Sans Thai is an acceptable alternative — you already have it in another project — but it runs slightly wider and needs testing in mixed lines.
-
-Apply both together so mixed strings resolve per-glyph:
+The CI names three, and Thai decides how they combine:
 
 ```css
-font-family: var(--font-latin), var(--font-thai);
+--font-display: var(--font-zalando),  var(--font-plex-thai), system-ui, sans-serif;
+--font:         var(--font-poppins),  var(--font-plex-thai), system-ui, sans-serif;
 ```
 
-The browser falls through to the Thai face for Thai codepoints automatically. Do not wrap Thai in a separate element to switch fonts — your bilingual strings sit on one line (`Start · เริ่มทำแบบสอบถาม`) and splitting them breaks the baseline.
+- **Zalando Sans** — display, headings, every button and UI label.
+- **Poppins** — Latin body copy. The CI sets it Light 300.
+- **IBM Plex Sans Thai** — Thai body *and* Thai display.
+
+**Zalando Sans has no Thai, whatever the system's readme says.** Google publishes it in
+latin, latin-ext and vietnamese; `next/font`'s own font data agrees. Thai display
+therefore resolves to IBM Plex Sans Thai at **700 — a real weight, not a synthesised
+one**, because faux-bolding Thai thickens the tone marks into the glyph above, which is
+the exact defect §2's leading rule exists to prevent.
+
+The fallback is per codepoint, so a bilingual string resolves correctly inside one run of
+text. Never wrap Thai in its own element to "help" it — `Start · เริ่มทำแบบสอบถาม` sits on
+one line and splitting it breaks the baseline.
+
+**All three are self-hosted through `next/font`.** The design system loads them from
+Google Fonts through an `@import` inside a stylesheet, which is the worst available shape
+here: a CSS `@import` is serialised, so the browser fetches the stylesheet, parses it, and
+only then discovers the fonts — and the survey is answered on a phone, in Thai, on a poor
+connection, by somebody with no reason to wait. `next/font` self-hosts at build time,
+splits by `unicode-range` (a Thai reader pulls ~61 KB, an English one ~45 KB), preloads
+from our own origin, and generates a metric-matched fallback so the page does not reflow
+when the real face swaps in.
+
+**Body tracking is 0.** It was `-0.374px`, which is SF Pro's own optical tracking; Poppins
+is a geometric sans with wider sidebearings and does not want it, and negative tracking on
+any bilingual line collapses Thai tone marks. Display type takes `-0.03em`, and the client
+surface overrides even that to 0 — see the tracking floor later in this section.
 
 **Inter adjustments from the source:** nudge display letter-spacing down a further `-0.01em`, and tighten body line-height from 1.47 to 1.44. Inter's tracking is wider and its x-height taller than SF Pro's.
 

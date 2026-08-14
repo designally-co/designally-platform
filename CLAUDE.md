@@ -89,6 +89,28 @@ with the website track. `reference/flow-map.html` still draws the old branch aft
 
 `DESIGN.md` is the complete system — colour, type, Thai typography rules, spacing, every component spec, and the anti-patterns list. Read it before building any screen. Do not infer visual decisions from other repos.
 
+**The brand is the Designally CI, adopted 14 August 2026** from the branding team's design
+system (`claude.ai/design`, "Designally Design System"). Colour, the three typefaces, the
+five named brand pieces and the voice come from there. The structure underneath does not:
+the parchment inversion, the accent rule, borders-not-shadows, the Thai leading rule and
+the two volumes are this product's own and survived unchanged. The CI calls itself *a
+container, not a look*, and its mood is "expansive, intelligent, timeless" — there was no
+conflict with the minimalism already here.
+
+Three things to know before touching colour or type:
+
+- **Shape is not the CI's.** It sets card and control radius to 2px; this product keeps the
+  pill primary and the disc back control, because the survey is answered one card at a
+  time on a phone. Deliberate, and recorded at the radii tokens.
+- **A fill is CI-exact; a line or a mark is measured.** The CI orange is 2.92:1 on the page —
+  fine as a button, illegal as a control boundary, a status dot or text. `--primary`
+  fills, `--primary-mark` draws.
+- **Five CI values fail their own contrast and are corrected here**, hue and chroma held,
+  lightness moved. All are marked `CI-DIVERGENCE` in `globals.css` and tabulated in
+  `DESIGN.md` §1. Worth sending back to the branding team. The worst is the focus ring on
+  the dark Field at 1.39:1. Zalando Sans also does not cover Thai, though the readme says
+  it does.
+
 Three things from it that are easy to get wrong:
 
 - **The accent means "a person is needed here."** Never decorative. Accent on something nobody must act on is a defect.
