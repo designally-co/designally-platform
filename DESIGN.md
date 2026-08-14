@@ -275,6 +275,28 @@ Two things the rail changes that are easy to miss:
 **No `ch` cap on the question.** The mock set `max-width: 20ch`, which wrapped a real
 question to six lines while using half the column it had. The column is the measure.
 
+**The rail holds eye level; the question opens there and gives it up when it is long.**
+Two tokens: `--rail-top` (88px) is the least a column may sit from the top edge, and
+`--eye` — `clamp(96px, 18vh, 170px)` — is where a short card opens, a fifth of the way
+down, where the eye already is rather than where the viewport begins.
+
+A short card starting at the top edge left most of the screen empty beneath it. Opening at
+`--eye` turns that emptiness into margin and puts the question's first line level with the
+numeral. A long card cannot afford the same offset — 170px above the ten scales is 170px
+of the battery pushed off the first screen — so the tall cards open at `--rail-top`.
+
+**The rail does not move either way.** It is the one fixed thing on the screen, and a
+margin note that shifted per question would be the opposite of a reference point.
+
+Which cards are tall is declared by what they contain, not by a measured height:
+
+```css
+.slide:has(.pts), .slide:has(.board) { padding-top: var(--rail-top); }
+```
+
+`.pts` is the scale battery, `.board` is the six-image grid. A rule that names the thing
+stays true longer than a number does.
+
 ### The masthead holds the top at both widths, and stands off the edge on a laptop
 
 It is pinned everywhere — the Cut measures progress and has to stay in sight. What differs

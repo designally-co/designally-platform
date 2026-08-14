@@ -149,8 +149,17 @@
   --r-lg: 18px;
   --r-pill: 9999px;
 
-  /* where the rail and the question column both begin on a wide screen */
+  /**
+   * Where a wide screen starts reading.
+   *
+   * --rail-top is the floor: the least a column may sit from the top edge.
+   * --eye is where a short card opens, a little under a fifth of the way down,
+   * which is where the eye lands rather than where the viewport begins. A tall
+   * card falls back to --rail-top so its own length is not pushed off-screen by
+   * an offset it cannot afford.
+   */
   --rail-top: 88px;
+  --eye: clamp(96px, 18vh, 170px);
 
   /* motion — calm and mechanical. Nothing overshoots, nothing bounces. */
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
@@ -3225,7 +3234,10 @@ dialog::backdrop {
     /* not `stretch`: an item filling its own grid area has no room left to
        stick inside it, and the rail would scroll away with the question */
     align-self: start;
-    padding: var(--rail-top) 0 0;
+    /* the rail holds eye level whatever the card does — it is the one fixed
+       thing on the screen, and a margin note that moved per question would be
+       the opposite of a reference point */
+    padding: var(--eye) 0 0;
   }
 
   /* the rail stacks what the header laid out in a row */
@@ -3245,12 +3257,31 @@ dialog::backdrop {
     margin-top: 2px;
   }
 
+  /**
+   * The question opens at eye level, and at the top when it is long.
+   *
+   * A short card starting at the viewport's top edge left most of the screen
+   * empty underneath it. Opening at --eye puts the first line where the eye
+   * already is and turns that emptiness into margin.
+   *
+   * A long card cannot afford the same offset — 170px spent above the ten
+   * personality scales is 170px of the battery pushed off the first screen —
+   * so the tall cards open at --rail-top instead. Keyed off what the card
+   * *contains* rather than a measured height: `.pts` is the scale battery and
+   * `.board` is the six-image grid, and those are the two that run long. A
+   * declaration that names the thing is easier to keep true than a number.
+   */
   .survey-shell:has(> .qmast) > .slide {
     grid-column: 2;
     grid-row: 1;
-    padding: var(--rail-top) 0 40px;
+    padding: var(--eye) 0 40px;
   }
-  /* the grid owns the column width and the centring now */
+  .survey-shell:has(> .qmast) > .slide:has(.pts),
+  .survey-shell:has(> .qmast) > .slide:has(.board) {
+    padding-top: var(--rail-top);
+  }
+  /* the grid owns the column width; the padding above owns the vertical start,
+     so the card itself neither centres nor stretches */
   .survey-shell:has(> .qmast) .slidebody {
     max-width: none;
     margin: 0;
