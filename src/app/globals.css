@@ -3401,16 +3401,18 @@ dialog::backdrop {
 /**
  * The Thai half of a bilingual line, on its own line.
  *
- * Run together after a middot it wrapped mid-phrase — ไม่มีคำตอบ / ที่ผิด — and
- * a language that breaks in the middle of its own sentence reads as an
+ * Run together after a middot these wrapped mid-phrase — ไม่มีคำตอบ / ที่ผิด —
+ * and a language that breaks in the middle of its own sentence reads as an
  * afterthought rather than the other half of the sentence.
  *
  * Same size and tone as the English above it: the global `.th` is for Thai
- * *body* copy at 15px and --ink-2, which inside a 16.5px lead would have set
- * the two halves of one thought at two different weights. Scoped past both it
- * and `.client-surface .th`, which wins the leading on source order.
+ * *body* copy at 15px and --ink-2, which inside these would have set the two
+ * halves of one thought at two different sizes and two different greys. Scoped
+ * past both it and `.client-surface .th`, which wins the leading on source
+ * order.
  */
-.client-surface .intro .th {
+.client-surface .intro .th,
+.client-surface .takes .th {
   display: block;
   font-size: inherit;
   color: inherit;

@@ -191,9 +191,14 @@ its run:
 
 | Screen | Figure | Cut |
 |---|---|---|
-| Welcome | `21` — questions · about 20 minutes | 88px, the length it starts from |
+| Welcome | `21` — questions · about 20 minutes | full |
 | Question *n* | `n/21` | grown to *n* of the way across |
-| Completion | `21/21` — answered | full width |
+| Completion | `21/21` — answered | full |
+
+The welcome's Cut runs full rather than starting short. Nothing has progressed there yet,
+so a part-drawn line does not read as *none of twenty-one done* — it reads as a rule that
+failed to finish, which is why the old progress bar was hidden on that screen rather than
+shown at zero. Full, it is simply the Cut; it starts measuring on question one.
 
 That replaced prose on both ends. The welcome had the count and the time set as a sentence
 in the smallest type on the screen, under the button — the one fact a person weighs before

@@ -690,8 +690,12 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                  * and the Cut beside it is the same line that will measure the
                  * whole questionnaire, shown here at the length it starts from.
                  *
-                 * Bookends: this screen opens the Cut, the completion screen
-                 * closes it full.
+                 * The Cut runs full here, not short. Nothing has progressed
+                 * yet, so a part-drawn line is not "none of twenty-one done" —
+                 * it is a rule that failed to finish, which is the same reason
+                 * the old progress bar was hidden on this screen rather than
+                 * shown at zero. Full, it is simply the Cut, and it starts
+                 * measuring on the first question.
                  */}
                 <div className="qhead">
                   <span className="qfig">{survey.questionCount}</span>
@@ -701,7 +705,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                     <span className="th">ข้อ · ประมาณ 20 นาที</span>
                   </span>
                 </div>
-                <span className="qrule" aria-hidden="true" style={{ '--cut-progress': 0 } as CSSProperties} />
+                <span className="qrule" aria-hidden="true" style={{ '--cut-progress': 1 } as CSSProperties} />
                 <h1>Let&apos;s shape your brand, together.</h1>
                 {/**
                  * One line, and it is the only one that had to be here.
@@ -742,7 +746,8 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                   the masthead, where they are read rather than skimmed */}
               {started && (
                 <p className="takes">
-                  Your answers were saved on this device. · คำตอบของคุณถูกบันทึกไว้ในเครื่องนี้
+                  Your answers were saved on this device.
+                  <span className="th">คำตอบของคุณถูกบันทึกไว้ในเครื่องนี้</span>
                 </p>
               )}
             </div>
