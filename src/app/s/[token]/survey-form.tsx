@@ -592,11 +592,30 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
             question={card.question}
             total={survey.questionCount}
             section={card.section}
+            /**
+             * The way back to the send screen rides in the header.
+             *
+             * It used to be fixed to the top-right corner of the viewport at
+             * z-index 20, which was correct when the survey had no header —
+             * there was nothing up there to belong to. There is now, and a
+             * floating link painting on top of the masthead read as something
+             * that had come loose. In the header it is what it always was: a
+             * way out, sitting opposite the count that says where you are.
+             */
+            action={
+              fromSend ? (
+                <button className="toreview" type="button" onClick={openSend}>
+                  Back to send
+                </button>
+              ) : null
+            }
           />
         )}
 
-        {fromSend && (
-          <button className="toreview" type="button" onClick={openSend}>
+        {/* the identity card has no masthead to put it in — no number and no
+            section — so there it keeps the corner it used to live in */}
+        {fromSend && card?.kind !== 'question' && (
+          <button className="toreview floating" type="button" onClick={openSend}>
             Back to send
           </button>
         )}

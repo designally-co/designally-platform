@@ -3580,13 +3580,51 @@ dialog::backdrop {
  * than in the control row, which on a phone already holds a back arrow and a
  * full-width Continue and has no room for a third.
  */
-.toreview {
+/**
+ * The way back to the send screen — a header control now, not a floating one.
+ *
+ * It was fixed to the top-right corner at z-index 20, which was right when the
+ * survey had no header: there was nothing up there for it to belong to. The
+ * masthead is that header now, and a link painting on top of it read as
+ * something that had come loose from the page.
+ *
+ * Still no container. This is a way out, not the thing to do next, and a
+ * bordered pill up here reads as loudly as the action on the floor.
+ */
+.qhead .toreview {
+  flex: none;
+  align-self: flex-start;
+  /* the section label starts 7px down; this sits on the same line as its first */
+  margin-top: 7px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink-3);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: color 0.18s;
+  position: relative;
+}
+/* 13px of text is not a touch target; the hit area is 44px without the label
+   growing to match — the same trick the Thai toggle uses */
+.qhead .toreview::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(44px, 100%);
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+
+/* the identity card has no masthead, so there it keeps its old corner */
+.toreview.floating {
   position: fixed;
   top: 8px;
   right: 26px;
   z-index: 20;
-  /* no container: this is a way out, not the thing to do next, and a bordered
-     pill up here read as loudly as the action on the floor of the slide */
   padding: 12px 0;
   border: 0;
   background: none;
@@ -3621,7 +3659,8 @@ dialog::backdrop {
        the action sits near the floor instead of hovering above dead ground */
     padding: 56px 22px 28px;
   }
-  .toreview {
+  /* only the identity card's floating variant has a corner to sit in */
+  .toreview.floating {
     right: 22px;
   }
   .floorfade {

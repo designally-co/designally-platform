@@ -52,10 +52,13 @@ export function Masthead({
   question,
   total,
   section,
+  action,
 }: {
   question: SurveyQuestion;
   total?: number;
   section?: { en?: string; th?: string };
+  /** a way out, shown in the header rather than floating over it */
+  action?: React.ReactNode;
 }) {
   /* Bilingual whatever the lead language is — the same rule the choice labels
      follow (lang.tsx). Two words each, so it costs almost no height, and there
@@ -125,6 +128,7 @@ export function Masthead({
             {section?.th && <span className="th">{section.th}</span>}
           </span>
         )}
+        {action}
       </span>
       {/**
        * The Cut, and it measures how far in you are.
