@@ -249,30 +249,34 @@ Free space is handed to the margins, so a short card centres in the area the mas
 leaves; when the space runs negative they resolve to zero and the card starts at the top,
 fully scrollable.
 
-### The masthead pins on a phone and travels on a laptop
+### The masthead holds the top at both widths, and stands off the edge on a laptop
 
-Same element, opposite behaviour, and the reason is that only one of them scrolls.
+It is pinned everywhere — the Cut measures progress and has to stay in sight. What differs
+is how far it stands off the screen edge: **34px on a phone, 64px above 620px**, so on a
+laptop the count never reads as jammed into the corner.
 
-A phone wants it pinned: cards nearly fill the screen, scrolling is constant, and the Cut
-measuring progress has to stay in sight. Pinning it on a 900px laptop puts the count alone
-at the top of the screen with the question it labels somewhere in the middle — and every
-way of closing that distance made something else worse:
+**The offset is the masthead's own padding, not a `top` value, and that is the whole
+trick.** Pinning with `top: 64px` leaves a 64px band above it that the card scrolls up
+through, so content appears above the header. An offset made of padding sits *inside* the
+pinned box, so that band is the masthead's own background and whatever scrolls under it
+stays under it. It also keeps `--mast-h` honest — it is measured with `offsetHeight`, so
+the scales card's own pinned question keeps stacking underneath without knowing anything
+changed.
+
+Getting here took three wrong turns, all of them treating a symptom:
 
 | Attempt | What broke |
 |---|---|
-| Centre the card | metadata stranded 173px above the question |
+| Centre the card under the pinned masthead | metadata stranded 173px above the question |
 | Top-align the card | screen empty underneath |
 | Fix the controls to the floor to anchor that | button 200px from the answer it submits |
+| Centre masthead and card together as a group | the header stopped being fixed |
 
-None of those were the fault. The fault was a header pinned to a viewport edge on a screen
-that does not scroll. Above 620px the masthead, the question and the action **centre
-together as one group** — `margin-top: auto` on the masthead, `margin-bottom: auto` on the
-slide, and the slide dropping `flex: 1` so it takes its content's height. Each thing ends
-up next to the thing it belongs to: 8px from count to question, 34px from field to button,
-and the leftover space split above and below.
-
-`position: sticky` stays on it at every width, so the one card long enough to scroll — the
-ten scales — still pins it on the way down, on a laptop as on a phone.
+With the header genuinely fixed, the card is measured *off it* rather than centred away
+from it: a controlled `clamp(20px, 5vh, 48px)` gap below it, and the rest of the space
+falls to the floor where nothing has to line up with anything. On a phone the card still
+centres in what the masthead leaves, because there the free space is small enough that
+centring keeps the count close to its question.
 
 Before this, the client's first impression of Designally carried no Designally anywhere
 on it — the survey had no wordmark on any of its twenty-three screens.

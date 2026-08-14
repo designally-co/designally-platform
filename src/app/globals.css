@@ -3152,19 +3152,36 @@ dialog::backdrop {
  * — the ten scales — still pins it on the way down.
  */
 @media (min-width: 621px) {
-  .survey-shell:has(> .qmast) > .qmast {
-    margin-top: auto;
+  /**
+   * The masthead holds the top here too, but stands off the edge.
+   *
+   * The offset is the masthead's own padding rather than a `top` value, and
+   * that is the whole trick. Pinning with `top: 96px` leaves a 96px band above
+   * it that the card scrolls up through, so content appears above the header —
+   * an offset made of padding is inside the pinned box, so the band is the
+   * masthead's own background and whatever scrolls under it stays under it.
+   *
+   * It also means `--mast-h` needs no adjusting: it is measured with
+   * `offsetHeight`, so the scales card's own pinned question keeps stacking
+   * correctly underneath without knowing any of this changed.
+   */
+  .qmast {
+    padding-top: 64px;
+  }
+  /**
+   * And the question sits just under it rather than centring away from it.
+   *
+   * Centring into the space a pinned masthead leaves is what put the metadata
+   * 173px above the thing it labels. With the header fixed, the card is
+   * measured off it instead: a controlled gap below, and the remaining space
+   * falls to the floor where nothing has to line up with anything.
+   */
+  .survey-shell:has(> .qmast) .slidebody {
+    margin-top: clamp(20px, 5vh, 48px);
+    margin-bottom: auto;
   }
   .survey-shell:has(> .qmast) > .slide {
-    /* not flex:1 — the slide takes its content's height so the auto margins
-       above and below the pair have free space to share */
-    flex: none;
-    margin-bottom: auto;
     padding-bottom: 26px;
-  }
-  /* the group is doing the centring now; the card must not centre inside it */
-  .survey-shell:has(> .qmast) .slidebody {
-    margin-block: 0;
   }
 }
 
