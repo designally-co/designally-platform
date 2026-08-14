@@ -3105,12 +3105,45 @@ dialog::backdrop {
  * carry a masthead — and cannot be broken by a sibling appearing between them.
  */
 .survey-shell:has(> .qmast) .slide {
-  align-items: flex-start;
   padding-top: 0;
   /* the shell measures the viewport now, so this stops guessing at the
      masthead's height with a magic number */
   min-height: 0;
   flex: 1;
+}
+/**
+ * Centred when it fits, top-aligned when it does not.
+ *
+ * Both of the obvious answers are wrong on one card or the other.
+ * `align-items: center` centres a short question but pushes a long one off
+ * both ends, and the top of it becomes unreachable — that is how the scales
+ * card used to lose its first pair. `flex-start` keeps every card reachable
+ * and leaves a short one stranded under the masthead with the whole screen
+ * empty below it, which is what desktop looked like.
+ *
+ * Auto margins on the cross axis do both. Free space is handed to them, so a
+ * short card centres in the area the masthead leaves; when the space runs
+ * negative the margins resolve to zero and the card starts at the top with
+ * everything scrollable. No media query, no measurement, and it cannot strand
+ * content the way centring does.
+ *
+ * Deliberately does not touch padding-bottom: on a phone the controls are
+ * fixed to the floor and that padding is the clearance they stand in.
+ */
+.survey-shell:has(> .qmast) .slidebody {
+  margin-block: auto;
+}
+/**
+ * Above 620px the controls are back in normal flow, so the floor clearance the
+ * phone reserves for them is dead space — and with the card centred it is dead
+ * space on one side only, which reads as the content sitting too high. Scoped
+ * to a min-width so it cannot reach the breakpoint where that padding is the
+ * ground a fixed button stands on.
+ */
+@media (min-width: 621px) {
+  .survey-shell:has(> .qmast) .slide {
+    padding-bottom: 26px;
+  }
 }
 
 .qhead {

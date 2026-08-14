@@ -233,9 +233,23 @@ publishes its measured height as `--mast-h` and the question header pins at that
 Measured, not written down: the numeral is a `clamp()`, so the masthead is 115px on a small
 phone and 127px on a large one.
 
-With the masthead lifted out, the slide is **top-aligned rather than centred**. Centring a
-question under a pinned masthead put three hundred pixels between the count and the
-question it introduces.
+**The card is centred when it fits and top-aligned when it does not**, and neither of the
+obvious rules does that. `align-items: center` centres a short question but pushes a long
+one off both ends with its top unreachable — that is how the scales card used to lose its
+first pair. `flex-start` keeps every card reachable and strands a short one under the
+masthead with the screen empty below it.
+
+Cross-axis **auto margins** do both, with no media query and no measurement:
+
+```css
+.slidebody { margin-block: auto; }
+```
+
+Free space is handed to the margins, so a short card centres in the area the masthead
+leaves; when the space runs negative they resolve to zero and the card starts at the top,
+fully scrollable. Above 620px the slide also drops the floor clearance it reserves for the
+controls, which are back in normal flow there — kept behind a `min-width` so it can never
+reach the breakpoint where that padding is the ground a fixed button stands on.
 
 Before this, the client's first impression of Designally carried no Designally anywhere
 on it — the survey had no wordmark on any of its twenty-three screens.
