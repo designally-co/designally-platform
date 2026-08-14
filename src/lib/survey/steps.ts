@@ -14,6 +14,22 @@ import type { BlockKey, Package, SurveyKind } from '@/lib/db/schema';
  * split where the subject changes: what the brand is, then who it is for.
  */
 export type StepDef = {
+  /**
+   * The section a question belongs to, shown to the client.
+   *
+   * The questionnaire has two, and both packages have both: everything before
+   * the visual block is Project Information, the visual block is Visual
+   * Direction. The branding team asked for this because a respondent twelve
+   * questions in had no idea the survey had a shape.
+   *
+   * Presentation, not content — so it lives here rather than in the seed, and
+   * adding it does not bump the question version or invalidate a sent survey.
+   *
+   * The name field has none. It is one field before the questions start, and
+   * calling it a section would promise a third one.
+   */
+  sectionEn?: string;
+  sectionTh?: string;
   /** the small line above the heading — "Step 2 of 4 — Your brand" */
   eyebrowEn: string;
   headingEn: string;
@@ -22,6 +38,10 @@ export type StepDef = {
   /** "blockKey.order" */
   questions: string[];
 };
+
+/** the two sections the questionnaire has, in both packages */
+const INFO = { sectionEn: 'Project Information', sectionTh: 'ข้อมูลโปรเจกต์' };
+const DIRECTION = { sectionEn: 'Visual Direction', sectionTh: 'ทิศทางงานออกแบบ' };
 
 const IDENTITY: StepDef = {
   eyebrowEn: 'About you',
@@ -32,6 +52,7 @@ const IDENTITY: StepDef = {
 };
 
 const VISUAL: StepDef = {
+  ...DIRECTION,
   eyebrowEn: 'Visual direction',
   headingEn: 'How it should look and feel',
   descEn: 'The mood you want, and just as usefully, what you want to avoid.',
@@ -43,6 +64,7 @@ const VISUAL: StepDef = {
 const BRAND_STEPS: StepDef[] = [
   IDENTITY,
   {
+    ...INFO,
     eyebrowEn: 'What the brand is',
     headingEn: 'What makes your brand hard to replace',
     descEn: 'Where you come from, and what only you offer. Short, honest answers are perfect.',
@@ -50,6 +72,7 @@ const BRAND_STEPS: StepDef[] = [
     questions: ['strategy.1', 'strategy.7', 'strategy.2', 'strategy.6', 'strategy.8'],
   },
   {
+    ...INFO,
     eyebrowEn: 'Who it is for',
     headingEn: 'Your customers, and what they worry about',
     descEn: 'Who buys from you, what makes them hesitate, and what you want them to remember.',
@@ -57,6 +80,7 @@ const BRAND_STEPS: StepDef[] = [
     questions: ['strategy.10', 'strategy.3', 'strategy.4', 'strategy.9', 'strategy.12'],
   },
   {
+    ...INFO,
     eyebrowEn: 'Brand personality',
     headingEn: 'Where does your brand sit?',
     descEn: 'For each pair, tap the point that feels right. The middle means balanced.',
@@ -70,6 +94,7 @@ const BRAND_STEPS: StepDef[] = [
 const DESIGN_STEPS: StepDef[] = [
   IDENTITY,
   {
+    ...INFO,
     eyebrowEn: 'About this project',
     headingEn: 'The brand, and what this work is for',
     descEn: 'Where the brand stands today, who it speaks to, and what this piece of work has to do.',

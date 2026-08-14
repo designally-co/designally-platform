@@ -72,9 +72,11 @@ function stepIsVisible(step: SurveyStep, values: DraftValues, all: SurveyStep[])
  * battery is one question again, which is what it is: ten readings of the same
  * thing, answered against each other.
  */
+type Section = { en?: string; th?: string };
+
 type Card =
-  | { kind: 'fields'; questions: SurveyQuestion[] }
-  | { kind: 'question'; question: SurveyQuestion };
+  | { kind: 'fields'; questions: SurveyQuestion[]; section: Section }
+  | { kind: 'question'; question: SurveyQuestion; section: Section };
 
 export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   const [ready, setReady] = useState(false);
@@ -127,10 +129,11 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   const cards = useMemo(() => {
     const out: Card[] = [];
     for (const s of steps) {
+      const section: Section = { en: s.sectionEn, th: s.sectionTh };
       let pending: SurveyQuestion[] = [];
       const flush = () => {
         if (!pending.length) return;
-        out.push({ kind: 'fields', questions: pending });
+        out.push({ kind: 'fields', questions: pending, section });
         pending = [];
       };
       for (const q of s.questions) {
@@ -140,7 +143,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
         }
         flush();
 
-        out.push({ kind: 'question', question: q });
+        out.push({ kind: 'question', question: q, section });
       }
       flush();
     }
@@ -371,6 +374,9 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
     survey.questionCount - blanks.filter(({ question }) => question.number !== null).length;
 
   async function submit() {
+    /* the button is disabled while anything is blank; this is the second door,
+       in case a draft restores into a state the button was not re-rendered for */
+    if (blanks.length > 0) return;
     if (!respondentName) {
       setNameMissing(true);
       leaveSend(1);
@@ -494,8 +500,19 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
 
                 {blanks.length > 0 && (
                   <>
-                    <p className="blankcount">
-                      {blanks.length} still blank · ยังไม่ได้ตอบ {blanks.length} ข้อ
+                    {/* Every question is required, so this is the wall rather
+                        than a note. It is here and not on each question
+                        because a respondent who wants to think about one and
+                        come back can — they simply cannot leave without it. */}
+                    <p className="blankcount blocking">
+                      {blanks.length === 1
+                        ? 'One question still needs an answer before you can send.'
+                        : `${blanks.length} questions still need an answer before you can send.`}
+                    </p>
+                    <p className="blankcount blocking th">
+                      {blanks.length === 1
+                        ? 'ยังเหลืออีก 1 ข้อ ก่อนส่งคำตอบได้'
+                        : `ยังเหลืออีก ${blanks.length} ข้อ ก่อนส่งคำตอบได้`}
                     </p>
                     <ul className="blanklist">
                       {blanks.map(({ question, index }) => (
@@ -521,7 +538,11 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                 >
                   <Chevron back />
                 </button>
-                <button className="btn btn-primary ok" onClick={submit} disabled={submitting}>
+                <button
+                  className="btn btn-primary ok"
+                  onClick={submit}
+                  disabled={submitting || blanks.length > 0}
+                >
                   {submitting ? 'Sending' : 'Send answers'}
                 </button>
               </div>
@@ -578,6 +599,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                     onChange={(v) => setValue(card.question.ref, v)}
                     onEnter={() => advance(step)}
                     total={survey.questionCount}
+                    section={card.section}
                   />
                 )}
               </div>

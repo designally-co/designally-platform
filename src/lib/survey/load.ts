@@ -34,6 +34,9 @@ export type SurveyQuestion = {
 };
 
 export type SurveyStep = {
+  /** "Project Information" / "Visual Direction" — absent on the name field */
+  sectionEn?: string;
+  sectionTh?: string;
   eyebrowEn: string;
   headingEn: string;
   descEn?: string;

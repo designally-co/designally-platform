@@ -25,6 +25,8 @@ type Props = {
   onEnter?: () => void;
   /** how many numbered questions there are, for the badge */
   total?: number;
+  /** which of the questionnaire's two sections this question belongs to */
+  section?: { en?: string; th?: string };
   /** a rating battery dealt over several slides — which pairs this one holds */
 };
 
@@ -37,12 +39,29 @@ type Props = {
  * small block beside it, it reads as position — which is the only thing left
  * saying where in twenty-one you are, now that the slides carry no chrome.
  */
-function Heading({ question, total }: { question: SurveyQuestion; total?: number }) {
+function Heading({
+  question,
+  total,
+  section,
+}: {
+  question: SurveyQuestion;
+  total?: number;
+  section?: { en?: string; th?: string };
+}) {
   const t = useText();
   const help = t(question.helpEn, question.helpTh);
+  /* Bilingual whatever the lead language is — the same rule the choice labels
+     follow (lang.tsx). Two words each, so it costs almost no height, and there
+     is no per-question reveal for it: an English-only section label would be
+     invisible to exactly the reader it is meant to orient. */
+  const sectionLabel = [section?.en, section?.th].filter(Boolean).join(' · ');
 
   return (
     <>
+      {/* the shape of the survey, stated on every question rather than once at
+          the top of a part — somebody landing on question fifteen from the
+          review screen has not seen the top of anything */}
+      {sectionLabel && <span className="qsection">{sectionLabel}</span>}
       <span className="qq">
         {question.number !== null && (
           <span className="qnum">
@@ -115,7 +134,7 @@ function useAutosize(value: string) {
 
 /* ── paragraph and short_text ─────────────────────────────────────── */
 
-function TextAnswer({ question, value, onChange, onEnter, total }: Props) {
+function TextAnswer({ question, value, onChange, onEnter, total, section }: Props) {
   const text = typeof value === 'string' ? value : '';
   const long = question.type === 'paragraph';
   const id = useId();
@@ -138,7 +157,7 @@ function TextAnswer({ question, value, onChange, onEnter, total }: Props) {
   return (
     <div className="sq">
       <label htmlFor={id}>
-        <Heading question={question} total={total} />
+        <Heading question={question} total={total} section={section} />
       </label>
       <Alt question={question} />
       {long ? (
@@ -211,7 +230,7 @@ export function IdentityField({ question, value, onChange, onEnter }: Props) {
 
 /* ── multiple_choice ──────────────────────────────────────────────── */
 
-function ChoiceAnswer({ question, value, onChange, total }: Props) {
+function ChoiceAnswer({ question, value, onChange, total, section }: Props) {
   const v = (value ?? { choice: '' }) as { choice: string; other?: string };
   const config = question.config;
   const name = useId();
@@ -226,7 +245,7 @@ function ChoiceAnswer({ question, value, onChange, total }: Props) {
   return (
     <fieldset className="sq">
       <legend>
-        <Heading question={question} total={total} />
+        <Heading question={question} total={total} section={section} />
       </legend>
       <Alt question={question} />
       <div className="pick">
@@ -297,7 +316,7 @@ function asBoards(config: QuestionConfig) {
   return (config.choices ?? []).some((c) => Boolean(c.image));
 }
 
-function CheckboxAnswer({ question, value, onChange, total }: Props) {
+function CheckboxAnswer({ question, value, onChange, total, section }: Props) {
   const v = (value ?? { choices: [] }) as { choices: string[]; other?: string };
   const config = question.config;
   const chosen = new Set(v.choices);
@@ -335,7 +354,7 @@ function CheckboxAnswer({ question, value, onChange, total }: Props) {
   return (
     <fieldset className="sq">
       <legend>
-        <Heading question={question} total={total} />
+        <Heading question={question} total={total} section={section} />
       </legend>
       <Alt question={question} />
 
@@ -439,7 +458,7 @@ function CheckboxAnswer({ question, value, onChange, total }: Props) {
 
 /* ── linear_scale ─────────────────────────────────────────────────── */
 
-function ScaleAnswer({ question, value, onChange, total }: Props) {
+function ScaleAnswer({ question, value, onChange, total, section }: Props) {
   const v = (value ?? { scale: {} }) as { scale: Record<string, number> };
   const points = question.config.points ?? 5;
   /* Version 1 scales run 1..points; the version-2 personality scales run 0..10,
@@ -466,7 +485,7 @@ function ScaleAnswer({ question, value, onChange, total }: Props) {
           it — rating the eighth with no idea what is being rated is the failure
           mode that pinning avoids. */}
       <div className="scalehead">
-        <Heading question={question} total={total} />
+        <Heading question={question} total={total} section={section} />
         <Alt question={question} />
       </div>
       {pairs.map((p, i) => {

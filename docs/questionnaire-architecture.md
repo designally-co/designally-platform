@@ -27,6 +27,16 @@ Implemented in `seed/question-blocks.json`, imported by `npm run db:seed`.
 | **Brand** — Brand Strategy + Brand Identity | identity · strategy · visual | 22 |
 | **Design** | identity · project · visual | 12 |
 
+**The client sees two sections**, added 14 August 2026 at the branding team's
+request: **Project Information** covers the strategy or project block, **Visual
+Direction** covers the visual block, and both packages have both. The name field
+has neither — it is one field before the questions start, and labelling it would
+promise a third section.
+
+The labels live in `src/lib/survey/steps.ts`, not in the seed. They are
+presentation, so adding or rewording one does not bump the question version or
+change what an already-sent survey asks.
+
 **Consequence:** editing a Visual Direction question once updates both questionnaires.
 
 **A client buys one package or the other, never both**, so nobody is ever asked the visual block

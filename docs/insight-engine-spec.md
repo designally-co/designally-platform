@@ -77,6 +77,15 @@ Where answers contradict, ranked by how expensive the disagreement is.
 Severity should be judged by **how much work a late reversal destroys**: audience and positioning are HIGH (they invalidate everything downstream), tone is MEDIUM (it costs a rewrite), colour preference is LOW (it costs an afternoon).
 
 ### 3. Clarity gaps — what nobody could answer
+
+> **Changed 14 August 2026.** Every question is now required: the send screen
+> refuses while anything is blank. Blanks therefore no longer reach the
+> analysis, and this layer has to find the same signal in what people write
+> instead — "ยังไม่มี", "ไม่มี", one-word answers. The ARUN+ data shows they do
+> write exactly that, so the finding survives; it is simply no longer free.
+>
+> The branding team asked for it, knowing this. A respondent can still skip a
+> question and come back — they just cannot leave without it.
 Questions where answers are empty, one-word, or explicitly uncertain. This is the insight most agencies miss, and it is pure gold.
 
 *In your ARUN+ data:* several respondents answered "ยังไม่มี" (not yet), "ไม่มี" (none), or left the competitor and product questions blank. Read individually, those look like lazy answers. Read together, they say something precise: **the organisation has not decided this yet**, and no amount of design will fix it.

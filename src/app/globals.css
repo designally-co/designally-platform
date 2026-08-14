@@ -770,15 +770,33 @@ label.f span {
  */
 .qlangbtn {
   position: relative;
+  display: inline-flex;
+  align-items: center;
   font-family: inherit;
-  font-size: 13px;
+  font-size: 14px;
   color: var(--primary);
   background: transparent;
-  border: 0;
-  border-bottom: 1px solid var(--hairline);
-  padding: 4px 0;
+  /* The ghost pill from DESIGN.md section 5, which is what this is: the second
+     action on the screen. It was a word with a hairline under it — legible if
+     you were looking for it, and easy to miss if you were not, which for a Thai
+     reader is the difference between a bilingual survey and an English one. */
+  border: 1px solid var(--primary);
+  border-radius: var(--r-pill);
+  padding: 6px 14px;
+  /* it overlapped the question by 2px as a bare word; as a pill it needs the
+     air a pill needs */
+  margin-top: 12px;
   min-height: 32px;
   cursor: pointer;
+  transition: background 0.18s;
+}
+@media (hover: hover) {
+  .qlangbtn:hover {
+    background: var(--primary-tint);
+  }
+}
+.qlangbtn:active {
+  background: var(--primary-tint);
 }
 .qlangbtn::after {
   content: '';
@@ -790,9 +808,6 @@ label.f span {
   transform: translate(-50%, -50%);
 }
 @media (hover: hover) {
-  .qlangbtn:hover {
-    border-bottom-color: var(--primary);
-  }
 }
 .qaltbody {
   display: block;
@@ -914,6 +929,33 @@ label.f span {
   font-size: 13.5px;
   line-height: 1.7;
   color: var(--ink-3);
+}
+
+/**
+ * Which of the two sections this question is in.
+ *
+ * Above the number, because "where am I in the shape of this" is a coarser
+ * question than "which number am I on", and a reader takes the coarser one
+ * first.
+ */
+.qsection {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 13px;
+  color: var(--ink-3);
+  letter-spacing: 0.02em;
+  /* Thai never below 1.6 in a line that can hold it */
+  line-height: 1.7;
+}
+
+/* not a count any more — a condition. It reads in the caution colour because
+   it is the reason the button below it will not work. */
+.blankcount.blocking {
+  color: var(--caution);
+  margin-top: 26px;
+}
+.blankcount.blocking + .blankcount.blocking {
+  margin-top: 2px;
 }
 
 /* the send screen's list of what is still blank — each one goes back to it */
