@@ -113,6 +113,39 @@ Both glyphs are solved against `--fill-press`, the extreme they sit on rather th
 resting state — the darkest fill on the light Field (4.51) and the lightest on the dark
 one (4.53). Solving against the resting fill would have left the press state at 3.90.
 
+### A radio that is on is orange. A checkbox that is on is charcoal.
+
+The CI states both halves and this product was using one treatment for both, because a
+single class carries either input.
+
+The rule has a reason under it beyond consistency. The CI budgets roughly **one to three
+orange marks per screen**. A "choose 3" question with three ticked would put three more
+oranges on a card that already spends its budget on the progress bar and the primary
+action — six marks, and the accent stops meaning anything. Charcoal also does real work
+for the client: it says, before they read the help text, whether this question takes one
+answer or several.
+
+This applies to both multi-select forms — the text list and the image boards. On the
+boards it is the difference between two accents on screen and eight.
+
+### The five named pieces, and where they are
+
+| Piece | Where |
+|---|---|
+| **The Field** | warm white throughout; near-black on welcome and completion |
+| **The Edge** | every card, input and divider — 1px, never orange |
+| **The Wordmark** | welcome and completion only |
+| **The Cut** | welcome and completion only — **once per layout** |
+| **The Mark** | not yet — no vector was supplied, only a 274px PNG |
+
+The Cut earns the pure CI `#ef6148` rather than the measured action orange: nothing sits
+on it, nothing is read from it, and it is not a control, so it carries no contrast
+obligation — only weight. It is the only orange line permitted anywhere. Rules, dividers
+and table borders are never orange, because an orange line means something here.
+
+Before this, the client's first impression of Designally carried no Designally anywhere
+on it — the survey had no wordmark on any of its twenty-three screens.
+
 ### CI-DIVERGENCE — five measurements to send back
 
 Hue and chroma are the CI's in every case; only lightness moved.

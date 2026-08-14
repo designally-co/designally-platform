@@ -437,6 +437,10 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
           <div className="slide" data-active="" data-dir="next">
             <div className="slidebody">
               <div className="slidemain">
+                <span className="cut" aria-hidden="true" />
+                <span className="wordmark">
+                  Design<em>ally</em>
+                </span>
                 <div className="done-mark" aria-hidden="true">
                   ✓
                 </div>
@@ -622,6 +626,15 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
           <section className="slide" data-active="" data-dir={dir} key="welcome">
             <div className="slidebody">
               <div className="slidemain">
+                {/* Two of the CI's five named pieces, and the only two screens
+                    that should carry them. The Cut is one orange line used once
+                    per layout — the moment of conviction — and the Wordmark
+                    signs it. Without these the client's first impression of
+                    Designally had no Designally anywhere on it. */}
+                <span className="cut" aria-hidden="true" />
+                <span className="wordmark">
+                  Design<em>ally</em>
+                </span>
                 <h1>Let&apos;s shape your brand, together.</h1>
                 <p className="intro">
                   This questionnaire helps our team understand your brand before we begin

@@ -294,8 +294,10 @@ textarea {
     transform 0.16s var(--ease),
     color 0.2s;
 }
+/* The CI is explicit: press scales to 0.99, and the scale is the feedback —
+   nothing overshoots, nothing bounces. This was 0.95, which is a squish. */
 .btn:active {
-  transform: scale(0.95);
+  transform: scale(0.99);
 }
 .btn-primary {
   background: var(--primary);
@@ -318,9 +320,15 @@ textarea {
     background: var(--primary-tint);
   }
 }
+/* CI-DIVERGENCE: the CI sets disabled at 40% opacity. `not-allowed` is adopted
+   — it says "not yet" where `default` said nothing. The opacity is not: the
+   disabled control here is the Send button held back by unanswered questions,
+   and at 40% its label measures 1.87:1 against its own fill. Disabled controls
+   are exempt from 1.4.3, but a person still has to read which action is
+   blocked. 50% keeps it at 2.21 and the blank count carries the rest. */
 .btn[disabled] {
   opacity: 0.5;
-  cursor: default;
+  cursor: not-allowed;
 }
 .btn[disabled]:active {
   transform: none;
@@ -333,7 +341,7 @@ textarea {
 .input {
   width: 100%;
   font-size: 17px;
-  letter-spacing: -0.374px;
+  letter-spacing: 0;
   color: var(--ink);
   background: var(--canvas);
   border: 1px solid var(--hairline);
@@ -368,7 +376,7 @@ label.f {
   display: block;
   font-size: 14px;
   font-weight: 600;
-  letter-spacing: -0.224px;
+  letter-spacing: 0;
   margin-bottom: 7px;
 }
 label.f span {
@@ -442,6 +450,25 @@ label.f span {
   flex-wrap: wrap;
 }
 /**
+ * The Cut — one of the CI's five named pieces, and the one with a rule
+ * attached: **one orange line, used once per layout.** The moment of
+ * conviction. 2px by 88px, the CI's own measurements.
+ *
+ * This is the only orange line permitted anywhere. Rules, dividers and table
+ * borders are never orange, because an orange line means something here. It
+ * earns the pure CI #ef6148 rather than the measured action orange: nothing
+ * sits on it, nothing has to be read from it, and it is not a control — it
+ * carries no contrast obligation, only weight.
+ */
+.cut {
+  display: block;
+  width: var(--cut-length);
+  height: var(--cut-width);
+  background: var(--cut);
+  margin-bottom: 22px;
+}
+
+/**
  * The Wordmark — one of the CI's five named pieces.
  *
  * "Always DESIGNALLY. in full caps with an orange period." This was a
@@ -468,6 +495,13 @@ label.f span {
 .wordmark::after {
   content: ".";
   color: var(--primary-mark);
+}
+/* on the survey's two signed screens the wordmark is a block above the
+   headline, not an inline lockup in a header bar */
+.slidemain .wordmark {
+  display: block;
+  color: var(--ink-3);
+  margin-bottom: 26px;
 }
 .sform .head .proj {
   font-size: 13px;
@@ -591,6 +625,27 @@ label.f span {
   border-color: var(--primary-mark);
   background: var(--primary-tint);
 }
+/**
+ * A checkbox that is on is charcoal; a radio that is on is orange.
+ *
+ * The CI states both halves — orange "the selected radio point", charcoal
+ * "controls that are on (checkbox, selected tag)" — and this file was using
+ * one treatment for both because `.pickone` carries either input.
+ *
+ * The rule has a reason underneath it beyond consistency. The CI budgets
+ * roughly one to three orange marks per screen. A "choose up to five" question
+ * with five ticked would put five oranges on one card and spend the accent
+ * entirely, on the screen where the primary action also needs it. Charcoal
+ * also does real work here: it tells the client, before they read the help
+ * text, whether this question takes one answer or several.
+ */
+.pickone.sel:has(input[type="checkbox"]) {
+  border-color: var(--ink);
+  background: var(--pearl);
+}
+.pickone:has(input[type="checkbox"]) input {
+  accent-color: var(--ink);
+}
 .pickone b {
   display: block;
   font-size: 15px;
@@ -698,7 +753,7 @@ label.f span {
   text-align: left;
   font-size: 15px;
   font-weight: 400;
-  letter-spacing: -0.224px;
+  letter-spacing: 0;
   cursor: pointer;
   background: var(--canvas);
   color: var(--ink);
@@ -1015,9 +1070,11 @@ label.f span {
   }
 }
 /* Selection is a 2px border, as everywhere else. The padding compensates so
-   nothing shifts when it thickens (DESIGN.md §5). */
+   nothing shifts when it thickens (DESIGN.md §5).
+   Charcoal, not orange: these are checkboxes, and six of them chosen would
+   otherwise put six accents on one card. See .pickone.sel above. */
 .board.sel {
-  border: 2px solid var(--primary-mark);
+  border: 2px solid var(--ink);
 }
 .board img {
   display: block;
@@ -1056,8 +1113,8 @@ label.f span {
     border-color 0.18s var(--ease);
 }
 .board input:checked {
-  background: var(--primary);
-  border-color: var(--on-primary);
+  background: var(--ink);
+  border-color: var(--on-dark);
 }
 .board:has(input:checked)::after {
   content: '';
@@ -1067,7 +1124,7 @@ label.f span {
   z-index: 3;
   width: 6px;
   height: 11px;
-  border: solid var(--on-primary);
+  border: solid var(--on-dark);
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
   pointer-events: none;
@@ -1143,10 +1200,11 @@ label.f span {
   margin-bottom: 20px;
 }
 
+/* 8px, not 10 — the CI caps a reveal's travel at 8. */
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -1241,7 +1299,7 @@ label.f span {
 .topbar .today {
   font-size: 14px;
   color: var(--ink-3);
-  letter-spacing: -0.224px;
+  letter-spacing: 0;
 }
 .topbar .topbar-cta {
   margin-left: auto;
@@ -1249,7 +1307,7 @@ label.f span {
 .linkish {
   font-size: 14px;
   font-weight: 600;
-  letter-spacing: -0.224px;
+  letter-spacing: 0;
   color: var(--ink-3);
   background: transparent;
   border: 0;
@@ -1371,7 +1429,7 @@ label.f span {
   font-size: 14px;
   color: var(--ink-3);
   margin-top: 8px;
-  letter-spacing: -0.224px;
+  letter-spacing: 0;
 }
 .work .act {
   flex-shrink: 0;
@@ -1762,7 +1820,7 @@ label.f span {
   font-size: 14px;
   font-weight: 600;
   color: var(--ink-3);
-  letter-spacing: -0.224px;
+  letter-spacing: 0;
   padding: 0 12px 10px;
   border-bottom: 1px solid var(--hairline);
   white-space: nowrap;
@@ -1785,7 +1843,7 @@ label.f span {
 .ptable .c-name {
   font-size: 17px;
   font-weight: 600;
-  letter-spacing: -0.374px;
+  letter-spacing: 0;
   display: flex;
   align-items: center;
   gap: 9px;
@@ -1800,13 +1858,13 @@ label.f span {
 .ptable .c-sub {
   font-size: 14px;
   color: var(--ink-3);
-  letter-spacing: -0.224px;
+  letter-spacing: 0;
   margin-top: 2px;
 }
 .ptable .c-main {
   font-size: 14px;
   color: var(--ink-2);
-  letter-spacing: -0.224px;
+  letter-spacing: 0;
 }
 .ptable .c-stage {
   width: 170px;
@@ -1814,7 +1872,7 @@ label.f span {
 .ptable .c-when {
   font-size: 14px;
   color: var(--ink-3);
-  letter-spacing: -0.224px;
+  letter-spacing: 0;
   line-height: 1.43;
 }
 
@@ -1864,7 +1922,7 @@ label.f span {
     font-size: 12px;
     font-weight: 600;
     color: var(--ink-3);
-    letter-spacing: -0.12px;
+    letter-spacing: 0;
     margin-bottom: 2px;
   }
   .ptable .c-stage {
@@ -1901,14 +1959,14 @@ label.f span {
   font-size: 17px;
   font-weight: 600;
   color: var(--primary-mark);
-  letter-spacing: -0.374px;
+  letter-spacing: 0;
   margin-bottom: 3px;
 }
 .elsewhere .es {
   display: block;
   font-size: 14px;
   color: var(--ink-3);
-  letter-spacing: -0.224px;
+  letter-spacing: 0;
   line-height: 1.43;
 }
 
@@ -2197,7 +2255,7 @@ dialog::backdrop {
   min-height: 44px;
   font-size: 14px;
   font-weight: 400;
-  letter-spacing: -0.224px;
+  letter-spacing: 0;
   cursor: pointer;
   text-align: left;
   transition: border-color 0.18s;
@@ -3187,10 +3245,13 @@ dialog::backdrop {
  * obviously caused by the tap. The fill goes one step deeper than hover and the
  * disc shrinks, the same 0.95 the primary button uses.
  */
+/* CI-DIVERGENCE, narrow: the CI says press is scale alone with no colour
+   change. On a 44px disc, 0.99 is four tenths of a pixel — no feedback at all
+   on the one control that has no label to flicker. It keeps the deeper fill. */
 .okback:active {
   background: var(--fill-press);
   color: var(--ink);
-  transform: scale(0.95);
+  transform: scale(0.99);
 }
 @media (hover: hover) {
   /* a filled control deepens its own fill — DESIGN.md section 5, Hover */
