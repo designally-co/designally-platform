@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 
 import { isAnswered, type DraftValues } from '@/lib/survey/answers';
 import type { SurveyPayload, SurveyQuestion, SurveyStep } from '@/lib/survey/load';
@@ -427,38 +427,57 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   if (submitted) {
     return (
       <LangContext.Provider value={LEAD}>
-        {/* The dark Field. The CI reserves it for a moment of drama, and
-            DESIGN.md independently reserves it for exactly these two screens —
-            the welcome and the completion. Everything between them stays on
-            warm white so the answers are the loudest thing on the page. */}
-        <div className="survey-shell client-surface" data-field="dark">
+        {/* One Field for the whole questionnaire.
+            This screen and the welcome ran on the CI's near-black Field, which
+            it reserves for a moment of drama. Twenty-three screens read better
+            as one surface than as three: the drama cost a change of ground
+            twice in a sitting, and a client who has just answered twenty-one
+            questions does not need the page to announce that they finished.
+            The Cut and the Wordmark still sign both screens. */}
+        <div className="survey-shell client-surface">
           {/* the floor controls are revealed by data-active, and there is only
               ever one screen — without it the only action here was invisible */}
           <div className="slide" data-active="" data-dir="next">
             <div className="slidebody">
               <div className="slidemain">
-                <span className="cut" aria-hidden="true" />
                 <span className="wordmark">
                   Design<em>ally</em>
                 </span>
-                <div className="done-mark" aria-hidden="true">
-                  ✓
+                {/**
+                 * The Cut arrives full, and that is the whole ending.
+                 *
+                 * This screen used to open with a 52px tick, then say the
+                 * answers had been received, then say it again in Thai, then
+                 * explain the button underneath it. Four ways of saying done.
+                 *
+                 * The line that measured the questionnaire finishing at its
+                 * full width says it once, in the brand's own object, and the
+                 * count beside it is the same figure the client watched climb
+                 * for twenty-one screens. The tick went with the sentences.
+                 */}
+                <div className="qhead">
+                  <span className="qfig">
+                    {survey.questionCount}
+                    <i>/{survey.questionCount}</i>
+                  </span>
+                  <span className="qsection">
+                    Answered
+                    <br />
+                    <span className="th">ตอบครบแล้ว</span>
+                  </span>
                 </div>
-              <h1>
-                Thank you, <em>{submitted}</em>.
-              </h1>
-              <p className="intro">
-                Your answers are with the Designally team. We&apos;ll bring every perspective
-                together and see you at the kick-off meeting.
-              </p>
-                <p className="introth th">
-                  คำตอบของคุณถูกส่งถึงทีมแล้ว แล้วพบกันในการประชุมเริ่มโปรเจกต์
+                <span className="qrule" aria-hidden="true" style={{ '--cut-progress': 1 } as CSSProperties} />
+                <h1>
+                  Thank you, <em>{submitted}</em>.
+                </h1>
+                <p className="intro">
+                  We&apos;ll bring every perspective together and see you at the kick-off.
                 </p>
+                <p className="introth th">แล้วพบกันในการประชุมเริ่มโปรเจกต์</p>
               </div>
               <button className="btn btn-quiet start" onClick={answerAsSomeoneElse}>
                 Answer as another stakeholder
               </button>
-              <p className="takes">Know someone else who should answer? Forward the same link.</p>
             </div>
           </div>
         </div>
@@ -565,11 +584,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
 
   return (
     <LangContext.Provider value={LEAD}>
-      <div
-        className="survey-shell client-surface"
-        /* the welcome only — the questions themselves stay on warm white */
-        data-field={step === WELCOME ? 'dark' : undefined}
-      >
+      <div className="survey-shell client-surface">
         {/**
          * The masthead sits here, outside the keyed <section>, and the reason
          * is the Cut.
@@ -661,19 +676,35 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
           <section className="slide" data-active="" data-dir={dir} key="welcome">
             <div className="slidebody">
               <div className="slidemain">
-                {/* Two of the CI's five named pieces, and the only two screens
-                    that should carry them. The Cut is one orange line used once
-                    per layout — the moment of conviction — and the Wordmark
-                    signs it. Without these the client's first impression of
-                    Designally had no Designally anywhere on it. */}
-                <span className="cut" aria-hidden="true" />
                 <span className="wordmark">
                   Design<em>ally</em>
                 </span>
+                {/**
+                 * The same masthead the questions use, at the start of its run.
+                 *
+                 * The count and the time were a sentence under the button —
+                 * "About 20 minutes · 21 questions" — which is the one fact a
+                 * person weighs before committing twenty minutes, set in the
+                 * smallest type on the screen. As a figure it is read first,
+                 * and the Cut beside it is the same line that will measure the
+                 * whole questionnaire, shown here at the length it starts from.
+                 *
+                 * Bookends: this screen opens the Cut, the completion screen
+                 * closes it full.
+                 */}
+                <div className="qhead">
+                  <span className="qfig">{survey.questionCount}</span>
+                  <span className="qsection">
+                    Questions · about 20 minutes
+                    <br />
+                    <span className="th">ข้อ · ประมาณ 20 นาที</span>
+                  </span>
+                </div>
+                <span className="qrule" aria-hidden="true" style={{ '--cut-progress': 0 } as CSSProperties} />
                 <h1>Let&apos;s shape your brand, together.</h1>
                 <p className="intro">
-                  This questionnaire helps our team understand your brand before we begin
-                  designing. There are no wrong answers.
+                  It helps us understand your brand before we start designing. There are no
+                  wrong answers.
                 </p>
                 {/* The two screens with no per-question reveal keep their Thai
                     line, so a Thai-only reader is never stranded at the moment
@@ -694,11 +725,13 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
               >
                 {started ? 'Continue' : 'Start'}
               </button>
-              <p className="takes">
-                {started
-                  ? 'Your answers were saved on this device. · คำตอบของคุณถูกบันทึกไว้ในเครื่องนี้'
-                  : `About 20 minutes · ${survey.questionCount} questions · ประมาณ 20 นาที`}
-              </p>
+              {/* only the resume state now — the count and the time moved into
+                  the masthead, where they are read rather than skimmed */}
+              {started && (
+                <p className="takes">
+                  Your answers were saved on this device. · คำตอบของคุณถูกบันทึกไว้ในเครื่องนี้
+                </p>
+              )}
             </div>
           </section>
         )}

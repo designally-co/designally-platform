@@ -177,7 +177,21 @@
 }
 
 /* ============================================================
-   The dark Field.
+   The dark Field. **Currently applied nowhere.**
+
+   The welcome and completion screens ran on it until 14 August;
+   the questionnaire is one surface now, warm white throughout.
+
+   Kept rather than deleted, and the reason is not sentiment. It
+   is the CI's own [data-field] mechanism — a named piece of the
+   brand system, the same standing as the unused steps in the
+   spacing and radius scales — and it carries measurements that
+   would be re-derived wrongly from the CI alone: the focus ring
+   the system leaves at 1.39:1 on this ground, and the disc
+   warmed to match the light Field's. Deleting it would throw
+   away the correction and keep the defect.
+
+   If a dark surface is ruled out for good, this goes.
 
    The CI names three Fields — near-black, warm off-white, steel
    grey-blue — and scopes them with [data-field], so this uses the
@@ -468,25 +482,6 @@ label.f span {
   margin-bottom: 38px;
   flex-wrap: wrap;
 }
-/**
- * The Cut — one of the CI's five named pieces, and the one with a rule
- * attached: **one orange line, used once per layout.** The moment of
- * conviction. 2px by 88px, the CI's own measurements.
- *
- * This is the only orange line permitted anywhere. Rules, dividers and table
- * borders are never orange, because an orange line means something here. It
- * earns the pure CI #ef6148 rather than the measured action orange: nothing
- * sits on it, nothing has to be read from it, and it is not a control — it
- * carries no contrast obligation, only weight.
- */
-.cut {
-  display: block;
-  width: var(--cut-length);
-  height: var(--cut-width);
-  background: var(--cut);
-  margin-bottom: 22px;
-}
-
 /**
  * The Wordmark — one of the CI's five named pieces.
  *
@@ -1242,12 +1237,6 @@ label.f span {
 
 .otherwrap {
   margin-top: 9px;
-}
-
-.done-mark {
-  font-size: 52px;
-  line-height: 1;
-  margin-bottom: 20px;
 }
 
 /* 8px, not 10 — the CI caps a reveal's travel at 8. */

@@ -170,11 +170,37 @@ and 19.
 
 | Piece | Where |
 |---|---|
-| **The Field** | warm white throughout; near-black on welcome and completion |
+| **The Field** | warm white, every screen |
 | **The Edge** | every card, input and divider — 1px, never orange |
 | **The Wordmark** | welcome and completion only |
-| **The Cut** | welcome and completion, and **once on every question card** |
+| **The Cut** | **once on every screen** — and it is the progress |
 | **The Mark** | not yet — no vector was supplied, only a 274px PNG |
+
+**One Field, twenty-three screens.** The welcome and completion ran on the CI's near-black
+Field, which it reserves for a moment of drama. They read better as one surface: the drama
+cost a change of ground twice in a sitting, and a client who has just answered twenty-one
+questions does not need the page to announce that they finished. The `[data-field="dark"]`
+token set stays in `globals.css`, applied nowhere — it is one of the CI's three named
+Fields, and it carries corrections (the focus ring the system leaves at 1.39:1 on that
+ground) that would be re-derived wrongly from the CI alone.
+
+### The Cut is the bookends
+
+The welcome and completion carry the same masthead the questions do, at the two ends of
+its run:
+
+| Screen | Figure | Cut |
+|---|---|---|
+| Welcome | `21` — questions · about 20 minutes | 88px, the length it starts from |
+| Question *n* | `n/21` | grown to *n* of the way across |
+| Completion | `21/21` — answered | full width |
+
+That replaced prose on both ends. The welcome had the count and the time set as a sentence
+in the smallest type on the screen, under the button — the one fact a person weighs before
+committing twenty minutes. The completion opened with a 52px tick, then said the answers
+had arrived, then said it again in Thai, then explained the button underneath: four ways
+of saying done. The line that measured the questionnaire arriving at its full width says
+it once, and the tick and the sentences went with it.
 
 The Cut earns the pure CI `#ef6148` rather than the measured action orange: nothing sits
 on it, nothing is read from it, and it is not a control, so it carries no contrast
