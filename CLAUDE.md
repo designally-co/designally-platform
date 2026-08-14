@@ -166,10 +166,13 @@ question_blocks  key (identity | strategy | project | visual
 questions        block_id, order, text_en, text_th, type, config, version
 surveys          project_id, kind (discovery), token,
                  opened_at, closed_at, closed_by
-responses        survey_id, respondent_name, email, submitted_at
-                 email — retired at question version 4, kept for surveys sent before it
-                 role, decision_maker — both retired at question version 3,
-                 kept for surveys sent before it
+responses        survey_id, respondent_name, role, email, submitted_at
+                 role and email — retired at versions 3 and 4, both live again at
+                 question version 5: the team asked for who is speaking and how to
+                 reach them before they read an answer. Neither column was ever
+                 dropped, so bringing the questions back needed no migration.
+                 decision_maker — retired at question version 3, kept for surveys
+                 sent before it
 answers          response_id, question_id, value
 briefs           project_id, generated_at, content, confirmed_at, confirmed_by
 decisions        project_id, question, outcome, note, recorded_at, recorded_by

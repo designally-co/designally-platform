@@ -115,6 +115,11 @@ export default function AnswersSheet({
                 onClick={() => setOpen(i)}
               >
                 <b>{p.name}</b>
+                {/* the position, live again at question version 5. Whose view
+                    this is changes what a disagreement means — a founder and a
+                    new hire dissenting is not the same finding twice. Absent on
+                    anything sent at versions 3 or 4, which never asked. */}
+                {p.role && <span className="ansrole">{p.role}</span>}
                 <span>
                   {p.answered} answered
                   {p.blank > 0 && ` · ${p.blank} blank`}

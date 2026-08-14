@@ -1536,6 +1536,11 @@ label.f span {
   color: var(--ink-3);
   line-height: 1.7;
 }
+/* the position sits under the name and above the count — who is speaking,
+   before how much they said */
+.anspeople button .ansrole {
+  color: var(--ink-2);
+}
 @media (hover: hover) {
   .anspeople button:hover {
     border-color: var(--ink-3);

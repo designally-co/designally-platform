@@ -15,14 +15,19 @@ export const dynamic = 'force-dynamic';
  * answer rows, so `answers` remains a complete record of what was asked and
  * what came back.
  *
- * The identity block asks two things: the name, and an email to follow up on.
- * The email is found by `maps_to: "email"` rather than by position, so it stays
- * correct if the block is ever reordered.
+ * The identity block asks three things at question version 5: the name, the
+ * position, and an email to follow up on. Each is found by its own `maps_to`
+ * rather than by position in the block, so reordering them cannot silently
+ * write a name into the email column.
  *
- * Two columns here are retired and deliberately not dropped: `decision_maker`
- * (question version 3) and `role` (replaced by the email in the same version).
- * Surveys sent before then collected real answers into both, and rule 5 means
- * they keep asking the questions they were sent with.
+ * The name falls back to the first short answer, because versions 1–4 never
+ * carried `maps_to: "name"` and rule 5 means those surveys keep asking exactly
+ * what they were sent with. A survey sent last week still resolves correctly.
+ *
+ * `decision_maker` is retired (question version 3) and deliberately not
+ * dropped: surveys sent before then collected real answers into it. `role`
+ * was retired at the same version and is live again at 5 — the column never
+ * went anywhere, which is why bringing the question back needed no migration.
  */
 function identityOf(questions: SurveyQuestion[], values: DraftValues) {
   const identity = questions.filter((q) => q.blockKey === 'identity');
@@ -30,13 +35,14 @@ function identityOf(questions: SurveyQuestion[], values: DraftValues) {
     const v = q ? values[q.ref] : undefined;
     return typeof v === 'string' ? v.trim() : '';
   };
+  const mapped = (to: string) => identity.find((q) => q.config.maps_to === to);
 
   const shortAnswers = identity.filter((q) => q.type === 'short_text');
-  const emailQuestion = identity.find((q) => q.config.maps_to === 'email');
 
   return {
-    name: text(shortAnswers[0]),
-    email: text(emailQuestion),
+    name: text(mapped('name') ?? shortAnswers[0]),
+    role: text(mapped('role')),
+    email: text(mapped('email')),
   };
 }
 
@@ -66,7 +72,7 @@ export async function POST(req: NextRequest, ctx: RouteContext<'/api/s/[token]/s
   if (payload.archived) return NextResponse.json({ error: 'project finished' }, { status: 409 });
 
   const questions = payload.steps.flatMap((s) => s.questions);
-  const { name, email } = identityOf(questions, values);
+  const { name, role, email } = identityOf(questions, values);
 
   if (!name) return NextResponse.json({ error: 'respondent name is required' }, { status: 400 });
 
@@ -84,6 +90,7 @@ export async function POST(req: NextRequest, ctx: RouteContext<'/api/s/[token]/s
     .values({
       surveyId: survey.id,
       respondentName: name,
+      role: role || null,
       email: email || null,
     })
     .returning();

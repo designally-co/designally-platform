@@ -43,6 +43,8 @@ export type ReadableAnswer = {
 
 export type RespondentAnswers = {
   name: string;
+  /** live again at question version 5 — a name alone does not say whose view it is */
+  role: string | null;
   email: string | null;
   submittedAt: Date;
   answered: number;
@@ -145,6 +147,7 @@ export async function loadProjectAnswers(projectId: string): Promise<ProjectAnsw
       }));
       return {
         name: p.respondentName,
+        role: p.role,
         email: p.email,
         submittedAt: p.submittedAt,
         answered: list.filter((a) => a.value !== null).length,
