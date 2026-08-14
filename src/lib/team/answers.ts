@@ -51,7 +51,8 @@ export type RespondentAnswers = {
 };
 
 export type ProjectAnswers = {
-  clientName: string;
+  /* the client's name is not here: the sheet is opened from a project that
+     already has it, and a second copy was returning the client's id */
   questionVersion: number;
   respondents: RespondentAnswers[];
 };
@@ -73,7 +74,7 @@ export async function loadProjectAnswers(projectId: string): Promise<ProjectAnsw
     .where(eq(responses.surveyId, row.survey.id))
     .orderBy(asc(responses.submittedAt));
   if (!people.length) {
-    return { clientName: '', questionVersion: row.survey.questionVersion, respondents: [] };
+    return { questionVersion: row.survey.questionVersion, respondents: [] };
   }
 
   const blocks = await db
@@ -131,7 +132,6 @@ export async function loadProjectAnswers(projectId: string): Promise<ProjectAnsw
   }
 
   return {
-    clientName: row.project.clientId,
     questionVersion: row.survey.questionVersion,
     respondents: people.map((p) => {
       const mine = byResponse.get(p.id) ?? new Map();
