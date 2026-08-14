@@ -72,12 +72,28 @@
   --canvas: #ffffff;
   --parchment: var(--warm-white);
   --pearl: #fafaf9;
-  /* the neutral control fill — an icon button with no label to carry it */
-  --fill: #dcdee2;
-  --fill-deep: #cecfd3;
-  --fill-press: #bdbfc5;
-  /* the glyph that sits on that fill: 4.99:1 there, 6.54:1 on the page */
-  --glyph: #53575e;
+  /**
+   * The neutral control fill — an icon button with no label to carry it.
+   *
+   * CI-DIVERGENCE, and this one is a looks call rather than a measurement.
+   * The CI hues its neutral ramp 265° "so light surfaces echo the steel
+   * grey-blue Field". That reasoning does not hold where this disc actually
+   * sits: its page is #f3f3f3, a dead neutral with no hue at all, and its
+   * neighbour is the orange primary. A blue-grey disc beside a warm orange
+   * button reads as borrowed from another system.
+   *
+   * So the same ramp, rotated to the CI orange's own family (45°) at a
+   * chroma low enough to stay a neutral rather than become a tint — a warm
+   * grey that belongs to this brand instead of echoing a Field the survey
+   * never shows.
+   *
+   * The glyph is solved against --fill-press, the darkest ground it ever
+   * sits on, not against the resting fill: 4.51 there, 5.97 at rest.
+   */
+  --fill: #dfd7d4;
+  --fill-deep: #d3cac6;
+  --fill-press: #c6bbb6;
+  --glyph: #514c49;
   /* the dark Field. The CI names three; this is the near-black one. */
   --tile: #0b0d12;
   --tile-raised: var(--charcoal-900);
@@ -185,11 +201,15 @@
   --primary-tint: #34211d;
   --primary-focus: #a9c4e8; /* 10.87:1, was 1.39:1 */
 
-  /* the icon disc, inverted: a light glyph on a raised dark fill */
-  --fill: #2b2f35;
-  --fill-deep: #363b42;
-  --fill-press: #434850;
-  --glyph: #cecfd3;
+  /* the icon disc, inverted: a light glyph on a raised dark fill, and warmed
+     to the same 45° family as the light Field's so the control does not
+     change temperature when the survey crosses from welcome to question one.
+     The glyph is solved against --fill-press, which on a dark ground is the
+     *lightest* fill and therefore the binding case: 4.53 there, 6.99 at rest. */
+  --fill: #322c2a;
+  --fill-deep: #403935;
+  --fill-press: #514844;
+  --glyph: #bdb8b6;
 }
 
 *,

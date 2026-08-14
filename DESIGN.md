@@ -67,10 +67,10 @@ no decorative colour.
 --canvas           #ffffff   /* raised: cards, sheets, inputs */
 --canvas-parchment var(--warm-white)     /* the page */
 --surface-pearl    #fafaf9
---surface-fill     #dcdee2  /* icon-button fill */
---surface-fill-deep #cecfd3 /* its hover */
---surface-fill-press #bdbfc5 /* its press */
---glyph            #53575e   /* an icon sitting on that fill */
+--surface-fill     #dfd7d4  /* icon-button fill — a warm neutral, see below */
+--surface-fill-deep #d3cac6 /* its hover */
+--surface-fill-press #c6bbb6 /* its press */
+--glyph            #514c49   /* an icon sitting on that fill */
 --surface-tile-1   #0b0d12   /* the dark Field */
 --surface-black    #000000   /* true void — rare */
 
@@ -99,6 +99,19 @@ fill still wants depth under a white label but a rule has to lighten to be seen.
 
 The pure CI orange keeps two jobs: **the Cut**, and **the dark Field** — where it is
 finally free to be itself.
+
+**The icon disc is a warm neutral, not the CI's cool one.** The CI hues its whole neutral
+ramp 265° "so light surfaces echo the steel grey-blue Field". That reasoning does not
+survive contact with where this control actually sits: the page behind it is `#f3f3f3`, a
+dead neutral with no hue at all, and its neighbour is the orange primary. A blue-grey disc
+beside a warm orange button reads as borrowed from another system. Same ramp, rotated to
+the orange's own family (45°) at a chroma low enough to stay a neutral rather than become
+a tint — and the dark Field's disc is warmed to match, so the control does not change
+temperature when the survey crosses from welcome to question one.
+
+Both glyphs are solved against `--fill-press`, the extreme they sit on rather than the
+resting state — the darkest fill on the light Field (4.51) and the lightest on the dark
+one (4.53). Solving against the resting fill would have left the press state at 3.90.
 
 ### CI-DIVERGENCE — five measurements to send back
 
