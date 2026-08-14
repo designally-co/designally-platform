@@ -49,10 +49,10 @@ no decorative colour.
 --stone-500        #aaaaaa   /* the resting state of a point or rule */
 
 /* action */
---primary          var(--orange-500)     /* fills only: the button, the bar */
---on-primary       var(--charcoal-900)   /* its label — see below */
---primary-mark     #c73f29   /* orange as a line, a dot, or text */
---primary-deep     #d2472e   /* hover darkens, never lightens */
+--primary          #c73f29   /* the action orange: fill, line, dot and text */
+--on-primary       #ffffff   /* 5.03:1 */
+--primary-mark     var(--primary)        /* parts company only on the dark Field */
+--primary-deep     #b03f2b   /* hover darkens, never lightens — 5.85:1 */
 --primary-focus    var(--steel-500)      /* focus is steel, never orange */
 --primary-on-dark  #ff8f7a
 
@@ -80,18 +80,25 @@ no decorative colour.
 --cut              var(--orange-500)  /* The Cut. Never a rule, never a divider. */
 ```
 
-**A fill is CI-exact; a line or a mark is measured.** The CI orange is 2.92:1 on the warm
-white page. As a button or a progress bar that is fine — nothing has to resolve its edge,
-and its own label carries the contrast. As a 1px control boundary, a 6px status dot, or a
-line of text it *is* the meaning, and 2.92 clears neither the 4.5:1 text floor nor the
-3:1 a control boundary needs. So `--primary` fills and `--primary-mark` draws. The Thai
-toggle on the survey was the case that proved it: a button whose only edge measured 2.92
-against the page behind it.
+**#ef6148 cannot do functional work on the CI's own default page.** This is the deepest of
+the divergences and it is worth stating plainly. On warm white the CI orange is **2.92:1**,
+so it cannot draw a control boundary, a status dot or a line of text — all of which need
+3:1 at minimum. Under white it is **3.24:1**, so it cannot carry a button label either.
+It is legal in exactly two places: with charcoal on top of it, and on the dark Field,
+where it measures 5.99:1.
 
-**The primary button's label is charcoal, not white.** White on `#ef6148` is 3.24:1 and
-this label runs at 17px. Charcoal on the same orange is 5.19:1, and the CI already says a
-control that is *on* goes charcoal rather than orange, so the correction is the system's
-own logic rather than a departure from it.
+Charcoal-on-orange was built first and measured 5.19:1. It was rejected on looks — dark on
+mid-orange reads as a caution sign rather than a brand action. Studio judgement, and the
+right call.
+
+So **the action colour is the CI hue and chroma at the lightness where a white label
+clears 4.5:1**: `#c73f29`, 5.03 under white and 4.54 as a line on the page. One orange,
+legal as a fill, a rule, a dot and text — which is why `--primary` and `--primary-mark`
+hold the same value on the light Field. They part company only on the dark one, where a
+fill still wants depth under a white label but a rule has to lighten to be seen.
+
+The pure CI orange keeps two jobs: **the Cut**, and **the dark Field** — where it is
+finally free to be itself.
 
 ### CI-DIVERGENCE — five measurements to send back
 
@@ -99,6 +106,7 @@ Hue and chroma are the CI's in every case; only lightness moved.
 
 | CI token | CI value | Measured | Used here |
 |---|---|---|---|
+| `--surface-accent` as a button | `#ef6148` | 3.24:1 under white | `#c73f29` — 5.03 |
 | `--text-accent` | `#d95039` | 3.67:1 on page | `#c73f29` — 4.54 |
 | `--status-done` | `#329568` | 3.36:1 | `#107f54` — 4.52 |
 | `--status-warn` | `#e39f2c` | **2.04:1** | `#a06000` — 4.54 |

@@ -27,32 +27,35 @@
   --stone-500: #aaaaaa;
 
   /* ---- action ----
-     The CI makes orange the primary button. Its own token for the
-     label is #ffffff, which measures 3.24:1 on #ef6148 and cannot
-     carry a 17px label. Charcoal on the same orange is 5.19:1, and
-     the CI already says a control that is *on* goes charcoal rather
-     than orange, so the correction is the system's own logic. */
-  --primary: var(--orange-500);
-  --on-primary: var(--charcoal-900); /* CI-DIVERGENCE: white is 3.24:1 */
-  --primary-deep: #d2472e; /* hover darkens, never lightens */
+     CI-DIVERGENCE, and the one that goes deepest: **#ef6148 cannot do
+     functional work on the CI's own default page.** It is 2.92:1 on warm
+     white, so it cannot draw a control boundary or a status dot; and it is
+     3.24:1 under white, so it cannot carry a button label either. Charcoal
+     on it is legal at 5.19:1 and was tried first, but dark-on-orange reads
+     as a caution sign rather than a brand action — studio judgement.
+
+     So the action colour is the CI hue (32°) and chroma at the lightness
+     where a white label clears 4.5:1: 5.03 under white, 4.54 as a line on
+     the page. One orange, legal as a fill, a rule, a dot and text.
+
+     The pure CI orange keeps two jobs — the Cut, and the dark Field, where
+     it measures 5.99:1 and is finally free to be itself. */
+  --primary: #c73f29;
+  --on-primary: #ffffff; /* 5.03:1 */
+  --primary-deep: #b03f2b; /* hover darkens, never lightens — 5.85:1 */
 
   /**
-   * The rule this product uses for orange: **a fill is CI-exact, a line or a
-   * mark is measured.**
+   * Orange as a line, a dot, or text.
    *
-   * The CI orange is 2.92:1 on the warm-white page. As a button or a bar that
-   * is fine — nobody has to resolve its edge to read it, and its own label
-   * carries the contrast. As a 1px control boundary, a 6px status dot or a
-   * line of text it is the only thing carrying the meaning, and 2.92 is under
-   * both the 4.5:1 text floor and the 3:1 a control boundary needs. The Thai
-   * toggle on the survey was exactly this: a button whose only edge measured
-   * 2.92 against the page behind it.
+   * On the light Field this is the action colour itself — one orange doing
+   * every job. It stays a separate name because on the dark Field the two
+   * part company: a fill still wants the deep orange under a white label,
+   * while a rule or a dot has to lighten to be seen at all.
    *
    * CI-DIVERGENCE: the system's own --text-accent is orange-600 #d95039 =
-   * 3.67:1 and cannot carry text either. Hue (32°) and chroma held, lightness
-   * 0.612 → 0.562. On a dark Field this lightens instead of darkening.
+   * 3.67:1 on the page and cannot carry text.
    */
-  --primary-mark: #c73f29;
+  --primary-mark: var(--primary);
   --primary-tint: #fff0ec;
   /* focus is steel, never orange — an orange ring would read as a Cut */
   --primary-focus: var(--steel-500);

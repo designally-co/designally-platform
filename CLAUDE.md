@@ -102,9 +102,11 @@ Three things to know before touching colour or type:
 - **Shape is not the CI's.** It sets card and control radius to 2px; this product keeps the
   pill primary and the disc back control, because the survey is answered one card at a
   time on a phone. Deliberate, and recorded at the radii tokens.
-- **A fill is CI-exact; a line or a mark is measured.** The CI orange is 2.92:1 on the page —
-  fine as a button, illegal as a control boundary, a status dot or text. `--primary`
-  fills, `--primary-mark` draws.
+- **`#ef6148` cannot do functional work on the CI's own page.** 2.92:1 on warm white, so it
+  cannot draw a boundary, a dot or text; 3.24:1 under white, so it cannot carry a button
+  label. The action colour is the CI hue at the lightness where a white label clears
+  4.5:1 — `#c73f29`. The pure CI orange keeps the Cut and the dark Field, where it
+  measures 5.99 and is free to be itself.
 - **Five CI values fail their own contrast and are corrected here**, hue and chroma held,
   lightness moved. All are marked `CI-DIVERGENCE` in `globals.css` and tabulated in
   `DESIGN.md` §1. Worth sending back to the branding team. The worst is the focus ring on
