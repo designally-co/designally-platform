@@ -250,16 +250,24 @@ function TextAnswer({ question, value, onChange, onEnter }: Props) {
       </label>
       <Alt question={question} />
       {long ? (
-        <textarea
-          id={id}
-          ref={box}
-          className="textarea"
-          rows={1}
-          value={text}
-          onChange={(e) => onChange(e.target.value)}
-          onKeyDown={advance}
-          placeholder={placeholder}
-        />
+        <>
+          <textarea
+            id={id}
+            ref={box}
+            className="textarea"
+            rows={1}
+            value={text}
+            onChange={(e) => onChange(e.target.value)}
+            onKeyDown={advance}
+            placeholder={placeholder}
+          />
+          {/* Shift+Enter belongs to the field, not to the button — it is what
+              this box does with a keystroke, and reading it beside Continue
+              suggested it was something Continue did. "or press Enter" stays
+              there, because that one really is about the button. Hidden with
+              the other shortcut below 620px, where there is no Shift to hold. */}
+          <span className="fieldhint">Shift + Enter for a line break</span>
+        </>
       ) : (
         <input
           id={id}

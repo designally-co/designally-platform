@@ -3382,6 +3382,15 @@ dialog::backdrop {
   font-size: 12.5px;
   color: var(--ink-3);
 }
+/* the same note, but about the field rather than the button, so it sits under
+   the field. Same size and tone as .okhint because it is the same kind of
+   thing — a keyboard aside, not instruction. */
+.fieldhint {
+  display: block;
+  margin-top: 9px;
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
 
 /* welcome and send share the slide, centred and bare */
 /**
@@ -3732,7 +3741,10 @@ dialog::backdrop {
   .btn.ok {
     flex: 1;
   }
-  .okhint {
+  /* both keyboard asides go together: there is no Shift to hold on a touch
+     keyboard, and Return there makes a line break rather than advancing */
+  .okhint,
+  .fieldhint {
     display: none;
   }
   /* Start, Send answers and the thank-you's action get the same floor, and the

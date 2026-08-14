@@ -635,11 +635,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                   />
                 )}
               </div>
-              <Ok
-                onClick={() => advance(step)}
-                onBack={() => goTo(step - 1, 'back')}
-                hint={card.kind === 'question' && card.question.type === 'paragraph'}
-              />
+              <Ok onClick={() => advance(step)} onBack={() => goTo(step - 1, 'back')} />
             </div>
           </section>
         ) : (
@@ -712,15 +708,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
  * puts on the floor next to it. On a pointer device the chevron pair in the
  * corner does that job instead, so the arrow here is hidden.
  */
-function Ok({
-  onClick,
-  onBack,
-  hint,
-}: {
-  onClick: () => void;
-  onBack: () => void;
-  hint?: boolean;
-}) {
+function Ok({ onClick, onBack }: { onClick: () => void; onBack: () => void }) {
   return (
     <div className="okrow">
       <button className="okback" onClick={onBack} type="button" aria-label="Previous question">
@@ -729,7 +717,9 @@ function Ok({
       <button className="btn btn-primary ok" onClick={onClick}>
         Continue
       </button>
-      <span className="okhint">{hint ? 'Shift + Enter for a line break' : 'or press Enter'}</span>
+      {/* only what this button does. The paragraph's Shift+Enter now sits under
+          the box it belongs to — see questions.tsx. */}
+      <span className="okhint">or press Enter</span>
     </div>
   );
 }
