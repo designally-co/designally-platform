@@ -3053,6 +3053,15 @@ dialog::backdrop {
   padding: calc(34px + env(safe-area-inset-top, 0px)) 26px 0;
   flex: none;
 }
+
+/* the identity screen: no figure, no section, no Cut, and — unless somebody
+   came from the send screen — no action, so the band carries nothing and takes
+   no height. It still exists, because the slide's layout is selected on it. */
+.qmast.bare {
+  /* the safe-area inset stays — it is the notch, not spacing, and dropping it
+     would run the first field under it */
+  padding-block: env(safe-area-inset-top, 0px) 0;
+}
 .qmast .qhead,
 .qmast .qrule {
   max-width: 660px;

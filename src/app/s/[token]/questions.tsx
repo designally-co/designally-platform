@@ -87,6 +87,17 @@ export function Masthead({
    * Measured rather than assumed: the numeral is a `clamp()`, so the masthead
    * is 115px on a small phone and 127px on a large one, and a hardcoded offset
    * would be wrong on one of them.
+   *
+   * **Re-measured when the content changes, not only on mount.** The observer
+   * alone ran once and then reported nothing: it holds the element it was given
+   * at mount, and moving between cards hands the component a different one. So
+   * the value stayed at whatever the first screen measured — 81px while the
+   * masthead stood at 156 — and the scales card's sticky header, which is the
+   * one thing that reads this, sat 75px too high and slid under the masthead.
+   * Exactly the fault the variable was added to fix, quietly restored.
+   *
+   * It only became visible once the identity screen dropped its figure and its
+   * Cut, which made the difference between the two heights large enough to see.
    */
   useEffect(() => {
     const el = box.current;
@@ -100,10 +111,21 @@ export function Masthead({
       ro.disconnect();
       root.style.removeProperty('--mast-h');
     };
-  }, []);
+  }, [index, total, section?.en, section?.th, action]);
+
+  /**
+   * Nothing to say. The identity screen has no figure, no section and no Cut,
+   * and unless somebody arrived from the send screen it has no action either —
+   * so the band would be 81px of padding above three contact fields.
+   *
+   * It still renders, collapsed, rather than being dropped: the slide's layout
+   * is selected on `.survey-shell:has(> .qmast)`, and a screen that removed the
+   * element would quietly take a different one.
+   */
+  const bare = index === null && !section?.en && !section?.th && !action;
 
   return (
-    <div className="qmast" ref={box}>
+    <div className={bare ? 'qmast bare' : 'qmast'} ref={box}>
       {/**
        * The position set as a figure, the section beside it.
        *
@@ -160,14 +182,24 @@ export function Masthead({
        * card begins instead of floating above it, and the brand's own object
        * rather than borrowed chrome. The hairline underneath is its track.
        *
-       * At zero on the identity screen, which is the Cut at its resting length
-       * — the brand's own mark, present, and not yet claiming any distance.
+       * Absent altogether on the identity screen. It was drawn there at its
+       * resting length first, on the argument that the mark was worth keeping
+       * even where it measured nothing — but the Cut *is* the progress on this
+       * surface, and a progress mark on a screen outside the count is a reading
+       * offered where there is nothing to read. There is no measure before the
+       * questions, so there is no line. Asked for 17 August 2026.
+       *
+       * The Edge goes with it: the hairline is this element's own `::before`,
+       * the Cut's track rather than a divider in its own right, and a track
+       * under no Cut is furniture.
        */}
-      <span
-        className="qrule"
-        aria-hidden="true"
-        style={{ '--cut-progress': index === null ? 0 : index / total } as CSSProperties}
-      />
+      {index !== null && (
+        <span
+          className="qrule"
+          aria-hidden="true"
+          style={{ '--cut-progress': index / total } as CSSProperties}
+        />
+      )}
     </div>
   );
 }

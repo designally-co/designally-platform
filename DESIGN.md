@@ -192,7 +192,7 @@ its run:
 | Screen | Figure | Cut |
 |---|---|---|
 | Welcome | `21` — questions · about 20 minutes | full |
-| Name, position, email | *none* | at rest |
+| Name, position, email | *none* | *no Cut, no masthead* |
 | Screen *n* | `n/9` | grown to *n* of the way across |
 | Completion | `21/21` — answered | full |
 
@@ -201,12 +201,22 @@ so a part-drawn line does not read as *none of twenty-one done* — it reads as 
 failed to finish, which is why the old progress bar was hidden on that screen rather than
 shown at zero. Full, it is simply the Cut; it starts measuring on question one.
 
-**The identity screen is not counted, and its Cut is at rest** — the 88px resting length,
-present as the brand's mark and claiming no distance. Asked for 17 August 2026. Name,
-position and email are what a person gives *before* the questionnaire, and counting them
-put `1/6` over a screen holding no question and started a Design survey a sixth of the way
-along before anything had been read. The count is keyed on the card being a field grid
-rather than on it being the first one, because that is the actual property.
+**The identity screen has no masthead at all.** Asked for 17 August 2026. Name, position
+and email are what a person gives *before* the questionnaire: counting them put `1/6` over
+a screen holding no question and started a Design survey a sixth of the way along before
+anything had been read.
+
+The Cut was kept there at first, at its 88px resting length, on the argument that the
+brand's mark was worth having even where it measured nothing. It went too, the same day
+and rightly — **on this surface the Cut *is* the progress**, so a Cut on a screen outside
+the count offers a reading where there is nothing to read. The Edge goes with it: the
+hairline is the Cut's own track, not a divider in its own right, and a track under no Cut
+is furniture.
+
+What is left is a collapsed band — the element still exists, because the slide's layout is
+selected on `:has(> .qmast)`, but it carries only the safe-area inset. The count is keyed
+on the card being a **field grid** rather than on it being the first one, because that is
+the actual property.
 
 That replaced prose on both ends. The welcome had the count and the time set as a sentence
 in the smallest type on the screen, under the button — the one fact a person weighs before
