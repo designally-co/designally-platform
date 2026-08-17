@@ -302,7 +302,16 @@ headings now; the longest is *"References and limits"*. `white-space: nowrap`
 is the guard, so a longer one shows up as a string that needs shortening rather
 than wrapping into the question.
 
-**The question number sits above the question**, not beside it. Everything a
+**The question number is a figure, set the way the count is.** Light 300 in the
+display face at 20–28px, grey. It was 13px semibold — a caption-sized bold "3"
+over a 33px question, which reads as a stray piece of metadata rather than as a
+number. The masthead settled this once and the reasoning carries: *"at 58px a
+bold figure outweighs the question it introduces. The size is there to stop the
+count being a line of text, not to make it loud."* A question's number is the
+same object one scale down. Weight and colour keep it under the question, not
+size.
+
+**It sits above the question**, not beside it. Everything a
 question owns then shares one left edge — its words, the ไทย control, the
 field, its hint, its choices — and that edge is the centred column's own.
 Hanging the number in a 34px margin needed an indent that either narrowed a

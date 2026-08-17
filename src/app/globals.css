@@ -3556,15 +3556,26 @@ dialog::backdrop {
  * words 17px right of the middle on every screen because the page was centring
  * the question *plus* its indent.
  *
- * Small and muted. Inline it inherited the question's 33px, which is a great
- * deal of type to spend on "3".
+ * **A figure, not a label.** It was 13px semibold — a caption-sized bold "3"
+ * hanging over a 33px question, which reads as a stray piece of metadata
+ * rather than as a number. The masthead's own count settled this once: it is
+ * set large and Light, because "at 58px a bold figure outweighs the question it
+ * introduces. The size is there to stop the count being a line of text, not to
+ * make it loud." A question's number is the same object one scale down, so it
+ * takes the same treatment — the CI's display face, Light 300, and grey.
+ *
+ * Weight and colour are what keep it under the question, not size: 28px Light
+ * in `--ink-3` against 33px Regular in `--ink`.
  */
 .qgroup:not(.solo) .qopen .qn {
   display: block;
-  margin: 0 0 7px;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
+  margin: 0 0 1px;
+  font-family: var(--font-display);
+  font-size: clamp(20px, 2.6vw, 28px);
+  font-weight: 300;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
   color: var(--ink-3);
 }
 
