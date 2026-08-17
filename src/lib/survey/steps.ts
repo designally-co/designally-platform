@@ -50,6 +50,12 @@ export type StepDef = {
    * masthead had an eyebrow and was never once rendered. The phrases are the
    * headings now and the sentences are gone; the questions underneath say what
    * the sentences were saying, at more length and in two languages.
+   *
+   * **Three words at most.** Two of the phrases came over at four — "Where you
+   * came from" and "Who it is for" — and they were the two that would not fit
+   * a 320px screen. Three is the cap the set is written to now; the guard that
+   * enforces it is `white-space: nowrap` on `.qtopic`, which ellipses a long
+   * one rather than wrapping it into the question.
    */
   headingEn: string;
   descTh?: string;
@@ -116,7 +122,7 @@ const BRAND_STEPS: StepDef[] = [
   IDENTITY,
   {
     ...INFO,
-    headingEn: 'Where you came from',
+    headingEn: 'Where you began',
     descTh: 'ตอบสั้น ๆ ตามจริงได้เลย',
     questions: ['strategy.7', 'strategy.1'],
   },
@@ -128,7 +134,7 @@ const BRAND_STEPS: StepDef[] = [
   },
   {
     ...INFO,
-    headingEn: 'Who it is for',
+    headingEn: 'Your customers',
     descTh: 'ลูกค้าของคุณเป็นใคร และอะไรทำให้เขาลังเล',
     questions: ['strategy.10', 'strategy.3'],
   },
