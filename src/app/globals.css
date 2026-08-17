@@ -1068,12 +1068,21 @@ label.f span {
 }
 /* the eyebrow itself, and only it — set on `.qsec` rather than the block, so
    the subject beneath does not inherit the caps and come out shouting */
+/**
+ * Quieter than the subject under it.
+ *
+ * At 11.5/600 the caps and the tracking made it the loudest thing in the
+ * masthead — a label outranking the line it labels. 10.5/400 keeps the label
+ * *form*, which is what caps and tracking are for, and drops the weight that
+ * was doing the shouting. Still `--ink-3` at 6.02:1, so nothing is traded for
+ * it: DESIGN.md's ladder has no 500, and this is the step below 600.
+ */
 .qsec {
   display: block;
-  font-size: 11.5px;
-  font-weight: 600;
+  font-size: 10.5px;
+  font-weight: 400;
   text-transform: uppercase;
-  letter-spacing: 0.11em;
+  letter-spacing: 0.1em;
 }
 /* Thai has no cases, and tracking pulls its marks off their glyphs —
    DESIGN.md's floor is -0.02em, and caps-tracking is the other direction */
@@ -4204,9 +4213,11 @@ dialog::backdrop {
     z-index: 5;
     background: var(--parchment);
     border-bottom: var(--cut-width) solid var(--cut);
-    /* close to the subject: the line belongs to these two words, and 15px of
-       air read as a gap between them rather than as an edge under them */
-    padding-bottom: 7px;
+    /* The line belongs to these two words. 15px of air read as a gap between
+       them rather than an edge under them, and 7px still did once the line
+       box's own descender space was counted — the visible gap is this padding
+       plus whatever the leading leaves under the baseline. */
+    padding-bottom: 1px;
   }
   /* `top` and `left` have to be cancelled, not just overridden: the base rule
      pins the disc to the vertical rail's eye level and half-translates it, and
@@ -4222,8 +4233,31 @@ dialog::backdrop {
   }
   /* the subject stops short of the disc, which crosses the line beside it */
   .qtopic {
-    margin-top: 6px;
+    margin-top: 5px;
+    /* 1.2, not 1.35. It is one line and it has no Thai in it any more, so
+       DESIGN.md's floor is the 1.25 for a line that stands alone rather than
+       the 1.6 a line that can hold Thai needs — and the leading was most of
+       the gap between the words and the line under them. */
+    line-height: 1.2;
     padding-right: calc(var(--disc) + var(--sp-lg) + 14px);
+  }
+
+  /**
+   * Below 360px the heading is measured, not assumed.
+   *
+   * Three of the twelve — "Where you came from", "References and limits",
+   * "What they remember" — are 182–190px wide at 17px, against 176px of usable
+   * column once the disc's reserve is taken out of a 320px screen. They would
+   * have ellipsed. A smaller disc and a smaller heading give 192px of column to
+   * a 179px longest string.
+   */
+  @media (max-width: 360px) {
+    :root {
+      --disc: 46px;
+    }
+    .qtopic {
+      font-size: 16px;
+    }
   }
   /* no gutter: the rail is not beside the column any more */
   .survey-shell {
