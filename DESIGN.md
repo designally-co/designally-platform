@@ -278,6 +278,19 @@ four-line masthead on a phone where two will do. Worth saying to the branding
 team rather than letting it pass: a Thai-only reader meets those two lines in
 English.
 
+**The answer is a box, not a ruled line.** It was a bottom border on a
+transparent ground — a writing line rather than a field. That reads beautifully
+on a screen holding one question and stops reading on a screen holding three:
+an underline says *words go above me* and gives no edge left or right, so with
+several stacked there was nothing to say where one answer's ground ended and
+the next question began. Canvas inside the Edge at `--r-md`, which is the same
+object every input in the team app already is.
+
+**And no rule between questions.** The hairline was right while a question was
+one line and its answer one more. With the answer a box of its own, the box
+*is* the boundary and a rule under it was a second one a few pixels away. 44px
+of space does it instead.
+
 **The floor controls are in the flow**, under the questions, at every width.
 They were fixed to the viewport floor on a phone, riding above the keyboard on
 a measured `--kb` with a four-layer blur ramp beneath them. All of it went the

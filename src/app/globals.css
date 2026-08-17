@@ -3492,24 +3492,21 @@ dialog::backdrop {
  * seam rather than a structure. The Edge closes the masthead and opens the
  * list — one line doing both jobs, which is what it was drawn for.
  */
-.qgroup > * {
-  border-bottom: 1px solid var(--hairline);
-}
-.qopen {
-  padding: 26px 0 30px;
-}
 /**
- * One question on a screen has nothing to separate it from.
+ * No rule between questions.
  *
- * The personality scales are a step of their own — ten pairs is a screenful —
- * so there is no list, and a list's rules around a single item are two lines
- * bracketing nothing, a hand's width under the Cut that already closed the
- * masthead.
+ * They were separated by a hairline, which was right when a question was one
+ * line and its answer was one more — the list read as a list. With the answer
+ * now a box of its own, the box *is* the boundary, and a rule under it was a
+ * second one drawn a few pixels away from the first.
+ *
+ * Space does it instead, and more of it than the rule needed: 44px, which is
+ * wide enough that nobody has to work out which answer belongs to which ask.
  */
-.qgroup.solo,
-.qgroup.solo > * {
-  border: 0;
+.qopen + .qopen {
+  margin-top: 44px;
 }
+/* one question on a screen has nothing to be spaced from */
 .qgroup.solo .qopen {
   padding: 0;
 }
@@ -3816,18 +3813,30 @@ dialog::backdrop {
 }
 
 /* the answer — a rule, not a box */
+/**
+ * A box, not a ruled line.
+ *
+ * It was a bottom border on a transparent ground — a writing line rather than a
+ * field. That reads beautifully on a screen holding one question and stops
+ * reading at all on a screen holding three: an underline says "words go above
+ * me" and gives no edge to the left or right, so with several stacked there was
+ * nothing to tell where one answer's ground ended and the next question began
+ * except the empty space between them.
+ *
+ * Canvas inside the Edge, `--r-md` — the same object every input in the team
+ * app is, which is the point: the survey stops inventing a control.
+ */
 .slide .input,
 .slide .textarea {
-  background: transparent;
-  border: 0;
-  border-bottom: 1px solid var(--hairline);
-  border-radius: 0;
-  padding: 6px 2px;
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
   height: auto;
-  min-height: 52px;
-  margin-top: 26px;
-  font-size: clamp(1.25rem, 2.6vw, 1.6rem);
-  line-height: 1.5;
+  min-height: 58px;
+  margin-top: 18px;
+  font-size: clamp(1.05rem, 1.9vw, 1.22rem);
+  line-height: 1.6;
   color: var(--ink);
   transition: border-color 0.18s;
 }
@@ -3836,7 +3845,7 @@ dialog::backdrop {
    is deliberately not used: Safari does not support it, and this survey is
    mostly answered on iPhones. */
 .slide .textarea {
-  min-height: 58px;
+  min-height: 108px;
   max-height: 46dvh;
   overflow-y: auto;
   resize: none;
@@ -3844,7 +3853,7 @@ dialog::backdrop {
 .slide .input:focus,
 .slide .textarea:focus {
   outline: 0;
-  border-bottom-color: var(--primary-mark);
+  border-color: var(--primary-mark);
 }
 .slide .input::placeholder,
 .slide .textarea::placeholder {
@@ -3854,11 +3863,11 @@ dialog::backdrop {
   color: var(--ink-3);
 }
 /* the focus ring is the system's one shadow, and removing it outright would
-   strand a keyboard user — it moves to the field's rule instead */
+   strand a keyboard user — it moves to the field's own edge instead */
 .slide .input:focus-visible,
 .slide .textarea:focus-visible {
-  border-bottom-width: 2px;
-  padding-bottom: 5px;
+  border-color: var(--primary-mark);
+  box-shadow: 0 0 0 3px var(--primary-tint);
 }
 
 /* OK, and the shortcut beside it */
@@ -4193,7 +4202,9 @@ dialog::backdrop {
     z-index: 5;
     background: var(--parchment);
     border-bottom: var(--cut-width) solid var(--cut);
-    padding-bottom: 15px;
+    /* close to the subject: the line belongs to these two words, and 15px of
+       air read as a gap between them rather than as an edge under them */
+    padding-bottom: 7px;
   }
   /* `top` and `left` have to be cancelled, not just overridden: the base rule
      pins the disc to the vertical rail's eye level and half-translates it, and
