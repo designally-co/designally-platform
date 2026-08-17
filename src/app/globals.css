@@ -3737,22 +3737,32 @@ dialog::backdrop {
 /**
  * The mark inside the disc, on the two screens before the count starts.
  *
- * 62% of the disc, which is what leaves the mark's own bounding box the same
- * optical air a two-digit fraction gets. The PNG is a white knockout with an
- * alpha channel, so the D reads white and the disc shows through everywhere
- * the mark is not — the counter and the Point are `--primary`, which is the
- * one place in the system the CI's orange gets to sit inside its own mark
- * without being asked to carry a boundary.
+ * The PNG is a white knockout with an alpha channel, so the D reads white and
+ * the disc shows through everywhere the mark is not — the counter and the Point
+ * are `--primary`, which is the one place in the system the CI's orange gets to
+ * sit inside its own mark without being asked to carry a boundary.
  *
- * Nudged up by a hair: the mark's Point hangs below the D's baseline, so the
- * drawn mass sits low in its own box and centring the box leaves the D looking
- * dropped.
+ * **54%, not 62%.** The mark is drawn corner to corner: its ink bounding box is
+ * the full 274×284 frame, so the box's *diagonal* is what has to clear the rim,
+ * not its width. At 62% the diagonal was 88% of the diameter and the D's
+ * shoulder ran into the edge. 54% puts the corners at about 78%, which is the
+ * margin a badge wants.
+ *
+ * **Nudged right and up, and by less than the arithmetic says.** The ink fills
+ * the frame edge to edge, so centring the box gives equal margins and still
+ * reads left-heavy: the mark's left edge is the D's full stem and its right
+ * edge is the Point, a small disc low in the corner, so the eye takes the
+ * bowl for the right edge and sees the whole thing sitting left. The alpha
+ * centroid measures 44.2% / 51.7%, and correcting the full distance to it
+ * overshoots — weighting by area, the D outvotes the Point by too much and the
+ * lockup ends up crowding the right rim. Half of it is where the two edges
+ * look equal, checked side by side at 300px against the disc's own centre.
  */
 .qdisc.markdisc img {
-  width: 62%;
+  width: 54%;
   height: auto;
   display: block;
-  transform: translateY(-3%);
+  transform: translate(2.9%, -0.9%);
 }
 .qdisc {
   display: flex;
