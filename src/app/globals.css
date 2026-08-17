@@ -3370,8 +3370,70 @@ dialog::backdrop {
      the first word — the margin reading as the layout rather than as air. */
   .survey-shell .slidebody,
   .survey-shell .qmast .qhead {
-    max-width: 880px;
+    max-width: var(--col);
     margin-inline: auto;
+  }
+
+  /**
+   * The rail stands beside the words, not out at the edge of the screen.
+   *
+   * It was `clamp(38px, 4.4vw, 76px)` from the viewport's left — a position
+   * with nothing to do with where the column ended up, so on a wide screen the
+   * disc sat a hundred pixels clear of the section it was counting and read as
+   * furniture rather than as part of the masthead.
+   *
+   * Derived from the column instead. The column is centred and at most 880px,
+   * so its left edge is `50vw − col/2`, and the rail is 58px left of that:
+   * half a disc plus air, so the disc lands just clear of the first word.
+   *
+   * `--col` must not be derived from `--rail-gutter`, which is derived from
+   * `--rail-x` — that cycle makes all three invalid at computed-value time and
+   * `--rail-x` silently resolves to 0, which is where the rail went. The gutter
+   * is zero here anyway: the column centres itself and the rail lives in the
+   * space that leaves.
+   */
+  :root {
+    --rail-gutter: 0px;
+    --col: min(880px, 100vw - 340px);
+    --rail-x: calc(50vw - var(--col) / 2 - 58px);
+  }
+
+  /**
+   * …and the disc rides the masthead, level with the words by construction.
+   *
+   * Fixed at `--eye` it needed the masthead to start at a hardcoded offset to
+   * line up with it. Hung off the block it belongs to, it lines up with
+   * whatever that block does — and it still sits on the line, because both take
+   * their x from `--rail-x`.
+   */
+  /**
+   * `top: 50%` has to mean the middle of the words, so the block has to *be*
+   * the words. The masthead carries 34px of top padding and none at the bottom
+   * — an asymmetry that put its box's centre 27px above its text's centre, and
+   * the disc with it. The padding moves to the shell.
+   */
+  .qmast {
+    position: relative;
+    padding-top: 0;
+  }
+  .survey-shell {
+    padding-top: 44px;
+  }
+  /* the rail's own disc, not an `<i>` — `rail.tsx` renders `<b class="qdisc">`,
+     so `.qrail i` matched nothing and both discs drew */
+  .qrail .qdisc {
+    display: none;
+  }
+  /* `.qmast` in front, because the base `.qdisc.mastdisc { display: none }`
+     ties on specificity and sits later in the file */
+  .qmast .qdisc.mastdisc {
+    display: flex;
+    position: absolute;
+    top: 50%;
+    left: var(--rail-x);
+    right: auto;
+    bottom: auto;
+    transform: translate(-50%, -50%);
   }
 }
 
@@ -3852,15 +3914,39 @@ dialog::backdrop {
 .slide .textarea {
   background: var(--canvas);
   border: 1px solid var(--hairline);
-  border-radius: var(--r-md);
-  padding: 14px 16px;
+  /* `--r-lg`, the radius every other card on this page takes — a field is a
+     surface here, not a control squeezed into a form row, and at `--r-md` it
+     was the only 11px corner on a screen of 18px ones */
+  border-radius: var(--r-lg);
+  padding: 17px 19px;
   height: auto;
-  min-height: 58px;
+  min-height: 62px;
   margin-top: 18px;
   font-size: clamp(1.05rem, 1.9vw, 1.22rem);
   line-height: 1.6;
   color: var(--ink);
-  transition: border-color 0.18s;
+  /* the caret is the one place the accent is unarguable: it marks exactly
+     where the person is, which is what the accent means */
+  caret-color: var(--primary-mark);
+  transition:
+    border-color 0.18s var(--ease),
+    box-shadow 0.18s var(--ease),
+    background-color 0.18s var(--ease);
+}
+/* the survey's own selection, rather than the browser's blue — the tint is
+   already the ground the focus ring uses */
+.slide .input::selection,
+.slide .textarea::selection {
+  background: var(--primary-tint);
+  color: var(--ink);
+}
+@media (hover: hover) {
+  /* the line darkens, the same hover every quiet control on this survey has.
+     Without it a field gave no sign it was a field until you clicked in it. */
+  .slide .input:hover:not(:focus),
+  .slide .textarea:hover:not(:focus) {
+    border-color: var(--ink-3);
+  }
 }
 /* Grows with its content (useAutosize) to about half the screen, then scrolls
    inside itself so the question above and OK below stop moving. field-sizing
@@ -3876,6 +3962,10 @@ dialog::backdrop {
 .slide .textarea:focus {
   outline: 0;
   border-color: var(--primary-mark);
+  /* the system's one shadow, spent here. Three pixels of the accent's own tint
+     — a ring, not a glow: no offset, no blur, so it reads as a second line
+     rather than as light coming off the box. */
+  box-shadow: 0 0 0 3px var(--primary-tint);
 }
 .slide .input::placeholder,
 .slide .textarea::placeholder {
@@ -3884,13 +3974,8 @@ dialog::backdrop {
      fine-print tone and measures 4.66. */
   color: var(--ink-3);
 }
-/* the focus ring is the system's one shadow, and removing it outright would
-   strand a keyboard user — it moves to the field's own edge instead */
-.slide .input:focus-visible,
-.slide .textarea:focus-visible {
-  border-color: var(--primary-mark);
-  box-shadow: 0 0 0 3px var(--primary-tint);
-}
+/* :focus already carries the ring above, and a keyboard user gets the same
+   one — there is nothing left for :focus-visible to add here */
 
 /* OK, and the shortcut beside it */
 .okrow {

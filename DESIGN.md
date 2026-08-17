@@ -250,7 +250,18 @@ collapsing the only thing on a screen would leave nothing to look at.
 ### The Cut stands up — and lies down again on a phone
 
 **Wide: a full-height line down the left edge, fixed, with a filled disc
-crossing it near the top and the question count inside the disc.** Nothing on
+crossing it beside the masthead and the count inside the disc.** The rail's x
+is derived from the column — `50vw − col/2 − 58px` — so the disc lands 17px
+clear of the first word instead of out at the viewport's edge, and the disc is
+hung off the masthead rather than the rail, so it is level with the words by
+construction rather than by a hardcoded offset.
+
+**The answer field is a card, not a form row.** `--r-lg`, the radius every
+other card on the page takes; 17/19 padding; the line darkens on hover like
+every other quiet control; the focus ring is the system's one shadow, three
+pixels of the accent's own tint with no offset and no blur, so it reads as a
+second line rather than as light. The caret is the accent — the one place it is
+unarguable, since it marks exactly where the person is. Nothing on
 it moves — the line runs its full length on every screen and never fills, and
 the number inside the disc changes rather than a mark sliding down a track. The
 line is the brand's mark, not a progress track.
