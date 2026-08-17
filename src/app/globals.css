@@ -3439,13 +3439,19 @@ dialog::backdrop {
    */
   .qmast .qhead {
     background: var(--parchment);
-    padding-block: 30px 24px;
+    /**
+     * The air above the words lives *inside* the pinned block.
+     *
+     * It was the shell's `padding-top`, above the masthead — which meant the
+     * masthead had that far to travel before its top reached 0 and it pinned.
+     * The group crept up by 47px on the first flick and then held, which is
+     * exactly the movement it is supposed to not have. Inside the block, the
+     * block starts at 0 and never moves at all.
+     */
+    padding-block: clamp(40px, 6vh, 64px) 24px;
   }
   .survey-shell {
-    /* air above the first thing on the screen. It scrolls away and the
-       masthead's own 30px is what remains when the block pins — generous at
-       rest, compact in use. */
-    padding-top: clamp(36px, 5.5vh, 60px);
+    padding-top: 0;
   }
   /* the rail's own disc, not an `<i>` — `rail.tsx` renders `<b class="qdisc">`,
      so `.qrail i` matched nothing and both discs drew */
