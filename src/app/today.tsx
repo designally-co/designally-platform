@@ -45,6 +45,26 @@ export default function Today({
     /* whose row was clicked — the sheet opens on them */
     focus: string;
   } | null>(null);
+  /**
+   * The project a sheet was opened *from*, so back is a step and not a
+   * dismissal.
+   *
+   * The sheets took a back chevron on 17 August 2026, and a chevron makes a
+   * promise a Close button never did: it says there is a place behind this one.
+   * Answers and insights are both reached from a project, and both used to shut
+   * the project on the way in and drop you on the landing page on the way out —
+   * so reading one person's answers cost two clicks to get back to where you
+   * were. Insights can also be opened from the Needs you card, and then there
+   * is no project behind them and back is the page. Null means exactly that.
+   */
+  const [cameFrom, setCameFrom] = useState<string | null>(null);
+
+  /** back out of a sheet: to the project it was opened from, or to the page */
+  const goBack = (leave: () => void) => {
+    leave();
+    if (cameFrom) setOpenProject(cameFrom);
+    setCameFrom(null);
+  };
   const toast = useToast();
   const [writing, startWriting] = useTransition();
 
@@ -241,9 +261,11 @@ export default function Today({
       {insightsProject?.insights && (
         <InsightsSheet
           project={insightsProject}
-          onClose={() => setOpenInsights(null)}
+          backLabel={cameFrom ? `Back to ${insightsProject.clientName}` : 'Back to all projects'}
+          onClose={() => goBack(() => setOpenInsights(null))}
           onConfirmed={(msg) => {
             setOpenInsights(null);
+            setCameFrom(null);
             toast.show(msg);
           }}
         />
@@ -253,11 +275,14 @@ export default function Today({
           data={answers.data}
           clientName={answers.name}
           focus={answers.focus}
+          backLabel={cameFrom ? `Back to ${answers.name}` : 'Back to all projects'}
           onDeleted={(msg) => {
             setAnswers(null);
+            /* the person is gone, so the project they were on is where to land */
+            goBack(() => {});
             toast.show(msg);
           }}
-          onClose={() => setAnswers(null)}
+          onClose={() => goBack(() => setAnswers(null))}
         />
       )}
       {project && (
@@ -265,12 +290,14 @@ export default function Today({
           project={project}
           origin={origin}
           onOpenInsights={() => {
+            setCameFrom(project.id);
             setOpenProject(null);
             setOpenInsights(project.id);
           }}
           onReadAnswers={async (responseId) => {
             const data = await readAnswers(project.id);
             if (!data) return;
+            setCameFrom(project.id);
             setOpenProject(null);
             setAnswers({ name: project.clientName, data, focus: responseId });
           }}

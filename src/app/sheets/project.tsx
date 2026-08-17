@@ -163,7 +163,7 @@ export default function ProjectSheet({
   );
 
   return (
-    <Sheet title="Project" actions={actions} onClose={onClose}>
+    <Sheet title="Project" actions={actions} backLabel="Back to all projects" onClose={onClose}>
       <div className="pd-head">
         <h1>{p.clientName}</h1>
         <div className="pkg">

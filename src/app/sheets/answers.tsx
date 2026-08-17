@@ -90,6 +90,7 @@ export default function AnswersSheet({
   data,
   clientName,
   focus,
+  backLabel,
   onDeleted,
   onClose,
 }: {
@@ -101,6 +102,8 @@ export default function AnswersSheet({
    * and making the team find them again in the tabs.
    */
   focus?: string;
+  /** where back goes — the project, when the sheet was opened from one */
+  backLabel?: string;
   /** a response was deleted — the caller closes this sheet and says so */
   onDeleted: (message: string) => void;
   onClose: () => void;
@@ -134,7 +137,7 @@ export default function AnswersSheet({
     });
 
   return (
-    <Sheet title={`What ${clientName} said`} onClose={onClose}>
+    <Sheet title={`What ${clientName} said`} backLabel={backLabel} onClose={onClose}>
       {!data.respondents.length ? (
         <p className="quiet">Nobody has answered yet.</p>
       ) : (

@@ -817,12 +817,19 @@ Sub-nav, sheet headers, brief action bars: `rgba(245,245,247,0.8)` with `saturat
 
 Full-screen dialog. Backdrop `rgba(0,0,0,0.32)`. Inner sheet 760px on `--canvas-parchment`, entering with an 18px rise over 420ms. Body padding `32px 28px 72px`.
 
-**The header is a toolbar**, the same three slots as the page's: title · actions · Close, with
-Close in its own group after the actions. Everything that can be *done* to what the sheet is
-about lives there — one visible action at most, the rest behind More — and the body describes
-rather than acts. It was sticky and frosted over `rgba(245, 245, 247, 0.8)` until 17 August 2026;
-it is the sheet's own parchment now, with a permanent hairline, because a sheet always has
-content under its header.
+**The header is a toolbar**, in three slots: **back · title · actions**.
+
+Back is the **52px disc** specified under *Icon button* below — `pill` radius, `--surface-fill`,
+no border, the shared `--glyph` chevron — at the far leading edge, on its own. 44px where only a
+cursor reaches it. It was a text `Close` pill on the trailing edge until 17 August 2026; Apple's
+HIG asks for the standard symbol, at the leading edge, and never the word, and it is the one
+glyph this product spends (see `docs/navigation-decisions.md`). It is the same object as the
+survey's back control, at the same size, drawn from the same component.
+
+Actions take the trailing edge — one visible at most, the rest behind **More** — and the body
+describes rather than acts. The header was sticky and frosted over `rgba(245, 245, 247, 0.8)`
+until the same day; it is the sheet's own parchment now, with a permanent hairline, because a
+sheet always has content under its header.
 
 ---
 

@@ -2094,24 +2094,50 @@ dialog::backdrop {
   font-size: 15.5px;
   font-weight: 600;
 }
-/* the actions group takes the space, so Close keeps its own group after it */
+/* the actions take the trailing edge; back has the leading edge to itself */
 .sheet-top .bartrail {
   margin-left: auto;
 }
-.sheet-top .x {
-  font-size: 14px;
-  color: var(--ink-2);
-  background: transparent;
-  border: 1px solid var(--hairline);
+
+/**
+ * The way out.
+ *
+ * The same disc as the survey's back control — `--fill`, no border, the shared
+ * chevron — because it is the same object doing the same job, and the team
+ * should not have to learn a second one. DESIGN.md sizes it 52px where a thumb
+ * uses it and 40px where only a cursor does; a sheet header is both, so it
+ * takes 44 on a pointer, which is the touch floor, and the full 52 on a phone.
+ *
+ * It replaced a text `Close` pill on the trailing edge on 17 August 2026, per
+ * Apple's HIG: the standard symbol, at the far leading edge, and never the word.
+ */
+.sheet-top .back {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  margin-left: -6px;
+  border: 0;
   border-radius: var(--r-pill);
-  padding: 6px 16px;
-  min-height: 44px;
+  background: var(--fill);
+  color: var(--glyph);
   cursor: pointer;
-  transition: border-color 0.18s;
+  transition:
+    background-color 0.18s,
+    color 0.18s,
+    transform 0.12s var(--ease);
+}
+.sheet-top .back:active {
+  background: var(--fill-press);
+  color: var(--ink);
+  transform: scale(0.96);
 }
 @media (hover: hover) {
-  .sheet-top .x:hover {
-    border-color: var(--ink);
+  /* a filled control deepens its own fill — DESIGN.md section 5, Hover */
+  .sheet-top .back:hover {
+    background: var(--fill-deep);
+    color: var(--ink);
   }
 }
 .sheet-body {
@@ -2506,6 +2532,12 @@ dialog::backdrop {
   }
   .sheet-top {
     padding: 12px 20px;
+  }
+  /* a thumb uses it here — DESIGN.md's 52px, the survey's own size */
+  .sheet-top .back {
+    width: 52px;
+    height: 52px;
+    margin-left: -10px;
   }
 }
 

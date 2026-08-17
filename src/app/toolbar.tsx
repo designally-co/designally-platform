@@ -37,10 +37,14 @@ import MoreMenu from './menu';
  *
  * What was refused:
  *
- * - **Symbols instead of labels.** "Prefer simple, recognizable symbols for
- *   items instead of text." `docs/navigation-decisions.md` says the opposite
- *   and is right for this product: "a bare glyph needs a legend where words do
- *   not." Words stay.
+ * - **Symbols instead of labels, for actions.** "Prefer simple, recognizable
+ *   symbols for items instead of text." `docs/navigation-decisions.md` says the
+ *   opposite and is right for this product: "a bare glyph needs a legend where
+ *   words do not." Words stay — for actions. The way out of a sheet is the one
+ *   exception and is a chevron, because the HIG names Back and Close as
+ *   standard symbols and every machine already teaches them; see sheets/sheet.tsx.
+ *   This bar is the root of the app and has nothing to go back to, so it has no
+ *   such control.
  * - Bottom toolbars, tab bars, and customization. The product has one place;
  *   a tab bar would be a lie about that, and five people with two actions have
  *   nothing to customize.

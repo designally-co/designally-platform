@@ -127,10 +127,13 @@ function Quotes({ quotes }: { quotes: string[] }) {
 
 export default function InsightsSheet({
   project,
+  backLabel,
   onClose,
   onConfirmed,
 }: {
   project: ProjectView;
+  /** where back goes — the project, when the sheet was opened from one */
+  backLabel?: string;
   onClose: () => void;
   onConfirmed: (message: string) => void;
 }) {
@@ -152,7 +155,7 @@ export default function InsightsSheet({
   }
 
   return (
-    <Sheet title={`${project.clientName} — insights`} onClose={onClose}>
+    <Sheet title={`${project.clientName} — insights`} backLabel={backLabel} onClose={onClose}>
       <div className="insights">
         {/* 1 · read this first */}
         <h1>{insights.headline}</h1>
