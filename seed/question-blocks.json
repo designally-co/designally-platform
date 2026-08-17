@@ -1,6 +1,6 @@
 {
-  "version": 5,
-  "updated": "2026-08-14",
+  "version": 6,
+  "updated": "2026-08-17",
   "note": "Version 5. The identity block asks three things again: name, position and email. Position (`role`) was dropped at version 3 and the email at version 4, the latter on the grounds that nothing in the product read it. The team asked for both back — they want to know who is speaking and how to reach them before they read a single answer, and a name alone does not say whether a view is the founder's or an intern's. The privacy reasoning that removed the email still holds and is still enforced, in the one place that matters: buildTranscript drops the whole identity block, so none of these three ever reaches the analysis API. They are contact and attribution, read by the team on the answers sheet, not evidence. All three carry `maps_to`, so the submit route finds them by meaning rather than by position and a later reorder cannot silently swap a name into an email column. Versions 1-4 are left in place: surveys sent at those versions keep the questions they were sent with (rule 5), and their answers still reference those rows. Blocks core, branding, website and ecommerce stay at version 1 for the same reason — they are simply no longer attached to any package.",
   "packages": {
     "brand": [

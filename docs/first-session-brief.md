@@ -162,7 +162,7 @@ quantity of work.
 ### ~~Milestone 6 — the template editor~~
 
 **Retired 17 August 2026, with the *Question templates* panel.** The questionnaire is fixed at
-version 5 and the branding team owns its wording; an editor for it is a surface to maintain and
+version 6 and the branding team owns its wording; an editor for it is a surface to maintain and
 the easiest way to break rule 5. Kept below because the versioning requirement in it is still the
 rule, whoever ends up editing a question and however they do it.
 

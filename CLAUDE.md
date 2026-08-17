@@ -210,6 +210,14 @@ optional min/max), `linear_scale` (with pole labels, point count, and an optiona
 run **1–5**. Version 2 briefly ran them 0–10; `start` and the wide rendering stay for the surveys
 sent while that was true.
 
+**Question version 6, 17 August 2026.** Same twenty-one questions, same order, same types,
+same answers — only the words in front of them. Seven of the visual questions opened with the
+label their own screen heading already said (*"Mood and Personality — choose 3 words…"* under a
+heading reading *"Mood and impression"*), and two were missing a full stop. The fix could not
+reach version 5: `scripts/seed.ts` refuses to replace a question anybody has answered, which is
+rule 5 working rather than failing. A new version is how a correction reaches the next client
+without rewriting what the last one was asked.
+
 **Decided 11 August 2026 — two packages, and the website track is retired.** The branding team
 replaced the questionnaire. A client buys Brand **or** Design, never both.
 
@@ -242,7 +250,7 @@ Each one ends with something usable. Do not start the next before the previous h
 4. **The human gate** — review and confirm the insights. That is where the platform stops.
 5. ~~The website track~~ — retired 11 August 2026 with the website package.
 6. ~~The template editor~~ — retired 17 August 2026 with the *Question templates* panel. The
-   questionnaire is fixed at version 5, the branding team owns its wording, and the questions
+   questionnaire is fixed at version 6, the branding team owns its wording, and the questions
    live in `seed/question-blocks.json`. Rule 5 still holds if that ever changes.
 
 ## Working conventions

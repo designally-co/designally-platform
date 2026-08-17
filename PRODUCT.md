@@ -64,7 +64,7 @@ The website track and its follow-up content survey were retired on 11 August 202
 - **Internal facilitation notes never render on a client-facing surface**, and live in their own field rather than behind a flag.
 - **The client's contact email never goes to the analysis API.** It is contact detail, not evidence, and it is the only field that identifies a real person off this system.
 - The survey must work on a phone, in Thai, on a poor connection, and save progress as the client goes.
-- **Questions live in a seed file, and that is now the settled answer.** The questionnaire is fixed at version 5, the branding team owns its wording, and changing one needs a developer and a deploy. The in-app template editor was retired on 17 August 2026 — an editor for something nobody edits is a surface to maintain and the easiest way to break the versioning rule above.
+- **Questions live in a seed file, and that is now the settled answer.** The questionnaire is fixed at version 6, the branding team owns its wording, and changing one needs a developer and a deploy. The in-app template editor was retired on 17 August 2026 — an editor for something nobody edits is a surface to maintain and the easiest way to break the versioning rule above.
 
 ## Brand Commitments
 
