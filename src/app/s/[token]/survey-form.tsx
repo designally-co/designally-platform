@@ -78,7 +78,7 @@ function stepIsVisible(step: SurveyStep, values: DraftValues, all: SurveyStep[])
 type Section = { en?: string; th?: string };
 
 type Card =
-  | { kind: 'fields'; questions: SurveyQuestion[]; section: Section }
+  | { kind: 'fields'; questions: SurveyQuestion[]; section: Section; headingEn: string; descTh?: string }
   | {
       kind: 'group';
       questions: SurveyQuestion[];
@@ -164,7 +164,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
         const section: Section = { en: s.sectionEn, th: s.sectionTh };
         const allFields = s.questions.every((q) => q.type === 'short_text' && q.number === null);
         return allFields
-          ? { kind: 'fields', questions: s.questions, section }
+          ? { kind: 'fields', questions: s.questions, section, headingEn: s.headingEn, descTh: s.descTh }
           : {
               kind: 'group',
               questions: s.questions,
@@ -343,33 +343,68 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
    * `visualViewport` listeners running on every keystroke went with it.
    */
 
+  /**
+   * Every view starts at its own top.
+   *
+   * Called from the handler rather than only from an effect, and both are
+   * needed. The effect below is what actually catches every route into a new
+   * screen — the review rows, the keyboard, the back control. This runs first,
+   * inside the tap that caused the move, which is the only moment iOS Safari
+   * reliably lets a page scroll itself: after the gesture ends it will restore
+   * the position it thinks the document had, and a screen you have already
+   * scrolled through opens halfway down.
+   *
+   * `scrollingElement` as well as the window, because the two disagree on iOS
+   * when the visual viewport is offset by the keyboard, which it is every time
+   * a client presses Continue from inside a text box.
+   *
+   * Nothing here restores a scroll position: a screen is a page, and a new page
+   * begins at the beginning.
+   */
+  const toTop = useCallback(() => {
+    window.scrollTo(0, 0);
+    if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
+  }, []);
+
   /* the questions end at the last card; past it is the send screen */
-  const advance = (n: number) => (n >= cards.length ? openSend() : setStep(n + 1));
+  const advance = (n: number) => {
+    toTop();
+    return n >= cards.length ? openSend() : setStep(n + 1);
+  };
 
+  const goTo = useCallback(
+    (index: number, direction: 'next' | 'back' = 'next') => {
+      toTop();
+      setDir(direction);
+      setStep(index);
+    },
+    [toTop],
+  );
 
-  const goTo = useCallback((index: number, direction: 'next' | 'back' = 'next') => {
-    setDir(direction);
-    setStep(index);
-  }, []);
-
-  const leaveSend = useCallback((index: number) => {
-    setDir('back');
-    setFromSend(true);
-    setSending(false);
-    setStep(index);
-  }, []);
+  const leaveSend = useCallback(
+    (index: number) => {
+      toTop();
+      setDir('back');
+      setFromSend(true);
+      setSending(false);
+      setStep(index);
+    },
+    [toTop],
+  );
 
   const openSend = useCallback(() => {
+    toTop();
     setDir('next');
     setFromSend(false);
     setSending(true);
-  }, []);
+  }, [toTop]);
 
-  /* Every view starts at its own top. Nothing here restores a scroll position:
-     a question is a page now, and a new page begins at the beginning. */
+  /* the backstop, for every way into a screen that is not one of the four
+     handlers above — and for the paint after this one, once the new screen's
+     height is known */
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [step, sending, submitted]);
+    toTop();
+  }, [step, sending, submitted, toTop]);
 
   /* ── submit ─────────────────────────────────────────────────────── */
 
@@ -777,7 +812,11 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
             counted={counts.position[step - 1] !== null}
             count={railAt !== null ? { n: railAt, total: counts.total } : undefined}
             section={card.section}
-            heading={card.kind === 'group' ? { en: card.headingEn, th: card.descTh } : undefined}
+            /* The identity card takes a heading too. It was withheld because
+               name, position and email are not questions — but the screen still
+               needs naming, and "About you" over three fields asking who you
+               are is the shortest true thing to call it. */
+            heading={{ en: card.headingEn, th: card.descTh }}
             /**
              * The way back to the send screen rides in the header.
              *

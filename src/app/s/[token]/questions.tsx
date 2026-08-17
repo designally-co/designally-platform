@@ -7,6 +7,7 @@ import type { QuestionConfig } from '@/lib/db/schema';
 import type { RawValue } from '@/lib/survey/answers';
 import type { SurveyQuestion } from '@/lib/survey/load';
 import { OTHER_LABEL, useLang, useOtherText, useText } from './lang';
+import { Disc } from './rail';
 
 const OTHER = '__other__';
 
@@ -186,12 +187,7 @@ export function Masthead({
              * On a phone this block is `static`, so the disc still positions
              * against the masthead and still crosses its bottom edge.
              */}
-            {count && (
-              <b className="qdisc mastdisc" aria-hidden="true">
-                {count.n}
-                <span>/{count.total}</span>
-              </b>
-            )}
+            {count && <Disc n={count.n} total={count.total} className="mastdisc" />}
           </span>
         )}
         {action}

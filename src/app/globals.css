@@ -3702,6 +3702,27 @@ dialog::backdrop {
 .qdisc span {
   font-weight: 400;
 }
+
+/**
+ * The mark inside the disc, on the two screens before the count starts.
+ *
+ * 62% of the disc, which is what leaves the mark's own bounding box the same
+ * optical air a two-digit fraction gets. The PNG is a white knockout with an
+ * alpha channel, so the D reads white and the disc shows through everywhere
+ * the mark is not — the counter and the Point are `--primary`, which is the
+ * one place in the system the CI's orange gets to sit inside its own mark
+ * without being asked to carry a boundary.
+ *
+ * Nudged up by a hair: the mark's Point hangs below the D's baseline, so the
+ * drawn mass sits low in its own box and centring the box leaves the D looking
+ * dropped.
+ */
+.qdisc.markdisc img {
+  width: 62%;
+  height: auto;
+  display: block;
+  transform: translateY(-3%);
+}
 .qdisc {
   display: flex;
   align-items: center;
@@ -4566,6 +4587,25 @@ dialog::backdrop {
     justify-content: center;
     min-height: 0;
   }
+  /**
+   * …except the identity screen, which starts at the top like every other one.
+   *
+   * Centring is right for the welcome and the completion, where the content is
+   * a short statement on an otherwise empty screen. The identity screen was in
+   * that company while it had no masthead. It has one now — the same section
+   * and heading the questions carry — and a heading with 160px of nothing under
+   * it before the first field reads as a screen that failed to load rather than
+   * a screen with room to breathe.
+   */
+  .slidemain:has(.identitygrid) {
+    justify-content: flex-start;
+  }
+  /* and the auto margins that centre a short card go with it — see
+     `.survey-shell:has(> .qmast) .slidebody`, which is what hands this screen
+     its 160px */
+  .survey-shell:has(> .qmast) .slidebody:has(.identitygrid) {
+    margin-block: 0 auto;
+  }
   .okback {
     display: grid;
   }
@@ -4601,12 +4641,20 @@ dialog::backdrop {
   .survey-shell:has(> .qmast) .slide {
     padding-top: 32px;
   }
-  /* the Continue row is in the flow and is the last thing on the screen, so
-     this is the air under it. 44px put it against the bottom edge on a phone —
-     and against the home indicator on the ones that have one, which is what the
-     safe-area inset is for. */
+  /**
+   * The air under the Continue row, which is the last thing in the flow.
+   *
+   * 88px measures fine in a desktop browser at 390px wide and is not enough on
+   * a real phone: iOS Safari's bottom toolbar covers roughly 80 of it, so the
+   * button that ends a long screen arrives a few pixels off the bottom of the
+   * glass and is hard to hit. `100dvh` sizes the shell against the *visible*
+   * viewport, but nothing puts space under the last element except this.
+   *
+   * 140 plus the safe-area inset. Nothing is below the button, so the space
+   * costs a reader nothing and buys a thumb the room it needs.
+   */
   .slide {
-    padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(140px + env(safe-area-inset-bottom, 0px));
   }
 
   .btn.ok,

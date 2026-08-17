@@ -67,7 +67,16 @@ export type StepDef = {
 const INFO = { sectionEn: 'Project Information', sectionTh: 'ข้อมูลโปรเจกต์' };
 const DIRECTION = { sectionEn: 'Visual Direction', sectionTh: 'ทิศทางงานออกแบบ' };
 
+/**
+ * The identity screen carries the section too.
+ *
+ * It ran without one, on the reasoning that it is not really a question. But
+ * the screen is inside Project Information — it is the first thing the section
+ * asks — and a masthead that shows a section on every screen but the first
+ * makes the first look unfinished rather than special.
+ */
 const IDENTITY: StepDef = {
+  ...INFO,
   headingEn: 'About you',
   descTh: 'ส่งลิงก์นี้ต่อให้ผู้ที่ควรมีส่วนร่วมได้เลย',
   questions: ['identity.1', 'identity.2', 'identity.3'],
