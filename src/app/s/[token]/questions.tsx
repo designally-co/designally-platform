@@ -171,25 +171,28 @@ export function Masthead({
              */}
             {section?.en && <span className="qsec">{section.en}</span>}
             {heading && <span className="qtopic">{heading.en}</span>}
+            {/**
+             * The disc lives with the words, so it can be centred on them.
+             *
+             * As a sibling of the whole header it was centred on that box —
+             * which carries the pinned block's air at the top and less at the
+             * bottom, so the disc sat 47px above the middle of the two lines it
+             * belongs to. Inside this block, `top: 50%` means the middle of the
+             * words at any masthead height.
+             *
+             * On a phone this block is `static`, so the disc still positions
+             * against the masthead and still crosses its bottom edge.
+             */}
+            {count && (
+              <b className="qdisc mastdisc" aria-hidden="true">
+                {count.n}
+                <span>/{count.total}</span>
+              </b>
+            )}
           </span>
         )}
         {action}
       </span>
-      {/**
-       * On a phone the Cut is this block's bottom edge — a border in
-       * `globals.css`, with the count crossing it here. Both the section and
-       * the subject stay above the line; it closes the masthead rather than
-       * dividing it.
-       *
-       * On a wide screen this is hidden and the count rides the vertical rail
-       * at the left edge instead. See `rail.tsx`.
-       */}
-      {count && (
-        <b className="qdisc mastdisc" aria-hidden="true">
-          {count.n}
-          <span>/{count.total}</span>
-        </b>
-      )}
     </div>
   );
 }

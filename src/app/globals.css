@@ -3448,7 +3448,10 @@ dialog::backdrop {
      * exactly the movement it is supposed to not have. Inside the block, the
      * block starts at 0 and never moves at all.
      */
-    padding-block: clamp(40px, 6vh, 64px) 24px;
+    /* and more air under the words than over the questions had: the block is
+       pinned and opaque, so a question arriving 24px under it read as pressed
+       against the masthead rather than as the next thing down the page */
+    padding-block: clamp(40px, 6vh, 64px) 44px;
   }
   .survey-shell {
     padding-top: 0;
@@ -3458,13 +3461,26 @@ dialog::backdrop {
   .qrail .qdisc {
     display: none;
   }
-  /* `.qmast` in front, because the base `.qdisc.mastdisc { display: none }`
-     ties on specificity and sits later in the file */
+  /**
+   * The disc is centred on the words, and it hangs off them.
+   *
+   * `.qsection` is the two lines and nothing else, so `top: 50%` of it is their
+   * middle whatever the masthead's padding does. `-58px` is the same number the
+   * rail's own x is built from, measured from the column's left edge — so the
+   * disc lands on the line without either of them having to know about the
+   * other's arithmetic.
+   *
+   * `.qmast` in front, because the base `.qdisc.mastdisc { display: none }`
+   * ties on specificity and sits later in the file.
+   */
+  .qmast .qsection {
+    position: relative;
+  }
   .qmast .qdisc.mastdisc {
     display: flex;
     position: absolute;
     top: 50%;
-    left: var(--rail-x);
+    left: -58px;
     right: auto;
     bottom: auto;
     transform: translate(-50%, -50%);
@@ -4334,9 +4350,9 @@ dialog::backdrop {
    * the heading nothing; only the eyebrow, which is two or three words, has to
    * stay clear of it.
    */
-  .qhead {
-    position: relative;
-  }
+  /* `.qhead` is deliberately *not* positioned: the disc lives inside it now,
+     and it has to measure its `bottom` against the masthead, whose bottom edge
+     is the Cut. The way out below positions against the masthead too. */
   .qhead .toreview {
     position: absolute;
     top: 0;
