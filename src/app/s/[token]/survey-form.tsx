@@ -837,6 +837,37 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
           />
         )}
 
+        {/**
+         * The welcome wears it too, holding the count instead of a position.
+         *
+         * "21 · Questions · about 20 minutes" was a block in the middle of the
+         * slide with the wordmark above it, which meant the first screen set its
+         * head on a different grid from the twenty-one that follow — and the
+         * client's eye had to find the subject twice in the first two screens.
+         * In the masthead it is where every subsequent screen's subject will be,
+         * beside the same disc, and the wordmark is gone: the mark is inside the
+         * disc now and the name does not need saying twice on one screen.
+         */}
+        {!card && (
+          <Masthead
+            counted={false}
+            count={{ n: 0, total: counts.total }}
+            /* The figure is inside the block the disc is centred on, not
+               beside it: the disc is positioned off `.qsection`'s left edge,
+               so a figure outside it pushes the words right and leaves the
+               disc sitting on top of the numerals. */
+            lead={
+              <span className="qwhen">
+                <span className="qfig">{survey.questionCount}</span>
+                <span>
+                  Questions · about 20 minutes
+                  <span className="th">ข้อ · ประมาณ 20 นาที</span>
+                </span>
+              </span>
+            }
+          />
+        )}
+
         {/* every screen carries a masthead now, including the identity fields,
             so the way back always has a header to sit in — the floating variant
             it used to need is gone */}
@@ -909,9 +940,6 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
           <section className="slide" data-active="" data-dir={dir} key="welcome">
             <div className="slidebody">
               <div className="slidemain">
-                <span className="wordmark">
-                  Design<em>ally</em>
-                </span>
                 {/**
                  * The same masthead the questions use, at the start of its run.
                  *
@@ -929,14 +957,6 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                  * shown at zero. Full, it is simply the Cut, and it starts
                  * measuring on the first question.
                  */}
-                <div className="qhead">
-                  <span className="qfig">{survey.questionCount}</span>
-                  <span className="qsection">
-                    Questions · about 20 minutes
-                    <br />
-                    <span className="th">ข้อ · ประมาณ 20 นาที</span>
-                  </span>
-                </div>
                 {/* The date the team asked for. It is the one thing on this
                     screen that makes somebody answer this week rather than
                     next, so it sits with the count rather than in the small

@@ -55,6 +55,7 @@ export function Masthead({
   section,
   heading,
   action,
+  lead,
 }: {
   /**
    * Whether this screen is part of the count at all.
@@ -95,6 +96,12 @@ export function Masthead({
   heading?: { en: string; th?: string };
   /** a way out, shown in the header rather than floating over it */
   action?: React.ReactNode;
+  /**
+   * Words in place of the section and the subject, for a screen that has
+   * neither. The welcome is the only one: it says how long this will take
+   * rather than where in it you are.
+   */
+  lead?: React.ReactNode;
 }) {
   /* Bilingual whatever the lead language is — the same rule the choice labels
      follow (lang.tsx). Two words each, so it costs almost no height, and there
@@ -124,7 +131,7 @@ export function Masthead({
    * is selected on `.survey-shell:has(> .qmast)`, and a screen that removed the
    * element would quietly take a different one.
    */
-  const bare = !counted && !section?.en && !section?.th && !action && !count;
+  const bare = !counted && !section?.en && !section?.th && !action && !count && !lead;
 
   return (
     <div className={bare ? 'qmast bare' : 'qmast'} ref={box}>
@@ -158,7 +165,7 @@ export function Masthead({
         {/* `count` counts: the identity screen has no section and no subject,
             and the disc lives inside this block — without it in the test the
             block never rendered and that screen lost its mark. */}
-        {(section?.en || section?.th || heading || count) && (
+        {(section?.en || section?.th || heading || lead || count) && (
           <span className="qsection">
             {/**
              * English only, both of them — asked for 17 August 2026.
@@ -173,6 +180,7 @@ export function Masthead({
              * Worth saying plainly to the branding team rather than letting it
              * pass: a Thai-only reader now meets these two lines in English.
              */}
+            {lead}
             {section?.en && <span className="qsec">{section.en}</span>}
             {heading && <span className="qtopic">{heading.en}</span>}
             {/**

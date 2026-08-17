@@ -1087,6 +1087,24 @@ label.f span {
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
+/**
+ * What the welcome puts where a question puts its section and subject.
+ *
+ * Not `.qsec`: that is a label on the line beneath it and takes caps for it,
+ * and this is a sentence with no line beneath. Sentence case at the subject's
+ * size, both languages, one under the other — the pair reads as the fact it is
+ * rather than as a label on the figure to its left.
+ */
+.qwhen {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 15px;
+  color: var(--ink-2);
+}
+.qwhen .th {
+  display: block;
+}
 /* Thai has no cases, and tracking pulls its marks off their glyphs —
    DESIGN.md's floor is -0.02em, and caps-tracking is the other direction */
 .qsec .th {
