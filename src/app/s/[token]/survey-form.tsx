@@ -897,7 +897,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
             </div>
           </section>
         ) : (
-          <section className="slide" data-active="" data-dir={dir} key="welcome">
+          <section className="slide" data-screen="welcome" data-active="" data-dir={dir} key="welcome">
             <div className="slidebody">
               <div className="slidemain">
                 {/**

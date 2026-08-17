@@ -1106,7 +1106,11 @@ label.f span {
   font-weight: 400;
   line-height: 1.35;
   letter-spacing: -0.012em;
-  color: var(--ink-2);
+  /* `--ink-3`, which is `.qsection`'s own — this line does not override it the
+     way `.qtopic` does. A screen's subject earns `--ink-2`; how long the
+     questionnaire takes is the quietest fact on the page and was reading as
+     the loudest. 6.02:1, so nothing is traded for it. */
+  color: var(--ink-3);
 }
 .qwhen .th {
   display: block;
@@ -4147,6 +4151,53 @@ dialog::backdrop {
   text-wrap: balance;
   margin-bottom: 16px;
 }
+/**
+ * The welcome's ladder — four roles, and each one a step nobody has to read to
+ * place.
+ *
+ * It ran on `.slide h1` at clamp(2rem, 4.6vw, 3.1rem) with `.intro` at
+ * clamp(16.5px, 1.9vw, 18px), which at 390px measured 32px against 16.5px with
+ * `.qwhen` sitting between them at 17px. Three problems in that, all of them
+ * the same problem:
+ *
+ * - **`.qwhen` and `.intro` were one voice.** 17/400 against 16.5/400, same
+ *   family — half a pixel between how long this takes and what the screen
+ *   promises you. Two jobs cannot share a size and a weight and still be two.
+ * - **The quietest role was set in the darkest ink.** `.qwhen` inherited
+ *   `--ink-2` at 13.4:1 while the line it outranks ran `--ink-3` at 6.02:1. The
+ *   ramp now runs `--ink` → `--ink-2` → `--ink-3` in the order the eye should
+ *   take them; `.qwhen` simply stops overriding `.qsection`'s own colour.
+ * - **32 to 16.5 is a cliff, not a step.** DESIGN.md §2 reserves `hero` at 56px
+ *   for "Survey welcome only" and `lead` at 28px for "Survey sub-copy", and
+ *   this is the screen both were written for. Neither was in use.
+ *
+ * The completion and the three error screens keep `.slide h1`. The completion's
+ * heading holds a respondent's name, so it can carry Thai at display size —
+ * that is the case DESIGN.md's display-leading clause was measured for, and 1.28
+ * is the number it arrived at. This screen's headline is a fixed English string,
+ * so it can take 1.08 and read as one object rather than two lines.
+ */
+.slide[data-screen='welcome'] h1 {
+  font-size: clamp(2.35rem, 7.4vw, 3.5rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  margin-bottom: 20px;
+}
+/* `lead`, near enough: 20.8px on a phone and 24.8px above 1080, which is the
+   step the headline needs under it.
+   The floor is 1.3rem rather than 1.2 because of what is *above* the Cut, not
+   below it: `.qwhen` holds 17px at the same weight and the same family, and
+   19.2 against 17 is not a difference a reader can use. 20.8 is 1.22x it, and
+   the ink is a step apart as well.
+   1.6 leading because the Thai sits on its own line here and DESIGN.md's floor
+   is not negotiable below display size. */
+.slide[data-screen='welcome'] .intro {
+  font-size: clamp(1.3rem, 2.4vw, 1.55rem);
+  line-height: 1.6;
+  color: var(--ink-2);
+  max-width: 34ch;
+}
+
 .slide h2 {
   font-size: clamp(1.5rem, 3.2vw, 2.05rem);
   line-height: 1.3;
@@ -4159,18 +4210,6 @@ dialog::backdrop {
   max-width: 52ch;
   margin-bottom: 0;
 }
-.slide[data-slide='0'] .slidebody {
-  text-align: center;
-}
-.slide[data-slide='0'] .intro {
-  margin-left: auto;
-  margin-right: auto;
-}
-/* the welcome is the one centred composition, so its action centres with it */
-.slide[data-slide='0'] .btn.start {
-  margin-inline: auto;
-}
-
 /* the Thai line under the English one, on the two screens that carry no
    per-question reveal */
 .introth {
@@ -4179,10 +4218,6 @@ dialog::backdrop {
   line-height: 1.7;
   max-width: 52ch;
   margin-top: 7px;
-}
-.slide[data-slide='0'] .introth {
-  margin-left: auto;
-  margin-right: auto;
 }
 /**
  * Its own line, and its label centred by layout.
@@ -4202,9 +4237,13 @@ dialog::backdrop {
      leaving the one element not on the edge. */
   margin: 26px 0 0;
 }
+/* The welcome's fine print, and the only place it is used. 14px is DESIGN.md's
+   `caption` — "Meta, secondary", which is exactly what this is. It was 13,
+   which is on no rung of the ladder: between `caption` at 14 and `fine` at 12,
+   and reached by nothing. */
 .takes {
   margin-top: 14px;
-  font-size: 13px;
+  font-size: 14px;
   color: var(--ink-3);
 }
 
