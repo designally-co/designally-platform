@@ -51,33 +51,90 @@ const IDENTITY: StepDef = {
   questions: ['identity.1', 'identity.2', 'identity.3'],
 };
 
-const VISUAL: StepDef = {
-  ...DIRECTION,
-  eyebrowEn: 'Visual direction',
-  headingEn: 'How it should look and feel',
-  descEn: 'The mood you want, and just as usefully, what you want to avoid.',
-  descTh: 'ทิศทางงานออกแบบที่ต้องการ และสิ่งที่ไม่อยากให้เป็น',
-  questions: ['visual.1', 'visual.2', 'visual.3', 'visual.4', 'visual.5', 'visual.6', 'visual.7'],
-};
+/**
+ * Part 2, word for word the same in both packages, in three screens.
+ *
+ * The seven visual questions are three different acts: the feeling you want,
+ * the feeling you do not, and the practical constraints. Keeping them apart is
+ * what stops "choose 3 words" and "final file formats" sharing a heading.
+ */
+const VISUAL_STEPS: StepDef[] = [
+  {
+    ...DIRECTION,
+    eyebrowEn: 'The feeling',
+    headingEn: 'How it should feel',
+    descEn: 'The mood you want people to get from it.',
+    descTh: 'ความรู้สึกที่อยากให้คนได้รับ',
+    questions: ['visual.1', 'visual.2'],
+  },
+  {
+    ...DIRECTION,
+    eyebrowEn: 'What to avoid',
+    headingEn: 'What you do not want',
+    descEn: 'Just as useful as what you do — it saves a round of revisions.',
+    descTh: 'สำคัญไม่แพ้สิ่งที่อยากได้ ช่วยลดการแก้งาน',
+    questions: ['visual.4', 'visual.5'],
+  },
+  {
+    ...DIRECTION,
+    eyebrowEn: 'References and limits',
+    headingEn: 'What you like, and what the work must fit',
+    descEn: 'Anything the design has to live inside — sizes, platforms, existing assets.',
+    descTh: 'สิ่งที่งานออกแบบต้องอยู่ในกรอบ เช่น ขนาด แพลตฟอร์ม หรือสิ่งที่มีอยู่เดิม',
+    questions: ['visual.3', 'visual.6', 'visual.7'],
+  },
+];
 
-/** Brand Strategy + Brand Identity — identity, strategy in three parts, visual. */
+/**
+ * The steps below are the screens. Two to four questions each.
+ *
+ * This was one question per screen, which the prototype and the CI's own survey
+ * kit both recommend and which is genuinely good for a conversational intake.
+ * The branding team asked for grouping on 17 August 2026: twenty-one screens is
+ * twenty-one taps and twenty-one identical layouts, and questions that belong to
+ * one thought were arriving one at a time with no way to see them together.
+ *
+ * Grouped by subject, never by count. A screen holds questions somebody would
+ * answer in one breath — where you came from; what you promise; what to avoid —
+ * so the heading above them is true rather than a label over an arbitrary
+ * bundle. That is why the personality scales sit alone: ten rows is already a
+ * screenful, and nothing else belongs in the same breath as them.
+ */
+
+/** Brand Strategy + Brand Identity — identity, six strategy screens, three visual. */
 const BRAND_STEPS: StepDef[] = [
   IDENTITY,
   {
     ...INFO,
-    eyebrowEn: 'What the brand is',
-    headingEn: 'What makes your brand hard to replace',
-    descEn: 'Where you come from, and what only you offer. Short, honest answers are perfect.',
-    descTh: 'เล่าให้เราฟังว่าแบรนด์ของคุณมีที่มาอย่างไร และมีอะไรที่แบรนด์อื่นทดแทนได้ยาก',
-    questions: ['strategy.1', 'strategy.7', 'strategy.2', 'strategy.6', 'strategy.8'],
+    eyebrowEn: 'Where you came from',
+    headingEn: 'Your story, and what only you offer',
+    descEn: 'Short, honest answers are perfect.',
+    descTh: 'ตอบสั้น ๆ ตามจริงได้เลย',
+    questions: ['strategy.7', 'strategy.1'],
+  },
+  {
+    ...INFO,
+    eyebrowEn: 'What you promise',
+    headingEn: 'What customers can always count on',
+    descEn: 'The things you would protect even when it costs you.',
+    descTh: 'สิ่งที่คุณจะรักษาไว้ แม้ต้องแลกมาด้วยต้นทุน',
+    questions: ['strategy.6', 'strategy.8', 'strategy.2'],
   },
   {
     ...INFO,
     eyebrowEn: 'Who it is for',
     headingEn: 'Your customers, and what they worry about',
-    descEn: 'Who buys from you, what makes them hesitate, and what you want them to remember.',
-    descTh: 'ลูกค้าของคุณเป็นใคร กังวลเรื่องอะไร และอยากให้เขาจดจำอะไร',
-    questions: ['strategy.10', 'strategy.3', 'strategy.4', 'strategy.9', 'strategy.12'],
+    descEn: 'Who buys from you, and what makes them hesitate.',
+    descTh: 'ลูกค้าของคุณเป็นใคร และอะไรทำให้เขาลังเล',
+    questions: ['strategy.10', 'strategy.3'],
+  },
+  {
+    ...INFO,
+    eyebrowEn: 'What they remember',
+    headingEn: 'What should stay with them',
+    descEn: 'What sets you apart, and the one thing you want left behind.',
+    descTh: 'สิ่งที่ทำให้คุณต่าง และสิ่งเดียวที่อยากให้เขาจดจำ',
+    questions: ['strategy.4', 'strategy.9', 'strategy.12'],
   },
   {
     ...INFO,
@@ -85,23 +142,40 @@ const BRAND_STEPS: StepDef[] = [
     headingEn: 'Where does your brand sit?',
     descEn: 'For each pair, tap the point that feels right. The middle means balanced.',
     descTh: 'แตะจุดที่ตรงกับความรู้สึกของคุณ จุดกลางหมายถึงอยู่ตรงกลางระหว่างสองด้าน',
-    questions: ['strategy.5', 'strategy.14', 'strategy.11', 'strategy.13'],
+    /* alone: ten pairs is a screenful, and nothing shares that breath */
+    questions: ['strategy.5'],
   },
-  VISUAL,
+  {
+    ...INFO,
+    eyebrowEn: 'How it speaks',
+    headingEn: 'The voice, inside and out',
+    descEn: 'How the brand sounds to customers, and how your team talks about it.',
+    descTh: 'แบรนด์พูดกับลูกค้าอย่างไร และทีมพูดถึงแบรนด์อย่างไร',
+    questions: ['strategy.14', 'strategy.11', 'strategy.13'],
+  },
+  ...VISUAL_STEPS,
 ];
 
-/** Design — identity, the four project questions, visual. */
+/** Design — identity, two project screens, the same three visual screens. */
 const DESIGN_STEPS: StepDef[] = [
   IDENTITY,
   {
     ...INFO,
-    eyebrowEn: 'About this project',
-    headingEn: 'The brand, and what this work is for',
-    descEn: 'Where the brand stands today, who it speaks to, and what this piece of work has to do.',
-    descTh: 'แบรนด์อยู่ตรงไหน พูดกับใคร และงานชิ้นนี้ต้องทำหน้าที่อะไร',
-    questions: ['project.1', 'project.2', 'project.3', 'project.4'],
+    eyebrowEn: 'The brand today',
+    headingEn: 'Where the brand stands, and who it speaks to',
+    descEn: 'Where it came from, and who buys from you.',
+    descTh: 'แบรนด์มีที่มาอย่างไร และใครคือลูกค้าของคุณ',
+    questions: ['project.1', 'project.2'],
   },
-  VISUAL,
+  {
+    ...INFO,
+    eyebrowEn: 'This project',
+    headingEn: 'What this work has to do',
+    descEn: 'The job it must do, and where it will be used.',
+    descTh: 'งานชิ้นนี้ต้องทำหน้าที่อะไร และจะถูกใช้ที่ไหน',
+    questions: ['project.3', 'project.4'],
+  },
+  ...VISUAL_STEPS,
 ];
 
 const BY_PACKAGE: Record<Package, StepDef[]> = {

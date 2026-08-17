@@ -76,7 +76,14 @@ type Section = { en?: string; th?: string };
 
 type Card =
   | { kind: 'fields'; questions: SurveyQuestion[]; section: Section }
-  | { kind: 'question'; question: SurveyQuestion; section: Section };
+  | {
+      kind: 'group';
+      questions: SurveyQuestion[];
+      section: Section;
+      headingEn: string;
+      descEn?: string;
+      descTh?: string;
+    };
 
 export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   const [ready, setReady] = useState(false);
@@ -126,29 +133,36 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
     [survey.steps, values],
   );
 
-  const cards = useMemo(() => {
-    const out: Card[] = [];
-    for (const s of steps) {
-      const section: Section = { en: s.sectionEn, th: s.sectionTh };
-      let pending: SurveyQuestion[] = [];
-      const flush = () => {
-        if (!pending.length) return;
-        out.push({ kind: 'fields', questions: pending, section });
-        pending = [];
-      };
-      for (const q of s.questions) {
-        if (q.type === 'short_text' && q.number === null) {
-          pending.push(q);
-          continue;
-        }
-        flush();
-
-        out.push({ kind: 'question', question: q, section });
-      }
-      flush();
-    }
-    return out;
-  }, [steps]);
+  /**
+   * One card per step. The step *is* the screen.
+   *
+   * This used to split every step into a card per question, which is why the
+   * survey ran to twenty-one screens. The branding team asked for two to four
+   * questions together, and the grouping already existed — `steps.ts` has
+   * always defined thematic groups with their own headings, and the split threw
+   * that structure away on the way to the screen.
+   *
+   * The unnumbered short-text run (the identity block) keeps its own kind,
+   * because it is laid out as a compact field grid rather than as questions.
+   */
+  const cards = useMemo(
+    () =>
+      steps.map((s): Card => {
+        const section: Section = { en: s.sectionEn, th: s.sectionTh };
+        const allFields = s.questions.every((q) => q.type === 'short_text' && q.number === null);
+        return allFields
+          ? { kind: 'fields', questions: s.questions, section }
+          : {
+              kind: 'group',
+              questions: s.questions,
+              section,
+              headingEn: s.headingEn,
+              descEn: s.descEn,
+              descTh: s.descTh,
+            };
+      }),
+    [steps],
+  );
 
   /* the last question; past it is the send screen */
   const LAST = cards.length;
@@ -362,7 +376,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
     return cards
       .map((c, i) => ({ card: c, index: i + 1 }))
       .flatMap(({ card, index }) =>
-        (card.kind === 'question' ? [card.question] : card.questions)
+        card.questions
           .filter((q) => q.required && !isAnswered(q.type, values[q.ref]))
           .filter((q) => !seen.has(q.ref) && seen.add(q.ref))
           .map((q) => ({ question: q, index })),
@@ -603,10 +617,10 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
          * It is also outside `.slidemain`, so it holds still while the question
          * animates under it.
          */}
-        {card?.kind === 'question' && (
+        {card && (
           <Masthead
-            question={card.question}
-            total={survey.questionCount}
+            index={step}
+            total={cards.length}
             section={card.section}
             /**
              * The way back to the send screen rides in the header.
@@ -628,13 +642,9 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
           />
         )}
 
-        {/* the identity card has no masthead to put it in — no number and no
-            section — so there it keeps the corner it used to live in */}
-        {fromSend && card?.kind !== 'question' && (
-          <button className="toreview floating" type="button" onClick={openSend}>
-            Back to send
-          </button>
-        )}
+        {/* every screen carries a masthead now, including the identity fields,
+            so the way back always has a header to sit in — the floating variant
+            it used to need is gone */}
 
         {card ? (
           <section className="slide" data-active="" data-dir={dir} key={step}>
@@ -660,14 +670,37 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                     ))}
                   </div>
                 ) : (
-                  <Question
-                    question={card.question}
-                    value={values[card.question.ref]}
-                    onChange={(v) => setValue(card.question.ref, v)}
-                    onEnter={() => advance(step)}
-                    total={survey.questionCount}
-                    section={card.section}
-                  />
+                  <>
+                    {/**
+                     * The screen's own heading, above the two to four questions
+                     * that share it.
+                     *
+                     * These headings have existed in steps.ts since the survey
+                     * was built and were never rendered — one question per
+                     * screen had nothing to head. Grouped, they are what makes
+                     * the screen a subject rather than a bundle: "What you
+                     * promise" over three questions that are all promises.
+                     */}
+                    <h2 className="qgrouph">{card.headingEn}</h2>
+                    {card.descEn && (
+                      <p className="qgroupd">
+                        {card.descEn}
+                        {card.descTh && <span className="th">{card.descTh}</span>}
+                      </p>
+                    )}
+                    {card.questions.map((q) => (
+                      <Question
+                        key={q.ref}
+                        question={q}
+                        value={values[q.ref]}
+                        onChange={(v) => setValue(q.ref, v)}
+                        /* Enter moves to the next screen, not the next question
+                           — the questions on a screen are read together, and a
+                           key that jumped between them would fight the scroll */
+                        onEnter={() => advance(step)}
+                      />
+                    ))}
+                  </>
                 )}
               </div>
               <Ok onClick={() => advance(step)} onBack={() => goTo(step - 1, 'back')} />

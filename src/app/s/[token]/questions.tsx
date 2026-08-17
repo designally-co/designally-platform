@@ -49,13 +49,15 @@ type Props = {
  * twenty-one questions with "16 of 21, Visual Direction".
  */
 export function Masthead({
-  question,
+  index,
   total,
   section,
   action,
 }: {
-  question: SurveyQuestion;
-  total?: number;
+  /** which screen this is, 1-based */
+  index: number;
+  /** how many screens the questionnaire has */
+  total: number;
   section?: { en?: string; th?: string };
   /** a way out, shown in the header rather than floating over it */
   action?: React.ReactNode;
@@ -92,35 +94,35 @@ export function Masthead({
     };
   }, []);
 
-  if (question.number === null && !section?.en && !section?.th) return null;
-
   return (
     <div className="qmast" ref={box}>
       {/**
-       * The count set as a figure, the section beside it.
+       * The position set as a figure, the section beside it.
        *
        * These were two stacked lines above the question, which with the
        * language button made four blocks of text before a client reached
        * anything they could answer — most of the top of the card spent on
-       * preamble, twenty-one times over.
+       * preamble.
        *
        * Set as one object they stop competing with the question: a large light
        * numeral against a small label is a difference of scale rather than a
        * third and fourth row. The CI's graphic system is the point and the line
-       * in sequence, and a position in a run of twenty-one is that, so the
-       * count is the right thing to give the size to.
+       * in sequence, and a position in a run is that, so the count is the right
+       * thing to give the size to.
        *
-       * Still stated on every question rather than once at the top of a part —
-       * somebody landing on question fifteen from the review screen has not
-       * seen the top of anything.
+       * It counts **screens, not questions**, since the branding team asked for
+       * two to four questions together. "3/10" is a promise a client can hold;
+       * "8/21" while looking at three questions at once is a riddle.
+       *
+       * Still stated on every screen rather than once at the top of a part —
+       * somebody arriving from the review screen has not seen the top of
+       * anything.
        */}
       <span className="qhead">
-        {question.number !== null && (
-          <span className="qfig">
-            {question.number}
-            {total ? <i>/{total}</i> : null}
-          </span>
-        )}
+        <span className="qfig">
+          {index}
+          <i>/{total}</i>
+        </span>
         {(section?.en || section?.th) && (
           <span className="qsection">
             {section?.en}
@@ -147,11 +149,7 @@ export function Masthead({
       <span
         className="qrule"
         aria-hidden="true"
-        style={
-          question.number !== null && total
-            ? ({ '--cut-progress': question.number / total } as CSSProperties)
-            : undefined
-        }
+        style={{ '--cut-progress': index / total } as CSSProperties}
       />
     </div>
   );
@@ -163,7 +161,19 @@ function Heading({ question }: { question: SurveyQuestion }) {
   const help = t(question.helpEn, question.helpTh);
   return (
     <>
-      <span className="qq">{t(question.textEn, question.textTh)}</span>
+      <span className="qq">
+        {/**
+         * The question's own number, back as a small badge.
+         *
+         * It moved into the masthead when a screen held one question, because
+         * there it *was* the screen. A screen holds two to four now, so the
+         * masthead counts screens and each question needs to say which of the
+         * twenty-one it is — the send screen's blank list names them by that
+         * number, and "3 · What unique value…" has to find its question.
+         */}
+        {question.number !== null && <i className="qn">{question.number}</i>}
+        {t(question.textEn, question.textTh)}
+      </span>
       {help && <span className="qhelp">{help}</span>}
     </>
   );

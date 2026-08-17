@@ -3436,6 +3436,57 @@ dialog::backdrop {
  * past both it and `.client-surface .th`, which wins the leading on source
  * order.
  */
+/**
+ * A screen's heading, and the two to four questions under it.
+ *
+ * The heading is the subject the questions share, so it takes the display face
+ * and the question text steps down from it — inside a group the questions are
+ * items, not headlines, and setting them at the old single-question size made
+ * three of them read as three separate screens stacked.
+ */
+.qgrouph {
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2.9vw, 1.75rem);
+  font-weight: 700;
+  line-height: 1.22;
+  color: var(--ink);
+  text-wrap: balance;
+  margin-bottom: 7px;
+}
+.qgroupd {
+  font-size: 14.5px;
+  color: var(--ink-3);
+  max-width: 54ch;
+  margin-bottom: 30px;
+}
+.qgroupd .th {
+  display: block;
+  font-size: inherit;
+  color: inherit;
+}
+/* the questions in a group sit apart enough to be separate asks */
+.slide .qgrouph ~ .sq {
+  margin-bottom: 34px;
+}
+.slide .qgrouph ~ .sq:last-of-type {
+  margin-bottom: 0;
+}
+/* inside a group the question is an item, not the headline the masthead used
+   to introduce — it steps down so the group heading stays the loudest thing */
+.slide .qgrouph ~ .sq .qq {
+  font-size: clamp(1.02rem, 2vw, 1.18rem);
+  font-weight: 600;
+  line-height: 1.45;
+}
+/* the question's number, small and in front of its text */
+.slide .qq .qn {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--ink-3);
+  margin-right: 9px;
+  font-variant-numeric: tabular-nums;
+}
+
 /* the date the team asked for, under the count it belongs with */
 .qdue {
   margin: -6px 0 15px;

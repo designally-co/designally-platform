@@ -60,6 +60,12 @@ changes; only `DATABASE_URL`.
 ## Two surfaces, one app
 
 - **Public** (`/s/[token]`) — client surveys. No login. Must work on a phone, in Thai, on a poor connection. Saves progress as the client goes.
+  **Two to four questions per screen**, grouped by subject in `src/lib/survey/steps.ts` —
+  the step *is* the screen. Asked for by the branding team 17 August 2026; it was one
+  question per screen before. Group by what somebody answers in one breath, never by
+  count, and the heading over a screen has to be true of everything under it. The
+  masthead counts screens; each question keeps its own 1–21 number, which is how the
+  send screen's blank list finds it.
 - **Private** (everything else) — the team app. Behind auth. Designally staff only.
 
 Keep them in one Next.js app. Do not build two projects.
