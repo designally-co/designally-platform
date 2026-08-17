@@ -444,7 +444,10 @@ label.f span {
   /* On a phone the Cut is horizontal: `--rail-y` is how far down it sits, and
      `--rail-mast-top` is what the masthead needs above it so the eyebrow lands
      just over the line rather than under it. */
-  --rail-y: 104px;
+  /* 102, so the 2px line's own centre lands on 103 — where a question screen's
+     masthead ends. The three screens with no masthead draw their line there so
+     the disc does not shift between them. */
+  --rail-y: 102px;
   --rail-mast-top: 68px;
 
   /* where the Cut runs, how big its disc is, and what the pair costs the
@@ -3463,10 +3466,23 @@ dialog::backdrop {
      * exactly the movement it is supposed to not have. Inside the block, the
      * block starts at 0 and never moves at all.
      */
-    /* and more air under the words than over the questions had: the block is
-       pinned and opaque, so a question arriving 24px under it read as pressed
-       against the masthead rather than as the next thing down the page */
-    padding-block: clamp(40px, 6vh, 64px) 44px;
+    /**
+     * The words sit so their middle lands on `--eye`, which is where the disc
+     * sits on every screen that has no masthead — the welcome, the send screen
+     * and the completion. Those three put it at 155px on an 860px window while
+     * a question screen had it at 82, so the mark jumped up the moment the
+     * questionnaire started and back down when it ended.
+     *
+     * 30px is half the block, and the block is exactly two lines by design: a
+     * two-or-three word eyebrow over a heading capped at three words with
+     * `white-space: nowrap` enforcing it. A block whose height cannot change is
+     * a block whose middle can be aimed at.
+     *
+     * The bottom padding is the air the questions need under a pinned, opaque
+     * band — at 24px a question read as pressed against the masthead rather
+     * than as the next thing down the page.
+     */
+    padding-block: calc(var(--eye) - 30px) 44px;
   }
   .survey-shell {
     padding-top: 0;
@@ -3492,6 +3508,14 @@ dialog::backdrop {
    */
   .qmast .qsection {
     position: relative;
+    /**
+     * It keeps the two-line height even with nothing in it.
+     *
+     * The identity screen's masthead carries the disc and no words, so the
+     * block collapsed to nothing and `top: 50%` of nothing is its top — the
+     * disc landed 30px above the line every other screen puts it on.
+     */
+    min-height: 60px;
   }
   .qmast .qdisc.mastdisc {
     display: flex;
@@ -4444,7 +4468,10 @@ dialog::backdrop {
     top: auto;
     left: auto;
     right: var(--sp-lg);
-    bottom: 0;
+    /* the border box, not the padding box: `bottom: 0` stops at the inside of
+       the 2px Cut, which left the disc centred a hair above the line it is
+       supposed to be sitting on */
+    bottom: calc(var(--cut-width) * -1);
     transform: translateY(50%);
   }
   /**
@@ -4470,6 +4497,17 @@ dialog::backdrop {
   }
 
   /* the subject stops short of the disc, which crosses the line beside it */
+  /**
+   * The words block keeps its height with nothing in it.
+   *
+   * The identity screen's masthead carries the disc and no words, so it
+   * collapsed to 7px and its bottom edge — which is the Cut, and where the disc
+   * sits — landed at 61px against every other screen's 103. The block is two
+   * lines everywhere else; here it is two lines' worth of nothing.
+   */
+  .qmast .qsection {
+    min-height: 49px;
+  }
   .qtopic {
     margin-top: 5px;
     /* 1.2, not 1.35. It is one line and it has no Thai in it any more, so
