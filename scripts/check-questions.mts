@@ -65,16 +65,44 @@ if (suspect.length) {
   console.log('\nNo Thai string opens with a Latin word.');
 }
 
-/* Which version each live link is frozen at — a survey sent before a
-   correction keeps the questions it was sent with, which is rule 5 and not a
-   defect, but it is the thing most likely to be mistaken for one. */
-const live = await db.select().from(surveys).orderBy(desc(surveys.id)).limit(8);
-if (live.length) {
-  console.log('\nMost recent surveys:');
-  for (const s of live) {
-    const stale = s.questionVersion < latest ? `  <-- frozen below ${latest}` : '';
-    console.log(`  /s/${s.token}  version ${s.questionVersion}${stale}`);
+/**
+ * Which version each live link is frozen at — a survey sent before a
+ * correction keeps the questions it was sent with, which is rule 5 and not a
+ * defect, but it is the thing most likely to be mistaken for one.
+ *
+ * Wrapped, because this is where a database behind the schema announces itself
+ * and a stack trace is the wrong way to hear it. `surveys` is the widest table
+ * the app reads on nearly every page, so a column missing here is not a
+ * reporting problem — it is the team app failing to list a project and the
+ * New survey sheet failing to create one. It found exactly that on Neon the
+ * first time it ran: `due_at` had never been migrated.
+ */
+try {
+  const live = await db.select().from(surveys).orderBy(desc(surveys.id)).limit(8);
+  if (live.length) {
+    console.log('\nMost recent surveys:');
+    for (const s of live) {
+      const stale = s.questionVersion < latest ? `  <-- frozen below ${latest}` : '';
+      console.log(`  /s/${s.token}  version ${s.questionVersion}${stale}`);
+    }
+  } else {
+    console.log('\nNo surveys yet.');
   }
+} catch (err) {
+  const cause = (err as { cause?: { code?: string; message?: string } })?.cause;
+  if (cause?.code === '42703') {
+    console.log(`\nTHIS DATABASE IS BEHIND THE SCHEMA.\n`);
+    console.log(`  ${cause.message}\n`);
+    console.log(`  The questions above are fine — they are a different table. This is`);
+    console.log(`  the one the team app reads on nearly every page, so as it stands the`);
+    console.log(`  project list and the New survey sheet will both fail.\n`);
+    console.log(`  Apply the migrations with the DIRECT connection string, not the`);
+    console.log(`  pooled one (README, Databases):\n`);
+    console.log(`    DATABASE_URL="<direct>" npm run db:migrate\n`);
+    console.log(`  then run this again.\n`);
+    process.exit(1);
+  }
+  throw err;
 }
 
 console.log('');
