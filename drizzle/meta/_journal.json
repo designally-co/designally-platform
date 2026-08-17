@@ -22,6 +22,13 @@
       "when": 1786617463482,
       "tag": "0002_sour_ultimatum",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1786935522801,
+      "tag": "0003_optimal_sugar_man",
+      "breakpoints": true
     }
   ]
 }

@@ -220,6 +220,24 @@ export const surveys = pgTable('surveys', {
 
   openedAt: timestamp('opened_at', { withTimezone: true }).notNull().defaultNow(),
 
+  /**
+   * When the team asked for answers by. Fourteen days at creation, editable.
+   *
+   * **This does not close anything.** Rule 1 — nothing happens on a timer, and
+   * closing collection is one of the four human gates that records who acted.
+   * A date that closed a survey by itself would leave `closed_by` empty, which
+   * is the whole thing the gate exists to prevent.
+   *
+   * It does two jobs instead. The client sees it, which is what actually makes
+   * people answer; and once it passes, the project surfaces in Needs you with
+   * a prompt. A person still clicks. A late answer still lands, which is a
+   * gift rather than a problem.
+   *
+   * Nullable: surveys sent before this existed have no date and behave exactly
+   * as they did.
+   */
+  dueAt: timestamp('due_at', { withTimezone: true }),
+
   /* gate 1 — close collection */
   closedAt: timestamp('closed_at', { withTimezone: true }),
   closedBy: uuid('closed_by').references(() => users.id),

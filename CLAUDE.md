@@ -144,6 +144,11 @@ it predates the split, and what it draws is this surface, not the brief.
 These are product decisions, not preferences. If a request conflicts with one, say so before building it.
 
 1. **Nothing happens on a timer.** The app never closes a survey, confirms a brief, or archives a project by itself. It may surface a prompt; a person acts.
+   A survey carries a **due date** — 14 days by default, editable on the project — and
+   that is a date, not a deadline the software enforces. The client is shown it, and once
+   it passes the project appears in Needs you asking whether to close. Answers arriving
+   after it are accepted. Asked for 14 August 2026; built this way rather than as an
+   auto-close, which would have left `closed_by` empty.
 2. **Four human gates, each recording who acted:** close collection · confirm the insights · record the kick-off decisions · archive the project. Store `*_by` and `*_at` on every one.
 3. **No expected respondent count.** Collection is open-ended. Never show a fraction like "2 of 4". Show "3 answers so far · last one 2 days ago".
 4. **No estimated content volume.** Do not calculate or display a predicted piece count anywhere, client-facing or internal. The earlier figure came from one project and is not reliable.

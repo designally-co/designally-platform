@@ -20,6 +20,7 @@ import {
 import { CURRENT_QUESTION_VERSION, PACKAGE_BLOCKS } from '@/lib/survey/packages';
 import { makeToken } from '@/lib/survey/token';
 import { packageLabel } from '@/lib/team/labels';
+import { DEFAULT_DUE_DAYS } from '@/lib/team/projects';
 
 /**
  * Every gate records who acted. That is rule 2, and it is enforced here rather
@@ -101,6 +102,10 @@ export async function createSurvey(formData: FormData): Promise<ActionResult> {
       /* Rule 5 — frozen now. Editing a template later cannot reach this survey. */
       questionVersion: CURRENT_QUESTION_VERSION,
       blockKeys,
+      /* Two weeks, the default the branding team asked for. It is a date the
+         client is shown and the team is prompted by — it closes nothing on its
+         own (rule 1). Editable afterwards on the project. */
+      dueAt: new Date(Date.now() + DEFAULT_DUE_DAYS * 24 * 60 * 60 * 1000),
     })
     .returning();
 
@@ -337,6 +342,41 @@ export async function readAnswers(projectId: string) {
  * An events table would hold the whole sequence; there isn't one, and inventing
  * it for this would be building the audit log before the audit.
  */
+/**
+ * Change the date the team asked for answers by.
+ *
+ * It closes nothing (rule 1) — it is what the client is shown and what puts the
+ * project into Needs you once it passes. Clearing it is allowed and means "no
+ * date", which is how every survey sent before this existed behaves.
+ *
+ * Stored at the end of the chosen day in Bangkok rather than at midnight UTC:
+ * a client answering on the afternoon of the 31st in Thailand has met a date
+ * that says the 31st, and would not have under a UTC midnight.
+ */
+export async function setDueDate(projectId: string, day: string | null): Promise<ActionResult> {
+  await actingUser();
+  const db = await getDb();
+
+  let dueAt: Date | null = null;
+  if (day) {
+    /* +07:00 is Bangkok and does not observe daylight saving, so a fixed offset
+       is correct here rather than a lie that happens to work half the year. */
+    dueAt = new Date(`${day}T23:59:59+07:00`);
+    if (Number.isNaN(dueAt.getTime())) return { ok: false, error: 'That is not a date.' };
+  }
+
+  const [row] = await db
+    .update(surveys)
+    .set({ dueAt })
+    .where(eq(surveys.projectId, projectId))
+    .returning();
+
+  if (!row) return { ok: false, error: 'That project has no survey.' };
+
+  revalidatePath('/');
+  return { ok: true };
+}
+
 export async function reopenCollection(projectId: string): Promise<ActionResult> {
   await actingUser();
   const db = await getDb();

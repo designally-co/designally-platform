@@ -19,6 +19,15 @@ export { PACKAGE_LABEL };
 /** Days of silence before the app suggests closing. It only suggests. */
 export const QUIET_LIMIT = 5;
 
+/**
+ * How long a survey asks for answers by default. The branding team's number.
+ *
+ * It is a date, not a deadline the software enforces: rule 1 says nothing
+ * happens on a timer, and closing collection records who closed it. Past this
+ * the project appears in Needs you and a person decides.
+ */
+export const DEFAULT_DUE_DAYS = 14;
+
 /** The team works in Bangkok; dates are theirs, not the server's. */
 const TZ = 'Asia/Bangkok';
 
@@ -83,6 +92,10 @@ export type ProjectView = {
   surveyId: string | null;
   token: string | null;
   sentOn: string | null;
+  /** the date the team asked for answers by — shown, never enforced */
+  dueOn: string | null;
+  /** the same date as YYYY-MM-DD in Bangkok, for the date input to edit */
+  dueDay: string | null;
   closedOn: string | null;
   closedByName: string | null;
 
@@ -136,6 +149,9 @@ function buildAction(v: {
   answers: number;
   quietDays: number | null;
   sentOn: string | null;
+  dueOn: string | null;
+  /** days past the date the team asked for; null if no date or not yet due */
+  overdueDays: number | null;
   hasInsights: boolean;
   insightsConfirmedOn: string | null;
   conflicts: number;
@@ -179,6 +195,28 @@ function buildAction(v: {
    * not stubbed here, because a button that does nothing is worse than no
    * button.
    */
+  /**
+   * The date the team asked for answers by has passed.
+   *
+   * Ranked above the quiet check because it is the stronger signal: silence
+   * might mean people are busy, but a passed date is a commitment the team made
+   * to itself. It still only asks — rule 1, and the gate records who closed it.
+   * Answers arriving after this are accepted and welcome.
+   */
+  if (!v.closedOn && v.overdueDays !== null && v.overdueDays > 0) {
+    return {
+      kind: 'close-collection',
+      say:
+        v.answers > 0
+          ? `${plural(v.answers, 'answer')} in, and the date you asked for has passed.`
+          : 'The date you asked for has passed, and nobody has answered.',
+      emphasis:
+        v.answers > 0 ? 'Close it, or give it longer?' : 'Chase it, or give it longer?',
+      when: `Was due ${v.dueOn} · ${agoText(v.overdueDays)}`,
+      label: 'Close collection',
+    };
+  }
+
   if (!v.closedOn && v.answers > 0 && v.quietDays !== null && v.quietDays >= QUIET_LIMIT) {
     return {
       kind: 'close-collection',
@@ -304,6 +342,18 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
       ? daysBetween(lastAnswer ?? survey.openedAt)
       : null;
 
+    const dueOn = formatDay(survey?.dueAt ?? null);
+    /* en-CA gives YYYY-MM-DD, which is what <input type="date"> wants, and the
+       Bangkok timezone keeps the day the team picked from sliding a day back */
+    const dueDay = survey?.dueAt
+      ? new Intl.DateTimeFormat('en-CA', { timeZone: TZ }).format(survey.dueAt)
+      : null;
+    /* Days past the date the team asked for. Null when there is no date, or
+       when it has not arrived yet — surveys sent before the field existed
+       simply never trigger the prompt. */
+    const overdueDays =
+      survey?.dueAt && survey.dueAt < new Date() ? daysBetween(survey.dueAt) : null;
+
     const people = survey ? (peopleBySurvey.get(survey.id) ?? []) : [];
     /* DESIGN.md §6 — an empty cell is a defect, so the Answers column names
        who answered now that it no longer names who decides. */
@@ -332,6 +382,8 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
       surveyId: survey?.id ?? null,
       token: survey?.token ?? null,
       sentOn,
+      dueOn,
+      dueDay,
       closedOn,
       closedByName: survey?.closedBy ? (actorName.get(survey.closedBy) ?? null) : null,
 
@@ -365,6 +417,8 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
         answers,
         quietDays,
         sentOn,
+        dueOn,
+        overdueDays,
         hasInsights: Boolean(insights),
         insightsConfirmedOn: formatDay(insightRow?.confirmedAt ?? null),
         conflicts: insights?.unsettled.length ?? 0,

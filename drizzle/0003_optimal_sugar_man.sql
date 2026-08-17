@@ -1,0 +1,1 @@
+ALTER TABLE "surveys" ADD COLUMN "due_at" timestamp with time zone;

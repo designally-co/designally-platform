@@ -705,6 +705,16 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                     <span className="th">ข้อ · ประมาณ 20 นาที</span>
                   </span>
                 </div>
+                {/* The date the team asked for. It is the one thing on this
+                    screen that makes somebody answer this week rather than
+                    next, so it sits with the count rather than in the small
+                    print — and it closes nothing: a late answer still lands. */}
+                {survey.dueOn && (
+                  <p className="qdue">
+                    Please answer by {survey.dueOn.en}
+                    <span className="th">กรุณาตอบภายในวันที่ {survey.dueOn.th}</span>
+                  </p>
+                )}
                 <span className="qrule" aria-hidden="true" style={{ '--cut-progress': 1 } as CSSProperties} />
                 <h1>Let&apos;s shape your brand, together.</h1>
                 {/**

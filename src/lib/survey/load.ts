@@ -62,6 +62,14 @@ export type SurveyPayload = {
    * acts and a team can do either without the other.
    */
   archived: boolean;
+  /**
+   * The date the team asked for answers by, already formatted for reading.
+   *
+   * Shown on the welcome and nowhere else. It is the thing that actually makes
+   * somebody answer this week rather than next, and it closes nothing — a late
+   * answer still lands (rule 1). Null on surveys sent before the field existed.
+   */
+  dueOn: { en: string; th: string } | null;
   steps: SurveyStep[];
   questionCount: number;
 };
@@ -181,6 +189,31 @@ export async function loadSurvey(rawToken: string): Promise<SurveyPayload | null
     clientName: row.client.name,
     package: row.project.package,
     closed: row.survey.closedAt !== null,
+    /**
+     * Formatted in both languages, not once in English and reused.
+     *
+     * A Thai sentence ending in "31 August" is the same defect as an English
+     * one ending in a Thai month: the line is bilingual, so the date inside it
+     * has to be too.
+     *
+     * Bangkok in both, because the client reads it there and a date is not a
+     * moment — the 31st must not become the 30th because a server sits in
+     * Virginia.
+     */
+    dueOn: row.survey.dueAt
+      ? {
+          en: new Intl.DateTimeFormat('en-GB', {
+            day: 'numeric',
+            month: 'long',
+            timeZone: 'Asia/Bangkok',
+          }).format(row.survey.dueAt),
+          th: new Intl.DateTimeFormat('th-TH', {
+            day: 'numeric',
+            month: 'long',
+            timeZone: 'Asia/Bangkok',
+          }).format(row.survey.dueAt),
+        }
+      : null,
     archived: row.project.archived,
     steps,
     /* Numbered questions only, so the welcome screen's promise and the last

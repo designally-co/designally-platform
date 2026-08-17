@@ -7,6 +7,7 @@ import {
   closeCollection,
   deleteResponse,
   reopenCollection,
+  setDueDate,
 } from '@/lib/team/actions';
 import type { ProjectView } from '@/lib/team/projects';
 import { forDisplay } from '@/lib/survey/link';
@@ -250,6 +251,38 @@ export default function ProjectSheet({
               ? 'Closed — anyone opening it now is told so.'
               : 'Still open. Forward it to anyone who should have a say.'}
           </p>
+
+          {/**
+           * The date the team asked for. Two weeks at creation, changed here.
+           *
+           * It is deliberately not a switch that closes anything: the client
+           * sees this date on the welcome screen, and once it passes the
+           * project appears in Needs you asking whether to close. A person
+           * still decides — rule 1, and the gate records who acted. Clearing
+           * it means no date, which is how every survey sent before this
+           * existed already behaves.
+           */}
+          {!p.closedOn && (
+            <div className="pd-due">
+              <label htmlFor={`due-${p.id}`}>Asking for answers by</label>
+              <input
+                id={`due-${p.id}`}
+                type="date"
+                className="input"
+                defaultValue={p.dueDay ?? ''}
+                disabled={pending}
+                onChange={(e) =>
+                  run(
+                    () => setDueDate(p.id, e.target.value || null),
+                    e.target.value ? 'Date updated. The client sees it on the welcome screen.' : 'Date cleared.',
+                  )
+                }
+              />
+              <span className="hintline">
+                The client sees this. It does not close the survey — you do.
+              </span>
+            </div>
+          )}
           {/* A stakeholder replying the day after collection closed is not an
               edge case. Reopening leaves the insights alone: what it says was true
               of the answers it was written from, and it keeps saying so. */}
