@@ -8,7 +8,7 @@ import Chevron from '../../chevron';
 import QuestionGrid, { type GridPoint } from './grid';
 import Rail from './rail';
 import { LangContext, type Lang } from './lang';
-import Question, { Folded, IdentityField, Masthead, type ValueUpdate } from './questions';
+import Question, { IdentityField, Masthead, type ValueUpdate } from './questions';
 
 const WELCOME = 0;
 
@@ -126,42 +126,6 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
    * from number 21.
    */
   const [dir, setDir] = useState<'next' | 'back'>('next');
-
-  /**
-   * Which question on the current screen is open.
-   *
-   * A screen holds two to four questions and shows one of them at a time: the
-   * rest collapse to their number, their question clamped to two lines, and —
-   * once answered — what the client wrote. Built 17 August 2026, after the
-   * grouped screen turned out to be three copies of the old single-question
-   * screen stacked, each with its own headline-weight ask, its own language
-   * control and its own hint, so one screen read as three.
-   *
-   * The branding team asked for two to four questions per screen so somebody
-   * can see what a section covers before answering it. That still holds: every
-   * question is on the screen and readable, and the ones behind you show your
-   * own answer rather than a placeholder.
-   *
-   * Null means "work it out" — the first unanswered question, or the first if
-   * they are all done. Stored as a ref rather than an index, and checked
-   * against the current card below, so moving between screens resets it
-   * without an effect firing a second render to do it.
-   */
-  const [openQ, setOpenQ] = useState<{ step: number; ref: string } | null>(null);
-  /**
-   * Whether the question about to open was *asked for*.
-   *
-   * Opening one by tapping its row, by pressing Enter, or by coming back from
-   * the send screen to fix a blank all mean the client wants to type — so the
-   * field takes focus. Arriving at a screen does not: focusing there raises the
-   * phone keyboard over the question before anybody has read it, which is the
-   * behaviour every questionnaire is disliked for.
-   */
-  const wantsFocus = useRef(false);
-  const openQuestionTo = (ref: string, at = step) => {
-    wantsFocus.current = true;
-    setOpenQ({ step: at, ref });
-  };
 
   const draftKey = useRef<string>('');
   const storageKey = draftStorageKey(survey.token);
@@ -393,13 +357,10 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
     setStep(index);
   }, []);
 
-  const leaveSend = useCallback((index: number, ref?: string) => {
+  const leaveSend = useCallback((index: number) => {
     setDir('back');
     setFromSend(true);
     setSending(false);
-    /* the blank list points at one question, so open that one rather than
-       whichever the screen would have chosen for itself */
-    if (ref) openQuestionTo(ref, index);
     setStep(index);
   }, []);
 
@@ -523,95 +484,22 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
    * The accordion, resolved for whatever card is on screen.
    *
    * `grouped` is null on a one-question screen — the personality scales are a
-   * step of their own, and collapsing the only thing on a screen would leave
-   * nothing to look at. Those render exactly as they did.
+   * step of their own, so there is no list and a list's rules around a single
+   * item would be two lines bracketing nothing.
    *
-   * `openQuestion` falls back rather than resetting: an `openQ` belonging to
-   * another screen simply does not match, so the answer is recomputed. No
-   * effect, and therefore no second render on every step.
    */
   const grouped = card && card.kind === 'group' && card.questions.length > 1 ? card : null;
 
   /**
-   * Which question a screen opens on, decided **once per screen**.
+   * The question the rail's disc is counting.
    *
-   * It has to be a memo and not a plain expression. Derived live from `values`,
-   * "the first unanswered question" moved the moment the client typed their
-   * first character: question one stopped being unanswered, so the open row
-   * jumped to question two and took the field out from under them mid-word.
-   * Caught by walking the flow rather than by reading it — pressing Enter after
-   * typing left the screen instead of opening question two, because by then the
-   * open question already *was* question two and there was nothing below it.
-   *
-   * Keyed on the screen's number and its question refs, **not on the card
-   * object**. `cards` derives from `steps`, and `steps` filters by
-   * `stepIsVisible(s, values, …)` because some steps are conditional — so the
-   * card is a new object on every keystroke, and a memo keyed on its identity
-   * re-runs on every keystroke too, which is the bug wearing a memo.
-   *
-   * The answers are read at the moment of arrival rather than tracked, which is
-   * the whole point: what was unanswered when the screen opened.
-   */
-  const valuesNow = useRef(values);
-  valuesNow.current = values;
-  const groupedNow = useRef(grouped);
-  groupedNow.current = grouped;
-  const groupKey = grouped ? `${step}|${grouped.questions.map((q) => q.ref).join(',')}` : '';
-  const openByDefault = useMemo(() => {
-    const g = groupedNow.current;
-    if (!g) return null;
-    return (g.questions.find((q) => !isAnswered(q.type, valuesNow.current[q.ref])) ?? g.questions[0])
-      .ref;
-    /* groupKey is the dependency by design — see above */
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groupKey]);
-
-  /* an `openQ` from another screen is not this screen's business */
-  const chosen = openQ && openQ.step === step ? openQ.ref : openByDefault;
-  const openQuestion = grouped
-    ? (grouped.questions.find((q) => q.ref === chosen) ?? grouped.questions[0])
-    : null;
-  /* the next one still to answer *below* this one — going back up is a tap */
-  const nextOnScreen =
-    grouped && openQuestion
-      ? grouped.questions
-          .slice(grouped.questions.indexOf(openQuestion) + 1)
-          .find((q) => !isAnswered(q.type, values[q.ref]))
-      : undefined;
-
-  /**
-   * What Enter does. The next question on this screen if there is one, the
-   * next screen if there is not.
-   *
-   * Without this, Enter on the first of three questions left the other two
-   * unanswered behind a screen the client had already left — the exact hazard
-   * of showing one at a time. The hint beside Continue says which it will be,
-   * because the two are no longer the same act: Continue always leaves the
-   * screen, and skipping is a thing a person is allowed to do deliberately.
-   */
-  const forward = () => (nextOnScreen ? openQuestionTo(nextOnScreen.ref) : advance(step));
-
-  /**
-   * The question the rail is pointing at.
-   *
-   * The open one on a group screen, the only one on a solo screen, and null on
-   * the identity card — name, position and email are not numbered and are not
-   * part of the twenty-one a client was promised.
+   * The first numbered one on the screen: with two to four questions open at
+   * once, "15 of 21" is where this screen starts, which is the honest reading
+   * of a screen you can see all of. Null on the identity card — name, position
+   * and email are not numbered and are not part of the twenty-one.
    */
   const railAt =
-    openQuestion?.number ??
-    (card?.kind === 'group' ? (card.questions.find((q) => q.number !== null)?.number ?? null) : null);
-
-  /* the field of a question somebody asked to open takes focus; one that opened
-     because it was next on a screen they have just arrived at does not */
-  useEffect(() => {
-    if (!wantsFocus.current) return;
-    wantsFocus.current = false;
-    const field = document.querySelector<HTMLElement>(
-      '.qopen textarea, .qopen input:not([type=radio]):not([type=checkbox])',
-    );
-    field?.focus();
-  }, [openQuestion?.ref]);
+    card?.kind === 'group' ? (card.questions.find((q) => q.number !== null)?.number ?? null) : null;
 
   /* Terminal, so it is tested before every other screen. It was tested after
      `sending`, which is still true when the send succeeds — the answers reached
@@ -757,7 +645,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                         text as its accessible name and its tooltip, so nothing
                         the list said is gone; it is just no longer twenty-one
                         lines long. */}
-                    <QuestionGrid points={points} onPick={(step, ref) => leaveSend(step, ref)} />
+                    <QuestionGrid points={points} onPick={(step) => leaveSend(step)} />
                   </>
                 )}
                 {error && <p className="qwarn">{error}</p>}
@@ -872,37 +760,38 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                      * see questions.tsx. What is left on the slide is the
                      * questions, which is what a person came here to answer.
                      */}
+                    {/**
+                     * Every question on the screen, open.
+                     *
+                     * They folded to one open row for a few hours on 17 August
+                     * 2026 and were opened again the same day: a section a
+                     * client can see all of is what the branding team asked for
+                     * when they asked for two to four questions on a screen,
+                     * and a row you have to tap to read is not that.
+                     *
+                     * What survived the experiment is the list — hairlines
+                     * between the questions instead of a 34px void, and every
+                     * number hanging in the same 34px column.
+                     */}
                     <div className={grouped ? 'qgroup' : 'qgroup solo'}>
-                      {card.questions.map((q) =>
-                        !grouped || q.ref === openQuestion?.ref ? (
-                          <div className="qopen" key={q.ref}>
-                            <Question
-                              question={q}
-                              value={values[q.ref]}
-                              onChange={(v) => setValue(q.ref, v)}
-                              /* Enter goes to the next question on this screen,
-                                 and only leaves the screen once none is left */
-                              onEnter={forward}
-                            />
-                          </div>
-                        ) : (
-                          <Folded
-                            key={q.ref}
+                      {card.questions.map((q) => (
+                        <div className="qopen" key={q.ref}>
+                          <Question
                             question={q}
                             value={values[q.ref]}
-                            onOpen={() => openQuestionTo(q.ref)}
+                            onChange={(v) => setValue(q.ref, v)}
+                            /* Enter leaves the screen: the questions here are
+                               read together, and a key that jumped between them
+                               would fight the scroll */
+                            onEnter={() => advance(step)}
                           />
-                        ),
-                      )}
+                        </div>
+                      ))}
                     </div>
                   </>
                 )}
               </div>
-              <Ok
-                onClick={() => advance(step)}
-                onBack={() => goTo(step - 1, 'back')}
-                enterGoes={nextOnScreen ? 'question' : 'screen'}
-              />
+              <Ok onClick={() => advance(step)} onBack={() => goTo(step - 1, 'back')} />
             </div>
           </section>
         ) : (

@@ -441,12 +441,22 @@ label.f span {
    one question group per screenful.
    ============================================================ */
 :root {
-  /* what the rail and its figure occupy on the right of every survey screen */
-  --rail-gutter: 56px;
+  /* where the Cut runs, how big its disc is, and what the pair costs the
+     column. The disc is centred on the line, so the gutter is the line's
+     position plus half a disc plus air. */
+  /* far enough in that the disc, which is centred on the line, clears the
+     viewport edge on a phone — at 26px it hung a pixel off it */
+  --rail-x: clamp(38px, 7.5vw, 150px);
+  --disc: clamp(54px, 6.5vw, 88px);
+  --rail-gutter: calc(var(--rail-x) + var(--disc) / 2 + 24px);
 }
 
+/**
+ * The gutter is on both sides, so a centred column is centred in the *window*
+ * and not in what the rail leaves. The rail lives in the left one.
+ */
 .survey-shell {
-  padding-right: var(--rail-gutter);
+  padding-inline: var(--rail-gutter);
   min-height: 100dvh;
   /* a column so the slide can take exactly the height the pinned masthead
      leaves, rather than a hardcoded subtraction of it */
@@ -1033,15 +1043,37 @@ label.f span {
 /* beside the figure now, and stacked EN over TH rather than joined with a
    middot: on a rail this narrow the joined string wrapped anyway, and it wrapped
    in the middle of the Thai */
+/**
+ * The section, as an eyebrow.
+ *
+ * Uppercase and tracked out, which is the one place this product sets caps:
+ * it is two or three words naming which half of the questionnaire you are in,
+ * it is the smallest thing in the masthead, and set as sentence case at 12px it
+ * read as a stray line of prose above the subject rather than a label on it.
+ */
 .qsection {
   flex: 1;
   min-width: 0;
   padding-top: 7px;
   display: block;
-  font-size: 12.5px;
   color: var(--ink-3);
   /* Thai never below 1.6 in a line that can hold it */
   line-height: 1.6;
+}
+/* the eyebrow itself, and only it — set on `.qsec` rather than the block, so
+   the subject beneath does not inherit the caps and come out shouting */
+.qsec {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+}
+/* Thai has no cases, and tracking pulls its marks off their glyphs —
+   DESIGN.md's floor is -0.02em, and caps-tracking is the other direction */
+.qsec .th {
+  text-transform: none;
+  letter-spacing: 0;
 }
 .qsection .th {
   display: block;
@@ -1065,20 +1097,34 @@ label.f span {
  * count is the loud thing in this object and the question is the loud thing on
  * the screen.
  */
+/**
+ * The subject, beside the disc.
+ *
+ * 22px, regular. It was 15px and semibold, sized to sit quietly under a heavy
+ * masthead — the masthead is a line and a disc now, so the only type in that
+ * corner is this, and it has room to be read. Still well under the question's
+ * 33px: the thing you answer stays the loudest thing on the screen.
+ */
 .qtopic {
   display: block;
-  margin-top: 5px;
-  font-size: 14.5px;
-  font-weight: 600;
-  line-height: 1.45;
+  margin-top: 7px;
+  font-size: clamp(17px, 1.7vw, 22px);
+  font-weight: 400;
+  line-height: 1.35;
+  letter-spacing: -0.012em;
   color: var(--ink-2);
   text-wrap: pretty;
+  /* it sat beside a rail in a 220px column once; it has the width of the page
+     now, and 22ch broke "What customers can always count on" over two lines
+     with its Thai over two more */
+  max-width: 40ch;
 }
 .qtopic .th {
   display: block;
   font-style: normal;
   font-weight: 400;
-  font-size: inherit;
+  font-size: 0.78em;
+  line-height: 1.6;
   color: var(--ink-3);
 }
 
@@ -3287,31 +3333,20 @@ dialog::backdrop {
 }
 
 /**
- * Wide, the column holds the left margin rather than centring.
+ * The questions sit in the centre of the window.
  *
- * Centred, it drifted into the middle of the screen with the masthead's words
- * above it and the rail's point far off to the right — three things at three
- * horizontal positions, none of them aligned to each other. Left, the section,
- * the subject, the question and its answer all start on one line, and the empty
- * ground is on the side the rail closes.
+ * They held the left margin for a few hours, hard against the rail. Centred is
+ * what was asked for, and it is the better read: the rail and its disc are a
+ * fixture at the edge of the screen, the way a page number is, and the column
+ * they mark should not be hanging off them.
  *
- * 780px rather than 660: the measure has the room now that nothing shares the
- * width with it, and at the answer field's 23px that is about 55 characters,
- * inside the 65–75 the type scale asks for.
+ * The shell's gutters are symmetric for exactly this — see `.survey-shell`.
  */
 @media (min-width: 1080px) {
-  .survey-shell {
-    padding-left: clamp(40px, 7vw, 104px);
-  }
-  .survey-shell .slidebody {
-    max-width: 780px;
-    margin-inline: 0;
-  }
-  /* the masthead centred its own 660px block inside a now-full-width band, so
-     the section and the subject sat 200px right of the question they head */
+  .survey-shell .slidebody,
   .survey-shell .qmast .qhead {
-    max-width: 780px;
-    margin-inline: 0;
+    max-width: 720px;
+    margin-inline: auto;
   }
 }
 
@@ -3372,71 +3407,57 @@ dialog::backdrop {
 }
 
 /**
- * The Cut, stood up — the fixed rail down the right edge.
+ * The Cut, stood up — a full-height line down the left, with the count on it.
  *
- * A hairline the height of the viewport, with the CI's point riding it and the
- * count riding the point. The point's height *is* the progress: the line does
- * not fill behind it, which is what makes this a rail rather than a progress
- * bar turned on its side.
+ * Fixed, and **nothing on it moves**. An earlier build slid the point down the
+ * line as a progress head; it holds still now and the number inside the disc
+ * changes instead. That settles what the line is for: it is the brand's mark,
+ * not a track, so it runs its full length on every screen and never fills.
  *
- * Fixed, so the line and the point hold still while the page moves under them.
- * A mark that scrolled would be measuring the scroll.
- *
- * The gutter it needs is `--rail-gutter`, taken out of the shell's right
- * padding so the figure never lands on a question. It costs a phone's column
- * 34px of width and buys back the 166px of pinned masthead the horizontal Cut
- * required.
+ * The line keeps the pure CI orange — nothing is read from a line, so it
+ * carries no contrast obligation, only weight. The disc does not: it holds
+ * white numerals, which is the job DESIGN.md §1 measured `#ef6148` at 3.24:1
+ * and failed. It takes the action orange at 5.03:1.
  */
 .qrail {
   position: fixed;
-  top: 96px;
-  bottom: 96px;
-  right: 22px;
-  width: 1px;
-  background: var(--hairline);
+  top: 0;
+  bottom: 0;
+  left: var(--rail-x);
+  width: var(--cut-width);
+  background: var(--cut);
   z-index: 4;
   pointer-events: none;
 }
-/* full-height carrier hung at its bottom edge — see rail.tsx for why the
-   translate is `at - 1` and not `at` */
-.qrail i {
+/* the count, in a disc crossing the line at eye level */
+.qdisc {
   position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 1px;
-  height: 100%;
-  transform: translateY(calc((var(--at, 0) - 1) * 100%));
-  transition: transform var(--dur-slow, 380ms) var(--ease);
-}
-.qrail i::after {
-  content: '';
-  position: absolute;
-  left: -4px;
-  bottom: -4px;
-  width: 8px;
-  height: 8px;
+  top: var(--eye);
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  width: var(--disc);
+  height: var(--disc);
   border-radius: var(--r-pill);
-  background: var(--primary-mark);
-}
-/* the count rides the point, stacked so it fits the gutter at every width */
-.qrail b {
-  position: absolute;
-  right: 13px;
-  bottom: -15px;
-  display: block;
-  text-align: right;
-  font-size: 12.5px;
+  background: var(--primary);
+  color: var(--on-dark);
+  font-size: calc(var(--disc) * 0.23);
   font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: 0;
-  color: var(--ink-3);
+  line-height: 1;
+  letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
-.qrail b em {
-  display: block;
-  font-style: normal;
+/* "21" and "/21" are one line and one weight — a fraction, not a headline with
+   a subscript. The slash is the only thing between them. */
+.qdisc span {
   font-weight: 400;
+}
+.qdisc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /**
@@ -4200,10 +4221,10 @@ dialog::backdrop {
   .slide .okrow,
   .slide .btn.start {
     position: fixed;
-    left: 22px;
     /* fixed, so the shell's padding does not reach it — the rail's gutter has
-       to be spelled out here or the hairline crosses the Continue pill */
-    right: calc(22px + var(--rail-gutter));
+       to be spelled out here or the line crosses the Continue pill */
+    left: var(--rail-gutter);
+    right: 22px;
     bottom: calc(var(--kb, 0px) + 22px);
     z-index: 15;
     margin: 0;

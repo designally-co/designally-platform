@@ -1,49 +1,38 @@
 'use client';
 
-import type { CSSProperties } from 'react';
-
 /**
- * The Cut, stood up — and the progress with it.
+ * The Cut, stood up — and the count sitting on it.
  *
- * A hairline down the right edge of every screen, fixed, with the CI's point
- * riding it and the count riding the point. Where the client is in the
- * questionnaire is the point's height on the line, and nothing else on the
- * screen carries progress: the horizontal Cut under the masthead is gone.
+ * A full-height orange line down the left of every survey screen with a filled
+ * disc crossing it near the top, the question count inside the disc. The line
+ * is the CI's Cut at `orientation="vertical"`; the disc is its Point, at the
+ * size a brand mark wants rather than the 8px a progress head wants.
  *
- * `PointRule.jsx` in the CI ships `orientation="vertical"` and its own example
- * is `length="100%"`, so this is the brand's own object at the size the brand
- * drew it. The line does not fill behind the point — the point is the reading,
- * which is what makes this a rail rather than a progress bar rotated.
+ * **Nothing here moves.** An earlier build had the point sliding down the line
+ * as a progress head — the count read off its height. It holds still now and
+ * the number inside it changes instead: the graphic is a fixture of the screen,
+ * the way a masthead is, and progress is read rather than measured. Asked for
+ * directly, and it settles what the line is for — it is the brand's mark, not a
+ * track, so it runs its full length on every screen and never fills.
  *
- * **It counts questions, not screens.** The masthead counted screens because a
- * screen held two to four questions at once and `DESIGN.md` was right that
- * "8/21 while looking at three questions is a riddle". A screen shows one
- * question at a time now, so the client really is on question 8, and the
- * questionnaire can count the thing the welcome screen actually promises. The
- * point moves *within* a screen as each question opens, so progress is
- * continuous rather than nine jumps.
+ * **The disc is `--primary`, not the CI's `#ef6148`.** DESIGN.md §1 measured
+ * the CI's orange at 3.24:1 under white, which is why it cannot carry a button
+ * label — and this disc carries white numerals, which is the same job. The line
+ * beside it keeps the pure CI orange, because nothing is read from a line.
  *
- * **Fixed, not sticky.** The line and the point hold still while the page
- * moves under them — asked for directly, and it is what makes the point's
- * height mean something: a mark that scrolled would be measuring the scroll.
- *
- * Positioned by `translateY` on a full-height carrier hung at its bottom edge,
- * translated by `at − 1`. A percentage in a transform resolves against the
- * element's own box, so the carrier moves the point exactly `at` down the rail,
- * on the compositor. Hung at the top and translated by `at`, the arithmetic is
- * the same and the carrier hangs a rail's height below the fold.
+ * It counts questions, not screens: a screen opens one question at a time, so
+ * the client really is on question 8 of 21, which is the number the welcome
+ * screen promised them.
  */
 export default function Rail({ n, total }: { n: number | null; total: number }) {
   return (
     <div className="qrail" aria-hidden="true">
-      <i style={{ '--at': n === null ? 0 : n / total } as CSSProperties}>
-        {n !== null && (
-          <b>
-            {n}
-            <em>/{total}</em>
-          </b>
-        )}
-      </i>
+      {n !== null && (
+        <b className="qdisc">
+          {n}
+          <span>/{total}</span>
+        </b>
+      )}
     </div>
   );
 }
