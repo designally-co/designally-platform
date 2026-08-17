@@ -3418,10 +3418,12 @@ dialog::backdrop {
  * A hairline between rows, not the 34px void they used to have. The void said
  * "these are separate asks", which a line says better and in no vertical space
  * — and that space was most of what made one screen read as three.
+ *
+ * **No line on top.** There was one, and it sat 65px under the masthead's own
+ * Edge: two full-width hairlines with nothing between them, which reads as a
+ * seam rather than a structure. The Edge closes the masthead and opens the
+ * list — one line doing both jobs, which is what it was drawn for.
  */
-.qgroup {
-  border-top: 1px solid var(--hairline);
-}
 .qgroup > * {
   border-bottom: 1px solid var(--hairline);
 }
@@ -3445,6 +3447,30 @@ dialog::backdrop {
 }
 .slide .qopen .sq {
   margin-bottom: 0;
+}
+/**
+ * The open question hangs its number, like every folded row above and below it.
+ *
+ * It did not: the badge was inline with a 9px margin, so the question's text
+ * started at whatever the glyph happened to measure — 226px against the folded
+ * rows' 222px. Four pixels, on the one edge a list is read down.
+ *
+ * A hanging indent rather than a grid, because the question is a run of inline
+ * content — the number, the text, and on a revealed question the Thai after it
+ * — and a grid would make each of those a column of its own.
+ *
+ * Not on a solo screen: there is no list there to line up with, and the scales
+ * question is better off as it was.
+ */
+.qgroup:not(.solo) .qopen .qq {
+  padding-left: 34px;
+  text-indent: -34px;
+}
+.qgroup:not(.solo) .qopen .qn {
+  display: inline-block;
+  width: 34px;
+  margin-right: 0;
+  text-indent: 0;
 }
 
 /**
@@ -3622,10 +3648,22 @@ dialog::backdrop {
   left: 0;
   top: 0;
   height: var(--cut-width);
-  width: calc(var(--cut-progress, 1) * 100%);
-  max-width: 100%;
+  /**
+   * Full width, scaled — not a computed width.
+   *
+   * It animated `width` on every advance, which is a layout property: each
+   * frame of a 380ms transition re-laid the masthead out, twenty-one times a
+   * survey, on a phone on a poor connection. `scaleX` from the left edge draws
+   * exactly the same line and never leaves the compositor.
+   *
+   * The CI's own token is `--transition-cut: width …`; this is the one place
+   * it is not followed, and the mark it produces is identical.
+   */
+  width: 100%;
+  transform: scaleX(var(--cut-progress, 1));
+  transform-origin: left center;
   background: var(--cut);
-  transition: width var(--dur-slow, 380ms) var(--ease);
+  transition: transform var(--dur-slow, 380ms) var(--ease);
 }
 @media (prefers-reduced-motion: reduce) {
   .qrule::after {

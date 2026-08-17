@@ -210,6 +210,17 @@ piece of ink on the screen is either a question or an answer.
 
 The heading is not on the slide at all — it is in the masthead, above.
 
+**Every question on the screen shares one left edge.** The folded rows hang their number
+in a 34px column; the open question hangs its own the same way, as a hanging indent rather
+than a grid — it is a run of inline content, and a grid would make the number, the text and
+the revealed Thai three columns. It was inline with a 9px margin before, so the open
+question's text started at whatever its numeral happened to measure: 226px against the
+folded rows' 222px, on the one edge a list is read down.
+
+**No hairline on top of the list.** There was one, 65px under the masthead's own Edge —
+two full-width lines with nothing between them, which reads as a seam. The Edge closes the
+masthead and opens the list.
+
 Rows are separated by a hairline, not by the 34px void they used to have. The
 void said "these are separate asks", which a line says better and in no
 vertical space — and that space was most of what made one screen read as three.
@@ -299,9 +310,13 @@ is not a rule: it is a segment, left-aligned, closing nothing. So the masthead c
 both, doing the two jobs they are each for. The Edge runs the full width and gives the
 block its floor; the Cut sits on its left end and says the card begins.
 
-And then it grows. The CI's motion tokens define `--transition-cut: width var(--dur-slow)
-var(--ease-out)` — a transition for the width of a line otherwise fixed at 88px, which is
-the system saying this line was always meant to move. So the Cut measures how far in the
+And then it grows — by `transform: scaleX()`, not by width. The CI's motion tokens define
+`--transition-cut: width var(--dur-slow) var(--ease-out)`, and this is the one place that
+token is not followed literally: `width` is a layout property, so each frame of a 380ms
+transition re-laid the masthead out, on every advance, on a phone on a poor connection. A
+scale from the left edge draws exactly the same line and never leaves the compositor. The
+CI is right that the line was always meant to move; it is wrong about which property moves
+it. So the Cut measures how far in the
 client is, and the sticky bar that used to float at the top of the viewport is gone: one
 mark instead of two, at the place the card begins rather than above it, and the brand's
 own object rather than borrowed chrome.
