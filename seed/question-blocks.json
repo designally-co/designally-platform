@@ -113,6 +113,8 @@
           "type": "linear_scale",
           "text_en": "If your brand were a person, what would they be like?",
           "text_th": "ถ้าแบรนด์เป็นคนอยากให้เขาเป็นคนแบบไหน",
+          "help_en": "For each pair, tap the point that feels right. The middle means balanced.",
+          "help_th": "แตะจุดที่ตรงกับความรู้สึกของคุณ จุดกลางหมายถึงอยู่ตรงกลางระหว่างสองด้าน",
           "required": true,
           "config": {
             "points": 5,
