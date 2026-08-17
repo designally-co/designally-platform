@@ -618,14 +618,24 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
           <div className="slide" data-screen="done" data-active="" data-dir="next">
             <div className="slidebody">
               <div className="slidemain">
+                {/**
+                 * The whole screen, now.
+                 *
+                 * "See you at the kick-off · แล้วพบกันในการประชุมเริ่มโปรเจกต์"
+                 * sat under this and was deleted 17 August 2026 with the
+                 * kick-off itself. The platform does not model that meeting any
+                 * more — it models a questionnaire and the summary it produces
+                 * — so the line was a client-facing promise about something
+                 * that had stopped existing, in two languages.
+                 *
+                 * Nothing replaces it. The masthead says the questionnaire is
+                 * complete, this says thank you, and the only thing left to
+                 * offer somebody is the link for the next stakeholder. What
+                 * happens after the summary is not this surface's to promise.
+                 */}
                 <h1>
                   Thank you, <em>{submitted}</em>.
                 </h1>
-                {/* the same shape as the welcome's, Thai on its own line */}
-                <p className="intro">
-                  See you at the kick-off
-                  <span className="th">แล้วพบกันในการประชุมเริ่มโปรเจกต์</span>
-                </p>
               </div>
               <button className="btn btn-quiet start" onClick={answerAsSomeoneElse}>
                 Answer as another stakeholder

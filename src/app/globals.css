@@ -4201,6 +4201,9 @@ dialog::backdrop {
  */
 .slide[data-screen='done'] h1 {
   line-height: 1.28;
+  /* The action is the only thing under it now, and it is a different kind of
+     thing — closing the gap to 18px made the button read as part of the
+     sentence. The shared 20px stands. */
 }
 /* `lead`, near enough: 20.8px on a phone and 24.8px above 1080, which is the
    step the headline needs under it.
