@@ -87,6 +87,17 @@ type Card =
       descTh?: string;
     };
 
+/**
+ * The way back to the send screen, parked 17 August 2026.
+ *
+ * It is moving somewhere else and is hidden until it lands — not deleted,
+ * because `fromSend` and `openSend` are the machinery it needs and both are
+ * still here, so putting it back is flipping this. The masthead's rules for it
+ * are still in `globals.css` and inert without it.
+ */
+const SHOW_BACK_TO_SEND = false;
+
+
 export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   const [ready, setReady] = useState(false);
   const [step, setStep] = useState(WELCOME);
@@ -706,7 +717,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
              * way out, sitting opposite the count that says where you are.
              */
             action={
-              fromSend ? (
+              fromSend && SHOW_BACK_TO_SEND ? (
                 <button className="toreview" type="button" onClick={openSend}>
                   Back to send
                 </button>

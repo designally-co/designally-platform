@@ -190,7 +190,7 @@
         {
           "order": 7,
           "type": "paragraph",
-          "text_en": "Tell your brand story briefly in this order: Beginning · Turning Point · Where the brand is today",
+          "text_en": "Tell your brand story briefly in this order: Beginning · Turning Point · Where the brand is today.",
           "text_th": "เล่าเรื่องแบรนด์สั้น ๆ ตามลำดับนี้ จุดเริ่มต้น · จุดเปลี่ยน · วันนี้แบรนด์อยู่ตรงไหน",
           "required": true
         },
@@ -340,8 +340,8 @@
         {
           "order": 1,
           "type": "checkboxes",
-          "text_en": "Mood and Personality — choose 3 words that best reflect how you want the brand to feel",
-          "text_th": "Mood And Personality กรุณาเลือก 3 คำที่อยากให้แบรนด์สะท้อนมากที่สุด",
+          "text_en": "Choose 3 words that best reflect how you want the brand to feel.",
+          "text_th": "กรุณาเลือก 3 คำที่อยากให้แบรนด์สะท้อนมากที่สุด",
           "required": true,
           "config": {
             "min": 3,
@@ -389,8 +389,8 @@
         {
           "order": 2,
           "type": "short_text",
-          "text_en": "First Impression — when people first see the brand, how do you want them to feel?",
-          "text_th": "First Impression เมื่อคนเห็นแบรนด์ครั้งแรก อยากให้เขารู้สึกอย่างไร?",
+          "text_en": "When people first see the brand, how do you want them to feel?",
+          "text_th": "เมื่อคนเห็นแบรนด์ครั้งแรก อยากให้เขารู้สึกอย่างไร?",
           "required": true,
           "help_en": "Please describe in 3 words.",
           "help_th": "กรุณาตอบเป็น 3 คำ"
@@ -398,8 +398,8 @@
         {
           "order": 3,
           "type": "paragraph",
-          "text_en": "Visual References — select visual references you like and explain why, focusing on mood, layout, feeling and visual style.",
-          "text_th": "Visual References กรุณาเลือกภาพ reference ที่ชอบ พร้อมอธิบายว่า “ชอบเพราะอะไร” โดยเน้นอธิบายในเชิง Mood, Layout, Feeling, Visual Style",
+          "text_en": "Select visual references you like and explain why, focusing on mood, layout, feeling and visual style.",
+          "text_th": "กรุณาเลือกภาพ reference ที่ชอบ พร้อมอธิบายว่า “ชอบเพราะอะไร” โดยเน้นอธิบายในเชิง Mood, Layout, Feeling, Visual Style",
           "required": true,
           "help_en": "Avoid answers like “because it looks nice”. For example: warm, calm, premium mood · clean and easy-to-read layout · trustworthy but approachable feeling · use of imagery, colour, typography, space.",
           "help_th": "หลีกเลี่ยงการตอบเพียงว่า “สวย” เช่น ชอบ mood ที่ดูอบอุ่น สงบ พรีเมียม · ชอบ layout ที่ดู clean และอ่านง่าย · ชอบ feeling ที่ดูน่าเชื่อถือแต่ไม่แข็งเกินไป · ชอบการใช้ภาพ สี typography space"
@@ -407,8 +407,8 @@
         {
           "order": 4,
           "type": "checkboxes",
-          "text_en": "Things to Avoid — what kind of image or impression do you not want the brand to have?",
-          "text_th": "Things to Avoid ไม่อยากให้แบรนด์ดูมีภาพลักษณ์แบบไหน",
+          "text_en": "What kind of image or impression do you not want the brand to have?",
+          "text_th": "ไม่อยากให้แบรนด์ดูมีภาพลักษณ์แบบไหน",
           "required": true,
           "config": {
             "other": true,
@@ -447,8 +447,8 @@
         {
           "order": 5,
           "type": "checkboxes",
-          "text_en": "Design Elements to Avoid — are there any visual elements you dislike or want to avoid?",
-          "text_th": "Design Elements to Avoid มีองค์ประกอบไหนที่ไม่ชอบหรืออยากหลีกเลี่ยงไหม",
+          "text_en": "Are there any visual elements you dislike or want to avoid?",
+          "text_th": "มีองค์ประกอบไหนที่ไม่ชอบหรืออยากหลีกเลี่ยงไหม",
           "required": true,
           "config": {
             "other": true,
@@ -491,8 +491,8 @@
         {
           "order": 6,
           "type": "paragraph",
-          "text_en": "Limitations and Requirements — are there any specific limitations or requirements we should consider?",
-          "text_th": "Limitation And Requirements มีข้อจำกัดหรือสิ่งที่ต้องคำนึงถึงเป็นพิเศษไหม",
+          "text_en": "Are there any specific limitations or requirements we should consider?",
+          "text_th": "มีข้อจำกัดหรือสิ่งที่ต้องคำนึงถึงเป็นพิเศษไหม",
           "required": true,
           "help_en": "e.g. preferred or restricted colours · preferred or required fonts · business regulations · existing CI or brand assets that must be retained.",
           "help_th": "เช่น สีที่อยากใช้ หรือสีที่ห้ามใช้ · Font ที่มีในใจ หรือ font ที่ต้องใช้ · กฎระเบียบหรือ regulation ที่เกี่ยวข้องกับธุรกิจ · CI เดิม หรือ brand asset เดิมที่ต้องรักษาไว้"
@@ -500,8 +500,8 @@
         {
           "order": 7,
           "type": "paragraph",
-          "text_en": "Technical Requirements — what are your requirements for usage, platforms and final files?",
-          "text_th": "Technical Requirements requirement ด้านการใช้งาน แพลตฟอร์ม และไฟล์ final",
+          "text_en": "What are your requirements for usage, platforms and final files?",
+          "text_th": "requirement ด้านการใช้งาน แพลตฟอร์ม และไฟล์ final",
           "required": true,
           "help_en": "e.g. size, format, deadline · platforms where the design will be used (print, digital, social media, website, packaging) · final file formats required.",
           "help_th": "เช่น Size, Format, Deadline · Platform ที่จะใช้งาน (Print, Digital, Social Media, Website, Packaging) · ไฟล์ final ที่ต้องการได้รับ"

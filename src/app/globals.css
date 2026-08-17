@@ -3607,11 +3607,14 @@ dialog::backdrop {
  * now a box of its own, the box *is* the boundary, and a rule under it was a
  * second one drawn a few pixels away from the first.
  *
- * Space does it instead, and more of it than the rule needed: 44px, which is
- * wide enough that nobody has to work out which answer belongs to which ask.
+ * Space does it instead, and a good deal more of it than the rule needed. With
+ * a line between them 44px was plenty; with nothing between them it is the only
+ * thing saying where one ask ends, and 44px against a field that is itself 60px
+ * tall read as part of the same block. 76px, which is more than the tallest
+ * thing inside a question.
  */
 .qopen + .qopen {
-  margin-top: 44px;
+  margin-top: 76px;
 }
 /* one question on a screen has nothing to be spaced from */
 .qgroup.solo .qopen {
@@ -4316,6 +4319,28 @@ dialog::backdrop {
     bottom: 0;
     transform: translateY(50%);
   }
+  /**
+   * The way out is lifted out of the flow.
+   *
+   * `.qhead` is a row, so "Back to send" was taking width off the block beside
+   * it — and that block already gives up 92px to the disc. The heading was
+   * being squeezed twice and ellipsed at "Mood and impr…". Absolute, it costs
+   * the heading nothing; only the eyebrow, which is two or three words, has to
+   * stay clear of it.
+   */
+  .qhead {
+    position: relative;
+  }
+  .qhead .toreview {
+    position: absolute;
+    top: 0;
+    right: var(--sp-lg);
+    margin-top: 0;
+  }
+  .qmast:has(.toreview) .qsec {
+    padding-right: 108px;
+  }
+
   /* the subject stops short of the disc, which crosses the line beside it */
   .qtopic {
     margin-top: 5px;
@@ -4410,8 +4435,12 @@ dialog::backdrop {
   .survey-shell:has(> .qmast) .slide {
     padding-top: 32px;
   }
+  /* the Continue row is in the flow and is the last thing on the screen, so
+     this is the air under it. 44px put it against the bottom edge on a phone —
+     and against the home indicator on the ones that have one, which is what the
+     safe-area inset is for. */
   .slide {
-    padding-bottom: 44px;
+    padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
   }
 
   .btn.ok,
