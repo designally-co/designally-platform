@@ -166,33 +166,57 @@ Three decisions inside that are worth keeping:
 `font-variant-numeric: tabular-nums` so the figures do not jitter as the count passes 9
 and 19.
 
-### Inside a group, the question is the loudest thing
+### A group shows one question at a time
 
-A screen holds two to four questions under a heading naming their subject. The heading was
-set on the display face at 28px/700 and the questions stepped *down* from it to 19px — so
-the largest, boldest type on a screen whose whole job is answering two questions belonged
-to a label. *Where the brand stands, and who it speaks to*, over *tell us your brand story*
-and *who are your core customers*: it says nothing the next two lines do not, in type that
-makes it read first.
+A screen holds two to four questions. It shows them all and opens one.
 
-**The heading and its description are one quiet context block now** — body face, 15px,
-one size, two inks: `--ink-2` for what this screen is about, `--ink-3` for why. Not an
-eyebrow; nothing follows that it labels. It is the last thing read before the work, and it
-is set like it.
+It used to open all of them, and that was three copies of the old
+single-question screen stacked — each with a headline-weight ask, its own
+language control, its own *Shift + Enter* hint and its own full-width rule. One
+screen read as three, and the group heading had been pushed to display weight
+at 28px/700 to hold them together, which put the loudest type on the screen on
+a label naming what the questions already name.
 
-**The question is 20px in `--ink` at 600.** Two steps up from the block, both taken with
-size and weight rather than a second face or a second colour — and still short of the 33px
-a lone question takes, because two or three of those on one screen read as three screens
-stacked, which is what the old heading weight was compensating for.
+**The open question is the screen.** It takes the full 33px of `.slide .qq` —
+the size a lone question always had, and the size it had been stepped down from
+for a problem this solves better.
 
-The display face does not leave the screen with the heading: the masthead numeral is
-46–64px of it, and that is where the brand's voice belongs here.
+**A folded row is the number, the question clamped to two lines, and — once
+answered — what the client wrote, clamped to one.** Two lines rather than one,
+because a row nobody can read is a row they have to open to find out whether
+they want to open it, and seeing what a section covers before answering it is
+the reason the branding team asked for grouped screens in the first place.
 
-**`.qgrouph` is scoped through `.slide`** and has to be. It is an `<h2>`, and `.slide h2`
-is (0,1,1) against a bare `.qgrouph`'s (0,1,0) — so the size written on `.qgrouph` never
-applied, at any point, and the heading rendered a step *larger* than the value its own
-comment explained. The fourth instance of this collision in `globals.css`; the fix is the
-same every time.
+**There is no tick.** The answer is the status: a row showing the client's own
+words has been answered, a row showing only a question has not.
+`docs/navigation-decisions.md` carries a status in words rather than a mark that
+needs a legend, and here the words are the client's. Which also means every
+piece of ink on the screen is either a question or an answer.
+
+The heading and its description stay the quiet context block they became: body
+face, 15px, one size, two inks — what this screen is about, then why. Not an
+eyebrow; nothing follows that it labels.
+
+Rows are separated by a hairline, not by the 34px void they used to have. The
+void said "these are separate asks", which a line says better and in no
+vertical space — and that space was most of what made one screen read as three.
+A Brand group now fits a 390px screen with about 40px of scroll.
+
+**Enter goes to the next question on the screen, and only leaves the screen
+when none is left.** Continue always leaves. They are no longer the same act,
+so the hint beside Continue says which is which — without it, Enter on the
+first of three questions stranded the other two behind a screen the client had
+already left, which is the hazard of showing one at a time.
+
+**One question on a screen is left alone.** The personality scales are a step of
+their own — ten pairs is a screenful and nothing shares that breath — and
+collapsing the only thing on a screen would leave nothing to look at.
+
+**`.qgrouph` is scoped through `.slide`** and has to be. It is an `<h2>`, and
+`.slide h2` is (0,1,1) against a bare `.qgrouph`'s (0,1,0) — so the size written
+on `.qgrouph` never applied, at any point, and the heading rendered a step
+*larger* than the value its own comment explained. The fourth instance of this
+collision in `globals.css`; the fix is the same every time.
 
 ### The five named pieces, and where they are
 

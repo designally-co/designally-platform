@@ -61,7 +61,9 @@ changes; only `DATABASE_URL`.
 
 - **Public** (`/s/[token]`) — client surveys. No login. Must work on a phone, in Thai, on a poor connection. Saves progress as the client goes.
   **Two to four questions per screen**, grouped by subject in `src/lib/survey/steps.ts` —
-  the step *is* the screen. Asked for by the branding team 17 August 2026; it was one
+  the step *is* the screen, and it **shows all of them and opens one**. The rest fold to
+  their number, their question, and once answered the client's own words; tapping one opens
+  it. Enter goes to the next question and only leaves the screen when none is left. Asked for by the branding team 17 August 2026; it was one
   question per screen before. Group by what somebody answers in one breath, never by
   count, and the heading over a screen has to be true of everything under it. The
   masthead counts screens and does not count the name/position/email screen — the

@@ -516,21 +516,28 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
    * typing left the screen instead of opening question two, because by then the
    * open question already *was* question two and there was nothing below it.
    *
-   * `grouped` is `cards[step - 1]`, and `cards` is memoised, so the identity is
-   * stable for as long as the screen is — one evaluation per screen, and the
-   * answers are read at the moment of arrival rather than tracked.
+   * Keyed on the screen's number and its question refs, **not on the card
+   * object**. `cards` derives from `steps`, and `steps` filters by
+   * `stepIsVisible(s, values, …)` because some steps are conditional — so the
+   * card is a new object on every keystroke, and a memo keyed on its identity
+   * re-runs on every keystroke too, which is the bug wearing a memo.
+   *
+   * The answers are read at the moment of arrival rather than tracked, which is
+   * the whole point: what was unanswered when the screen opened.
    */
   const valuesNow = useRef(values);
   valuesNow.current = values;
-  const openByDefault = useMemo(
-    () =>
-      grouped
-        ? (grouped.questions.find((q) => !isAnswered(q.type, valuesNow.current[q.ref])) ??
-            grouped.questions[0]
-          ).ref
-        : null,
-    [grouped],
-  );
+  const groupedNow = useRef(grouped);
+  groupedNow.current = grouped;
+  const groupKey = grouped ? `${step}|${grouped.questions.map((q) => q.ref).join(',')}` : '';
+  const openByDefault = useMemo(() => {
+    const g = groupedNow.current;
+    if (!g) return null;
+    return (g.questions.find((q) => !isAnswered(q.type, valuesNow.current[q.ref])) ?? g.questions[0])
+      .ref;
+    /* groupKey is the dependency by design — see above */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupKey]);
 
   /* an `openQ` from another screen is not this screen's business */
   const chosen = openQ && openQ.step === step ? openQ.ref : openByDefault;
