@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 
+import { deleteResponse } from '@/lib/team/actions';
 import type { AnswerValue } from '@/lib/db/schema';
 import type { ProjectAnswers, ReadableAnswer } from '@/lib/team/answers';
 import Sheet from './sheet';
@@ -88,14 +89,49 @@ function Answer({ a }: { a: ReadableAnswer }) {
 export default function AnswersSheet({
   data,
   clientName,
+  focus,
+  onDeleted,
   onClose,
 }: {
   data: ProjectAnswers;
   clientName: string;
+  /**
+   * Whose answers to open on. The sheet is reached by clicking a person on the
+   * project, so it opens on that person rather than on whoever answered first
+   * and making the team find them again in the tabs.
+   */
+  focus?: string;
+  /** a response was deleted — the caller closes this sheet and says so */
+  onDeleted: (message: string) => void;
   onClose: () => void;
 }) {
-  const [open, setOpen] = useState(0);
+  const [open, setOpen] = useState(() => {
+    const i = data.respondents.findIndex((p) => p.id === focus);
+    return i === -1 ? 0 : i;
+  });
   const person = data.respondents[open];
+  /**
+   * Delete sits here, on the answers themselves, and not on the project's list
+   * of names — moved 17 August 2026. Deleting somebody's twenty minutes from a
+   * card showing only their name and email is a decision made without the
+   * evidence; here the reason to delete it, a duplicate or a test run, is on
+   * the screen above the button. The two-press guard is unchanged.
+   */
+  const [pending, start] = useTransition();
+  const [warned, setWarned] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const remove = () =>
+    start(async () => {
+      setError(null);
+      const result = await deleteResponse(person.id, warned);
+      if (!result.ok) {
+        setError(result.error ?? 'That did not work.');
+        setWarned(true);
+        return;
+      }
+      onDeleted(`${person.name}'s answers deleted.`);
+    });
 
   return (
     <Sheet title={`What ${clientName} said`} onClose={onClose}>
@@ -108,7 +144,7 @@ export default function AnswersSheet({
           <div className="anspeople" role="tablist">
             {data.respondents.map((p, i) => (
               <button
-                key={p.name + i}
+                key={p.id}
                 role="tab"
                 aria-selected={i === open}
                 className={i === open ? 'on' : undefined}
@@ -139,6 +175,14 @@ export default function AnswersSheet({
               <Answer a={a} key={i} />
             ))}
           </ul>
+
+          {/* under the answers, not above them: the reason to delete a response
+              is in the response, and a Delete placed before it is pressed on a
+              name alone — which is what it was on the project sheet. */}
+          {error && <p className="formerror">{error}</p>}
+          <button className="ansdrop" disabled={pending} onClick={remove}>
+            {warned ? 'Delete anyway' : `Delete ${person.name}'s answers`}
+          </button>
         </>
       )}
     </Sheet>

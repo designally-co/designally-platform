@@ -10,15 +10,13 @@ import NewSurveySheet from './sheets/new-survey';
 import ProjectSheet from './sheets/project';
 import AnswersSheet from './sheets/answers';
 import InsightsSheet from './sheets/insights';
-import TemplatesSheet from './sheets/templates';
 import PastSheet from './sheets/past';
-import ComingSheet from './sheets/coming';
 import Toast, { useToast } from './toast';
 import { reanalyse } from '@/lib/team/actions';
 
 const WORDS = ['Nothing', 'One thing', 'Two things', 'Three things', 'Four things', 'Five things'];
 
-type Panel = 'new' | 'templates' | 'past' | 'coming' | null;
+type Panel = 'new' | 'past' | null;
 
 export default function Today({
   today,
@@ -40,7 +38,12 @@ export default function Today({
   const [openProject, setOpenProject] = useState<string | null>(null);
   const [openInsights, setOpenInsights] = useState<string | null>(null);
   /* answers are fetched when asked for, not shipped with the page */
-  const [answers, setAnswers] = useState<{ name: string; data: ProjectAnswers } | null>(null);
+  const [answers, setAnswers] = useState<{
+    name: string;
+    data: ProjectAnswers;
+    /* whose row was clicked — the sheet opens on them */
+    focus: string;
+  } | null>(null);
   const toast = useToast();
   const [writing, startWriting] = useTransition();
 
@@ -161,7 +164,6 @@ export default function Today({
             <thead>
               <tr>
                 <th scope="col">Project</th>
-                <th scope="col">Stage</th>
                 <th scope="col">Answers</th>
                 <th scope="col">Latest</th>
               </tr>
@@ -196,17 +198,6 @@ export default function Today({
                     </div>
                     <div className="c-sub">{p.packageLabel}</div>
                   </td>
-                  <td className="c-stage" data-label="Stage">
-                    {/* the segment count follows the package — never five by default */}
-                    <div className="stage" aria-hidden="true">
-                      {p.flow.map((s, i) => (
-                        <i key={s} className={i < p.stage ? 'on' : i === p.stage ? 'now' : ''} />
-                      ))}
-                    </div>
-                    <div className="c-main">
-                      {p.flow[p.stage]} · {p.stage + 1} of {p.flow.length}
-                    </div>
-                  </td>
                   <td data-label="Answers">
                     {p.answers ? (
                       <>
@@ -238,22 +229,11 @@ export default function Today({
         )}
 
         <div className="elsewhere">
-          <button onClick={() => setPanel('templates')}>
-            <span className="et">Question templates</span>
-            <span className="es">
-              {library.reduce((n, b) => n + b.questions.length, 0)} questions in{' '}
-              {library.length} blocks · what clients are asked
-            </span>
-          </button>
           <button onClick={() => setPanel('past')}>
             <span className="et">Past projects</span>
             <span className="es">
-              {archived.length} archived · insights and decks stay searchable
+              {archived.length} archived · insights stay searchable
             </span>
-          </button>
-          <button onClick={() => setPanel('coming')}>
-            <span className="et">What&apos;s coming</span>
-            <span className="es">The analysis, the gates, and the website track</span>
           </button>
         </div>
       </main>
@@ -266,9 +246,6 @@ export default function Today({
           onCreated={(msg) => toast.show(msg)}
         />
       )}
-      {panel === 'templates' && (
-        <TemplatesSheet library={library} onClose={() => setPanel(null)} />
-      )}
       {panel === 'past' && (
         <PastSheet
           archived={archived}
@@ -276,7 +253,6 @@ export default function Today({
           onRestored={(msg) => toast.show(msg)}
         />
       )}
-      {panel === 'coming' && <ComingSheet onClose={() => setPanel(null)} />}
       {insightsProject?.insights && (
         <InsightsSheet
           project={insightsProject}
@@ -291,6 +267,11 @@ export default function Today({
         <AnswersSheet
           data={answers.data}
           clientName={answers.name}
+          focus={answers.focus}
+          onDeleted={(msg) => {
+            setAnswers(null);
+            toast.show(msg);
+          }}
           onClose={() => setAnswers(null)}
         />
       )}
@@ -302,11 +283,11 @@ export default function Today({
             setOpenProject(null);
             setOpenInsights(project.id);
           }}
-          onReadAnswers={async () => {
+          onReadAnswers={async (responseId) => {
             const data = await readAnswers(project.id);
             if (!data) return;
             setOpenProject(null);
-            setAnswers({ name: project.clientName, data });
+            setAnswers({ name: project.clientName, data, focus: responseId });
           }}
           onClose={() => setOpenProject(null)}
           onActed={(msg) => {

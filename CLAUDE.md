@@ -2,7 +2,7 @@
 
 ## Project
 
-Internal platform replacing the manual work between a signed deal and a kick-off meeting. Clients answer branded bilingual questionnaires; the platform collects responses, finds where stakeholders disagree, and produces one confirmed page that drives the kick-off.
+Internal platform replacing the manual work between a signed deal and the start of the work. Clients answer branded bilingual questionnaires; the platform collects responses, finds where stakeholders disagree, and produces one confirmed summary. That summary is the end of the job — what the team does with it afterwards is not the platform's business.
 
 Read `PRODUCT.md` for users, purpose and design principles. Read `DESIGN.md` for the visual system. Both take precedence over anything inferred from existing code.
 
@@ -125,15 +125,19 @@ Three things from it that are easy to get wrong:
 - **Thai leading: 1.6 in a paragraph, 1.25 on a line that stands alone.** Thai stacks four levels vertically and Latin-tuned values clip tone marks — but the flat 1.6 condemned `body` itself and so caught nothing. Measure the ink; see `DESIGN.md` §2.
 - **Borders, not shadows.** The focus ring is the only shadow in the system.
 
-## Two words, two things
+## One word, one thing
 
 **Insights** are what the analysis produces from the answers — conflicts, clarity
-gaps, flags, the deck outline. **The brief** is what the designer is handed after
-the kick-off decisions are recorded, and it is what the work runs on.
+gaps, flags. It is the only artefact the platform makes, and the job ends when a
+person confirms it.
 
-They were both called "brief" until 13 August 2026, which meant the button said
-one thing, the sheet title said "survey analysis", and the spec said "insight".
-One object, three words, and the second object had no word of its own.
+There was a second — **the brief**, what the designer was handed after the
+kick-off decisions were recorded. Both were called "brief" until 13 August 2026,
+which meant the button said one thing, the sheet title said "survey analysis",
+and the spec said "insight". Splitting the words is what let the second object be
+seen at all — and then seen for what it was, and dropped with the kick-off on
+17 August. The vocabulary work outlived the thing it was for: the surface is
+called the insights everywhere, and nothing here is called a brief.
 
 The SQL table was renamed to `insights` on 14 August 2026, which needed
 `drizzle-kit generate` run interactively — it has to be told the difference
@@ -155,7 +159,7 @@ These are product decisions, not preferences. If a request conflicts with one, s
    it passes the project appears in Needs you asking whether to close. Answers arriving
    after it are accepted. Asked for 14 August 2026; built this way rather than as an
    auto-close, which would have left `closed_by` empty.
-2. **Four human gates, each recording who acted:** close collection · confirm the insights · record the kick-off decisions · archive the project. Store `*_by` and `*_at` on every one.
+2. **Three human gates, each recording who acted:** close collection · confirm the insights · archive the project. Store `*_by` and `*_at` on every one. There was a fourth — recording the kick-off decisions — retired 17 August 2026 with the kick-off itself; it was never built.
 3. **No expected respondent count.** Collection is open-ended. Never show a fraction like "2 of 4". Show "3 answers so far · last one 2 days ago".
 4. **No estimated content volume.** Do not calculate or display a predicted piece count anywhere, client-facing or internal. The earlier figure came from one project and is not reliable.
 5. **Questions are versioned.** A sent survey keeps the question version it was sent with. Editing a template affects future surveys only.
@@ -170,13 +174,18 @@ Do not retype the questions; import that file.
 
 ```
 clients          name, project_code
-projects         client_id, package, stage, archived, archived_at/by,
-                 kickoff_at, pages, languages[]   (last two unused since v2)
+projects         client_id, package, archived, archived_at/by
+                 stage, kickoff_at — retired 17 August 2026 with the kick-off
+                 pages, languages[] — unused since v2
+                 all four retired in place: never written, never read
 question_blocks  key (identity | strategy | project | visual
                       | core | branding | website | content | ecommerce — retired)
 questions        block_id, order, text_en, text_th, type, config, version
 surveys          project_id, kind (discovery), token,
-                 opened_at, closed_at, closed_by
+                 opened_at, due_at, closed_at, closed_by
+                 due_at — the date the team told the client to answer by. It
+                 shows on the survey and raises a prompt on the landing page
+                 when it passes. It closes nothing (rule 1).
 responses        survey_id, respondent_name, role, email, submitted_at
                  role and email — retired at versions 3 and 4, both live again at
                  question version 5: the team asked for who is speaking and how to
@@ -185,8 +194,9 @@ responses        survey_id, respondent_name, role, email, submitted_at
                  decision_maker — retired at question version 3, kept for surveys
                  sent before it
 answers          response_id, question_id, value
-briefs           project_id, generated_at, content, confirmed_at, confirmed_by
-decisions        project_id, question, outcome, note, recorded_at, recorded_by
+insights         project_id, generated_at, content, sources,
+                 confirmed_at, confirmed_by   (table renamed from briefs, 14 Aug)
+decisions        retired 17 August 2026 with the kick-off — table kept, empty
 users            team members
 ```
 
@@ -211,11 +221,11 @@ its `/c/<token>` route, and **milestone 5**. The retired blocks stay in the data
 surveys already sent keep the questions they were sent with (rule 5); deleting a block key would
 orphan a real brief.
 
-Both packages run the same five stages, but the meter reads its length from `STAGE_FLOW` rather
-than assuming five:
-```
-Lead → Proposal → Survey → Analysis → Kick-off
-```
+**There are no stages.** The five-stage meter — Lead → Proposal → Survey → Analysis → Kick-off —
+went on 17 August 2026, along with the kick-off, the *What's coming* sheet and the question
+template panel. The app models a survey and the summary it produces, and nothing on either side
+of that. `projects.stage`, `projects.kickoff_at` and the whole `decisions` table are retired in
+place: never written, never read, never dropped.
 
 ## Build milestones
 
@@ -223,10 +233,12 @@ Each one ends with something usable. Do not start the next before the previous h
 
 1. **One survey link that works** — public bilingual form, saves to Postgres. No auth, no team app.
 2. **The team can see it** — auth, Projects list, create survey, view responses. Already replaces Google Forms.
-3. **The team can prepare in ten minutes** — close and analyse, Anthropic API, structured output. The engine reports what they might miss or must be careful about; it does not read the answers for them. The team sees the full answers, that summary, and a deck outline they build in Canva. Narrowed 13 August 2026 after the first real brief returned fifty items — see `docs/insight-engine-spec.md`.
-4. **The human gate and the decisions** — review, confirm, deck handoff, record decisions.
+3. **The team can prepare in ten minutes** — close and analyse, Anthropic API, structured output. The engine reports what they might miss or must be careful about; it does not read the answers for them. The team sees the full answers and that summary. Narrowed 13 August 2026 after the first real brief returned fifty items, and again on 17 August when the deck outline and the room notes went with the kick-off — see `docs/insight-engine-spec.md`.
+4. **The human gate** — review and confirm the insights. That is where the platform stops.
 5. ~~The website track~~ — retired 11 August 2026 with the website package.
-6. **The template editor** — until then, questions live in a seed file.
+6. ~~The template editor~~ — retired 17 August 2026 with the *Question templates* panel. The
+   questionnaire is fixed at version 5, the branding team owns its wording, and the questions
+   live in `seed/question-blocks.json`. Rule 5 still holds if that ever changes.
 
 ## Working conventions
 

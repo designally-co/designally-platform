@@ -6,7 +6,7 @@ _Designally Platform_
 
 **1 · Nothing.** Answers accumulate. No expected count, no fraction. The team is not asked to watch.
 
-**2 · Close collection** — the one judgement call. "Close and analyse" is always available; the app promotes the project into "Needs you" after 5 quiet days and asks *"enough to work with, or wait a little longer?"* It never closes a survey on its own.
+**2 · Close collection** — the one judgement call. "Close and analyse" is always available; the app promotes the project into "Needs you" when the survey's date passes, and again after 5 quiet days, and asks *"enough to work with, or wait a little longer?"* It never closes a survey on its own.
 
 **3 · The insights write themselves** — about 30 seconds.
 
@@ -19,24 +19,22 @@ _Designally Platform_
 
 Then **Confirm**. Nothing reaches a client before a person has confirmed.
 
-**5 · Build the deck** — "Send to Claude" produces the structured deck brief, Claude returns a .pptx, the team polishes in Canva.
+**5 · The work begins**, from the confirmed insights and the full answers.
 
-**6 · Run the kick-off** — the DECIDE slides are the agenda.
+## Where this used to go on
 
-**7 · Record what was decided.**
+Until 17 August 2026 there were three more steps: build a deck, run the kick-off, record what the
+room decided. They are gone, and so are the deck outline and the room notes the analysis used to
+write for them.
 
-**8 · The work begins**, with the recorded decisions as the brief.
+The reason is what recording decisions was for. It existed because the most valuable moment in the
+project — the client settling a conflict out loud — was being left in somebody's notebook, and a
+designer working from a memory of a meeting is how a settled question gets reopened in month
+three. That is a real problem and it is still real. It is just not this platform's: capturing what
+a room decided is a meeting problem, and solving it here meant the app had opinions about how the
+team runs a meeting it has never been in. What the platform is good at is reading twenty answers
+in two languages and saying where they disagree. It does that, and it stops.
 
 ## Time
-Before: roughly 4–8 hours per project reading surveys, analysing, and building a deck from scratch.
-After: roughly 1 hour, of which 15–20 minutes is human judgement — the part that should stay human.
-
-## Why recording decisions exists
-The whole design points at the kick-off: detect conflicts, put them on DECIDE slides, resolve them live. But nothing captured the answer — the most valuable moment in the project was left in someone's notebook.
-
-Consequences: the designer works from a memory of the meeting; a stakeholder who missed it reopens the question in month three; the client's own decision gets re-litigated because there is no record to point at.
-
-When a kick-off is marked done and no decisions are recorded, the project appears in "Needs you". The panel shows each conflict the insights found, the options the deck presented, and a free-text field for the nuance the options miss. **"Still open — needs another meeting" is a valid outcome**, because pretending a decision happened is worse than recording that it didn't.
-
-## Order matters
-Decisions are recorded before the design work starts, because what was decided is the brief the work runs on. Nothing downstream should begin from a memory of the meeting.
+Before: roughly 4–8 hours per project reading surveys and analysing by hand.
+After: under an hour, of which 15–20 minutes is human judgement — the part that should stay human.

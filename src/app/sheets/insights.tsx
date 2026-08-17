@@ -35,61 +35,6 @@ function outOf(some: number, all: number) {
 }
 
 /**
- * The outline, as plain text, for the deck the team builds in Canva by hand.
- *
- * Canva has no import worth the integration — its Connect API autofills brand
- * templates on a paid plan and would tie this platform to somebody else's API
- * staying still. A copy button costs nothing and the team keeps the design.
- *
- * DECIDE slides keep their marker in the pasted text: their position early in
- * the deck is the whole point of the running order, and a plain list of titles
- * loses it.
- */
-function CopyOutline({
-  slides,
-  confirmed,
-}: {
-  slides: Insights['deckOutline'];
-  confirmed: boolean;
-}) {
-  const [copied, setCopied] = useState(false);
-
-  const text = slides
-    .map((s, i) => `${i + 1}. ${s.needsDecision ? 'DECIDE: ' : ''}${s.title}\n   ${s.purpose}`)
-    .join('\n\n');
-
-  async function copy() {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 3000);
-    } catch {
-      /* a refused clipboard is not an error state — select it by hand */
-      setCopied(false);
-    }
-  }
-
-  /**
-   * Rule 6 — nothing reaches a client before a human confirms it.
-   *
-   * This outline becomes the deck the client is sat in front of, so copying it
-   * out is the moment it leaves the building. Confirming is a gate, not a
-   * formality, and a gate you can walk around is decoration.
-   */
-  if (!confirmed) {
-    return (
-      <span className="copylocked">Confirm the insights to copy this</span>
-    );
-  }
-
-  return (
-    <button className="btn btn-quiet copyoutline" onClick={copy} aria-live="polite">
-      {copied ? 'Copied' : 'Copy outline'}
-    </button>
-  );
-}
-
-/**
  * Whose answers this version read.
  *
  * Every count below is counted from these and no others, so it belongs above
@@ -245,7 +190,7 @@ export default function InsightsSheet({
 
         {/* 3 · unsettled — these become the DECIDE slides */}
         <section className="isec">
-          <h2>Unsettled — resolve at the kick-off</h2>
+          <h2>Unsettled — still to decide</h2>
           {insights.unsettled.length ? (
             insights.unsettled.map((c, i) => (
               <article className="conflict" key={i}>
@@ -318,39 +263,6 @@ export default function InsightsSheet({
               <p>{f.finding}</p>
             </div>
           ))}
-        </section>
-
-        {/* 7 · deck outline */}
-        <section className="isec">
-          <div className="isechead">
-            <h2>Kick-off deck outline</h2>
-            <CopyOutline slides={insights.deckOutline} confirmed={!!openVersion?.confirmedOn} />
-          </div>
-          <ul className="slides">
-            {insights.deckOutline.map((s, i) => (
-              <li key={i}>
-                <span className="sn">{i + 1}</span>
-                <span>
-                  {s.title}
-                  <span className="purpose">{s.purpose}</span>
-                </span>
-                {s.needsDecision && <span className="need">DECIDE</span>}
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        {/* 8 · internal only — rule 8 */}
-        <section className="isec">
-          <h2>How to run the room</h2>
-          <div className="internal">
-            <div className="lock">INTERNAL — NEVER SHOWN TO THE CLIENT</div>
-            {insights.howToRunTheRoom.map((n, i) => (
-              <p key={i}>
-                <b>{n.heading}</b> {n.body}
-              </p>
-            ))}
-          </div>
         </section>
 
         {/* every run this project has had. Re-analysing has always kept them;

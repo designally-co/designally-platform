@@ -16,20 +16,16 @@ import { z } from 'zod';
  * The same reasoning applies to rule 4: there is no field for an estimated
  * content volume, client-facing or internal.
  *
- * **It is deliberately flat, and deliberately split in two.** The first
- * version nested sections inside wrapper objects; the API rejected it with
- * "the compiled grammar is too large". Structured outputs compile the schema
- * into a grammar and nested arrays-of-objects multiply its size. Flattening
- * the wrappers was not enough on its own — the whole set is past the limit
- * however it is arranged — so the analysis runs as two passes, each with a
- * schema that compiles.
+ * **It is deliberately flat.** The first version nested sections inside wrapper
+ * objects; the API rejected it with "the compiled grammar is too large".
+ * Structured outputs compile the schema into a grammar and nested
+ * arrays-of-objects multiply its size, so flattening the wrappers is what makes
+ * it compile. Keep it flat — a tidy-looking re-nesting fails at runtime, not at
+ * build.
  *
- * The split is not only a workaround. docs/insight-engine-spec.md says the
- * deck outline is "generated from 2, 3 and 5", so the second pass reading the
- * first pass's findings is the order the spec already describes.
- *
- * Keep both halves flat, and keep them halves. A tidy-looking re-nesting or a
- * merge back into one schema fails at runtime, not at build.
+ * It also used to be split across two passes, because the deck outline and the
+ * room notes pushed even the flattened set past the limit. Both went with the
+ * kick-off on 17 August 2026, and what is left compiles as one.
  */
 
 const RespondentNames = z
@@ -69,14 +65,14 @@ export const FindingsSchema = z.object({
     )
     .describe('Only genuine independent agreement. Two people answering a question at all is not agreement.'),
 
-  /* 3 · unsettled — ranked; these become the DECIDE slides */
+  /* 3 · unsettled — ranked; the decisions somebody has to make */
   unsettled: z
     .array(
       z.object({
         question: z
           .string()
           .describe(
-            'The disagreement as a question the kick-off can answer — "Who is the customer?", not "Audience misalignment".',
+            'The disagreement as a question somebody can answer — "Who is the customer?", not "Audience misalignment".',
           ),
         severity: z
           .enum(SEVERITY)
@@ -110,12 +106,12 @@ export const FindingsSchema = z.object({
       consequence: z
         .string()
         .describe(
-          'What this means for the work — usually that the kick-off needs a workshop rather than a moodboard, and that the quotation is exposed to revisions.',
+          'What this means for the work — usually that the client needs a workshop rather than a moodboard, and that the quotation is exposed to revisions.',
         ),
     }),
   ),
 
-  /* 6 · signals — a finding, so it belongs in pass one */
+  /* 6 · signals */
   alignment: z
     .enum(ALIGNMENT)
     .describe(
@@ -136,53 +132,25 @@ export const FindingsSchema = z.object({
 });
 
 /**
- * Pass two — preparation, not interpretation.
+ * There was a second pass. It is gone, and so is the split.
  *
- * **Narrowed 13 August 2026.** This carried four more fields: the client's
- * repeated vocabulary, the named references decoded by the reason behind them,
- * a reading of every scale pair, and creative notes on adjective clusters. They
- * were the engine reading the answers *for* the team.
+ * It carried a deck outline and a set of notes on running the kick-off room —
+ * the two survivors of the 13 August narrowing, which had also cut the client's
+ * repeated vocabulary, the decoded references, a reading of every scale pair,
+ * and creative notes on adjective clusters, all of them the engine reading the
+ * answers *for* the team.
  *
- * That is the team's job, and doing it here cost them twice over: it buried the
- * handful of things they would genuinely have missed under fifty items, and the
- * team had no way to see the raw answers to check any of it against. The spec's
- * own filter — "if we removed this, would the team make a worse decision?" —
- * rules them out now that the answers are readable in the app.
+ * Both went on 17 August 2026 with the kick-off itself: the platform's job ends
+ * at the summary. What is left is what the spec's own filter keeps — if we
+ * removed this, would the team make a worse decision? — and it compiles as one
+ * schema, which is why `analyse` is a single call again.
  *
- * What survives is what a person cannot get by reading: a running order for the
- * room, and a deck skeleton built from the conflicts.
+ * Insights rows written before that date still hold the two fields. Nothing
+ * reads them and nothing strips them: they are what the analysis said on the
+ * day it ran, and rewriting history to match a later decision would make every
+ * stored insight a guess about when it was written.
  */
-export const CreativeSchema = z.object({
-  /* 7 · deck outline — built from settled, unsettled and the creative notes */
-  deckOutline: z
-    .array(
-      z.object({
-        title: z.string(),
-        purpose: z.string().describe('What this slide is for, in one line.'),
-        needsDecision: z
-          .boolean()
-          .describe('True when this slide asks the room to decide something. Conflicts become DECIDE slides and belong early.'),
-      }),
-    )
-    .max(10)
-    .describe('The running order the team builds the Canva deck from. Ten slides is a kick-off; thirteen is a reading.'),
+export const InsightsSchema = FindingsSchema;
 
-  /**
-   * Rule 8 — internal facilitation notes never render on a client-facing
-   * surface. Its own field rather than a flag on shared content, so a
-   * client-facing renderer cannot leak it by forgetting to check a boolean.
-   */
-  howToRunTheRoom: z
-    .array(z.object({ heading: z.string(), body: z.string() }))
-    .max(4)
-    .describe(
-      'Internal only, never shown to a client. How to handle the room — what to open with, what not to move past, what to handle gently and why. It can be blunt about people in a way the rest cannot.',
-    ),
-});
-
-/** The stored insights are both passes merged. */
-export const InsightsSchema = FindingsSchema.and(CreativeSchema);
-
-export type Findings = z.infer<typeof FindingsSchema>;
-export type Creative = z.infer<typeof CreativeSchema>;
-export type Insights = Findings & Creative;
+export type Insights = z.infer<typeof FindingsSchema>;
+export type Findings = Insights;

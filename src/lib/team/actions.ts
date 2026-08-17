@@ -36,10 +36,6 @@ export type ActionResult =
   | { ok: true; link?: string; warning?: string }
   | { ok: false; error: string };
 
-/** Stage indices into STAGE_FLOW — the same for every package at this end. */
-const STAGE_SURVEY = 2;
-const STAGE_ANALYSIS = 3;
-
 export async function createSurvey(formData: FormData): Promise<ActionResult> {
   await actingUser();
 
@@ -90,7 +86,7 @@ export async function createSurvey(formData: FormData): Promise<ActionResult> {
   const [client] = await db.insert(clients).values({ name, projectCode }).returning();
   const [project] = await db
     .insert(projects)
-    .values({ clientId: client.id, package: pkg, stage: STAGE_SURVEY })
+    .values({ clientId: client.id, package: pkg })
     .returning();
 
   const [survey] = await db
@@ -137,11 +133,6 @@ export async function closeCollection(surveyId: string, only?: string[]): Promis
     .returning();
 
   if (!survey) return { ok: false, error: 'That survey is already closed.' };
-
-  await db
-    .update(projects)
-    .set({ stage: STAGE_ANALYSIS })
-    .where(eq(projects.id, survey.projectId));
 
   /**
    * The close is committed before the analysis runs, and separately from it.

@@ -14,7 +14,7 @@ web
 
 Two audiences with opposite needs.
 
-**Designally's project team** — the people who run client projects: sending questionnaires, reading what came back, preparing kick-off meetings, and keeping several clients moving at once. They open this tool between other work, often for fifteen seconds, and need to know immediately whether anything is waiting on them. They are not looking for a dashboard to study; they are looking for an answer to "is there anything I have to do".
+**Designally's project team** — the people who run client projects: sending questionnaires, reading what came back, preparing for the first working meeting, and keeping several clients moving at once. They open this tool between other work, often for fifteen seconds, and need to know immediately whether anything is waiting on them. They are not looking for a dashboard to study; they are looking for an answer to "is there anything I have to do".
 
 **The client's stakeholders** — founders, marketing leads, operations managers at the client company, answering a questionnaire once. Most are answering on a phone, in Thai, without much context about why they were sent the link.
 
@@ -22,11 +22,11 @@ Two audiences with opposite needs.
 
 ## Product Purpose
 
-Designally Platform replaces the manual work between a signed deal and a kick-off meeting. Clients answer a branded bilingual questionnaire; the platform collects however many responses arrive and writes one page that says what the client has settled, where they contradict themselves or each other, and what they have not decided yet. A person on the team confirms that page before anything goes further.
+Designally Platform replaces the manual work between a signed deal and the start of the work. Clients answer a branded bilingual questionnaire; the platform collects however many responses arrive and writes one page that says what the client has settled, where they contradict themselves or each other, and what they have not decided yet. A person on the team confirms that page before anything goes further.
 
 **The analysis's first job is to turn twenty-one long answers into a page somebody can act on.** Most of that work is reading one person carefully: finding the gap between what they say they want and what they say they admire, noticing which questions they could not answer, and separating what is settled from what is still open in their own head.
 
-**When more than one person answers, disagreement between them is the most valuable thing in the data** — it becomes a decision slide in the kick-off deck rather than a surprise in revision round three. That case is the exception rather than the rule, and the brief must be worth reading when it does not occur.
+**When more than one person answers, disagreement between them is the most valuable thing in the data** — the team meets it on the first day rather than in revision round three. That case is the exception rather than the rule, and the insights must be worth reading when it does not occur.
 
 ## Positioning
 
@@ -34,19 +34,24 @@ An internal tool that turns scattered stakeholder answers into one confirmed pag
 
 ## Operating Context
 
-A project runs from a signed deal to a kick-off meeting.
+A project runs from a signed deal to a confirmed summary.
 
-1. The team creates a survey and copies the link. **Sending it is manual** — there is no email from the platform, ever.
+1. The team creates a survey and copies the link. **Sending it is manual** — there is no email from the platform, ever. The survey carries a date to answer by, two weeks out by default.
 2. The client answers, on a phone, usually in Thai, often a week or two after the link was sent.
-3. The team closes collection and the analysis writes the brief.
-4. The team reads and confirms the brief.
-5. **A person copies the confirmed brief into Claude and builds the kick-off deck from what comes back**, in a separate tool. The platform's job ends at producing text worth copying — it does not make slides and does not need to.
-6. The kick-off happens; the decisions taken there are recorded against the project.
-7. The project is archived by hand.
+3. The team closes collection and the analysis writes the insights.
+4. The team reads and confirms the insights. **This is where the platform's job ends.**
+5. The project is archived by hand, whenever the team judges it finished.
 
-**Four human gates, each recording who acted and when:** close collection · confirm the brief · record the kick-off decisions · archive the project. None of them can happen on a timer.
+**Three human gates, each recording who acted and when:** close collection · confirm the insights · archive the project. None of them can happen on a timer, including the date in step 1 — it raises a prompt and closes nothing.
 
-Two packages, and a client buys one or the other, never both — **Brand** (Brand Strategy + Brand Identity, 21 numbered questions) and **Design** (11). Both run the same five stages: Lead → Proposal → Survey → Analysis → Kick-off.
+**Narrowed 17 August 2026.** There were two more steps and a fourth gate: copy the confirmed
+text into Claude to build a kick-off deck, run the kick-off, and record what was decided. The
+platform now stops at the summary. Everything downstream of it — the deck, the meeting, the
+record of what the room settled — is the team's, done in the team's own tools. The engine's
+deck outline and its notes on running the room went at the same time, and so did the
+five-stage meter.
+
+Two packages, and a client buys one or the other, never both — **Brand** (Brand Strategy + Brand Identity, 21 numbered questions) and **Design** (11). There are no stages; a project is collecting answers, or it has a summary.
 
 The website track and its follow-up content survey were retired on 11 August 2026 and no longer form part of the flow.
 
@@ -59,7 +64,7 @@ The website track and its follow-up content survey were retired on 11 August 202
 - **Internal facilitation notes never render on a client-facing surface**, and live in their own field rather than behind a flag.
 - **The client's contact email never goes to the analysis API.** It is contact detail, not evidence, and it is the only field that identifies a real person off this system.
 - The survey must work on a phone, in Thai, on a poor connection, and save progress as the client goes.
-- Questions currently live in a seed file. Changing one needs a developer and a deploy until the template editor exists.
+- **Questions live in a seed file, and that is now the settled answer.** The questionnaire is fixed at version 5, the branding team owns its wording, and changing one needs a developer and a deploy. The in-app template editor was retired on 17 August 2026 — an editor for something nobody edits is a surface to maintain and the easiest way to break the versioning rule above.
 
 ## Brand Commitments
 
@@ -67,7 +72,7 @@ The product is Designally's own, and the client-facing questionnaire is for many
 
 ## Evidence on Hand
 
-**Real client data exists and is not in this repository.** The ARUN+ survey (28 responses across 6 departments) and the PCE-TH data are held in Google Drive and are the acceptance test for the analysis: the brief must find the B2B/B2C audience split, the mutual-avoid tone contradiction and the clarity gaps without being prompted for them. Both were collected under question version 1, which recorded each respondent's department and decision-maker status — signals the current questionnaire no longer collects.
+**Real client data exists and is not in this repository.** The ARUN+ survey (28 responses across 6 departments) and the PCE-TH data are held in Google Drive and are the acceptance test for the analysis: the insights must find the B2B/B2C audience split, the mutual-avoid tone contradiction and the clarity gaps without being prompted for them. Both were collected under question version 1, which recorded each respondent's department and decision-maker status — signals the current questionnaire no longer collects.
 
 `scripts/dev-fixture.ts` writes five synthetic respondents carrying deliberately planted findings, and `npm run dev:analyse` runs the real prompt against them. That is a test, not evidence about a real client.
 
@@ -92,10 +97,10 @@ Nothing in the product should imply the software is deciding. The interface neve
 1. **Priority is expressed as form, not labels.** Work blocked on the team sits at the top on a white surface with the largest type and the only accent-coloured buttons. Work waiting on the client sits below with no container at all — the absence of a card is the demotion. Templates and finished projects live behind one quiet line at the bottom.
 2. **An empty screen is success.** When nothing needs the team, say so plainly and let them close the laptop. Never manufacture activity to fill space.
 3. **Colour carries one meaning.** The accent means "a person is needed here" and appears on under ten percent of the surface. If it stops meaning that, it stops working.
-4. **The tool never decides on a timer.** It never closes a survey, confirms a brief, or archives a project by itself. It may notice that waiting has stopped being useful and ask; the answer belongs to a person, and the record stores who gave it.
+4. **The tool never decides on a timer.** It never closes a survey, confirms the insights, or archives a project by itself. It may notice that waiting has stopped being useful and ask; the answer belongs to a person, and the record stores who gave it.
 5. **State what is true, not what is estimated.** Report counts that exist — "3 answers so far · last one 2 days ago". Do not extrapolate volumes, percentages, or confidence from small samples.
 6. **Both languages, everywhere except the buttons.** Every client-facing question, heading, help line, placeholder and message exists in Thai and English. **Buttons are the one exception**, decided 13 August 2026: bilingual action labels wrapped to two lines on a phone and made the button the largest thing on screen, so navigation and action labels run in English alone. The exception is exactly that wide — it does not extend to step labels, system messages, or anything a respondent has to read to answer. Thai wraps differently and sits taller; layouts are tested in Thai before they are considered done.
-7. **The client's own words survive the pipeline.** Quotes from stakeholders reach the brief and the deck verbatim, in the language they were written in.
+7. **The client's own words survive the pipeline.** Quotes from stakeholders reach the insights verbatim, in the language they were written in.
 
 ## Accessibility & Inclusion
 

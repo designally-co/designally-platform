@@ -45,38 +45,12 @@ export const clients = pgTable('clients', {
  * Two packages, and a client buys one or the other — never both.
  *
  * The website and combined packages were retired on 11 August 2026 along with
- * the whole website track. Both remaining packages run the same five stages,
- * but the meter still reads its length from here rather than assuming five:
- * the moment that is hard-coded, adding a package becomes a hunt.
+ * the whole website track. The five-stage flow they ran through went on 17
+ * August: the app models a survey and the summary it produces, and nothing
+ * between.
  */
 export const PACKAGES = ['brand', 'design'] as const;
 export type Package = (typeof PACKAGES)[number];
-
-export const STAGE_FLOW: Record<Package, readonly string[]> = {
-  brand: ['Lead', 'Proposal', 'Survey', 'Analysis', 'Kick-off'],
-  design: ['Lead', 'Proposal', 'Survey', 'Analysis', 'Kick-off'],
-};
-
-/**
- * `projects.package` is a stored string, so a row written before a package was
- * retired still carries the old value — `branding`, `website`, `both`. Reading
- * STAGE_FLOW by that value returns undefined, and the landing page then calls
- * `.map` on it and the whole team app 500s. That is exactly what happened on
- * the version-2 deploy.
- *
- * Never index STAGE_FLOW directly. A retired package must render, because
- * archived work has to stay readable — the same promise rule 5 makes about
- * questions.
- */
-const RETIRED_FLOW: Record<string, readonly string[]> = {
-  branding: ['Lead', 'Proposal', 'Survey', 'Analysis', 'Kick-off'],
-  website: ['Lead', 'Proposal', 'Survey', 'Analysis', 'Kick-off', 'Content', 'Build'],
-  both: ['Lead', 'Proposal', 'Survey', 'Analysis', 'Kick-off', 'Content', 'Build'],
-};
-
-export function flowFor(pkg: string): readonly string[] {
-  return STAGE_FLOW[pkg as Package] ?? RETIRED_FLOW[pkg] ?? STAGE_FLOW.brand;
-}
 
 export const projects = pgTable('projects', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -84,9 +58,21 @@ export const projects = pgTable('projects', {
     .notNull()
     .references(() => clients.id, { onDelete: 'cascade' }),
   package: text('package').$type<Package>().notNull(),
-  /** index into STAGE_FLOW[package] */
+  /**
+   * Retired 17 August 2026 with the five-stage flow.
+   *
+   * The team app no longer models a project's position — the job is the survey
+   * and the summary it produces, and a meter counting towards a kick-off the
+   * platform does not track was inventing progress. Nothing reads this now and
+   * nothing writes it; the default keeps existing inserts valid.
+   *
+   * Not dropped, on the same reasoning that kept `role` and `email` through
+   * their retirement: a column costs nothing to leave and a great deal to
+   * recreate, and those two came back four days later.
+   */
   stage: integer('stage').notNull().default(2),
 
+  /* retired with the kick-off, 17 August 2026 — never written, never read */
   kickoffAt: timestamp('kickoff_at', { withTimezone: true }),
   /* Held the retired website block's answers. Unused since the website track
      was dropped; kept rather than migrated away, in case it returns. */
@@ -308,9 +294,10 @@ export const surveyDrafts = pgTable(
  * The analysis output.
  *
  * Renamed from "brief" in the product's vocabulary on 13 August 2026: the team
- * calls this the insights, and "brief" means what the designer is handed after
- * the kick-off decisions are recorded — a different artefact. One word for one
- * thing.
+ * called this the insights, and "brief" meant what the designer was handed after
+ * the kick-off decisions were recorded — a different artefact. The second
+ * artefact went with the kick-off on 17 August 2026, so there is one thing here
+ * again, and it is this one.
  *
  * The SQL table was renamed to match on 14 August 2026 — `drizzle-kit generate`
  * has to be told that is a rename rather than a drop of a table with real
@@ -344,6 +331,16 @@ export const insights = pgTable('insights', {
   confirmedBy: uuid('confirmed_by').references(() => users.id),
 });
 
+/**
+ * Retired 17 August 2026 with the kick-off. Never written, never read.
+ *
+ * It is left standing rather than dropped for the same reason `projects.stage`
+ * is: a retirement here has come back before — `responses.role` and
+ * `responses.email` were retired at question versions 3 and 4 and asked for
+ * again at version 5, four days later, and cost nothing to restore because the
+ * columns had never gone. An empty table costs nothing to keep and a migration
+ * to remove.
+ */
 export const decisions = pgTable('decisions', {
   id: uuid('id').primaryKey().defaultRandom(),
   projectId: uuid('project_id')
@@ -354,7 +351,6 @@ export const decisions = pgTable('decisions', {
   outcome: text('outcome').notNull(),
   note: text('note'),
 
-  /* gate 3 — record the kick-off decisions */
   recordedAt: timestamp('recorded_at', { withTimezone: true }).notNull().defaultNow(),
   recordedBy: uuid('recorded_by').references(() => users.id),
 });

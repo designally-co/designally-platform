@@ -42,6 +42,8 @@ export type ReadableAnswer = {
 };
 
 export type RespondentAnswers = {
+  /** the response row, so the project sheet can open the sheet on one person */
+  id: string;
   name: string;
   /** live again at question version 5 — a name alone does not say whose view it is */
   role: string | null;
@@ -146,6 +148,7 @@ export async function loadProjectAnswers(projectId: string): Promise<ProjectAnsw
         value: mine.get(q.id) ?? null,
       }));
       return {
+        id: p.id,
         name: p.respondentName,
         role: p.role,
         email: p.email,

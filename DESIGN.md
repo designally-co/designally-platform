@@ -739,18 +739,22 @@ Below 660px the row stacks and the button moves under the text.
 
 ### Project table
 
-The full project list is a real `<table>` — `<thead>`, `th scope="col"`, keyboard-focusable rows. Four columns:
+The full project list is a real `<table>` — `<thead>`, `th scope="col"`, keyboard-focusable rows. Three columns:
 
 | Column | Contents |
 |---|---|
 | Project | 8px Action Blue dot when the project needs the team · name at `body-strong` · package beneath at `caption` in `--ink-muted-48` |
-| Stage | Segment meter, then `caption` label "Analysis · 4 of 5" |
 | Answers | "3 answers" at `caption` in `--ink-muted-80`, then who answered — "Khun Tanawat", or "Khun Tanawat +2" — at `caption` in `--ink-muted-48` |
 | Latest | Two lines of state at `caption` in `--ink-muted-48` |
 
 Header cells at `caption-strong` in `--ink-muted-48`, 1px `--hairline` beneath. Body rows separated by 1px `--hairline`. **No zebra striping, no fills, no vertical rules.** Hover tints the row to `--canvas` — the same white-on-parchment lift used everywhere else. Cell padding `18px 12px`, top-aligned.
 
-Segment meter: N segments, 4px tall, 2px radius, 3px gap. Done `--ink-muted-80`, current `--primary`, future `--hairline`. Segment count follows the package — never hard-code five.
+**The Stage column and its segment meter went on 17 August 2026**, with the kick-off. The meter
+was N segments, 4px tall, reading "Analysis · 4 of 5", and its own spec insisted the count follow
+the package rather than being hard-coded — which was the tell. A project here is collecting
+answers or it has a summary; five dated stages were a progress bar drawn over two states, four of
+them advancing only when somebody remembered to advance them. The Latest column already says the
+true thing, in words. **Do not reintroduce it**: if a state matters, it belongs in Latest.
 
 Below **820px** the `<thead>` is visually hidden (`clip: rect(0 0 0 0)`) and each row becomes a stacked block; `td[data-label]::before` reprints the column name as a `fine` label above each value. No horizontal scrolling on a phone.
 
@@ -821,7 +825,10 @@ The team app is **one landing page**. There are no tabs and no sidebar.
 
 1. **Needs you** — white utility card on the parchment page, rich rows, one Action Blue pill each
 2. **All projects** — the table, action-needed rows first, marked with the blue dot
-3. **Three destinations** — Question templates · Past projects · What's coming, as a plain row at the foot, each opening its own panel
+3. **One destination** — Past projects, as a plain row at the foot, opening its own panel. There
+   were three until 17 August 2026; *Question templates* went with the fixed questionnaire and
+   *What's coming* with the kick-off. The row keeps its shape for one item — a lone destination
+   is not promoted to a button.
 
 Everything else is a panel opened from this page. Navigation holds places you can go; this product has one place.
 

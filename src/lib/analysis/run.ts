@@ -3,8 +3,8 @@ import 'server-only';
 import Anthropic from '@anthropic-ai/sdk';
 import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod';
 
-import { CreativeSchema, FindingsSchema, type Insights, type Creative, type Findings } from './schema';
-import { SYSTEM_PROMPT, buildUserPrompt, buildCreativePrompt } from './prompt';
+import { FindingsSchema, type Insights } from './schema';
+import { SYSTEM_PROMPT, buildUserPrompt } from './prompt';
 
 /**
  * The analysis. Server-side only — the key never reaches a client bundle,
@@ -16,7 +16,7 @@ const MODEL = 'claude-opus-5';
 /**
  * Effort is the latency and cost lever, and it matters here more than usual:
  * the analysis runs inside a request, and a serverless function has a ceiling.
- * At the default `high` the two passes took over five minutes, which exceeds
+ * At the default `high` this took over five minutes, which exceeds
  * what a Vercel function will allow. `medium` is the setting to beat — raise
  * it if the insights stop finding conflicts, and re-measure the wall clock when
  * you do.
@@ -44,22 +44,21 @@ export async function analyse(input: {
   const client = new Anthropic();
 
   /**
-   * Two passes, because the whole set is past the structured-output grammar
-   * limit however it is arranged (see schema.ts). Pass two is given pass one's
-   * findings, which is also the order docs/insight-engine-spec.md describes —
-   * the deck outline is generated from the settled and unsettled sections.
+   * One pass.
+   *
+   * There were two, because the deck outline and the room notes pushed the
+   * combined schema past the structured-output grammar limit and had to be
+   * asked for separately, given the first pass's findings. Both were dropped on
+   * 17 August 2026 — the platform's job ends at the summary — and the split
+   * went with them: what is left compiles on its own.
+   *
+   * That halves the API calls, and it takes the second call's latency out of a
+   * request that already runs close to a serverless function's ceiling.
    */
   const first = await callPass(client, FindingsSchema, buildUserPrompt(input));
   if (!first.ok) return first;
 
-  const second = await callPass(
-    client,
-    CreativeSchema,
-    buildCreativePrompt(input, first.value as Findings),
-  );
-  if (!second.ok) return second;
-
-  const insights = { ...(first.value as Findings), ...(second.value as Creative) } as Insights;
+  const insights = first.value as Insights;
 
   const missing = findMissingSections(insights);
   if (missing) return { ok: false, error: missing };
@@ -67,14 +66,7 @@ export async function analyse(input: {
   const violation = findForbiddenNumbers(insights);
   if (violation) return { ok: false, error: violation };
 
-  return {
-    ok: true,
-    insights,
-    usage: {
-      input: first.usage.input + second.usage.input,
-      output: first.usage.output + second.usage.output,
-    },
-  };
+  return { ok: true, insights, usage: first.usage };
 }
 
 type PassResult =
@@ -83,7 +75,7 @@ type PassResult =
 
 async function callPass(
   client: Anthropic,
-  schema: typeof FindingsSchema | typeof CreativeSchema,
+  schema: typeof FindingsSchema,
   prompt: string,
 ): Promise<PassResult> {
   try {
@@ -92,11 +84,11 @@ async function callPass(
     const stream = client.messages.stream({
       model: MODEL,
       /**
-       * A complete insights for a 26-person survey runs to a dozen deck slides,
-       * ten scale readings and ten facilitation notes. At 16000 the second
-       * pass was truncated mid-string, and because the SDK parses inside
-       * finalMessage() that surfaced as an opaque JSON error rather than the
-       * max_tokens branch below — the check never got to run.
+       * Kept at 32000 even though the output is smaller now. A 26-person
+       * survey is long, and the failure this guards against is not a clean
+       * refusal: at 16000 the response was truncated mid-string, and because
+       * the SDK parses inside finalMessage() that arrived as an opaque JSON
+       * error rather than the max_tokens branch below, so the check never ran.
        */
       max_tokens: 32000,
       system: SYSTEM_PROMPT,
@@ -167,20 +159,17 @@ async function callPass(
 
 /**
  * Insights are allowed to find nothing — an empty conflict list on a genuinely
- * aligned client is a real result, and empty flags is a good outcome. But some
- * sections are not findings, they are always written: every project gets a deck
- * outline and notes on running the room.
+ * aligned client is a real result, and empty flags is a good outcome. The
+ * headline is not a finding, it is always written, so an empty one means the
+ * run failed quietly rather than that there was nothing to say.
  *
- * On the real ARUN+ survey those came back empty and nothing complained. The
- * schema was satisfied, because an empty array is a valid array, and the team
- * would have opened insights with no deck and no facilitation notes with no way
- * to know anything had gone wrong. Silence is the worst outcome; refuse.
+ * This used to guard the deck outline and the room notes too, after both came
+ * back empty on the real ARUN+ survey and nothing complained. Those are gone;
+ * the reasoning is not. Silence is the worst outcome; refuse.
  */
 function findMissingSections(insights: Insights): string | null {
   const empty: string[] = [];
   if (!insights.headline.trim()) empty.push('an opening finding');
-  if (!insights.deckOutline.length) empty.push('a kick-off deck outline');
-  if (!insights.howToRunTheRoom.length) empty.push('notes on running the room');
 
   if (!empty.length) return null;
   return `The insights came back without ${empty.join(' and ')}, which every analysis has. It was not saved. Run the analysis again.`;
@@ -222,8 +211,6 @@ function findForbiddenNumbers(insights: Insights): string | null {
     ...insights.notDecidedYet.flatMap((g) => [g.topic, g.whatWasSeen, g.consequence]),
     insights.alignmentReason,
     ...insights.flags.map((f) => f.finding),
-    ...insights.deckOutline.flatMap((d) => [d.title, d.purpose]),
-    ...insights.howToRunTheRoom.flatMap((n) => [n.heading, n.body]),
   ];
 
   for (const line of prose) {

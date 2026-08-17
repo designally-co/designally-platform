@@ -5,7 +5,7 @@ import { useState, useTransition } from 'react';
 import {
   archiveProject,
   closeCollection,
-  deleteResponse,
+  reanalyse,
   reopenCollection,
   setDueDate,
 } from '@/lib/team/actions';
@@ -14,13 +14,18 @@ import { forDisplay } from '@/lib/survey/link';
 import Sheet from './sheet';
 
 /**
- * Everything about one client. Six sections, in the order of
- * docs/complete-flow.md: right now · where it is · who answered · decided at
- * the kick-off · documents · archive.
+ * Everything about one client. Five sections: who answered · right now ·
+ * the link · documents · archive. The job ends at the summary.
  *
- * The decisions and documents sections have nothing to show until milestones 3
- * and 4. They say so rather than being hidden, because "nothing produced yet"
- * is a true statement about the project and an empty space is not.
+ * **Who answered comes before the action**, reordered 17 August 2026. The order
+ * used to follow docs/complete-flow.md, which is the order things *happen* —
+ * but a team member opening this sheet is deciding whether there is enough to
+ * work with, and the answer to that is the list of people. Putting the button
+ * first asked them to decide above the evidence.
+ *
+ * The documents section has nothing to show until an analysis exists. It says
+ * so rather than being hidden, because "nothing produced yet" is a true
+ * statement about the project and an empty space is not.
  */
 export default function ProjectSheet({
   project: p,
@@ -33,15 +38,13 @@ export default function ProjectSheet({
   project: ProjectView;
   origin: string;
   onOpenInsights: () => void;
-  onReadAnswers: () => void;
+  onReadAnswers: (responseId: string) => void;
   onClose: () => void;
   onActed: (message: string) => void;
 }) {
   const [confirmArchive, setConfirmArchive] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
-  /* which response has already been warned about, so the next press deletes */
-  const [warned, setWarned] = useState<string | null>(null);
   /**
    * Whose answers the analysis should read. Null is everyone, which is the
    * default and nearly always what happens — the subset exists to see the insights
@@ -51,23 +54,14 @@ export default function ProjectSheet({
   const [only, setOnly] = useState<string[] | null>(null);
   const [picking, setPicking] = useState(false);
 
-  /* `onRefused` lets a caller treat a refusal as a step rather than a failure —
-     deleting a response a confirmed insights read comes back refused the first
-     time, with the reason, and the second press goes through. */
-  const run = (
-    fn: () => Promise<{ ok: boolean; error?: string }>,
-    message: string,
-    onRefused?: () => void,
-  ) =>
+  const run = (fn: () => Promise<{ ok: boolean; error?: string }>, message: string) =>
     start(async () => {
       setError(null);
       const result = await fn();
       if (!result.ok) {
         setError(result.error ?? 'That did not work.');
-        onRefused?.();
         return;
       }
-      setWarned(null);
       onActed(message);
     });
 
@@ -76,9 +70,39 @@ export default function ProjectSheet({
       <div className="pd-head">
         <h1>{p.clientName}</h1>
         <div className="pkg">
-          {p.packageLabel} · {p.flow[p.stage]} · step {p.stage + 1} of {p.flow.length}
+          {p.packageLabel}
           {p.projectCode ? ` · ${p.projectCode}` : ''}
         </div>
+      </div>
+
+      {/* who answered */}
+      <div className="pd-sec">
+        <h2>Who answered</h2>
+        {p.people.length ? (
+          <>
+            {/* The analysis reports what the team might miss; reading what
+                was actually said is their own work, and this is where it
+                starts — which is why this section is first now, above the
+                action. The team reads, then decides.
+
+                There was a "Read what they said" button under this list until
+                17 August 2026. It opened on whoever answered first, so anybody
+                wanting Khun Tanawat pressed a general button and then hunted
+                for him in the tabs. The card is the control, and it opens on
+                him. Delete went with it, to the answers themselves — see
+                sheets/answers.tsx. */}
+            <div className="pd-people">
+              {p.people.map((person) => (
+                <button className="person" key={person.id} onClick={() => onReadAnswers(person.id)}>
+                  <b>{person.name}</b>
+                  <span className="role">{person.email || 'no email given'}</span>
+                </button>
+              ))}
+            </div>
+          </>
+        ) : (
+          <p className="quiet">Nobody has answered yet.</p>
+        )}
       </div>
 
       {/* right now */}
@@ -91,8 +115,10 @@ export default function ProjectSheet({
             </p>
             <p className="when">{p.action.when}</p>
             {/* which answers this reads. Hidden until asked for, because the
-                answer is "all of them" almost every time. */}
-            {p.people.length > 1 && (
+                answer is "all of them" almost every time. Only for the two
+                actions that read answers — reviewing what is already written
+                reads nothing. */}
+            {p.action.kind !== 'review-insights' && p.people.length > 1 && (
               <div className="whoreads">
                 {picking ? (
                   <>
@@ -128,21 +154,38 @@ export default function ProjectSheet({
                 )}
               </div>
             )}
+            {/**
+             * Three actions reach this card and they are not the same act.
+             * Closing collection is the gate; writing the insights is the
+             * retry after the analysis failed on a survey already closed;
+             * reviewing opens the sheet and touches nothing.
+             *
+             * All three used to call `closeCollection`, so two of them came
+             * back "That survey is already closed." — the label said one thing
+             * and the button did another. Branch on the kind.
+             */}
             <button
               className="btn btn-primary btn-sm"
               disabled={pending || only?.length === 0}
-              onClick={() =>
+              onClick={() => {
+                if (p.action!.kind === 'review-insights') return onOpenInsights();
+                if (p.action!.kind === 'write-insights') {
+                  return run(() => reanalyse(p.id, only ?? undefined), 'The insights are written.');
+                }
                 run(
                   () => closeCollection(p.surveyId!, only ?? undefined),
-                  `Collection closed · ปิดรับคำตอบแล้ว`,
-                )
-              }
+                  'Collection closed · ปิดรับคำตอบแล้ว',
+                );
+              }}
             >
-              {pending ? 'Closing…' : p.action.label}
+              {pending ? 'Working…' : p.action.label}
             </button>
-            <p className="hintline">
-              This records that you closed it, and when. Writing the insights arrives in milestone 3.
-            </p>
+            {p.action.kind === 'close-collection' && (
+              <p className="hintline">
+                This records that you closed it, and when. Closing stops new answers and starts the
+                analysis.
+              </p>
+            )}
           </>
         ) : (
           <>
@@ -178,64 +221,6 @@ export default function ProjectSheet({
               </>
             )}
           </>
-        )}
-      </div>
-
-      {/* where it is */}
-      <div className="pd-sec">
-        <h2>Where it is</h2>
-        <ul className="tl">
-          {p.flow.map((stage, i) => {
-            const cls = i < p.stage ? 'done' : i === p.stage ? 'now' : 'next';
-            let when = '';
-            if (stage === 'Survey' && p.sentOn) when = `sent ${p.sentOn}`;
-            if (stage === 'Analysis' && p.closedOn) when = `closed with ${p.answers} answers`;
-            return (
-              <li className={cls} key={stage}>
-                <span>{stage}</span>
-                <span className="when">{when}</span>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-
-      {/* who answered */}
-      <div className="pd-sec">
-        <h2>Who answered</h2>
-        {p.people.length ? (
-          <>
-            <div className="pd-people">
-              {p.people.map((person) => (
-                <div className="person" key={person.id}>
-                  <b>{person.name}</b>
-                  <span className="role">{person.email || 'no email given'}</span>
-                  {/* a duplicate submission, or a test one. Two presses when a
-                      confirmed insights read it — the first says what would go. */}
-                  <button
-                    className="drop"
-                    disabled={pending}
-                    onClick={() =>
-                      run(
-                        () => deleteResponse(person.id, warned === person.id),
-                        `${person.name}'s answers deleted.`,
-                        () => setWarned(person.id),
-                      )
-                    }
-                  >
-                    {warned === person.id ? 'Delete anyway' : 'Delete'}
-                  </button>
-                </div>
-              ))}
-            </div>
-            {/* the analysis reports what the team might miss; reading what was
-                actually said is their own work, and this is where they do it */}
-            <button className="btn btn-quiet" onClick={onReadAnswers}>
-              Read what they said
-            </button>
-          </>
-        ) : (
-          <p className="quiet">Nobody has answered yet.</p>
         )}
       </div>
 
@@ -298,12 +283,6 @@ export default function ProjectSheet({
         </div>
       )}
 
-      {/* decided at the kick-off */}
-      <div className="pd-sec">
-        <h2>Decided at the kick-off</h2>
-        <p className="quiet">Nothing recorded yet — this fills in after the kick-off meeting.</p>
-      </div>
-
       {/* documents */}
       <div className="pd-sec">
         <h2>Documents</h2>
@@ -332,9 +311,9 @@ export default function ProjectSheet({
       <div className="pd-sec pd-archive">
         <h2>Finished with this project?</h2>
         <p>
-          Archiving moves it out of your live list. Nothing is deleted — the survey, the answers,
-          the insights and the decisions stay searchable. Only your team can do this; the app never
-          archives anything by itself. · ข้อมูลไม่ถูกลบ ค้นหาได้เสมอ
+          Archiving moves it out of your live list. Nothing is deleted — the survey, the answers
+          and the insights stay searchable. Only your team can do this; the app never archives
+          anything by itself. · ข้อมูลไม่ถูกลบ ค้นหาได้เสมอ
         </p>
         {confirmArchive ? (
           <div className="confirmrow">

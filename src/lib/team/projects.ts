@@ -7,7 +7,6 @@ import {
   responses,
   surveys,
   users,
-  flowFor,
   insights,
   type Package,
 } from '@/lib/db/schema';
@@ -83,8 +82,6 @@ export type ProjectView = {
   projectCode: string | null;
   package: Package;
   packageLabel: string;
-  stage: number;
-  flow: readonly string[];
   archived: boolean;
   archivedOn: string | null;
   archivedByName: string | null;
@@ -183,18 +180,12 @@ function buildAction(v: {
       say: `The survey is closed and the analysis is written.`,
       emphasis: found,
       when: v.closedOn
-        ? `Closed ${v.closedOn} with ${plural(v.answers, 'answer')} · kick-off not booked`
-        : `${plural(v.answers, 'answer')} · kick-off not booked`,
+        ? `Closed ${v.closedOn} with ${plural(v.answers, 'answer')}`
+        : plural(v.answers, 'answer'),
       label: 'Review insights',
     };
   }
 
-  /**
-   * Milestone 2 can reach one of these. Reviewing insights, recording decisions
-   * and sending the content survey arrive in milestones 3, 4 and 5 — they are
-   * not stubbed here, because a button that does nothing is worse than no
-   * button.
-   */
   /**
    * The date the team asked for answers by has passed.
    *
@@ -237,7 +228,7 @@ function buildLatest(v: {
 }): [string, string] {
   if (!v.sentOn) return ['Not sent yet', 'no link issued'];
   if (v.closedOn) {
-    return [`Closed with ${plural(v.answers, 'answer')}`, 'kick-off not booked'];
+    return [`Closed with ${plural(v.answers, 'answer')}`, 'insights written'];
   }
   if (v.answers === 0) return [`Sent ${v.sentOn}`, 'no answers yet'];
   return [`Sent ${v.sentOn}`, `last answer ${agoText(v.quietDays ?? 0)}`];
@@ -373,8 +364,6 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
       projectCode: client.projectCode,
       package: project.package,
       packageLabel: packageLabel(project.package),
-      stage: project.stage,
-      flow: flowFor(project.package),
       archived: project.archived,
       archivedOn: formatDay(project.archivedAt),
       archivedByName: project.archivedBy ? (actorName.get(project.archivedBy) ?? null) : null,

@@ -77,7 +77,7 @@ Then open with this:
 
 > Read CLAUDE.md, PRODUCT.md and DESIGN.md before doing anything. Then read docs/complete-flow.md and docs/questionnaire-architecture.md.
 >
-> Don't write code yet. Tell me in your own words: what this product does, what the four human gates are, and why the project table has no star. If any of that is unclear from the docs, say which file is missing it.
+> Don't write code yet. Tell me in your own words: what this product does, what the human gates are, and why the project table has no star. If any of that is unclear from the docs, say which file is missing it.
 
 You are testing whether the context landed. If it gets the gates right, the rest of the build will go well. If it doesn't, fix the docs before writing a line of code.
 
@@ -86,6 +86,13 @@ You are testing whether the context landed. If it gets the gates right, the rest
 ## The milestone prompts
 
 Copy these as-is. Run each to completion and use it before starting the next.
+
+> **These are the prompts as they were written, kept unedited.** Three things in them are no
+> longer true, and the record of what was asked for is worth more than a tidy document:
+> milestone 2's stage timeline and stage flow, and milestone 4's deck panel and recorded
+> decisions, all went on 17 August 2026 with the kick-off — the platform's job now ends at the
+> confirmed insights. Milestone 4 is the confirm gate and nothing else. What each milestone
+> means today is in `CLAUDE.md`.
 
 ### Milestone 1 — one survey link that works
 
@@ -152,7 +159,12 @@ This is the milestone that will take longest, and the time will go on tuning the
 went with them. Rule 4 survives on its own merits — the platform still never displays a predicted
 quantity of work.
 
-### Milestone 6 — the template editor
+### ~~Milestone 6 — the template editor~~
+
+**Retired 17 August 2026, with the *Question templates* panel.** The questionnaire is fixed at
+version 5 and the branding team owns its wording; an editor for it is a surface to maintain and
+the easiest way to break rule 5. Kept below because the versioning requirement in it is still the
+rule, whoever ends up editing a question and however they do it.
 
 > Build milestone 6.
 >
@@ -180,7 +192,12 @@ quantity of work.
 
 Milestone 1 in a session or two. Milestone 2 within the first week — and that is the point where it replaces Google Forms and starts paying for itself. Milestone 3 is the one to be patient with; the code is straightforward and the prompt tuning is not.
 
-The real risk is not that the code fails. It is building all six milestones before using any of them, then discovering the brief doesn't say what your designers need. Use each one on a real client before starting the next.
+The real risk is not that the code fails. It is building every milestone before using any of them, then discovering the summary doesn't say what your designers need. Use each one on a real client before starting the next.
+
+That risk is what two of the six milestones were eventually cut by. Milestone 5 went when the
+package it served did; milestones 4 and 6 shrank on 17 August 2026 when the team looked at what
+they actually opened. Both cuts came from use, not from planning, which is the argument for the
+order.
 
 ---
 

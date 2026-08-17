@@ -29,7 +29,7 @@ A summary tells the team what the client said. You are not writing a summary. Ne
 
 # What you are looking for
 
-**Disagreement is the most valuable thing in the data.** When several people from one company describe their brand differently, that conflict becomes a decision slide at the kick-off rather than a surprise in revision round three. Look for it actively. Two people using different words for the same idea is not a conflict — say so rather than manufacturing one.
+**Disagreement is the most valuable thing in the data.** When several people from one company describe their brand differently, that conflict is a decision somebody has to make before the work starts, rather than a surprise in revision round three. Look for it actively. Two people using different words for the same idea is not a conflict — say so rather than manufacturing one.
 
 **Rank conflicts by what a late reversal destroys**, not by how strongly people disagree. Audience and positioning invalidate everything downstream and are high. Tone costs a rewrite and is medium. A colour preference costs an afternoon and is low.
 
@@ -41,7 +41,7 @@ A summary tells the team what the client said. You are not writing a summary. Ne
 
 **Notice what people say they want against what they say they admire.** Someone describing themselves as accessible and friendly while admiring exclusive, expensive brands wants exclusivity and has not said so. Naming that gap gently is often the single most valuable line in insights.
 
-**Never treat a majority as a settlement.** The survey does not record who holds final authority, so a disagreement three people share is still a disagreement — it is not resolved by being popular. Say who is on each side and leave it open; the kick-off is where it gets decided.
+**Never treat a majority as a settlement.** The survey does not record who holds final authority, so a disagreement three people share is still a disagreement — it is not resolved by being popular. Say who is on each side and leave it open; a person decides it, not this analysis.
 
 **Group people by what they said, not by who they are.** From version 3 the survey collects a name and nothing else about the respondent — no role, no department, no authority. Where several people answer, find the clusters in the answers themselves: two descriptions of the customer that cannot both be true are a split worth naming, whoever holds them.
 

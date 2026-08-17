@@ -33,16 +33,31 @@ What the engine produces now:
 
 | Kept | Why |
 |---|---|
-| Settled ground | Stops the kick-off re-opening decided questions |
+| Settled ground | Stops the team re-opening questions the client already settled |
 | Unsettled, ranked by cost | The expensive disagreements, found before revision round three |
 | Not decided yet | The clarity gaps — the thing the spec calls pure gold, and the hardest to see by reading |
 | Flags | Outliers, low-effort answers, single-respondent risk |
 | Alignment | One honest read, with its reason |
-| Deck outline | At most ten slides, built from the conflicts — the team builds it in Canva by hand |
-| How to run the room | Internal, at most four notes |
 
-The team surface is three things, in this order: **the full answers**, this
-summary, and the deck outline with a copy button.
+The team surface is two things, in this order: **the full answers**, then this
+summary.
+
+### Narrowed again, 17 August 2026 — the summary is the end
+
+Two sections survived the 13 August cut and went in this one: the **deck
+outline** and **how to run the room**. Both described what the team should do
+*after* reading — build ten slides, handle four moments in a meeting — and the
+kick-off they were written for is no longer something the platform models. The
+engine's job ends where the team's judgement starts, and it starts at the
+summary.
+
+The practical effect is that the analysis is one API call again. The two-pass
+split existed because these two sections pushed the flattened schema past the
+structured-output grammar limit; what is left compiles in one.
+
+Insights generated before 17 August still hold both fields in their stored JSON.
+Nothing reads them and nothing strips them — they are what the analysis said on
+the day it ran.
 
 ---
 
@@ -67,7 +82,7 @@ Where respondents independently said the same thing. This is what the team can d
 
 *In your ARUN+ data:* "Trustworthy" appeared in roughly 20 of 28 adjective lists, "Professional" in 19, and 26 of 28 placed the brand on the Modern side. That is not a summary — it is a mandate. The designer can open the file knowing three things are already decided.
 
-**Why it changes a decision:** it removes the temptation to re-open settled questions in the kick-off, which is where meetings lose an hour.
+**Why it changes a decision:** it removes the temptation to re-open settled questions in the first meeting, which is where an hour goes.
 
 ### 2. Conflict map — the unsettled ground
 Where answers contradict, ranked by how expensive the disagreement is.
@@ -90,7 +105,7 @@ Questions where answers are empty, one-word, or explicitly uncertain. This is th
 
 *In your ARUN+ data:* several respondents answered "ยังไม่มี" (not yet), "ไม่มี" (none), or left the competitor and product questions blank. Read individually, those look like lazy answers. Read together, they say something precise: **the organisation has not decided this yet**, and no amount of design will fix it.
 
-**Why it changes a decision:** it tells the team to bring a workshop to the kick-off instead of a moodboard. It also protects the quotation — undecided clients generate revisions, and this is the earliest possible warning.
+**Why it changes a decision:** it tells the team the client needs a workshop, not a moodboard. It also protects the quotation — undecided clients generate revisions, and this is the earliest possible warning.
 
 ### 4. The client's own vocabulary
 The words and phrases stakeholders repeat in their free-text answers, extracted verbatim.
@@ -137,14 +152,14 @@ feeling and visual style, and to avoid answering "because it looks nice". When t
 properly, the reasons are the data.
 
 **Hard constraints.** Limitations and Technical Requirements are not opinions — a required font, a
-retained CI asset, a regulated claim, a deadline. They belong in the brief as facts, separated
-from everything the kick-off can still decide.
+retained CI asset, a regulated claim, a deadline. They belong in the summary as facts, separated
+from everything still open.
 
 ### Brand only — from the strategy block
 
 **Personality position, and the spread.** The ten scales run 1–5. The width is the finding, not
 the average: nine people at Serious and one at Fun is noise; a 50/50 split means the brand has no
-agreed temperament and the kick-off must resolve it.
+agreed temperament, and somebody has to settle it before the work starts.
 
 **The three protected things.** What the brand would defend at higher cost, with a real example
 each. Where several respondents protect different things, the brand has more than one idea of what
@@ -190,20 +205,22 @@ These should not appear on every brief. They earn their place by condition, and 
 
 ---
 
-## Suggested brief structure
+## Suggested insights structure
 
 Ordered by what a person needs first, not by the order questions were asked:
 
 1. **Read this first** — the one thing that will most affect the project (usually the highest conflict, or a red flag)
 2. **Settled** — agreement map
-3. **Unsettled** — conflict map, ranked, becomes the DECIDE slides
+3. **Unsettled** — conflict map, ranked
 4. **Not yet decided by the client** — clarity gaps
-5. **For the creative team** — package-specific insights
-6. **Signals** — alignment score, risk flags, anything triggered from Layer 3
-7. **Deck outline** — generated from 2, 3 and 5
-8. **How to run the room** — internal only, never shown to the client
+5. **Signals** — alignment score, risk flags, anything triggered from Layer 3
 
-A brief that opens with the most consequential finding is read. A brief that opens with a project summary is skimmed.
+Items 5 and 7 of the older list — *for the creative team* and the *deck outline* — went on
+13 and 17 August 2026 respectively, with *how to run the room*. This is the whole structure now,
+and it is what `src/lib/analysis/schema.ts` encodes.
+
+Insights that open with the most consequential finding are read. Insights that open with a project
+summary are skimmed.
 
 ---
 
