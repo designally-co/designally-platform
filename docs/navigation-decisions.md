@@ -59,14 +59,22 @@ control in the app. Sign out and Past projects are in More.
 content is under it. It was a hardcoded `rgba(245, 245, 247, 0.8)` behind a 20px blur — a cool grey
 that is not in this brand, on a warm page.
 
-**Words for actions, the standard symbol for back.** The HIG prefers symbols for toolbar items
-generally, and the no-star rule below wins that: a bare glyph needs a legend where words do not.
-It does not win for the way out. The HIG is specific there — *"Use the standard Back and Close
-buttons. People know that the standard Back button lets them retrace their steps through a
-hierarchy of information … Prefer the standard symbols for each, and don't use a text label that
-says Back or Close"* — and the no-star rule was aimed at **status**, a mark beside a name that
-nothing teaches. A back chevron is taught by every phone and every window on the machine, and it
-is a control rather than a reading. **One glyph, and it is this one.**
+**Toolbar controls are symbols. Everything else is words.** The HIG: *"Prefer simple,
+recognizable symbols for items instead of text, except for actions like edit that aren't
+well-represented by symbols,"* and *"Prefer system-provided symbols without borders."* Three marks
+carry the whole team app — the back **chevron**, the **chain link** for Copy link, and the
+**ellipsis** for More — each with a tooltip and an accessible name. Copy link turns into a tick
+for two seconds, and says "Link copied" into a live region, because a swapped glyph is silent.
+
+The primary action keeps its words: `New survey`, `Review insights`, `Confirm the insights`. The
+HIG's own exception is actions a symbol does not represent, and a prominent action with a label
+is what it shows everywhere.
+
+**The no-star rule below is not reversed by this, it is scoped.** It was aimed at *status* — a
+mark beside a name, which needs a legend because nothing teaches it. These three are *controls*,
+and every phone and window on the machine teaches them. The test is whether a first-time user
+would need a key: a star meaning "decision maker" fails it, an ellipsis meaning "more" does not.
+Anything inside the menu, where there is room for a sentence, stays in words.
 
 **Every sheet has the same bar.** Back · title · actions, and back has the leading edge to
 itself: *"Elements that let people return to the previous document … appear at the far leading

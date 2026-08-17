@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 
+import { MoreMark } from './icons';
+
 /**
  * The More menu, on the trailing edge of a toolbar.
  *
@@ -18,6 +20,11 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
  *
  * Children are a function of `close` so an item can dismiss the menu after
  * acting — or deliberately not, which is what the archive confirmation does.
+ *
+ * The button is the ellipsis, bare — the one symbol the HIG's own More menus
+ * use, and the only mark in this app that needs no argument for it. `label` is
+ * what it announces and what the tooltip says; the items inside stay in words,
+ * because a menu is a list of sentences and there is room for them.
  */
 export default function MoreMenu({
   label = 'More',
@@ -53,12 +60,14 @@ export default function MoreMenu({
   return (
     <div className="moreslot" ref={ref}>
       <button
-        className="linkish"
+        className="iconbtn"
+        aria-label={label}
+        title={label}
         aria-expanded={open}
         aria-haspopup="true"
         onClick={() => setOpen((o) => !o)}
       >
-        {label}
+        <MoreMark />
       </button>
       {open && <div className="barmenu">{children(() => setOpen(false))}</div>}
     </div>

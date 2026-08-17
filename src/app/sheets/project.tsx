@@ -11,6 +11,7 @@ import {
 } from '@/lib/team/actions';
 import type { ProjectView } from '@/lib/team/projects';
 import { forDisplay } from '@/lib/survey/link';
+import { CheckMark, LinkMark } from '../icons';
 import MoreMenu from '../menu';
 import Sheet from './sheet';
 
@@ -89,7 +90,10 @@ export default function ProjectSheet({
    *
    * Copy link is the one action taken often enough to stay visible — sending
    * the link again is most of what this sheet is opened for, and until now the
-   * only way to do it was to select the URL out of a box with the mouse.
+   * only way to do it was to select the URL out of a box with the mouse. It is
+   * a chain link, bare, per the HIG; the verb is in the tooltip and the
+   * accessible name, and the mark turns into a tick for two seconds, which is
+   * the only thing that says it worked.
    *
    * The rest go behind More, per the HIG: "Prioritize less important actions
    * for inclusion in the More menu." Closing collection keeps its prominent
@@ -105,9 +109,21 @@ export default function ProjectSheet({
   const actions = (
     <>
       {link && (
-        <button className="linkish" onClick={share}>
-          {copied ? 'Copied' : 'Copy link'}
-        </button>
+        <>
+          <button
+            className="iconbtn"
+            aria-label={copied ? 'Link copied' : 'Copy link'}
+            title={copied ? 'Copied' : 'Copy link'}
+            onClick={share}
+          >
+            {copied ? <CheckMark /> : <LinkMark />}
+          </button>
+          {/* a swapped glyph is silent to a screen reader, and changing the
+              button's own name mid-press is not reliably announced */}
+          <span className="visually-hidden" role="status">
+            {copied ? 'Link copied' : ''}
+          </span>
+        </>
       )}
       <MoreMenu>
         {(close) => (

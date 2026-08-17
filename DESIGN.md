@@ -827,7 +827,16 @@ glyph this product spends (see `docs/navigation-decisions.md`). It is the same o
 survey's back control, at the same size, drawn from the same component.
 
 Actions take the trailing edge — one visible at most, the rest behind **More** — and the body
-describes rather than acts. The header was sticky and frosted over `rgba(245, 245, 247, 0.8)`
+describes rather than acts. They are **bare marks, not discs**: 44px hit area, a 20px glyph at
+`--ink-3` (6.02:1 on parchment, twice the 3:1 a graphical object must clear), no border and no
+fill until hover, which lifts to `--canvas` like every other quiet control. The HIG's reason is
+that the bar is already the container — *"Borders … aren't necessary because the section provides
+a visible container"* — and the practical one is that the back disc has to stay distinct from
+them, which three identical discs in a row would have destroyed.
+
+Three marks, and no more: **chevron** (back), **chain link** (copy link), **ellipsis** (more).
+Each carries a tooltip and an accessible name; Copy link turns into a **tick** for two seconds and
+announces itself into a live region, because a swapped glyph is silent to a screen reader. The header was sticky and frosted over `rgba(245, 245, 247, 0.8)`
 until the same day; it is the sheet's own parchment now, with a permanent hairline, because a
 sheet always has content under its header.
 

@@ -1419,6 +1419,67 @@ label.f span {
   position: relative;
   display: flex;
 }
+
+/**
+ * A toolbar action: the mark, and nothing around it.
+ *
+ * The HIG: "Prefer system-provided symbols without borders. Borders (like
+ * outlined circle symbols) aren't necessary because the section provides a
+ * visible container, and the system defines hover and selection state
+ * appearances automatically." So no disc and no outline — the bar is the
+ * container. The one disc in a sheet header is the back control, and that
+ * difference is the point: navigation set apart from actions.
+ *
+ * 44px, which is the touch floor, around a 20px mark. The glyph is `--ink-3`,
+ * measured 6.02:1 on parchment — twice the 3:1 a graphical object has to clear.
+ * It carries the whole meaning here, so it is not asked to be subtle.
+ */
+.iconbtn {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  border: 0;
+  background: none;
+  border-radius: var(--r-pill);
+  color: var(--ink-3);
+  cursor: pointer;
+  transition:
+    color 0.18s,
+    background-color 0.18s,
+    transform 0.12s var(--ease);
+}
+.iconbtn:active {
+  transform: scale(0.94);
+}
+@media (hover: hover) {
+  /* the same hover every quiet control has — the mark darkens to ink. The
+     parchment wash is what gives a borderless button an edge to aim at. */
+  .iconbtn:hover {
+    color: var(--ink);
+    background: var(--canvas);
+  }
+}
+/* the menu is open: the button stays lit, so it is clear what the panel
+   belongs to — "the system defines hover and selection state appearances" */
+.iconbtn[aria-expanded='true'] {
+  color: var(--ink);
+}
+
+/* announced, never drawn — a swapped glyph is silent to a screen reader */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
 .barmenu button {
   display: block;
   width: 100%;
