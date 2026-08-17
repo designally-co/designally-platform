@@ -247,17 +247,32 @@ client is, and the sticky bar that used to float at the top of the viewport is g
 mark instead of two, at the place the card begins rather than above it, and the brand's
 own object rather than borrowed chrome.
 
-`--cut-length` is where it **starts**, not a floor:
+**It is the fraction, and nothing added to it:**
 
 ```css
+width: calc(var(--cut-progress) * 100%);
+```
+
+It was not. `--cut-length` used to be where the Cut **started**, with the progress mapped
+onto what was left:
+
+```css
+/* until 17 August 2026 */
 width: calc(var(--cut-length) + var(--cut-progress) * (100% - var(--cut-length)));
 ```
 
-A truthful 0–100% would put question one at a 16px stub that reads as a rendering fault.
-Clamping with `max(88px, …)` was worse — it froze the Cut for the first five questions, so
-a quarter of the survey gave no feedback. Mapped onto the range it moves about 12px on
-every question and still lands exactly full on the last, which is the part anyone actually
-reads off it.
+That was right for what it was written against. The survey then ran **one question per
+screen, twenty-one of them**, and a truthful 0–100% put question one at a 16px stub that
+reads as a rendering fault rather than a beginning — while clamping with `max(88px, …)`
+was worse, freezing the Cut for the first five questions so a quarter of the survey gave
+no feedback at all.
+
+**The premise expired when the screens were grouped.** Five to nine screens means the
+first one is a fifth or a ninth of the track — 73px at the narrowest, within a few pixels
+of the 88px the CI gives the Cut at rest. Nothing has to be added to make it read as a
+line, and adding it made the two halves of the masthead contradict each other: `1/5`
+beside a bar at 38% is the bar calling the numeral a liar. `--cut-length` is now unread —
+kept as the CI's number for a static Cut, which the next one will want.
 
 Question cards now carry **two** orange marks — the Cut and the Continue button — against
 the CI's stated one to three.

@@ -110,6 +110,9 @@
   /* The Cut: one orange line per layout. Never a rule, never a divider. */
   --cut: var(--orange-500);
   --cut-width: 2px;
+  /* The CI's resting length. Nothing reads it since 17 August 2026 — the Cut on
+     the survey is the progress fraction and nothing added to it — but it is the
+     CI's own number for the mark at rest, and the next static Cut wants it. */
   --cut-length: 88px;
 
   /* semantic — text and thin tints only, never fills, never buttons.
@@ -3486,14 +3489,22 @@ dialog::backdrop {
  * instead of two, sitting where the card begins rather than floating above it,
  * and it is the brand's own object rather than borrowed chrome.
  *
- * `--cut-length` is the *start*, not a floor. A truthful 0–100% would put
- * question one at a 16px stub that reads as a rendering fault rather than a
- * beginning, but clamping to `max(88px, …)` was worse: it froze the Cut at 88px
- * for the first five questions, so a quarter of the survey gave no feedback at
- * all. The progress is mapped onto the range instead — the Cut opens at the
- * length the CI gives it and grows across what is left, so it moves on every
- * single question and still lands exactly full on the last one, which is the
- * part a person actually reads off it.
+ * **It is the fraction, and nothing added to it.** It was not: the Cut started
+ * at `--cut-length` and grew across what was left, so `1/5` drew at 38% of the
+ * track and read as nearly half a questionnaire nobody had started.
+ *
+ * That offset was right for what it was written against. The survey then ran
+ * one question per screen, twenty-one of them, and a truthful bar put question
+ * one at a 16px stub that reads as a rendering fault rather than a beginning —
+ * while clamping to `max(88px, …)` was worse, freezing the Cut for the first
+ * five questions so a quarter of the survey gave no feedback at all.
+ *
+ * The premise expired when the branding team asked for two to four questions
+ * per screen. There are five to nine screens now, so the first one is a fifth
+ * or a ninth of the track — 73px at the narrowest, within a few pixels of the
+ * 88px the CI gives the Cut at rest. Nothing has to be added to make it read as
+ * a line, and adding it made the figure and the mark disagree: `1/5` beside a
+ * bar at 38% is the bar calling the numeral a liar.
  */
 .qrule::after {
   content: '';
@@ -3501,9 +3512,7 @@ dialog::backdrop {
   left: 0;
   top: 0;
   height: var(--cut-width);
-  width: calc(
-    var(--cut-length) + var(--cut-progress, 1) * (100% - var(--cut-length))
-  );
+  width: calc(var(--cut-progress, 1) * 100%);
   max-width: 100%;
   background: var(--cut);
   transition: width var(--dur-slow, 380ms) var(--ease);
