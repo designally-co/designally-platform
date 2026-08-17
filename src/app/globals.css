@@ -1091,15 +1091,21 @@ label.f span {
  * What the welcome puts where a question puts its section and subject.
  *
  * Not `.qsec`: that is a label on the line beneath it and takes caps for it,
- * and this is a sentence with no line beneath. Sentence case at the subject's
- * size, both languages, one under the other — the pair reads as the fact it is
- * rather than as a label on the figure to its left.
+ * and this is a sentence with no line beneath. It takes `.qtopic`'s size and
+ * weight instead — the size every other screen sets its subject at — so the
+ * welcome's head is built the same way as the twenty-one that follow it.
+ *
+ * The count is inside the sentence. It was a 46-58px figure beside it, which
+ * is the display treatment the masthead used to give a *position* in the run,
+ * and on the one screen where nothing has started yet it was the loudest thing
+ * on the page.
  */
 .qwhen {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  font-size: 15px;
+  display: block;
+  font-size: clamp(17px, 1.7vw, 22px);
+  font-weight: 400;
+  line-height: 1.35;
+  letter-spacing: -0.012em;
   color: var(--ink-2);
 }
 .qwhen .th {
@@ -1177,85 +1183,6 @@ label.f span {
 }
 .blankcount.blocking + .blankcount.blocking {
   margin-top: 2px;
-}
-
-/* the send screen's list of what is still blank — each one goes back to it */
-/**
- * The questionnaire as one object — the CI's **Structure** idiom, and the way
- * back into it.
- *
- * It replaced `.blanklist`, a list of every unanswered question. The list said
- * what was missing and nothing about the shape of what was not: two blanks read
- * the same whether the survey had four questions or twenty-one. The grid says
- * both, and its points are the navigation.
- *
- * Seven columns because twenty-one is three rows of seven exactly. A Design
- * survey has eleven and ends on a short row, which is the truth about a Design
- * survey rather than a layout to be fixed.
- */
-.qgrid {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 4px;
-  list-style: none;
-  margin: 0 0 var(--sp-md);
-  padding: 0;
-  max-width: 340px;
-}
-.qgrid li {
-  display: grid;
-  place-items: center;
-}
-/* the point itself: filled where an answer exists, a hairline ring where it
-   does not. The ring is the Edge — a hollow point is not a faded one. */
-.qgrid .pt {
-  display: grid;
-  place-items: center;
-  width: 100%;
-  border: 0;
-  background: none;
-  padding: 0;
-}
-.qgrid .pt i {
-  display: block;
-  width: 10px;
-  height: 10px;
-  border-radius: var(--r-pill);
-  border: 1.5px solid var(--hairline);
-  background: transparent;
-  transition:
-    background-color 0.18s,
-    border-color 0.18s,
-    transform 0.18s var(--ease);
-}
-.qgrid .pt.on i {
-  background: var(--primary-mark);
-  border-color: var(--primary-mark);
-}
-/* tappable on the send screen: the 44px floor is the target, not the mark */
-.qgrid.pick .pt {
-  min-height: 44px;
-  cursor: pointer;
-}
-@media (hover: hover) {
-  .qgrid.pick .pt:hover i {
-    border-color: var(--primary-mark);
-    transform: scale(1.25);
-  }
-}
-.qgrid.pick .pt:active i {
-  transform: scale(1.1);
-}
-
-/* the completion's grid is a picture, so it sits at the CI's own point size
-   and closes up — nothing here is aimed at */
-.qgrid:not(.pick) {
-  gap: 7px;
-  max-width: 190px;
-}
-.qgrid:not(.pick) .pt i {
-  width: 8px;
-  height: 8px;
 }
 
 /* checkbox rows for the shorter checkbox questions */
