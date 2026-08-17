@@ -154,7 +154,8 @@ it predates the split, and what it draws is this surface, not the brief.
 These are product decisions, not preferences. If a request conflicts with one, say so before building it.
 
 1. **Nothing happens on a timer.** The app never closes a survey, confirms a brief, or archives a project by itself. It may surface a prompt; a person acts.
-   A survey carries a **due date** — 14 days by default, editable on the project — and
+   A survey carries a **due date** — chosen on the New survey sheet, prefilled at 14
+   days and editable afterwards on the project — and
    that is a date, not a deadline the software enforces. The client is shown it, and once
    it passes the project appears in Needs you asking whether to close. Answers arriving
    after it are accepted. Asked for 14 August 2026; built this way rather than as an

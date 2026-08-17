@@ -12,23 +12,12 @@ import {
 } from '@/lib/db/schema';
 
 import { PACKAGE_LABEL, packageLabel } from '@/lib/team/labels';
+import { DEFAULT_DUE_DAYS, TZ, dayIn } from '@/lib/team/due';
 
-export { PACKAGE_LABEL };
+export { PACKAGE_LABEL, DEFAULT_DUE_DAYS };
 
 /** Days of silence before the app suggests closing. It only suggests. */
 export const QUIET_LIMIT = 5;
-
-/**
- * How long a survey asks for answers by default. The branding team's number.
- *
- * It is a date, not a deadline the software enforces: rule 1 says nothing
- * happens on a timer, and closing collection records who closed it. Past this
- * the project appears in Needs you and a person decides.
- */
-export const DEFAULT_DUE_DAYS = 14;
-
-/** The team works in Bangkok; dates are theirs, not the server's. */
-const TZ = 'Asia/Bangkok';
 
 export function formatDay(date: Date | null): string | null {
   if (!date) return null;
@@ -334,11 +323,7 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
       : null;
 
     const dueOn = formatDay(survey?.dueAt ?? null);
-    /* en-CA gives YYYY-MM-DD, which is what <input type="date"> wants, and the
-       Bangkok timezone keeps the day the team picked from sliding a day back */
-    const dueDay = survey?.dueAt
-      ? new Intl.DateTimeFormat('en-CA', { timeZone: TZ }).format(survey.dueAt)
-      : null;
+    const dueDay = survey?.dueAt ? dayIn(survey.dueAt) : null;
     /* Days past the date the team asked for. Null when there is no date, or
        when it has not arrived yet — surveys sent before the field existed
        simply never trigger the prompt. */

@@ -6,6 +6,7 @@ import type { Package } from '@/lib/db/schema';
 import { countQuestions, type LibraryBlock } from '@/lib/team/library-types';
 import { PACKAGE_BLOCKS } from '@/lib/survey/packages';
 import { createSurvey } from '@/lib/team/actions';
+import { DEFAULT_DUE_DAYS, defaultDueDay } from '@/lib/team/due';
 import { forDisplay } from '@/lib/survey/link';
 import Sheet from './sheet';
 
@@ -27,6 +28,16 @@ export default function NewSurveySheet({
 }) {
   const [pkg, setPkg] = useState<Package | null>(null);
   const [client, setClient] = useState('');
+  /**
+   * Two weeks, and changeable before the link is made rather than only after.
+   * It used to be set silently at creation and edited on the project — by which
+   * point the link had usually been copied and sent, so the date the client
+   * saw was the default whatever the team had actually agreed.
+   *
+   * Computed once, on the client, so the prefill is today in Bangkok and not
+   * whenever this bundle was built.
+   */
+  const [due, setDue] = useState(() => defaultDueDay());
   const [error, setError] = useState<string | null>(null);
   const [link, setLink] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -37,6 +48,7 @@ export default function NewSurveySheet({
     const form = new FormData();
     form.set('client', client);
     form.set('package', pkg ?? '');
+    form.set('due', due);
     start(async () => {
       const result = await createSurvey(form);
       if (!result.ok) {
@@ -101,6 +113,26 @@ export default function NewSurveySheet({
             </button>
           ))}
         </div>
+      </div>
+
+      <div className="field">
+        <label className="f" htmlFor="nDue">
+          Asking for answers by <span>· {DEFAULT_DUE_DAYS} days, change it if you need to</span>
+        </label>
+        <input
+          id="nDue"
+          type="date"
+          className="input"
+          value={due}
+          onChange={(e) => setDue(e.target.value)}
+          disabled={Boolean(link)}
+        />
+        {/* Rule 1 — it is a date, not a timer. Say so here, where somebody is
+            choosing it, rather than leaving them to find out. */}
+        <p className="hintline">
+          The client sees this on the welcome screen. It does not close the survey — you do, and
+          late answers still count. Leave it empty for no date.
+        </p>
       </div>
 
       {/* Rule 3 — collection is open-ended. There is nothing here to fill in

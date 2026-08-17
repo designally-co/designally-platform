@@ -20,7 +20,7 @@ import {
 import { CURRENT_QUESTION_VERSION, PACKAGE_BLOCKS } from '@/lib/survey/packages';
 import { makeToken } from '@/lib/survey/token';
 import { packageLabel } from '@/lib/team/labels';
-import { DEFAULT_DUE_DAYS } from '@/lib/team/projects';
+import { dayIn, defaultDueDay, endOfDay } from '@/lib/team/due';
 
 /**
  * Every gate records who acted. That is rule 2, and it is enforced here rather
@@ -44,6 +44,30 @@ export async function createSurvey(formData: FormData): Promise<ActionResult> {
 
   if (!raw) return { ok: false, error: 'Enter a client name · กรุณาใส่ชื่อลูกค้า' };
   if (!PACKAGES.includes(pkg)) return { ok: false, error: 'Choose a package' };
+
+  /**
+   * The date the team is telling the client to answer by. The sheet prefills
+   * two weeks and the team can change it there, which is where the decision
+   * belongs — a survey sent in the week before a shutdown does not want the
+   * same date as one sent in a quiet month, and editing it afterwards on the
+   * project meant the link was already copied and sent by then.
+   *
+   * Clearing the field is allowed and means no date: the client is shown none
+   * and the prompt never fires, which is how every survey sent before the
+   * field existed already behaves.
+   */
+  const dueRaw = formData.get('due');
+  const dueDay = dueRaw === null ? defaultDueDay() : String(dueRaw).trim();
+  let dueAt: Date | null = null;
+  if (dueDay) {
+    dueAt = endOfDay(dueDay);
+    if (Number.isNaN(dueAt.getTime())) return { ok: false, error: 'That is not a date.' };
+    /* A date already gone is a slip, not an intention — it would put the
+       project into Needs you the moment the link was copied. */
+    if (dueDay < dayIn(new Date())) {
+      return { ok: false, error: 'That date has already passed. Pick a later one.' };
+    }
+  }
 
   /* "ACME Coffee — ACME-2026-01" — the code is optional */
   const [namePart, ...codeParts] = raw.split(/[—–]/);
@@ -98,10 +122,9 @@ export async function createSurvey(formData: FormData): Promise<ActionResult> {
       /* Rule 5 — frozen now. Editing a template later cannot reach this survey. */
       questionVersion: CURRENT_QUESTION_VERSION,
       blockKeys,
-      /* Two weeks, the default the branding team asked for. It is a date the
-         client is shown and the team is prompted by — it closes nothing on its
-         own (rule 1). Editable afterwards on the project. */
-      dueAt: new Date(Date.now() + DEFAULT_DUE_DAYS * 24 * 60 * 60 * 1000),
+      /* The date the client is shown and the team is prompted by. It closes
+         nothing on its own (rule 1), and stays editable on the project. */
+      dueAt,
     })
     .returning();
 
@@ -350,9 +373,7 @@ export async function setDueDate(projectId: string, day: string | null): Promise
 
   let dueAt: Date | null = null;
   if (day) {
-    /* +07:00 is Bangkok and does not observe daylight saving, so a fixed offset
-       is correct here rather than a lie that happens to work half the year. */
-    dueAt = new Date(`${day}T23:59:59+07:00`);
+    dueAt = endOfDay(day);
     if (Number.isNaN(dueAt.getTime())) return { ok: false, error: 'That is not a date.' };
   }
 

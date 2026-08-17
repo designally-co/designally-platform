@@ -8,8 +8,8 @@ Every step belongs to the client, the team, or the app.
 
 | # | Who | Step | Time |
 |---|---|---|---|
-| 1 | Team | Deal signed → create survey: client name + package | 1 min |
-| 2 | App | Attaches the right question blocks, makes one link, sets a date two weeks out | instant |
+| 1 | Team | Deal signed → create survey: client name, package, and the date to answer by — prefilled at two weeks, changeable, or cleared for none | 1 min |
+| 2 | App | Attaches the right question blocks, makes one link | instant |
 | 3 | Team | Send the link to the client's main contact | — |
 | 4 | Client | Answers; gives name, position and email; forwards the link onward | ~20 min each |
 | 5 | App | Collects and counts — "3 answers so far · last one 2 days ago" | — |

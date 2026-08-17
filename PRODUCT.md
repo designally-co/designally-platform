@@ -36,7 +36,7 @@ An internal tool that turns scattered stakeholder answers into one confirmed pag
 
 A project runs from a signed deal to a confirmed summary.
 
-1. The team creates a survey and copies the link. **Sending it is manual** — there is no email from the platform, ever. The survey carries a date to answer by, two weeks out by default.
+1. The team creates a survey and copies the link. **Sending it is manual** — there is no email from the platform, ever. The survey carries a date to answer by, chosen when it is created and prefilled at two weeks.
 2. The client answers, on a phone, usually in Thai, often a week or two after the link was sent.
 3. The team closes collection and the analysis writes the insights.
 4. The team reads and confirms the insights. **This is where the platform's job ends.**
