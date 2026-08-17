@@ -440,7 +440,13 @@ label.f span {
    Marketing volume: 80px rhythm at welcome and completion,
    one question group per screenful.
    ============================================================ */
+:root {
+  /* what the rail and its figure occupy on the right of every survey screen */
+  --rail-gutter: 56px;
+}
+
 .survey-shell {
+  padding-right: var(--rail-gutter);
   min-height: 100dvh;
   /* a column so the slide can take exactly the height the pinned masthead
      leaves, rather than a hardcoded subtraction of it */
@@ -3146,9 +3152,16 @@ dialog::backdrop {
  * of the viewport, so a line of question text scrolling under the numeral
  * disappears rather than crossing it.
  */
+/**
+ * Not sticky any more.
+ *
+ * It was pinned so the Cut could stay in sight, and the Cut is on the rail
+ * now — which is fixed, so the thing that had to stay in sight already does.
+ * What is left here is the section and the subject: read once on arrival, and
+ * free to scroll away with the screen they describe. That is the 166px of
+ * permanent header a phone gets back.
+ */
 .qmast {
-  position: sticky;
-  top: 0;
   z-index: 5;
   background: var(--parchment);
   /* it sits above .slide now rather than inside it, so it carries the slide's
@@ -3273,155 +3286,46 @@ dialog::backdrop {
   }
 }
 
-/* ============================================================
-   The rail — the masthead beside the question, not above it.
-
-   Below this width the survey is a single column with the
-   masthead pinned across the top. That is right on a phone and
-   on a small laptop. It is wrong on a wide screen, where a
-   660px column left a third of the display empty on either
-   side and the metadata sat in a full-width band it did not
-   need: three short lines spanning 1400px.
-
-   Set as a margin note the proportions come back. The count and
-   the section become a rail the question is measured against,
-   the composition spans ~940px instead of 660, and the CI's
-   editorial reading — a figure in the margin, the text beside
-   it — is the one the type was drawn for.
-
-   1080px is where 220 + 56 + 640 plus page margins fits without
-   crowding. Below it the stacked header is still the better
-   shape, so nothing about the phone changes.
-   ============================================================ */
+/**
+ * Wide, the column holds the left margin rather than centring.
+ *
+ * Centred, it drifted into the middle of the screen with the masthead's words
+ * above it and the rail's point far off to the right — three things at three
+ * horizontal positions, none of them aligned to each other. Left, the section,
+ * the subject, the question and its answer all start on one line, and the empty
+ * ground is on the side the rail closes.
+ *
+ * 780px rather than 660: the measure has the room now that nothing shares the
+ * width with it, and at the answer field's 23px that is about 55 characters,
+ * inside the 65–75 the type scale asks for.
+ */
 @media (min-width: 1080px) {
-  .survey-shell:has(> .qmast) {
-    display: grid;
-    grid-template-columns: 220px minmax(0, 640px);
-    column-gap: 56px;
-    justify-content: center;
-    /* content-height rows, so the sticky rail has somewhere to travel */
-    align-items: start;
-    padding-inline: 40px;
+  .survey-shell {
+    padding-left: clamp(40px, 7vw, 104px);
   }
-
-  .survey-shell:has(> .qmast) > .qmast {
-    grid-column: 1;
-    grid-row: 1;
-    /* not `stretch`: an item filling its own grid area has no room left to
-       stick inside it, and the rail would scroll away with the question */
-    align-self: start;
-    /* the rail holds eye level whatever the card does — it is the one fixed
-       thing on the screen, and a margin note that moved per question would be
-       the opposite of a reference point */
-    padding: var(--eye) 0 0;
+  .survey-shell .slidebody {
+    max-width: 780px;
+    margin-inline: 0;
   }
-
-  /* the rail stacks what the header laid out in a row */
-  .survey-shell:has(> .qmast) .qhead {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 13px;
-  }
-  .survey-shell:has(> .qmast) .qfig {
-    font-size: 64px;
-  }
-  .survey-shell:has(> .qmast) .qsection {
-    padding-top: 0;
-    flex: none;
-  }
-  .survey-shell:has(> .qmast) .qhead .toreview {
-    margin-top: 2px;
-  }
-
-  /**
-   * Every question opens at eye level, whatever its length.
-   *
-   * A short card starting at the viewport's top edge left most of the screen
-   * empty underneath it. Opening at --eye puts the first line where the eye
-   * already is and turns that emptiness into margin.
-   *
-   * The tall cards briefly opened higher, on the reasoning that an offset costs
-   * them screen. It is not worth what it breaks: the numeral would sit level
-   * with the question on eighteen cards and above it on three, so the one fixed
-   * point on the screen would appear to move as a client advanced. A long card
-   * scrolls, and its own pinned question header keeps the top of it in reach.
-   * One line, every question.
-   */
-  .survey-shell:has(> .qmast) > .slide {
-    grid-column: 2;
-    grid-row: 1;
-    padding: var(--eye) 0 40px;
-  }
-  /* the grid owns the column width; the padding above owns the vertical start,
-     so the card itself neither centres nor stretches */
-  .survey-shell:has(> .qmast) .slidebody {
-    max-width: none;
-    margin: 0;
-  }
-  /* the question gets the display size the CI's scale was drawn for. No `ch`
-     cap on top of the column: at 19ch this wrapped a real question to six
-     lines while using half the width it had been given. The 640px column is
-     the measure — about 34 characters at this size, which is three lines for
-     the longest question in the set. */
-  .survey-shell:has(> .qmast) .slide .qq {
-    font-size: clamp(2.05rem, 2.6vw, 2.55rem);
-  }
-
-  /**
-   * The scales card's own pinned question stops offsetting by the masthead.
-   *
-   * `--mast-h` is the height of a header that sat *above* the content. Beside
-   * it that offset is a hole — and in the rail the masthead measures 238px, so
-   * the question would have pinned nearly a quarter of the screen down for no
-   * reason. It aligns with the top of the rail instead.
-   *
-   * Scoped through the shell rather than written as `.scalehead`: the base
-   * rule has the same specificity and sits later in the file, so a bare
-   * override here loses on source order. It measured 238px until it did not.
-   *
-   * It pins at --eye, the same line the rail's numeral holds, so a question
-   * that has come up to meet the header sits level with the count beside it.
-   */
-  .survey-shell:has(> .qmast) .scalehead {
-    top: var(--eye);
-  }
-  /**
-   * …and it has to paint the band above itself.
-   *
-   * This is the gap-above-a-pinned-header problem again, and the fix that
-   * worked for the masthead — put the offset in the padding, inside the pinned
-   * box — cannot be reused here: this box is not the top of the column, so
-   * padding would push the question down by --eye again when it is *not*
-   * pinned, on top of the offset the slide already has.
-   *
-   * So the band is painted instead. Pinned at --eye, the scale rows coming up
-   * from below were visible in the 162px above the question — the pole labels
-   * and a chosen dot sitting over the header. On a phone the masthead covers
-   * that strip; in the rail layout the masthead is in the other column and
-   * nothing was.
-   *
-   * Scoped to the rail, where the problem exists, and bounded by the column
-   * rather than the viewport so it never reaches across the gutter.
-   *
-   * The height is a viewport, not `--eye`. Sizing it to the token looks exact
-   * and is not: the sticky line and the painted edge are not the same number —
-   * measured, the box settles 8.4px below its own `top`, so a band of exactly
-   * `--eye` left a sliver at the very top of the screen for the scale rows to
-   * show through. There is nothing above this header in its column but the
-   * slide's own padding, so the band can simply be taller than any gap it
-   * might need to cover.
-   */
-  .survey-shell:has(> .qmast) .scalehead::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 100%;
-    height: 100vh;
-    background: var(--parchment);
-    pointer-events: none;
+  /* the masthead centred its own 660px block inside a now-full-width band, so
+     the section and the subject sat 200px right of the question they head */
+  .survey-shell .qmast .qhead {
+    max-width: 780px;
+    margin-inline: 0;
   }
 }
+
+/**
+ * There is no left rail any more.
+ *
+ * Above 1080px the masthead was a 220px margin column with the questions in a
+ * 640px column beside it. It went on 17 August 2026 with the horizontal Cut:
+ * the thing the rail existed to hold at eye level was the count and the Cut,
+ * and both are on the fixed right-hand rail now. What is left — the section and
+ * the subject — belongs at the top left of the column it describes, and the
+ * questions run the width.
+ */
+
 
 .qhead {
   display: flex;
@@ -3465,6 +3369,74 @@ dialog::backdrop {
   font-size: inherit;
   color: inherit;
   line-height: 1.6;
+}
+
+/**
+ * The Cut, stood up — the fixed rail down the right edge.
+ *
+ * A hairline the height of the viewport, with the CI's point riding it and the
+ * count riding the point. The point's height *is* the progress: the line does
+ * not fill behind it, which is what makes this a rail rather than a progress
+ * bar turned on its side.
+ *
+ * Fixed, so the line and the point hold still while the page moves under them.
+ * A mark that scrolled would be measuring the scroll.
+ *
+ * The gutter it needs is `--rail-gutter`, taken out of the shell's right
+ * padding so the figure never lands on a question. It costs a phone's column
+ * 34px of width and buys back the 166px of pinned masthead the horizontal Cut
+ * required.
+ */
+.qrail {
+  position: fixed;
+  top: 96px;
+  bottom: 96px;
+  right: 22px;
+  width: 1px;
+  background: var(--hairline);
+  z-index: 4;
+  pointer-events: none;
+}
+/* full-height carrier hung at its bottom edge — see rail.tsx for why the
+   translate is `at - 1` and not `at` */
+.qrail i {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 1px;
+  height: 100%;
+  transform: translateY(calc((var(--at, 0) - 1) * 100%));
+  transition: transform var(--dur-slow, 380ms) var(--ease);
+}
+.qrail i::after {
+  content: '';
+  position: absolute;
+  left: -4px;
+  bottom: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--primary-mark);
+}
+/* the count rides the point, stacked so it fits the gutter at every width */
+.qrail b {
+  position: absolute;
+  right: 13px;
+  bottom: -15px;
+  display: block;
+  text-align: right;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.qrail b em {
+  display: block;
+  font-style: normal;
+  font-weight: 400;
 }
 
 /**
@@ -4229,7 +4201,9 @@ dialog::backdrop {
   .slide .btn.start {
     position: fixed;
     left: 22px;
-    right: 22px;
+    /* fixed, so the shell's padding does not reach it — the rail's gutter has
+       to be spelled out here or the hairline crosses the Continue pill */
+    right: calc(22px + var(--rail-gutter));
     bottom: calc(var(--kb, 0px) + 22px);
     z-index: 15;
     margin: 0;
@@ -4312,7 +4286,7 @@ dialog::backdrop {
  */
 .scalehead {
   position: sticky;
-  top: var(--mast-h, 0px);
+  top: 0;
   z-index: 4;
   /* the page wash is near-white at the top of the viewport, which is the only
      place this element is ever seen */

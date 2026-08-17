@@ -243,9 +243,45 @@ collapsing the only thing on a screen would leave nothing to look at.
 | **The Field** | warm white, every screen |
 | **The Edge** | every card, input and divider — 1px, never orange |
 | **The Wordmark** | welcome and completion only |
-| **The Cut** | **once on every screen** — and it is the progress |
+| **The Cut** | **once on every screen** — vertical, down the right edge, and it is the progress |
 | **The Point** | the head of the Cut · the questionnaire grid · the team app's "needs you" |
 | **The Mark** | not yet — no vector was supplied, only a 274px PNG |
+
+### The Cut stands up — the right-hand rail
+
+**A hairline down the right edge of every survey screen, fixed, with the point
+riding it and the count riding the point.** The point's height on the line is
+where the client is; the line does not fill behind it. `PointRule.jsx` ships
+`orientation="vertical"` with `length="100%"`, so this is the brand's own
+object at the size the brand drew it.
+
+Three things went with the horizontal bar, and each was load-bearing:
+
+- **The masthead stopped pinning.** It was fixed to the top so the Cut could
+  stay in sight. The rail is fixed instead, so what had to stay in sight does.
+  What is left in the masthead — the section and the subject — is read once on
+  arrival and scrolls away with the screen it describes. On a phone that is
+  **166px of permanent header returned to the questions**, against a 56px
+  gutter the rail costs.
+- **The left rail went.** Above 1080px the masthead was a 220px margin column
+  beside a 640px column of questions. It existed to hold the count and the Cut
+  at eye level, and both are on the right now. The column holds the left margin
+  at 780px instead, so the section, the subject, the question and its answer all
+  start on one line.
+- **`--mast-h` went**, and a `ResizeObserver` with it. It existed so the scales
+  card's sticky header could sit under the pinned masthead — two things claiming
+  `top: 0`. There is one thing at the top edge again.
+
+**It counts questions now, not screens.** The masthead counted screens because
+a screen held two to four questions at once, and the reason was right at the
+time: *"8/21 while looking at three questions at once is a riddle."* A screen
+shows one question at a time as of the same day, so the client really is on
+question 8, and the questionnaire counts the thing the welcome screen promises.
+The point moves *within* a screen as each question opens — progress is
+continuous rather than nine jumps.
+
+**Two orange marks on a question screen, for the first time under the ceiling**:
+the point, and Continue.
 
 ### The Point — the CI's graphic system, adopted 17 August 2026
 

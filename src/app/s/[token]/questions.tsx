@@ -49,24 +49,24 @@ type Props = {
  * twenty-one questions with "16 of 21, Visual Direction".
  */
 export function Masthead({
-  index,
-  total,
+  counted,
   section,
   heading,
   action,
 }: {
   /**
-   * Which counted screen this is, 1-based — or **null** for a screen that is
-   * not counted, which is the identity card and only that.
+   * Whether this screen is part of the count at all.
    *
-   * Name, position and email come before the questionnaire rather than being
-   * the first part of it. Counting them put a number over a screen with no
-   * question on it and started the Cut at a sixth on a Design survey, which is
-   * a claim about progress nobody had made yet.
+   * The identity card is not — name, position and email come before the
+   * questionnaire rather than being the first part of it — and a screen outside
+   * the count carries no masthead at all.
+   *
+   * The count itself left this object on 17 August 2026 and rides the point on
+   * the right-hand rail, which measures questions rather than screens. What is
+   * left here is what the screen is *about*, which is what these words always
+   * were.
    */
-  index: number | null;
-  /** how many counted screens the questionnaire has */
-  total: number;
+  counted: boolean;
   /** which of the questionnaire's two parts this screen belongs to */
   section?: { en?: string; th?: string };
   /**
@@ -90,52 +90,28 @@ export function Masthead({
   const box = useRef<HTMLDivElement>(null);
 
   /**
-   * Publish the pinned height so anything else that pins can sit under it.
+   * Nothing publishes `--mast-h` any more.
    *
-   * The scales card has its own sticky header — it keeps the question on screen
-   * so the eighth pair is still answering something — and it also pinned at
-   * `top: 0`. Two things claiming the same edge meant the question covered the
-   * masthead and the progress vanished on the one card long enough to need it.
+   * It existed so the scales card's sticky header could sit *under* a pinned
+   * masthead — two things claiming `top: 0`. The masthead stopped pinning on
+   * 17 August 2026, when the Cut it was holding in view stood up and became the
+   * fixed right-hand rail, so there is one thing at the top edge again and the
+   * scale header pins at 0 like anything else.
    *
-   * Measured rather than assumed: the numeral is a `clamp()`, so the masthead
-   * is 115px on a small phone and 127px on a large one, and a hardcoded offset
-   * would be wrong on one of them.
-   *
-   * **Re-measured when the content changes, not only on mount.** The observer
-   * alone ran once and then reported nothing: it holds the element it was given
-   * at mount, and moving between cards hands the component a different one. So
-   * the value stayed at whatever the first screen measured — 81px while the
-   * masthead stood at 156 — and the scales card's sticky header, which is the
-   * one thing that reads this, sat 75px too high and slid under the masthead.
-   * Exactly the fault the variable was added to fix, quietly restored.
-   *
-   * It only became visible once the identity screen dropped its figure and its
-   * Cut, which made the difference between the two heights large enough to see.
+   * The measurement went with it, and with it a ResizeObserver that had to be
+   * re-keyed on every content change to report at all.
    */
-  useEffect(() => {
-    const el = box.current;
-    if (!el) return;
-    const root = document.documentElement;
-    const set = () => root.style.setProperty('--mast-h', `${el.offsetHeight}px`);
-    set();
-    const ro = new ResizeObserver(set);
-    ro.observe(el);
-    return () => {
-      ro.disconnect();
-      root.style.removeProperty('--mast-h');
-    };
-  }, [index, total, section?.en, section?.th, action]);
 
   /**
-   * Nothing to say. The identity screen has no figure, no section and no Cut,
-   * and unless somebody arrived from the send screen it has no action either —
-   * so the band would be 81px of padding above three contact fields.
+   * Nothing to say. The identity screen is outside the count, has no section
+   * and no subject, and unless somebody arrived from the send screen it has no
+   * action either — so the band would be padding above three contact fields.
    *
    * It still renders, collapsed, rather than being dropped: the slide's layout
    * is selected on `.survey-shell:has(> .qmast)`, and a screen that removed the
    * element would quietly take a different one.
    */
-  const bare = index === null && !section?.en && !section?.th && !action;
+  const bare = !counted && !section?.en && !section?.th && !action;
 
   return (
     <div className={bare ? 'qmast bare' : 'qmast'} ref={box}>
@@ -166,12 +142,6 @@ export function Masthead({
        * before a single question had been read.
        */}
       <span className="qhead">
-        {index !== null && (
-          <span className="qfig">
-            {index}
-            <i>/{total}</i>
-          </span>
-        )}
         {(section?.en || section?.th || heading) && (
           <span className="qsection">
             {/* still stacked, not joined with a middot: the rail is narrow
@@ -194,39 +164,10 @@ export function Masthead({
         {action}
       </span>
       {/**
-       * The Cut, and it measures how far in you are.
-       *
-       * The CI calls the Cut "one orange line, used once per layout — the
-       * moment of conviction", and its motion tokens ship
-       * `--transition-cut: width …`. A transition defined for the width of a
-       * line that is otherwise a fixed 88px is the system saying this line was
-       * always meant to grow.
-       *
-       * So it does the work the separate bar at the top of the viewport was
-       * doing, and does it better: one mark rather than two, sitting where the
-       * card begins instead of floating above it, and the brand's own object
-       * rather than borrowed chrome. The hairline underneath is its track.
-       *
-       * Absent altogether on the identity screen. It was drawn there at its
-       * resting length first, on the argument that the mark was worth keeping
-       * even where it measured nothing — but the Cut *is* the progress on this
-       * surface, and a progress mark on a screen outside the count is a reading
-       * offered where there is nothing to read. There is no measure before the
-       * questions, so there is no line. Asked for 17 August 2026.
-       *
-       * The Edge goes with it: the hairline is this element's own `::before`,
-       * the Cut's track rather than a divider in its own right, and a track
-       * under no Cut is furniture.
+       * The Cut is not here any more. It stood up on 17 August 2026 and became
+       * the fixed rail down the right edge — see `rail.tsx`. One orange line
+       * per layout, which is the CI's own rule for it, at a different angle.
        */}
-      {index !== null && (
-        <span
-          className="qrule"
-          aria-hidden="true"
-          style={{ '--cut-progress': index / total } as CSSProperties}
-        >
-          <i />
-        </span>
-      )}
     </div>
   );
 }

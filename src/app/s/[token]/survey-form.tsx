@@ -6,6 +6,7 @@ import { answerPreview, isAnswered, type DraftValues } from '@/lib/survey/answer
 import type { SurveyPayload, SurveyQuestion, SurveyStep } from '@/lib/survey/load';
 import Chevron from '../../chevron';
 import QuestionGrid, { type GridPoint } from './grid';
+import Rail from './rail';
 import { LangContext, type Lang } from './lang';
 import Question, { Folded, IdentityField, Masthead, type ValueUpdate } from './questions';
 
@@ -590,6 +591,17 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
    */
   const forward = () => (nextOnScreen ? openQuestionTo(nextOnScreen.ref) : advance(step));
 
+  /**
+   * The question the rail is pointing at.
+   *
+   * The open one on a group screen, the only one on a solo screen, and null on
+   * the identity card — name, position and email are not numbered and are not
+   * part of the twenty-one a client was promised.
+   */
+  const railAt =
+    openQuestion?.number ??
+    (card?.kind === 'group' ? (card.questions.find((q) => q.number !== null)?.number ?? null) : null);
+
   /* the field of a question somebody asked to open takes focus; one that opened
      because it was next on a screen they have just arrived at does not */
   useEffect(() => {
@@ -617,6 +629,8 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
             questions does not need the page to announce that they finished.
             The Cut and the Wordmark still sign both screens. */}
         <div className="survey-shell client-surface">
+          {/* the point at the floor of the rail: every question behind you */}
+          <Rail n={survey.questionCount} total={survey.questionCount} />
           {/* the floor controls are revealed by data-active, and there is only
               ever one screen — without it the only action here was invisible */}
           <div className="slide" data-active="" data-dir="next">
@@ -648,9 +662,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                     <span className="th">ตอบครบแล้ว</span>
                   </span>
                 </div>
-                <span className="qrule" aria-hidden="true" style={{ '--cut-progress': 1 } as CSSProperties}>
-                  <i />
-                </span>
+
                 {/* the same object the send screen showed with holes in it,
                     whole. Nothing is sent with a blank in it, so this is
                     always full — it is the payoff, not a reading. */}
@@ -686,8 +698,9 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
     return (
       <LangContext.Provider value={LEAD}>
         <div className="survey-shell client-surface">
-          {/* no bar here either — this screen says "N of 21 answered" in words,
-              which is what a full bar was trying to say and could not */}
+          {/* the point rests at the floor: the questions are behind you, and
+              what is still blank is the grid's job, not the rail's */}
+          <Rail n={survey.questionCount} total={survey.questionCount} />
           <div className="slide sendslide" data-active="" data-dir={dir}>
             <div className="slidebody">
               <div className="slidemain">
@@ -780,6 +793,9 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   return (
     <LangContext.Provider value={LEAD}>
       <div className="survey-shell client-surface">
+        {/* the rail is fixed to the viewport, so it belongs to the shell and
+            not to any screen — it is the one thing that does not move */}
+        <Rail n={card ? railAt : null} total={survey.questionCount} />
         {/**
          * The masthead sits here, outside the keyed <section>, and the reason
          * is the Cut.
@@ -799,8 +815,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
          */}
         {card && (
           <Masthead
-            index={counts.position[step - 1]}
-            total={counts.total}
+            counted={counts.position[step - 1] !== null}
             section={card.section}
             heading={card.kind === 'group' ? { en: card.headingEn, th: card.descTh } : undefined}
             /**
@@ -932,9 +947,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                     <span className="th">กรุณาตอบภายในวันที่ {survey.dueOn.th}</span>
                   </p>
                 )}
-                <span className="qrule" aria-hidden="true" style={{ '--cut-progress': 1 } as CSSProperties}>
-                  <i />
-                </span>
+
                 {/**
                  * The questionnaire as one object — but only once there is
                  * something to say with it.
