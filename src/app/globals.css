@@ -3412,12 +3412,40 @@ dialog::backdrop {
    * — an asymmetry that put its box's centre 27px above its text's centre, and
    * the disc with it. The padding moves to the shell.
    */
+  /**
+   * The masthead holds the top; only the questions move.
+   *
+   * The line, the disc, the section and the subject are one fixture — pinned,
+   * with the questions passing behind them. It is the same behaviour a phone
+   * has had since this morning, and the reason is the same: these four things
+   * say where you are, and a reference point that scrolls away stops being one.
+   */
   .qmast {
-    position: relative;
+    position: sticky;
+    top: 0;
+    /* above the rail's 4, so the line passes *behind* the disc. Without it the
+       fixed line drew across the face of the count. */
+    z-index: 5;
     padding-top: 0;
   }
+  /**
+   * The ground the questions pass behind is the **column's** width, not the
+   * window's.
+   *
+   * Put on `.qmast`, an opaque band would run the full width and paint over the
+   * rail — the line would vanish for the height of the masthead and reappear
+   * below it. On the inner block it covers exactly what has to be covered, and
+   * the line runs unbroken past the disc.
+   */
+  .qmast .qhead {
+    background: var(--parchment);
+    padding-block: 30px 24px;
+  }
   .survey-shell {
-    padding-top: 44px;
+    /* air above the first thing on the screen. It scrolls away and the
+       masthead's own 30px is what remains when the block pins — generous at
+       rest, compact in use. */
+    padding-top: clamp(36px, 5.5vh, 60px);
   }
   /* the rail's own disc, not an `<i>` — `rail.tsx` renders `<b class="qdisc">`,
      so `.qrail i` matched nothing and both discs drew */
