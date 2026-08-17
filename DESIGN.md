@@ -244,7 +244,41 @@ collapsing the only thing on a screen would leave nothing to look at.
 | **The Edge** | every card, input and divider — 1px, never orange |
 | **The Wordmark** | welcome and completion only |
 | **The Cut** | **once on every screen** — and it is the progress |
+| **The Point** | the head of the Cut · the questionnaire grid · the team app's "needs you" |
 | **The Mark** | not yet — no vector was supplied, only a 274px PNG |
+
+### The Point — the CI's graphic system, adopted 17 August 2026
+
+`guidelines/brand-point-line.html` names six things the point does: **point, scale, line,
+connection, focus, structure**. `PointRule.jsx` calls the line-ending-in-a-point "the
+brand's connector", and adds a warning worth repeating: *"Not a substitute for The Cut."*
+
+Three of the six are in this product. Two of those were already here before the CI arrived.
+
+| Idiom | Here |
+|---|---|
+| **Line** — a rule terminated by a point | the Cut's head, every screen |
+| **Structure** — a grid of points | the questionnaire, on the welcome, send and completion screens |
+| **Point** — a single mark | the team app's *needs you* dot, which predates the CI |
+| **Scale** — points growing in size | already solved, differently and better — see below |
+| **Connection** — point·line·point | explored for the question group, not taken: the points would replace the question numerals, and the send screen navigates by number |
+| **Focus** — a point inside a ring | explored for the scale and radio controls, not taken yet |
+
+**Functional points are `--primary-mark`, never the CI's `#ef6148`.** §1 measured the CI's
+own point colour at 2.92:1 on warm white. The Cut carries it because nothing is read *from*
+the Cut — it has weight, not information. A point that says where you are, or whether a
+question is answered, is read from, and takes the measured orange at 4.54:1. The two are a
+hair apart in hue; the difference in what they are allowed to mean is not.
+
+**The Scale idiom was already solved here, and better.** The CI ramps points `5 → 9 → 15 →
+22px` in one direction. The personality scales run `32 · 28 · 24 · 28 · 32` — large at both
+poles, small at the neutral centre — so size encodes *distance from neutral*. The CI's ramp
+would have told every respondent that Modern is **more** than Traditional. Worth sending
+back: the graphic is right, its direction is wrong on a bipolar scale.
+
+**The team app's dot is the Point idiom, built before the idiom arrived.** 8px,
+`--primary-mark`, one meaning. §6's "Action Blue" naming below is older than the CI
+adoption and describes a colour this product no longer uses.
 
 **One Field, twenty-three screens.** The welcome and completion ran on the CI's near-black
 Field, which it reserves for a moment of drama. They read better as one surface: the drama
@@ -348,8 +382,16 @@ line, and adding it made the two halves of the masthead contradict each other: `
 beside a bar at 38% is the bar calling the numeral a liar. `--cut-length` is now unread —
 kept as the CI's number for a static Cut, which the next one will want.
 
-Question cards now carry **two** orange marks — the Cut and the Continue button — against
-the CI's stated one to three.
+Question cards carry **three** orange marks — the Cut, the point at its head, and the
+Continue button — against the CI's stated one to three. That is the ceiling, and reaching
+it cost the `ไทย` control its accent on 17 August 2026.
+
+**The `ไทย` pill keeps its shape and gives up its colour.** It was a word with a hairline
+under it once, and was promoted to an orange pill because a Thai reader missed it — which
+for them is the difference between a bilingual survey and an English one. That finding
+stands, so the pill stands: still 48px of target, still impossible to mistake for prose.
+What it gave up is the accent, because the accent means *a person is needed here* and the
+marks that carry information have first claim on it.
 
 **The masthead pins, and it is the only thing on the slide that does not move.** It sits
 above `.slide` rather than inside it, for two reasons that have to hold together:

@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties }
 import { answerPreview, isAnswered, type DraftValues } from '@/lib/survey/answers';
 import type { SurveyPayload, SurveyQuestion, SurveyStep } from '@/lib/survey/load';
 import Chevron from '../../chevron';
+import QuestionGrid, { type GridPoint } from './grid';
 import { LangContext, type Lang } from './lang';
 import Question, { Folded, IdentityField, Masthead, type ValueUpdate } from './questions';
 
@@ -426,6 +427,33 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
       ? (values[emailQuestion.ref] as string).trim()
       : '';
 
+  /**
+   * Every numbered question, in the order the client saw them, with whether it
+   * has an answer. The CI's Structure grid is drawn from this.
+   *
+   * Numbered only: name, position and email are not numbered anywhere else and
+   * are not part of the twenty-one a client is told about. A question split
+   * over several cards is listed once, pointing at the card it starts on —
+   * the same rule `blanks` follows, for the same reason.
+   */
+  const points = useMemo<GridPoint[]>(() => {
+    const seen = new Set<string>();
+    return cards
+      .flatMap((c, i) =>
+        c.questions
+          .filter((q) => q.number !== null)
+          .filter((q) => !seen.has(q.ref) && seen.add(q.ref))
+          .map((q) => ({
+            n: q.number!,
+            ref: q.ref,
+            step: i + 1,
+            answered: isAnswered(q.type, values[q.ref]),
+            text: q.textEn,
+          })),
+      )
+      .sort((a, b) => a.n - b.n);
+  }, [cards, values]);
+
   const blanks = useMemo(() => {
     /* A split battery occupies several cards but is still one question — it is
        listed once, pointing at the slide it starts on. */
@@ -620,7 +648,21 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                     <span className="th">ตอบครบแล้ว</span>
                   </span>
                 </div>
-                <span className="qrule" aria-hidden="true" style={{ '--cut-progress': 1 } as CSSProperties} />
+                <span className="qrule" aria-hidden="true" style={{ '--cut-progress': 1 } as CSSProperties}>
+                  <i />
+                </span>
+                {/* the same object the send screen showed with holes in it,
+                    whole. Nothing is sent with a blank in it, so this is
+                    always full — it is the payoff, not a reading. */}
+                <QuestionGrid
+                  points={Array.from({ length: survey.questionCount }, (_, i) => ({
+                    n: i + 1,
+                    ref: `done.${i}`,
+                    step: 0,
+                    answered: true,
+                    text: '',
+                  }))}
+                />
                 <h1>
                   Thank you, <em>{submitted}</em>.
                 </h1>
@@ -695,16 +737,14 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                         ? 'ยังเหลืออีก 1 ข้อ ก่อนส่งคำตอบได้'
                         : `ยังเหลืออีก ${blanks.length} ข้อ ก่อนส่งคำตอบได้`}
                     </p>
-                    <ul className="blanklist">
-                      {blanks.map(({ question, index }) => (
-                        <li key={question.ref}>
-                          <button type="button" onClick={() => leaveSend(index, question.ref)}>
-                            <b>{question.number ?? '·'}</b>
-                            <span>{question.textEn}</span>
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
+                    {/* The grid replaces a list that named the blanks and
+                        nothing else — you could read it and still not know
+                        whether two missing out of twenty-one was nearly done
+                        or barely started. Each point carries its question's
+                        text as its accessible name and its tooltip, so nothing
+                        the list said is gone; it is just no longer twenty-one
+                        lines long. */}
+                    <QuestionGrid points={points} onPick={(step, ref) => leaveSend(step, ref)} />
                   </>
                 )}
                 {error && <p className="qwarn">{error}</p>}
@@ -892,7 +932,20 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                     <span className="th">กรุณาตอบภายในวันที่ {survey.dueOn.th}</span>
                   </p>
                 )}
-                <span className="qrule" aria-hidden="true" style={{ '--cut-progress': 1 } as CSSProperties} />
+                <span className="qrule" aria-hidden="true" style={{ '--cut-progress': 1 } as CSSProperties}>
+                  <i />
+                </span>
+                {/**
+                 * The questionnaire as one object — but only once there is
+                 * something to say with it.
+                 *
+                 * Empty, it draws twenty-one hollow points beside a figure that
+                 * already says 21: the same fact twice, which is the
+                 * over-explaining this screen was cut back for. Resuming, it
+                 * says the one thing the count cannot — *which* of them are
+                 * done — and that is worth a block of the brand's own graphic.
+                 */}
+                {points.some((pt) => pt.answered) && <QuestionGrid points={points} />}
                 <h1>Let&apos;s shape your brand, together.</h1>
                 {/**
                  * One line, and it is the only one that had to be here.

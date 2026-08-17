@@ -890,13 +890,26 @@ label.f span {
   align-items: center;
   font-family: inherit;
   font-size: 14px;
-  color: var(--primary-mark);
+  /**
+   * The pill stays; the accent goes.
+   *
+   * It was a word with a hairline under it once, and was promoted to an orange
+   * pill because a Thai reader missed it — which for them is the difference
+   * between a bilingual survey and an English one. That finding stands, so the
+   * shape stands: this is still a pill, still 48px of target, still impossible
+   * to mistake for prose.
+   *
+   * What it gave up, on 17 August 2026, is the accent. The accent means *a
+   * person is needed here*, and a question screen now carries the Cut, its
+   * point, the ไทย control and Continue — four marks competing to mean that,
+   * against DESIGN.md's ceiling of three. The two that carry information keep
+   * the colour; the one that offers a translation takes ink and a hairline,
+   * the same quiet-control treatment every other second action on this survey
+   * has.
+   */
+  color: var(--ink-2);
   background: transparent;
-  /* The ghost pill from DESIGN.md section 5, which is what this is: the second
-     action on the screen. It was a word with a hairline under it — legible if
-     you were looking for it, and easy to miss if you were not, which for a Thai
-     reader is the difference between a bilingual survey and an English one. */
-  border: 1px solid var(--primary-mark);
+  border: 1px solid var(--hairline);
   border-radius: var(--r-pill);
   padding: 6px 14px;
   /* it overlapped the question by 2px as a bare word; as a pill it needs the
@@ -907,12 +920,18 @@ label.f span {
   transition: background 0.18s;
 }
 @media (hover: hover) {
+  /* the line darkens — the hover every quiet control on this survey has */
   .qlangbtn:hover {
-    background: var(--primary-tint);
+    border-color: var(--ink-3);
   }
 }
 .qlangbtn:active {
-  background: var(--primary-tint);
+  border-color: var(--ink);
+}
+/* open, it is showing you something, so it holds the darker line */
+.qlangbtn[aria-expanded='true'] {
+  border-color: var(--ink-3);
+  color: var(--ink);
 }
 .qlangbtn::after {
   content: '';
@@ -1068,41 +1087,82 @@ label.f span {
 }
 
 /* the send screen's list of what is still blank — each one goes back to it */
-.blanklist {
+/**
+ * The questionnaire as one object — the CI's **Structure** idiom, and the way
+ * back into it.
+ *
+ * It replaced `.blanklist`, a list of every unanswered question. The list said
+ * what was missing and nothing about the shape of what was not: two blanks read
+ * the same whether the survey had four questions or twenty-one. The grid says
+ * both, and its points are the navigation.
+ *
+ * Seven columns because twenty-one is three rows of seven exactly. A Design
+ * survey has eleven and ends on a short row, which is the truth about a Design
+ * survey rather than a layout to be fixed.
+ */
+.qgrid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
   list-style: none;
-  margin: 18px 0 4px;
-  border-top: 1px solid var(--hairline);
+  margin: 0 0 var(--sp-md);
+  padding: 0;
+  max-width: 340px;
 }
-.blanklist li {
-  border-bottom: 1px solid var(--divider);
+.qgrid li {
+  display: grid;
+  place-items: center;
 }
-.blanklist button {
-  display: flex;
-  gap: 11px;
+/* the point itself: filled where an answer exists, a hairline ring where it
+   does not. The ring is the Edge — a hollow point is not a faded one. */
+.qgrid .pt {
+  display: grid;
+  place-items: center;
   width: 100%;
-  text-align: left;
-  font-family: inherit;
-  font-size: 15px;
-  line-height: 1.6;
-  color: var(--ink);
-  background: transparent;
   border: 0;
-  padding: 13px 0;
+  background: none;
+  padding: 0;
+}
+.qgrid .pt i {
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: var(--r-pill);
+  border: 1.5px solid var(--hairline);
+  background: transparent;
+  transition:
+    background-color 0.18s,
+    border-color 0.18s,
+    transform 0.18s var(--ease);
+}
+.qgrid .pt.on i {
+  background: var(--primary-mark);
+  border-color: var(--primary-mark);
+}
+/* tappable on the send screen: the 44px floor is the target, not the mark */
+.qgrid.pick .pt {
   min-height: 44px;
   cursor: pointer;
 }
-/* this one keeps the accent — it is a link back to an unanswered question, and
-   an unanswered question is precisely "a person is needed here" */
 @media (hover: hover) {
-  .blanklist button:hover span {
-    color: var(--primary-mark);
+  .qgrid.pick .pt:hover i {
+    border-color: var(--primary-mark);
+    transform: scale(1.25);
   }
 }
-.blanklist b {
-  flex-shrink: 0;
-  color: var(--ink-3);
-  font-weight: 400;
-  min-width: 22px;
+.qgrid.pick .pt:active i {
+  transform: scale(1.1);
+}
+
+/* the completion's grid is a picture, so it sits at the CI's own point size
+   and closes up — nothing here is aimed at */
+.qgrid:not(.pick) {
+  gap: 7px;
+  max-width: 190px;
+}
+.qgrid:not(.pick) .pt i {
+  width: 8px;
+  height: 8px;
 }
 
 /* checkbox rows for the shorter checkbox questions */
@@ -3664,6 +3724,55 @@ dialog::backdrop {
   transform-origin: left center;
   background: var(--cut);
   transition: transform var(--dur-slow, 380ms) var(--ease);
+}
+
+/**
+ * The point at the Cut's head — the CI's *Point & line*, which is its whole
+ * graphic system and which `PointRule.jsx` calls "the brand's connector".
+ *
+ * The Cut alone ended in a fade: a bar stops somewhere and you read *about*
+ * there. A line terminated by a point says exactly where, which is what a
+ * progress mark is for, and it is the brand's own object rather than a cap
+ * invented for the job.
+ *
+ * **Measured orange, not the CI's.** `#ef6148` is what the CI draws its points
+ * in, and DESIGN.md §1 measured it at 2.92:1 on warm white — the Cut carries it
+ * because nothing is read *from* the Cut, only weight. A point that says where
+ * you are is read from, so it takes `--primary-mark` at 4.54:1. The two marks
+ * are a hair apart in hue and the difference is invisible; the difference in
+ * whether they can carry meaning is not.
+ *
+ * Positioned by `translateX` on a full-width carrier, not by `left`. A
+ * percentage in `translateX` resolves against the element's own width, so a
+ * carrier the width of the track moves the point exactly `progress` across it,
+ * on the compositor — the same reason the Cut scales rather than growing.
+ *
+ * The carrier hangs its point on its **right** edge and is translated by
+ * `progress − 1`, so it travels from fully left-of-track to exactly overlaying
+ * it. Hung on the left and translated by `progress`, the arithmetic is the
+ * same but at full progress the carrier extends a whole track-width past the
+ * right edge — which is a horizontal scrollbar on every screen, and was.
+ * Overflow to the left of the origin does not scroll; overflow to the right
+ * does.
+ */
+.qrule i {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 0;
+  transform: translateX(calc((var(--cut-progress, 1) - 1) * 100%));
+  transition: transform var(--dur-slow, 380ms) var(--ease);
+}
+.qrule i::before {
+  content: '';
+  position: absolute;
+  right: -4px;
+  top: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--primary-mark);
 }
 @media (prefers-reduced-motion: reduce) {
   .qrule::after {

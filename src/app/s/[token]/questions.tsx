@@ -223,7 +223,9 @@ export function Masthead({
           className="qrule"
           aria-hidden="true"
           style={{ '--cut-progress': index / total } as CSSProperties}
-        />
+        >
+          <i />
+        </span>
       )}
     </div>
   );
