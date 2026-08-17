@@ -192,13 +192,21 @@ its run:
 | Screen | Figure | Cut |
 |---|---|---|
 | Welcome | `21` — questions · about 20 minutes | full |
-| Question *n* | `n/21` | grown to *n* of the way across |
+| Name, position, email | *none* | at rest |
+| Screen *n* | `n/9` | grown to *n* of the way across |
 | Completion | `21/21` — answered | full |
 
 The welcome's Cut runs full rather than starting short. Nothing has progressed there yet,
 so a part-drawn line does not read as *none of twenty-one done* — it reads as a rule that
 failed to finish, which is why the old progress bar was hidden on that screen rather than
 shown at zero. Full, it is simply the Cut; it starts measuring on question one.
+
+**The identity screen is not counted, and its Cut is at rest** — the 88px resting length,
+present as the brand's mark and claiming no distance. Asked for 17 August 2026. Name,
+position and email are what a person gives *before* the questionnaire, and counting them
+put `1/6` over a screen holding no question and started a Design survey a sixth of the way
+along before anything had been read. The count is keyed on the card being a field grid
+rather than on it being the first one, because that is the actual property.
 
 That replaced prose on both ends. The welcome had the count and the time set as a sentence
 in the smallest type on the screen, under the button — the one fact a person weighs before

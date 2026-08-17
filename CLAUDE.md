@@ -64,8 +64,9 @@ changes; only `DATABASE_URL`.
   the step *is* the screen. Asked for by the branding team 17 August 2026; it was one
   question per screen before. Group by what somebody answers in one breath, never by
   count, and the heading over a screen has to be true of everything under it. The
-  masthead counts screens; each question keeps its own 1–21 number, which is how the
-  send screen's blank list finds it.
+  masthead counts screens and does not count the name/position/email screen — the
+  count starts at the first question and its Cut is at rest there. Each question
+  keeps its own 1–21 number, which is how the send screen's blank list finds it.
 - **Private** (everything else) — the team app. Behind auth. Designally staff only.
 
 Keep them in one Next.js app. Do not build two projects.

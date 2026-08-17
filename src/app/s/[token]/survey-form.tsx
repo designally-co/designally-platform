@@ -167,8 +167,26 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
 
   /* the last question; past it is the send screen */
   const LAST = cards.length;
-  /* the send screen is still a position for the progress bar to count towards */
-  const STOPS = LAST + 1;
+
+  /**
+   * Where each card sits in the count the client is shown — and which cards are
+   * not in it at all.
+   *
+   * The identity card is not. Name, position and email are what you give before
+   * the questionnaire starts, not the first sixth of it, and counting them meant
+   * the Cut had already advanced on a screen where nothing had been answered.
+   * Asked for 17 August 2026; the count now begins at the first question, and
+   * the identity screen carries the Cut at rest.
+   *
+   * Keyed on the card being a field grid rather than on it being the first one,
+   * because that is the actual property: a screen of unnumbered short-text
+   * fields is not a question, wherever it lands.
+   */
+  const counts = useMemo(() => {
+    let n = 0;
+    const position = cards.map((c) => (c.kind === 'fields' ? null : ++n));
+    return { position, total: n };
+  }, [cards]);
 
   /* ── restore ────────────────────────────────────────────────────── */
 
@@ -620,8 +638,8 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
          */}
         {card && (
           <Masthead
-            index={step}
-            total={cards.length}
+            index={counts.position[step - 1]}
+            total={counts.total}
             section={card.section}
             /**
              * The way back to the send screen rides in the header.

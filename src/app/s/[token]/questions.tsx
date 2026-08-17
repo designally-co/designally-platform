@@ -54,9 +54,17 @@ export function Masthead({
   section,
   action,
 }: {
-  /** which screen this is, 1-based */
-  index: number;
-  /** how many screens the questionnaire has */
+  /**
+   * Which counted screen this is, 1-based — or **null** for a screen that is
+   * not counted, which is the identity card and only that.
+   *
+   * Name, position and email come before the questionnaire rather than being
+   * the first part of it. Counting them put a number over a screen with no
+   * question on it and started the Cut at a sixth on a Design survey, which is
+   * a claim about progress nobody had made yet.
+   */
+  index: number | null;
+  /** how many counted screens the questionnaire has */
   total: number;
   section?: { en?: string; th?: string };
   /** a way out, shown in the header rather than floating over it */
@@ -117,12 +125,18 @@ export function Masthead({
        * Still stated on every screen rather than once at the top of a part —
        * somebody arriving from the review screen has not seen the top of
        * anything.
+       *
+       * Absent on the identity screen, which is not one of the counted ones.
+       * "1/6" over three contact fields promised a questionnaire a sixth done
+       * before a single question had been read.
        */}
       <span className="qhead">
-        <span className="qfig">
-          {index}
-          <i>/{total}</i>
-        </span>
+        {index !== null && (
+          <span className="qfig">
+            {index}
+            <i>/{total}</i>
+          </span>
+        )}
         {(section?.en || section?.th) && (
           <span className="qsection">
             {section?.en}
@@ -145,11 +159,14 @@ export function Masthead({
        * doing, and does it better: one mark rather than two, sitting where the
        * card begins instead of floating above it, and the brand's own object
        * rather than borrowed chrome. The hairline underneath is its track.
+       *
+       * At zero on the identity screen, which is the Cut at its resting length
+       * — the brand's own mark, present, and not yet claiming any distance.
        */}
       <span
         className="qrule"
         aria-hidden="true"
-        style={{ '--cut-progress': index / total } as CSSProperties}
+        style={{ '--cut-progress': index === null ? 0 : index / total } as CSSProperties}
       />
     </div>
   );
