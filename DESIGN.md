@@ -247,13 +247,44 @@ collapsing the only thing on a screen would leave nothing to look at.
 | **The Point** | the head of the Cut · the questionnaire grid · the team app's "needs you" |
 | **The Mark** | not yet — no vector was supplied, only a 274px PNG |
 
-### The Cut stands up — the right-hand rail
+### The Cut stands up — and lies down again on a phone
 
-**A hairline down the right edge of every survey screen, fixed, with the point
-riding it and the count riding the point.** The point's height on the line is
-where the client is; the line does not fill behind it. `PointRule.jsx` ships
-`orientation="vertical"` with `length="100%"`, so this is the brand's own
-object at the size the brand drew it.
+**Wide: a full-height line down the left edge, fixed, with a filled disc
+crossing it near the top and the question count inside the disc.** Nothing on
+it moves — the line runs its full length on every screen and never fills, and
+the number inside the disc changes rather than a mark sliding down a track. The
+line is the brand's mark, not a progress track.
+
+**On a phone the Cut lies down and becomes the masthead's own bottom edge**,
+with the disc crossing it at the trailing end. Vertical, the rail cost a 100px
+gutter out of a 390px screen and left the questions a 264px column — on the one
+surface whose whole problem is having room for a Thai question. The section and
+the subject both sit *above* it: it closes the masthead rather than dividing it,
+and drawing it as a border means nothing has to measure a masthead of unknown
+height to find out where the line goes.
+
+That masthead is **sticky on a phone** — the section, the subject, the line and
+the disc hold the top while the questions pass under them. It is the one fixture
+at that width; the wide layout gets its fixture from the rail instead.
+
+**The disc is `--primary`, not the CI's `#ef6148`.** It carries white numerals,
+which is the job §1 measured that colour at 3.24:1 and failed. The line beside
+it keeps the pure CI orange, because nothing is read from a line.
+
+**The section and the subject are English only**, from 17 August 2026. They are
+wayfinding; every question under them is fully bilingual and one tap from Thai,
+so nothing a client has to *answer* is English-only. What the Thai bought was a
+four-line masthead on a phone where two will do. Worth saying to the branding
+team rather than letting it pass: a Thai-only reader meets those two lines in
+English.
+
+**The floor controls are in the flow**, under the questions, at every width.
+They were fixed to the viewport floor on a phone, riding above the keyboard on
+a measured `--kb` with a four-layer blur ramp beneath them. All of it went the
+same day: on a screen a client scrolls to the end of, the way forward belongs at
+the end, and a bar pinned over the last question was covering the thing it was
+asking about. The blur was §3's one documented divergence, and the system gets
+it back.
 
 Three things went with the horizontal bar, and each was load-bearing:
 

@@ -324,29 +324,13 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
    * longer than the screen is now simply a longer page.
    */
   /**
-   * How much of the screen the phone keyboard is covering, as a CSS variable.
+   * The keyboard measurement is gone.
    *
-   * The visual viewport shrinks when the keyboard opens; the layout viewport
-   * does not. Measuring the difference is the only way to keep the OK button
-   * sitting on top of the keyboard rather than underneath it — and Continue is
-   * the one control here, so losing it mid-answer strands the respondent.
+   * `--kb` existed so the floor controls could ride above the phone keyboard.
+   * The controls are in the flow under the questions from 17 August 2026, so
+   * the keyboard pushes the page rather than covering a fixed bar, and two
+   * `visualViewport` listeners running on every keystroke went with it.
    */
-  useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
-    const update = () => {
-      const covered = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-      document.documentElement.style.setProperty('--kb', `${Math.round(covered)}px`);
-    };
-    update();
-    vv.addEventListener('resize', update);
-    vv.addEventListener('scroll', update);
-    return () => {
-      vv.removeEventListener('resize', update);
-      vv.removeEventListener('scroll', update);
-      document.documentElement.style.removeProperty('--kb');
-    };
-  }, []);
 
   /* the questions end at the last card; past it is the send screen */
   const advance = (n: number) => (n >= cards.length ? openSend() : setStep(n + 1));
@@ -704,6 +688,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
         {card && (
           <Masthead
             counted={counts.position[step - 1] !== null}
+            count={railAt !== null ? { n: railAt, total: survey.questionCount } : undefined}
             section={card.section}
             heading={card.kind === 'group' ? { en: card.headingEn, th: card.descTh } : undefined}
             /**

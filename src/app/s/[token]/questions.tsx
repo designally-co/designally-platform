@@ -50,6 +50,7 @@ type Props = {
  */
 export function Masthead({
   counted,
+  count,
   section,
   heading,
   action,
@@ -67,6 +68,17 @@ export function Masthead({
    * were.
    */
   counted: boolean;
+  /**
+   * The question count, for the disc this draws on a phone.
+   *
+   * On a wide screen the count rides the vertical rail at the left edge, drawn
+   * by `rail.tsx`. On a phone the Cut lies down and becomes this block's own
+   * bottom edge, so the disc that crosses it has to be this block's too — a
+   * shell-level element cannot know where a masthead of unknown height ends
+   * without measuring it, and measuring it is the `--mast-h` ResizeObserver
+   * that was just deleted for reporting stale numbers.
+   */
+  count?: { n: number; total: number };
   /** which of the questionnaire's two parts this screen belongs to */
   section?: { en?: string; th?: string };
   /**
@@ -144,30 +156,40 @@ export function Masthead({
       <span className="qhead">
         {(section?.en || section?.th || heading) && (
           <span className="qsection">
-            {/* still stacked, not joined with a middot: the rail is narrow
-                enough that the joined string wrapped anyway, and it wrapped in
-                the middle of the Thai. Measured once already — see below. */}
-            {(section?.en || section?.th) && (
-              <span className="qsec">
-                {section?.en}
-                {section?.th && <i className="th">{section.th}</i>}
-              </span>
-            )}
-            {heading && (
-              <span className="qtopic">
-                {heading.en}
-                {heading.th && <i className="th">{heading.th}</i>}
-              </span>
-            )}
+            {/**
+             * English only, both of them — asked for 17 August 2026.
+             *
+             * These two lines are wayfinding: which half of the questionnaire
+             * this is, and what this screen is about. Every question under them
+             * is fully bilingual and one tap from Thai, so nothing a client has
+             * to *answer* is English-only. What the pair bought was a four-line
+             * masthead on a phone where two will do, on a surface whose whole
+             * problem is how much text arrives before the first question.
+             *
+             * Worth saying plainly to the branding team rather than letting it
+             * pass: a Thai-only reader now meets these two lines in English.
+             */}
+            {section?.en && <span className="qsec">{section.en}</span>}
+            {heading && <span className="qtopic">{heading.en}</span>}
           </span>
         )}
         {action}
       </span>
       {/**
-       * The Cut is not here any more. It stood up on 17 August 2026 and became
-       * the fixed rail down the right edge — see `rail.tsx`. One orange line
-       * per layout, which is the CI's own rule for it, at a different angle.
+       * On a phone the Cut is this block's bottom edge — a border in
+       * `globals.css`, with the count crossing it here. Both the section and
+       * the subject stay above the line; it closes the masthead rather than
+       * dividing it.
+       *
+       * On a wide screen this is hidden and the count rides the vertical rail
+       * at the left edge instead. See `rail.tsx`.
        */}
+      {count && (
+        <b className="qdisc mastdisc" aria-hidden="true">
+          {count.n}
+          <span>/{count.total}</span>
+        </b>
+      )}
     </div>
   );
 }

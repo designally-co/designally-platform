@@ -441,6 +441,12 @@ label.f span {
    one question group per screenful.
    ============================================================ */
 :root {
+  /* On a phone the Cut is horizontal: `--rail-y` is how far down it sits, and
+     `--rail-mast-top` is what the masthead needs above it so the eyebrow lands
+     just over the line rather than under it. */
+  --rail-y: 104px;
+  --rail-mast-top: 68px;
+
   /* where the Cut runs, how big its disc is, and what the pair costs the
      column. The disc is centred on the line, so the gutter is the line's
      position plus half a disc plus air. */
@@ -3208,8 +3214,10 @@ dialog::backdrop {
  * permanent header a phone gets back.
  */
 .qmast {
-  z-index: 5;
-  background: var(--parchment);
+  /* No stacking context and no ground of its own. Both were there to let a
+     pinned header cover the card scrolling under it; nothing pins here now, and
+     an opaque block at z-index 5 painted straight over the Cut — which on a
+     phone runs through this very band. */
   /* it sits above .slide now rather than inside it, so it carries the slide's
      own horizontal rhythm and the column it pins over stays aligned */
   padding: calc(34px + env(safe-area-inset-top, 0px)) 26px 0;
@@ -3429,6 +3437,13 @@ dialog::backdrop {
   z-index: 4;
   pointer-events: none;
 }
+/* The masthead draws its own disc only on a phone — see the 620px block. The
+   selector carries both classes because `.qdisc` sets `display: flex` further
+   down this file, and a bare `.mastdisc` ties on specificity and loses. */
+.qdisc.mastdisc {
+  display: none;
+}
+
 /* the count, in a disc crossing the line at eye level */
 .qdisc {
   position: absolute;
@@ -3524,6 +3539,25 @@ dialog::backdrop {
   width: 34px;
   margin-right: 0;
   text-indent: 0;
+}
+/**
+ * Everything under a question starts where the question does.
+ *
+ * The number hangs in a 34px column, so a control set at the card's left edge
+ * sat under the *number* rather than under the words it belongs to — the ไทย
+ * pill, the field, its hint and the choices all began one indent to the left of
+ * the thing they were part of.
+ *
+ * Done by padding the question's box and pulling the heading back out of it,
+ * not by margining each child in: a `margin-left` on a field that is `width:
+ * 100%` shifts it without narrowing it, and it runs 34px off the right of a
+ * phone. Padding narrows the box every child measures itself against.
+ */
+.qgroup:not(.solo) .qopen .sq {
+  padding-left: 34px;
+}
+.qgroup:not(.solo) .qopen .sq > .qq {
+  margin-left: -34px;
 }
 
 /**
@@ -4132,6 +4166,57 @@ dialog::backdrop {
 }
 
 @media (max-width: 620px) {
+  /**
+   * The Cut lies down again on a phone, and the masthead is the header.
+   *
+   * Vertical, the rail cost a 100px gutter out of a 390px screen and left the
+   * questions a 264px column — on the one surface whose whole problem is having
+   * room for a Thai question. Horizontal it costs a line's height, and it goes
+   * back to doing what it did before it stood up: closing the masthead.
+   *
+   * **It is this block's own bottom edge**, not a separate element, so the
+   * section and the subject both sit above it and it closes them rather than
+   * dividing them. That also means nothing has to measure a masthead of unknown
+   * height to find out where to draw a line under it — which is exactly the
+   * `--mast-h` ResizeObserver this file spent two commits deleting.
+   *
+   * Sticky, so the line, the disc and the words they belong to hold the top of
+   * the screen while the questions pass under them. It is the one fixture on a
+   * phone; the wide layout gets that from the rail instead.
+   */
+  .qrail {
+    display: none;
+  }
+  .qmast {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--parchment);
+    border-bottom: var(--cut-width) solid var(--cut);
+    padding-bottom: 15px;
+  }
+  /* `top` and `left` have to be cancelled, not just overridden: the base rule
+     pins the disc to the vertical rail's eye level and half-translates it, and
+     an unset `top` beats a set `bottom` every time */
+  .qdisc.mastdisc {
+    display: flex;
+    position: absolute;
+    top: auto;
+    left: auto;
+    right: var(--sp-lg);
+    bottom: 0;
+    transform: translateY(50%);
+  }
+  /* the subject stops short of the disc, which crosses the line beside it */
+  .qtopic {
+    margin-top: 6px;
+    padding-right: calc(var(--disc) + var(--sp-lg) + 14px);
+  }
+  /* no gutter: the rail is not beside the column any more */
+  .survey-shell {
+    padding-inline: 0;
+  }
+
   .slide {
     /* the 104px here cleared the corner chevrons, which a phone does not show —
        the action sits near the floor instead of hovering above dead ground */
@@ -4167,91 +4252,26 @@ dialog::backdrop {
     padding-top: 26px;
   }
   /**
-   * On the slide being answered, the controls ride above the keyboard.
+   * The controls sit under the questions, in the flow.
    *
-   * `--kb` is how much of the screen the keyboard is covering, measured from
-   * the visual viewport. Only the active slide is fixed — twenty-one fixed
-   * rows would stack on top of each other — and the slide reserves the room
-   * below so a long slide's last item can still scroll clear of the bar.
-   */
-  /**
-   * A progressive blur under the controls.
+   * They were fixed to the floor of the viewport, riding above the keyboard on
+   * a measured `--kb`, with a four-layer blur ramp beneath them so answers
+   * dissolved into the floor rather than being sliced by the bar. All of it
+   * went on 17 August 2026: on a screen a client scrolls to the end of, the way
+   * forward belongs at the end, and a bar pinned over the last question was
+   * covering the thing it was asking about.
    *
-   * The bar floats over the slide, so an answer scrolling beneath it used to
-   * hard-cut at the button's top edge. One blurred pane would only move the cut
-   * — the seam becomes a sharp line where the blur starts. Four layers with the
-   * radius doubling downward, each masked to a lower band, ramp it instead, so
-   * content dissolves into the floor rather than being sliced by it.
-   *
-   * DIVERGENCE from DESIGN.md section 3: the system has no material but ink,
-   * line and surface, and the focus ring is its only shadow. This is a blur,
-   * and it earns its place by doing a job — it is not glass for the look of
-   * glass. It exists only on the phone, only under the controls.
-   *
-   * It rides `--kb` with the bar, so it stays under the buttons when the
-   * keyboard pushes them up.
+   * With it went the `--kb` measurement, the `visualViewport` listeners that
+   * fed it, the blur ramp — a documented divergence from §3, which the system
+   * gets back — and the 104px of floor clearance every slide reserved.
    */
   .floorfade {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: var(--kb, 0px);
-    height: 152px;
-    z-index: 14;
-    pointer-events: none;
-    /* Opaque at the floor now that no blur is helping it hide anything, and
-       fading to a transparent *parchment* rather than the `transparent`
-       keyword — that keyword is transparent black, and interpolating toward it
-       can lay a grey cast over the middle of the ramp. */
-    background: linear-gradient(to top, var(--parchment) 0%, rgb(245 245 247 / 0) 62%);
+    display: none;
   }
-  /**
-   * The controls never belong to a slide.
-   *
-   * Fixing only the active slide's row left every other row in normal flow, so
-   * mid-swipe you saw two: the outgoing one still pinned to the floor and the
-   * incoming one riding up the screen with its slide. Two OK buttons and two
-   * back arrows at once, and the second appeared to pop into place.
-   *
-   * Every slide's action now sits at the same fixed point and only the active
-   * one is visible. They are identical and never move, so the handover cannot
-   * be seen — the bar reads as one object the questions pass behind, which is
-   * what it always looked like it was.
-   */
-  .slide .okrow,
-  .slide .btn.start {
-    position: fixed;
-    /* fixed, so the shell's padding does not reach it — the rail's gutter has
-       to be spelled out here or the line crosses the Continue pill */
-    left: var(--rail-gutter);
-    right: 22px;
-    bottom: calc(var(--kb, 0px) + 22px);
-    z-index: 15;
-    margin: 0;
-    opacity: 0;
-    pointer-events: none;
-    transition: bottom 0.18s var(--ease);
-  }
-  /* cancels the row's own top padding — it must not reach the button, whose
-     11px top is what keeps its label off the ceiling */
   .slide .okrow {
-    padding-top: 0;
+    margin-top: 34px;
   }
 
-  .slide[data-active] .okrow,
-  .slide[data-active] .btn.start {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  /* the review can run long, so the floor the controls are pinned to has to be
-     kept clear at the end of the list rather than only under a short slide */
-  .slide.sendslide {
-    padding-bottom: 116px;
-  }
-  .slide {
-    padding-bottom: 104px;
-  }
   .btn.ok,
   .btn.start {
     min-height: 52px;
