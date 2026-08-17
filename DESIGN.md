@@ -313,7 +313,18 @@ headings now; the longest is *"References and limits"*. `white-space: nowrap`
 is the guard, so a longer one shows up as a string that needs shortening rather
 than wrapping into the question.
 
-**The question number is a figure, set the way the count is.** Light 300 in the
+**There is no question number on the card.** It went on 17 August 2026. It was
+there because the masthead counted screens and each question had to say which
+of the twenty-one it was; its one remaining reader is the send screen's grid,
+which points a client back at a specific blank and now lands them on a screen
+of two to four questions with nothing visible saying which one they came for.
+That path is weaker for it, deliberately — the number was the last piece of
+furniture between the heading and the question, and every question now opens
+with its own words. `question.number` is untouched in the data: the grid knows
+it, the team's reading of the answers prints it, and the analysis cites it.
+
+*Its treatment while it existed, kept because the reasoning is reusable:*
+**a figure, set the way the count is.** Light 300 in the
 display face at 20–28px, grey. It was 13px semibold — a caption-sized bold "3"
 over a 33px question, which reads as a stray piece of metadata rather than as a
 number. The masthead settled this once and the reasoning carries: *"at 58px a

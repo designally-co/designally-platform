@@ -200,19 +200,23 @@ function Heading({ question }: { question: SurveyQuestion }) {
   const help = t(question.helpEn, question.helpTh);
   return (
     <>
-      <span className="qq">
-        {/**
-         * The question's own number, back as a small badge.
-         *
-         * It moved into the masthead when a screen held one question, because
-         * there it *was* the screen. A screen holds two to four now, so the
-         * masthead counts screens and each question needs to say which of the
-         * twenty-one it is — the send screen's blank list names them by that
-         * number, and "3 · What unique value…" has to find its question.
-         */}
-        {question.number !== null && <i className="qn">{question.number}</i>}
-        {t(question.textEn, question.textTh)}
-      </span>
+      {/**
+       * No number on the question, from 17 August 2026.
+       *
+       * It was there because the masthead counted screens and each question had
+       * to say which of the twenty-one it was. The masthead still counts
+       * screens, and the number's one remaining reader is the send screen's
+       * grid, which points a client back at a specific blank — landing them on
+       * a screen of two to four questions with nothing visible saying which one
+       * they came for. That path is weaker for this, and it is a deliberate
+       * trade: the number was the last piece of furniture between the heading
+       * and the question, and every question now begins with its own words.
+       *
+       * `question.number` is untouched in the data. The grid still knows it,
+       * the team's reading of the answers still prints it, and the analysis
+       * still cites it.
+       */}
+      <span className="qq">{t(question.textEn, question.textTh)}</span>
       {help && <span className="qhelp">{help}</span>}
     </>
   );

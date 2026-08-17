@@ -68,7 +68,8 @@ changes; only `DATABASE_URL`.
   count, and the heading over a screen has to be true of everything under it. The
   masthead counts screens and does not count the name/position/email screen — the
   count starts at the first question and its Cut is at rest there. Each question
-  keeps its own 1–21 number, which is how the send screen's blank list finds it.
+  keeps its own 1–21 number in the data — the send screen's grid, the team's
+  reading and the analysis all use it — but it is not printed on the card.
 - **Private** (everything else) — the team app. Behind auth. Designally staff only.
 
 Keep them in one Next.js app. Do not build two projects.

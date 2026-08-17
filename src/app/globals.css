@@ -3635,39 +3635,9 @@ dialog::backdrop {
  * question is better off as it was.
  */
 
-/**
- * The number sits above the question, not beside it.
- *
- * Everything a question owns then shares one left edge — its words, the ไทย
- * control, the field, its hint, its choices — and that edge is the centred
- * column's own. Nothing hangs into a margin, so nothing has to be pulled back
- * out of one: the hanging version needed a 34px indent that either narrowed a
- * `width: 100%` field or ran it off the right of a phone, and it pushed the
- * words 17px right of the middle on every screen because the page was centring
- * the question *plus* its indent.
- *
- * **A figure, not a label.** It was 13px semibold — a caption-sized bold "3"
- * hanging over a 33px question, which reads as a stray piece of metadata
- * rather than as a number. The masthead's own count settled this once: it is
- * set large and Light, because "at 58px a bold figure outweighs the question it
- * introduces. The size is there to stop the count being a line of text, not to
- * make it loud." A question's number is the same object one scale down, so it
- * takes the same treatment — the CI's display face, Light 300, and grey.
- *
- * Weight and colour are what keep it under the question, not size: 28px Light
- * in `--ink-3` against 33px Regular in `--ink`.
- */
-.qgroup:not(.solo) .qopen .qn {
-  display: block;
-  margin: 0 0 1px;
-  font-family: var(--font-display);
-  font-size: clamp(20px, 2.6vw, 28px);
-  font-weight: 300;
-  line-height: 1.05;
-  letter-spacing: -0.02em;
-  font-variant-numeric: tabular-nums;
-  color: var(--ink-3);
-}
+/* The question's number is gone from the card — see questions.tsx. It was a
+   figure above the question; the data still carries it for the send screen's
+   grid, the team's reading and the analysis. */
 
 /**
  * A folded row: the number, the question, and — once answered — the answer.
@@ -3754,15 +3724,6 @@ dialog::backdrop {
  * with a single question open, it *is* the screen, and the size it was stepped
  * down from is the size it should be.
  */
-/* the question's number, small and in front of its text */
-.slide .qq .qn {
-  font-style: normal;
-  font-weight: 600;
-  color: var(--ink-3);
-  margin-right: 9px;
-  font-variant-numeric: tabular-nums;
-}
-
 /* the date the team asked for, under the count it belongs with */
 .qdue {
   margin: -6px 0 15px;
