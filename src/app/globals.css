@@ -4152,8 +4152,8 @@ dialog::backdrop {
   margin-bottom: 16px;
 }
 /**
- * The welcome's ladder — four roles, and each one a step nobody has to read to
- * place.
+ * The ladder the two end screens share — four roles, each one a step nobody has
+ * to read to place.
  *
  * It ran on `.slide h1` at clamp(2rem, 4.6vw, 3.1rem) with `.intro` at
  * clamp(16.5px, 1.9vw, 18px), which at 390px measured 32px against 16.5px with
@@ -4171,17 +4171,36 @@ dialog::backdrop {
  *   for "Survey welcome only" and `lead` at 28px for "Survey sub-copy", and
  *   this is the screen both were written for. Neither was in use.
  *
- * The completion and the three error screens keep `.slide h1`. The completion's
- * heading holds a respondent's name, so it can carry Thai at display size —
- * that is the case DESIGN.md's display-leading clause was measured for, and 1.28
- * is the number it arrived at. This screen's headline is a fixed English string,
- * so it can take 1.08 and read as one object rather than two lines.
+ * The completion had the same four problems, in its own words: the wordmark,
+ * then a 46-58px `21/21` figure, then "Thank you, {name}." at 32px — the
+ * loudest thing on the screen was a count the client had just finished caring
+ * about, and the only sentence addressed to them was smaller than it. It takes
+ * the same ladder and the same masthead. The two ends of the run are built the
+ * same way, which is the point of them being the two ends of one run.
+ *
+ * The three error screens keep `.slide h1`: they are one flat statement with no
+ * second role under it, so there is no hierarchy for a ladder to carry.
  */
-.slide[data-screen='welcome'] h1 {
+.slide[data-screen] h1 {
   font-size: clamp(2.35rem, 7.4vw, 3.5rem);
-  line-height: 1.08;
   letter-spacing: -0.03em;
   margin-bottom: 20px;
+}
+/* A fixed English string, so it can close up and read as one object. */
+.slide[data-screen='welcome'] h1 {
+  line-height: 1.08;
+}
+/**
+ * The completion's cannot, and this is the number DESIGN.md measured.
+ *
+ * "Thank you, {name}." carries whatever the client typed, which on this product
+ * is as likely to be Thai as Latin — and Thai at display size is the exact case
+ * §2's display-leading clause was written for. It rendered the worst stack it
+ * could build at 37.6px and found 1.06 collides, 1.28 is clear and 1.6 reads as
+ * two unrelated lines. 1.28.
+ */
+.slide[data-screen='done'] h1 {
+  line-height: 1.28;
 }
 /* `lead`, near enough: 20.8px on a phone and 24.8px above 1080, which is the
    step the headline needs under it.
@@ -4191,7 +4210,7 @@ dialog::backdrop {
    the ink is a step apart as well.
    1.6 leading because the Thai sits on its own line here and DESIGN.md's floor
    is not negotiable below display size. */
-.slide[data-screen='welcome'] .intro {
+.slide[data-screen] .intro {
   font-size: clamp(1.3rem, 2.4vw, 1.55rem);
   line-height: 1.6;
   color: var(--ink-2);

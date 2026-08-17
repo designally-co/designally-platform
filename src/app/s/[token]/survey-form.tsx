@@ -577,38 +577,47 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
         <div className="survey-shell client-surface">
           {/* the disc at the end of the run: every screen behind you */}
           <Rail n={counts.total} total={counts.total} />
+          {/**
+           * The Cut arrives full, and that is the whole ending.
+           *
+           * This screen used to open with a 52px tick, then say the answers had
+           * been received, then say it again in Thai, then explain the button
+           * underneath it. Four ways of saying done.
+           *
+           * The line that measured the questionnaire finishing at its full
+           * width says it once, in the brand's own object, and the count in the
+           * disc is the same figure the client watched climb for twenty-one
+           * screens. The tick went with the sentences.
+           *
+           * In the masthead rather than on the slide, for the reason the
+           * welcome's is: this screen is the other end of the same run, and the
+           * disc, the words and the Cut belong in the place the twenty-one
+           * screens between them put those three things. The wordmark went with
+           * the move — the mark is in the disc, and a screen carrying it twice
+           * is saying the name to somebody who has just spent twenty minutes
+           * with it.
+           */}
+          <Masthead
+            counted={false}
+            count={{ n: counts.total, total: counts.total }}
+            lead={
+              /* The questions, not the screens. The disc counts screens, as
+                 it has on all nine of them — but the client was told twenty-one
+                 questions on the welcome, so "9/9" beside a bare "Answered"
+                 reads as nine of the twenty-one they were promised. The Thai is
+                 the string this screen already carried; it says answered in
+                 full and needs no number to do it. */
+              <span className="qwhen">
+                All {survey.questionCount} answered
+                <span className="th">ตอบครบแล้ว</span>
+              </span>
+            }
+          />
           {/* the floor controls are revealed by data-active, and there is only
               ever one screen — without it the only action here was invisible */}
-          <div className="slide" data-active="" data-dir="next">
+          <div className="slide" data-screen="done" data-active="" data-dir="next">
             <div className="slidebody">
               <div className="slidemain">
-                <span className="wordmark">
-                  Design<em>ally</em>
-                </span>
-                {/**
-                 * The Cut arrives full, and that is the whole ending.
-                 *
-                 * This screen used to open with a 52px tick, then say the
-                 * answers had been received, then say it again in Thai, then
-                 * explain the button underneath it. Four ways of saying done.
-                 *
-                 * The line that measured the questionnaire finishing at its
-                 * full width says it once, in the brand's own object, and the
-                 * count beside it is the same figure the client watched climb
-                 * for twenty-one screens. The tick went with the sentences.
-                 */}
-                <div className="qhead">
-                  <span className="qfig">
-                    {survey.questionCount}
-                    <i>/{survey.questionCount}</i>
-                  </span>
-                  <span className="qsection">
-                    Answered
-                    <br />
-                    <span className="th">ตอบครบแล้ว</span>
-                  </span>
-                </div>
-
                 <h1>
                   Thank you, <em>{submitted}</em>.
                 </h1>
