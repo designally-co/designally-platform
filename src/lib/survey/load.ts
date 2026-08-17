@@ -37,7 +37,6 @@ export type SurveyStep = {
   /** "Project Information" / "Visual Direction" — absent on the name field */
   sectionEn?: string;
   sectionTh?: string;
-  eyebrowEn: string;
   headingEn: string;
   descTh?: string;
   /** set when this step's block is conditional — "website.6" reveals it */

@@ -452,8 +452,8 @@ label.f span {
      position plus half a disc plus air. */
   /* far enough in that the disc, which is centred on the line, clears the
      viewport edge on a phone — at 26px it hung a pixel off it */
-  --rail-x: clamp(38px, 7.5vw, 150px);
-  --disc: clamp(54px, 6.5vw, 88px);
+  --rail-x: clamp(38px, 4.4vw, 76px);
+  --disc: clamp(54px, 6.5vw, 84px);
   --rail-gutter: calc(var(--rail-x) + var(--disc) / 2 + 24px);
 }
 
@@ -1119,10 +1119,15 @@ label.f span {
   line-height: 1.35;
   letter-spacing: -0.012em;
   color: var(--ink-2);
-  text-wrap: pretty;
-  /* it sat beside a rail in a 220px column once; it has the width of the page
-     now, and 22ch broke "What customers can always count on" over two lines
-     with its Thai over two more */
+  /**
+   * One line, always. The strings in `steps.ts` are short phrases chosen to fit
+   * — the longest is "References and limits" — and this is the guard that keeps
+   * a longer one from silently wrapping into the question instead of showing
+   * up as a string that needs shortening.
+   */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   max-width: 40ch;
 }
 .qtopic .th {
@@ -3351,9 +3356,12 @@ dialog::backdrop {
  * The shell's gutters are symmetric for exactly this — see `.survey-shell`.
  */
 @media (min-width: 1080px) {
+  /* 880, not 720. Centred inside a shell that already gives the rail its
+     gutter, a 720px column left a 184px band of nothing between the rail and
+     the first word — the margin reading as the layout rather than as air. */
   .survey-shell .slidebody,
   .survey-shell .qmast .qhead {
-    max-width: 720px;
+    max-width: 880px;
     margin-inline: auto;
   }
 }
@@ -3527,34 +3535,28 @@ dialog::backdrop {
  * Not on a solo screen: there is no list there to line up with, and the scales
  * question is better off as it was.
  */
-.qgroup:not(.solo) .qopen .qq {
-  padding-left: 34px;
-  text-indent: -34px;
-}
-.qgroup:not(.solo) .qopen .qn {
-  display: inline-block;
-  width: 34px;
-  margin-right: 0;
-  text-indent: 0;
-}
+
 /**
- * Everything under a question starts where the question does.
+ * The number sits above the question, not beside it.
  *
- * The number hangs in a 34px column, so a control set at the card's left edge
- * sat under the *number* rather than under the words it belongs to — the ไทย
- * pill, the field, its hint and the choices all began one indent to the left of
- * the thing they were part of.
+ * Everything a question owns then shares one left edge — its words, the ไทย
+ * control, the field, its hint, its choices — and that edge is the centred
+ * column's own. Nothing hangs into a margin, so nothing has to be pulled back
+ * out of one: the hanging version needed a 34px indent that either narrowed a
+ * `width: 100%` field or ran it off the right of a phone, and it pushed the
+ * words 17px right of the middle on every screen because the page was centring
+ * the question *plus* its indent.
  *
- * Done by padding the question's box and pulling the heading back out of it,
- * not by margining each child in: a `margin-left` on a field that is `width:
- * 100%` shifts it without narrowing it, and it runs 34px off the right of a
- * phone. Padding narrows the box every child measures itself against.
+ * Small and muted. Inline it inherited the question's 33px, which is a great
+ * deal of type to spend on "3".
  */
-.qgroup:not(.solo) .qopen .sq {
-  padding-left: 34px;
-}
-.qgroup:not(.solo) .qopen .sq > .qq {
-  margin-left: -34px;
+.qgroup:not(.solo) .qopen .qn {
+  display: block;
+  margin: 0 0 7px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
 }
 
 /**
@@ -4281,6 +4283,16 @@ dialog::backdrop {
   }
   .slide .okrow {
     margin-top: 34px;
+  }
+  /* Air under the Cut. The line closes the masthead, and a question arriving
+     against it read as part of that block rather than as the start of the next
+     one. Scoped through the shell because `.survey-shell:has(> .qmast) .slide`
+     sets `padding-top: 0` and outranks a bare `.slide` wherever either sits. */
+  .survey-shell:has(> .qmast) .slide {
+    padding-top: 32px;
+  }
+  .slide {
+    padding-bottom: 44px;
   }
 
   .btn.ok,

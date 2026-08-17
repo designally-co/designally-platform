@@ -475,15 +475,19 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   const grouped = card && card.kind === 'group' && card.questions.length > 1 ? card : null;
 
   /**
-   * The question the rail's disc is counting.
+   * What the disc counts: **screens, not questions**.
    *
-   * The first numbered one on the screen: with two to four questions open at
-   * once, "15 of 21" is where this screen starts, which is the honest reading
-   * of a screen you can see all of. Null on the identity card — name, position
-   * and email are not numbered and are not part of the twenty-one.
+   * It counted questions for a few hours, and that was right only while a
+   * screen opened one question at a time — you really were on question 8. All
+   * two to four are open again, so "15 of 21" over a screen holding 15, 16 and
+   * 17 is the position of the screen's *first* question wearing the look of a
+   * position in the questionnaire.
+   *
+   * A screen is what a client moves through, each one has a heading naming what
+   * it covers, and the disc counts those. Null on the identity card, which is
+   * outside the count entirely.
    */
-  const railAt =
-    card?.kind === 'group' ? (card.questions.find((q) => q.number !== null)?.number ?? null) : null;
+  const railAt = card ? counts.position[step - 1] : null;
 
   /* Terminal, so it is tested before every other screen. It was tested after
      `sending`, which is still true when the send succeeds — the answers reached
@@ -501,8 +505,8 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
             questions does not need the page to announce that they finished.
             The Cut and the Wordmark still sign both screens. */}
         <div className="survey-shell client-surface">
-          {/* the point at the floor of the rail: every question behind you */}
-          <Rail n={survey.questionCount} total={survey.questionCount} />
+          {/* the disc at the end of the run: every screen behind you */}
+          <Rail n={counts.total} total={counts.total} />
           {/* the floor controls are revealed by data-active, and there is only
               ever one screen — without it the only action here was invisible */}
           <div className="slide" data-active="" data-dir="next">
@@ -570,9 +574,9 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
     return (
       <LangContext.Provider value={LEAD}>
         <div className="survey-shell client-surface">
-          {/* the point rests at the floor: the questions are behind you, and
-              what is still blank is the grid's job, not the rail's */}
-          <Rail n={survey.questionCount} total={survey.questionCount} />
+          {/* the end of the run: what is still blank is the grid's job, not
+              the disc's */}
+          <Rail n={counts.total} total={counts.total} />
           <div className="slide sendslide" data-active="" data-dir={dir}>
             <div className="slidebody">
               <div className="slidemain">
@@ -667,7 +671,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
       <div className="survey-shell client-surface">
         {/* the rail is fixed to the viewport, so it belongs to the shell and
             not to any screen — it is the one thing that does not move */}
-        <Rail n={card ? railAt : null} total={survey.questionCount} />
+        <Rail n={railAt} total={counts.total} />
         {/**
          * The masthead sits here, outside the keyed <section>, and the reason
          * is the Cut.
@@ -688,7 +692,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
         {card && (
           <Masthead
             counted={counts.position[step - 1] !== null}
-            count={railAt !== null ? { n: railAt, total: survey.questionCount } : undefined}
+            count={railAt !== null ? { n: railAt, total: counts.total } : undefined}
             section={card.section}
             heading={card.kind === 'group' ? { en: card.headingEn, th: card.descTh } : undefined}
             /**

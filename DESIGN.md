@@ -286,6 +286,30 @@ several stacked there was nothing to say where one answer's ground ended and
 the next question began. Canvas inside the Edge at `--r-md`, which is the same
 object every input in the team app already is.
 
+**The count is screens, not questions.** It counted questions for a few hours,
+and that was right only while a screen opened one question at a time — you
+really were on question 8 of 21. All two to four are open again, so "15 of 21"
+over a screen holding 15, 16 and 17 was the position of the screen's *first*
+question wearing the look of a position in the questionnaire. A screen is what
+a client moves through and each one has a heading naming what it covers, so the
+disc counts those: `1/9` on Brand, `1/5` on Design.
+
+**Every heading is one line.** They were sentences — *"Your customers, and what
+they worry about"* — that wrapped to two and three lines beside the disc. Each
+step already carried a short phrase for the same job in an `eyebrowEn` written
+when the masthead had an eyebrow, and never once rendered. The phrases are the
+headings now; the longest is *"References and limits"*. `white-space: nowrap`
+is the guard, so a longer one shows up as a string that needs shortening rather
+than wrapping into the question.
+
+**The question number sits above the question**, not beside it. Everything a
+question owns then shares one left edge — its words, the ไทย control, the
+field, its hint, its choices — and that edge is the centred column's own.
+Hanging the number in a 34px margin needed an indent that either narrowed a
+`width: 100%` field or ran it off the right of a phone, and it pushed the words
+17px right of the middle because the page was centring the question *plus* its
+indent.
+
 **And no rule between questions.** The hairline was right while a question was
 one line and its answer one more. With the answer a box of its own, the box
 *is* the boundary and a rule under it was a second one a few pixels away. 44px
