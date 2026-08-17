@@ -3370,8 +3370,21 @@ dialog::backdrop {
     margin-top: clamp(20px, 5vh, 48px);
     margin-bottom: auto;
   }
+  /**
+   * The air under the Continue row, same as the phone gets.
+   *
+   * 26px, which is what this was. It reads as nothing under a 62px button: the
+   * Cut ends a thumb's width below the control and the screen looks like it
+   * was cut off mid-scroll. The phone was raised to 140 for the same complaint
+   * and this rule is why the wide screen kept the old value.
+   *
+   * Only the *bottom*. `.slidebody` still takes its top from the masthead and
+   * hands the rest of the free space to `margin-bottom: auto`, so on a screen
+   * with room to spare nothing moves — this is the floor of a screen that
+   * scrolls.
+   */
   .survey-shell:has(> .qmast) > .slide {
-    padding-bottom: 26px;
+    padding-bottom: 140px;
   }
 }
 
