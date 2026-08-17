@@ -148,10 +148,25 @@ The section, the count, the question and the language button were four stacked b
 most of the top of every card was preamble — twenty-one times over, and two of the four
 were metadata rather than the question.
 
-Two of them are now one object. The count is set as a **figure** at `clamp(46px, 12vw,
-58px)` in Light 300, with the section beside it at label size, stacked EN over TH. The
-difference between them is scale rather than two more rows, and a hairline Edge closes the
-masthead where two blank lines used to.
+They are now one object. The count is set as a **figure** at `clamp(46px, 12vw, 58px)` in
+Light 300, with the section beside it at label size stacked EN over TH, and under that the
+**screen's subject**, bilingual, at 14.5px. The difference between them is scale rather
+than more rows, and a hairline Edge closes the masthead where two blank lines used to.
+
+The subject arrived on 17 August 2026 from the slide, where it had been a heading with a
+plain-English second line under it that on nine screens out of eleven restated it — *"Your
+customers, and what they worry about"* over *"Who buys from you, and what makes them
+hesitate"*, before the two questions that say it a third time. The restatement is deleted
+from `steps.ts` and the heading moved up here, so the masthead is now the whole of what a
+person is told before the work: where you are, which part you are in, what this screen
+covers, and the Cut. The slide holds questions and nothing else.
+
+**The section stays stacked, not joined with a middot.** Tried, and reverted: on a rail
+this narrow the joined string wrapped anyway, and it wrapped in the middle of the Thai.
+
+Pinned, the masthead is 166px on a 390px phone — a fifth of the screen, permanently. It
+buys back more than that: with the heading gone from the slide, a two-question group and
+both its folded rows now fit one 844px screen with about nine pixels of scroll.
 
 Three decisions inside that are worth keeping:
 
@@ -193,9 +208,7 @@ words has been answered, a row showing only a question has not.
 needs a legend, and here the words are the client's. Which also means every
 piece of ink on the screen is either a question or an answer.
 
-The heading and its description stay the quiet context block they became: body
-face, 15px, one size, two inks — what this screen is about, then why. Not an
-eyebrow; nothing follows that it labels.
+The heading is not on the slide at all — it is in the masthead, above.
 
 Rows are separated by a hairline, not by the 34px void they used to have. The
 void said "these are separate asks", which a line says better and in no
@@ -211,12 +224,6 @@ already left, which is the hazard of showing one at a time.
 **One question on a screen is left alone.** The personality scales are a step of
 their own — ten pairs is a screenful and nothing shares that breath — and
 collapsing the only thing on a screen would leave nothing to look at.
-
-**`.qgrouph` is scoped through `.slide`** and has to be. It is an `<h2>`, and
-`.slide h2` is (0,1,1) against a bare `.qgrouph`'s (0,1,0) — so the size written
-on `.qgrouph` never applied, at any point, and the heading rendered a step
-*larger* than the value its own comment explained. The fourth instance of this
-collision in `globals.css`; the fix is the same every time.
 
 ### The five named pieces, and where they are
 

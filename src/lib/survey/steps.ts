@@ -32,8 +32,17 @@ export type StepDef = {
   sectionTh?: string;
   /** the small line above the heading — "Step 2 of 4 — Your brand" */
   eyebrowEn: string;
+  /**
+   * The screen's subject, in the masthead beside the count.
+   *
+   * There was an English second line under it too, and on nine screens out of
+   * eleven it restated the heading in plainer words — "Your customers, and what
+   * they worry about" over "Who buys from you, and what makes them hesitate."
+   * Two English sentences saying one thing, before the questions that say it
+   * again. Deleted 17 August 2026. `descTh` stays: it is the Thai of the
+   * heading, and it is the only Thai on the screen until a question is opened.
+   */
   headingEn: string;
-  descEn?: string;
   descTh?: string;
   /** "blockKey.order" */
   questions: string[];
@@ -46,7 +55,6 @@ const DIRECTION = { sectionEn: 'Visual Direction', sectionTh: 'ทิศทา�
 const IDENTITY: StepDef = {
   eyebrowEn: 'About you',
   headingEn: 'First, tell us who you are',
-  descEn: 'Anyone on your team can answer this — please pass the link to whoever should have a say.',
   descTh: 'ส่งลิงก์นี้ต่อให้ผู้ที่ควรมีส่วนร่วมได้เลย',
   questions: ['identity.1', 'identity.2', 'identity.3'],
 };
@@ -63,7 +71,6 @@ const VISUAL_STEPS: StepDef[] = [
     ...DIRECTION,
     eyebrowEn: 'The feeling',
     headingEn: 'How it should feel',
-    descEn: 'The mood you want people to get from it.',
     descTh: 'ความรู้สึกที่อยากให้คนได้รับ',
     questions: ['visual.1', 'visual.2'],
   },
@@ -71,7 +78,6 @@ const VISUAL_STEPS: StepDef[] = [
     ...DIRECTION,
     eyebrowEn: 'What to avoid',
     headingEn: 'What you do not want',
-    descEn: 'Just as useful as what you do — it saves a round of revisions.',
     descTh: 'สำคัญไม่แพ้สิ่งที่อยากได้ ช่วยลดการแก้งาน',
     questions: ['visual.4', 'visual.5'],
   },
@@ -79,7 +85,6 @@ const VISUAL_STEPS: StepDef[] = [
     ...DIRECTION,
     eyebrowEn: 'References and limits',
     headingEn: 'What you like, and what the work must fit',
-    descEn: 'Anything the design has to live inside — sizes, platforms, existing assets.',
     descTh: 'สิ่งที่งานออกแบบต้องอยู่ในกรอบ เช่น ขนาด แพลตฟอร์ม หรือสิ่งที่มีอยู่เดิม',
     questions: ['visual.3', 'visual.6', 'visual.7'],
   },
@@ -108,7 +113,6 @@ const BRAND_STEPS: StepDef[] = [
     ...INFO,
     eyebrowEn: 'Where you came from',
     headingEn: 'Your story, and what only you offer',
-    descEn: 'Short, honest answers are perfect.',
     descTh: 'ตอบสั้น ๆ ตามจริงได้เลย',
     questions: ['strategy.7', 'strategy.1'],
   },
@@ -116,7 +120,6 @@ const BRAND_STEPS: StepDef[] = [
     ...INFO,
     eyebrowEn: 'What you promise',
     headingEn: 'What customers can always count on',
-    descEn: 'The things you would protect even when it costs you.',
     descTh: 'สิ่งที่คุณจะรักษาไว้ แม้ต้องแลกมาด้วยต้นทุน',
     questions: ['strategy.6', 'strategy.8', 'strategy.2'],
   },
@@ -124,7 +127,6 @@ const BRAND_STEPS: StepDef[] = [
     ...INFO,
     eyebrowEn: 'Who it is for',
     headingEn: 'Your customers, and what they worry about',
-    descEn: 'Who buys from you, and what makes them hesitate.',
     descTh: 'ลูกค้าของคุณเป็นใคร และอะไรทำให้เขาลังเล',
     questions: ['strategy.10', 'strategy.3'],
   },
@@ -132,15 +134,16 @@ const BRAND_STEPS: StepDef[] = [
     ...INFO,
     eyebrowEn: 'What they remember',
     headingEn: 'What should stay with them',
-    descEn: 'What sets you apart, and the one thing you want left behind.',
     descTh: 'สิ่งที่ทำให้คุณต่าง และสิ่งเดียวที่อยากให้เขาจดจำ',
     questions: ['strategy.4', 'strategy.9', 'strategy.12'],
   },
   {
     ...INFO,
     eyebrowEn: 'Brand personality',
-    headingEn: 'Where does your brand sit?',
-    descEn: 'For each pair, tap the point that feels right. The middle means balanced.',
+    /* the one screen whose heading is an instruction rather than a subject —
+       "Where does your brand sit?" said less than the note under it, and the
+       Thai was already the note. One line now, and the two languages agree. */
+    headingEn: 'For each pair, tap the point that feels right. The middle means balanced.',
     descTh: 'แตะจุดที่ตรงกับความรู้สึกของคุณ จุดกลางหมายถึงอยู่ตรงกลางระหว่างสองด้าน',
     /* alone: ten pairs is a screenful, and nothing shares that breath */
     questions: ['strategy.5'],
@@ -149,7 +152,6 @@ const BRAND_STEPS: StepDef[] = [
     ...INFO,
     eyebrowEn: 'How it speaks',
     headingEn: 'The voice, inside and out',
-    descEn: 'How the brand sounds to customers, and how your team talks about it.',
     descTh: 'แบรนด์พูดกับลูกค้าอย่างไร และทีมพูดถึงแบรนด์อย่างไร',
     questions: ['strategy.14', 'strategy.11', 'strategy.13'],
   },
@@ -163,7 +165,6 @@ const DESIGN_STEPS: StepDef[] = [
     ...INFO,
     eyebrowEn: 'The brand today',
     headingEn: 'Where the brand stands, and who it speaks to',
-    descEn: 'Where it came from, and who buys from you.',
     descTh: 'แบรนด์มีที่มาอย่างไร และใครคือลูกค้าของคุณ',
     questions: ['project.1', 'project.2'],
   },
@@ -171,7 +172,6 @@ const DESIGN_STEPS: StepDef[] = [
     ...INFO,
     eyebrowEn: 'This project',
     headingEn: 'What this work has to do',
-    descEn: 'The job it must do, and where it will be used.',
     descTh: 'งานชิ้นนี้ต้องทำหน้าที่อะไร และจะถูกใช้ที่ไหน',
     questions: ['project.3', 'project.4'],
   },
@@ -199,7 +199,6 @@ function stepsFromBlocks(
     .map((key) => ({
       eyebrowEn: blockNames[key]?.nameEn ?? key,
       headingEn: blockNames[key]?.nameEn ?? key,
-      descEn: blockNames[key]?.introEn ?? undefined,
       descTh: blockNames[key]?.introTh ?? undefined,
       questions: (blockOrders[key] ?? []).map((order) => `${key}.${order}`),
     }));

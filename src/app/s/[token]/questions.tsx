@@ -52,6 +52,7 @@ export function Masthead({
   index,
   total,
   section,
+  heading,
   action,
 }: {
   /**
@@ -66,7 +67,19 @@ export function Masthead({
   index: number | null;
   /** how many counted screens the questionnaire has */
   total: number;
+  /** which of the questionnaire's two parts this screen belongs to */
   section?: { en?: string; th?: string };
+  /**
+   * What this screen is about, bilingual, beside the count.
+   *
+   * It sat on the slide above the questions until 17 August 2026, with an
+   * English second line under it that on nine screens out of eleven restated it
+   * in plainer words. Two headings and a count, in two places, before anything
+   * a person could answer. One object now: the count says where you are, the
+   * section says which part you are in, the heading says what this screen
+   * covers, and the Cut closes it.
+   */
+  heading?: { en: string; th?: string };
   /** a way out, shown in the header rather than floating over it */
   action?: React.ReactNode;
 }) {
@@ -159,11 +172,23 @@ export function Masthead({
             <i>/{total}</i>
           </span>
         )}
-        {(section?.en || section?.th) && (
+        {(section?.en || section?.th || heading) && (
           <span className="qsection">
-            {section?.en}
-            {section?.en && section?.th && <br />}
-            {section?.th && <span className="th">{section.th}</span>}
+            {/* still stacked, not joined with a middot: the rail is narrow
+                enough that the joined string wrapped anyway, and it wrapped in
+                the middle of the Thai. Measured once already — see below. */}
+            {(section?.en || section?.th) && (
+              <span className="qsec">
+                {section?.en}
+                {section?.th && <i className="th">{section.th}</i>}
+              </span>
+            )}
+            {heading && (
+              <span className="qtopic">
+                {heading.en}
+                {heading.th && <i className="th">{heading.th}</i>}
+              </span>
+            )}
           </span>
         )}
         {action}

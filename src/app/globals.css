@@ -1018,6 +1018,44 @@ label.f span {
   /* Thai never below 1.6 in a line that can hold it */
   line-height: 1.6;
 }
+.qsection .th {
+  display: block;
+  font-style: normal;
+  font-size: inherit;
+  color: inherit;
+}
+
+/**
+ * The screen's subject, in the masthead beside the count.
+ *
+ * It was on the slide above the questions, with an English second line under it
+ * that on nine screens out of eleven restated it in plainer words — "Your
+ * customers, and what they worry about" over "Who buys from you, and what makes
+ * them hesitate", before the two questions that say it a third time. The plain
+ * line is deleted and the heading moved up here, so the masthead is the whole
+ * of what a person is told before the work: where you are, which part you are
+ * in, what this screen covers, and the Cut.
+ *
+ * A step up from the section beside it, and a step below the question — the
+ * count is the loud thing in this object and the question is the loud thing on
+ * the screen.
+ */
+.qtopic {
+  display: block;
+  margin-top: 5px;
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+.qtopic .th {
+  display: block;
+  font-style: normal;
+  font-weight: 400;
+  font-size: inherit;
+  color: var(--ink-3);
+}
 
 /* not a count any more — a condition. It reads in the caution colour because
    it is the reason the button below it will not work. */
@@ -3370,89 +3408,16 @@ dialog::backdrop {
 }
 
 /**
- * The Thai half of a bilingual line, on its own line.
- *
- * Run together after a middot these wrapped mid-phrase — ไม่มีคำตอบ / ที่ผิด —
- * and a language that breaks in the middle of its own sentence reads as an
- * afterthought rather than the other half of the sentence.
- *
- * Same size and tone as the English above it: the global `.th` is for Thai
- * *body* copy at 15px and --ink-2, which inside these would have set the two
- * halves of one thought at two different sizes and two different greys. Scoped
- * past both it and `.client-surface .th`, which wins the leading on source
- * order.
- */
-/**
- * A screen's heading, and the two to four questions under it.
- *
- * **The questions are the loudest thing on the card. The heading is not.**
- *
- * It was the other way round: the heading took the display face at 28px/700
- * and the questions stepped *down* from it to 19px — so the largest, boldest
- * type on a screen whose entire job is answering two questions belonged to a
- * label naming the subject those two questions already name. "Where the brand
- * stands, and who it speaks to" over "tell us your brand story" and "who are
- * your core customers" tells a reader nothing the next two lines do not, in
- * type that makes them read it first.
- *
- * The reason it was set that way still holds and is handled differently now:
- * three questions at the old *single*-question size read as three separate
- * screens stacked, so they do need to sit below a headline weight. They sit
- * below it by being 20px rather than 33px — a step down from a headline, not
- * a step down from a heading that is itself a step down from a headline.
- *
- * So the heading and its description become one quiet context block, in the
- * body face, at one size, in two inks: what this screen is about, then why. It
- * is not an eyebrow — nothing follows it that it labels — it is the last thing
- * you read before the work, and it reads like it.
- *
- * The display face does not leave the screen with it: the masthead numeral is
- * 46–64px of it, and that is the brand's mark here.
- */
-/**
- * Scoped through `.slide`, and it has to be: the heading is an `<h2>`, and
- * `.slide h2` further down this file is (0,1,1) against a bare `.qgrouph`'s
- * (0,1,0). It wins on specificity wherever either sits in the file.
- *
- * Which means the size written here before — `clamp(1.35rem, 2.9vw, 1.75rem)`,
- * with a comment explaining the choice — never applied at all. The heading was
- * rendering at `.slide h2`'s 2.05rem the whole time, a step *larger* than the
- * value that was supposedly set. The fourth time this collision has appeared in
- * this file; the fix is the same every time — scope through the container.
- */
-.slide .qgrouph {
-  /* the body face, not the display one. At 15px it sits directly above its own
-     description at 15px, and two faces on two adjacent lines of one size is a
-     seam rather than a hierarchy — the block is one voice in two inks. The
-     display face keeps the masthead numeral, which is where it belongs. */
-  font-family: var(--font);
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 1.5;
-  letter-spacing: 0;
-  color: var(--ink-2);
-  text-wrap: pretty;
-  margin-bottom: 1px;
-}
-.qgroupd {
-  font-size: 15px;
-  line-height: 1.5;
-  color: var(--ink-3);
-  max-width: 54ch;
-  margin-bottom: 34px;
-}
-.qgroupd .th {
-  display: block;
-  font-size: inherit;
-  color: inherit;
-}
-/**
  * The group is a list, and one row of it is open.
  *
- * A hairline between rows, not a 34px void. The void was there to say "these
- * are separate asks", which is a job a line does better and in no vertical
- * space — and the space it cost was what made three questions read as three
- * screens stacked.
+ * `.qgrouph` and `.qgroupd` used to sit above it: the screen's heading and a
+ * plain-English restatement of it. The heading is in the masthead now, beside
+ * the count, and the restatement is deleted — see `.qtopic`. What is left on
+ * the slide is the questions.
+ *
+ * A hairline between rows, not the 34px void they used to have. The void said
+ * "these are separate asks", which a line says better and in no vertical space
+ * — and that space was most of what made one screen read as three.
  */
 .qgroup {
   border-top: 1px solid var(--hairline);
@@ -3462,6 +3427,21 @@ dialog::backdrop {
 }
 .qopen {
   padding: 26px 0 30px;
+}
+/**
+ * One question on a screen has nothing to separate it from.
+ *
+ * The personality scales are a step of their own — ten pairs is a screenful —
+ * so there is no list, and a list's rules around a single item are two lines
+ * bracketing nothing, a hand's width under the Cut that already closed the
+ * masthead.
+ */
+.qgroup.solo,
+.qgroup.solo > * {
+  border: 0;
+}
+.qgroup.solo .qopen {
+  padding: 0;
 }
 .slide .qopen .sq {
   margin-bottom: 0;

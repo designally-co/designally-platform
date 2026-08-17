@@ -39,7 +39,6 @@ export type SurveyStep = {
   sectionTh?: string;
   eyebrowEn: string;
   headingEn: string;
-  descEn?: string;
   descTh?: string;
   /** set when this step's block is conditional — "website.6" reveals it */
   revealedBy?: string;

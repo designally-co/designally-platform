@@ -82,7 +82,6 @@ type Card =
       questions: SurveyQuestion[];
       section: Section;
       headingEn: string;
-      descEn?: string;
       descTh?: string;
     };
 
@@ -194,7 +193,6 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
               questions: s.questions,
               section,
               headingEn: s.headingEn,
-              descEn: s.descEn,
               descTh: s.descTh,
             };
       }),
@@ -764,6 +762,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
             index={counts.position[step - 1]}
             total={counts.total}
             section={card.section}
+            heading={card.kind === 'group' ? { en: card.headingEn, th: card.descTh } : undefined}
             /**
              * The way back to the send screen rides in the header.
              *
@@ -814,23 +813,11 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                 ) : (
                   <>
                     {/**
-                     * The screen's own heading, above the two to four questions
-                     * that share it.
-                     *
-                     * These headings have existed in steps.ts since the survey
-                     * was built and were never rendered — one question per
-                     * screen had nothing to head. Grouped, they are what makes
-                     * the screen a subject rather than a bundle: "What you
-                     * promise" over three questions that are all promises.
+                     * The heading is in the masthead now, beside the count —
+                     * see questions.tsx. What is left on the slide is the
+                     * questions, which is what a person came here to answer.
                      */}
-                    <h2 className="qgrouph">{card.headingEn}</h2>
-                    {card.descEn && (
-                      <p className="qgroupd">
-                        {card.descEn}
-                        {card.descTh && <span className="th">{card.descTh}</span>}
-                      </p>
-                    )}
-                    <div className="qgroup">
+                    <div className={grouped ? 'qgroup' : 'qgroup solo'}>
                       {card.questions.map((q) =>
                         !grouped || q.ref === openQuestion?.ref ? (
                           <div className="qopen" key={q.ref}>
