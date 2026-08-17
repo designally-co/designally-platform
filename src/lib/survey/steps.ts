@@ -83,7 +83,7 @@ const IDENTITY: StepDef = {
 const VISUAL_STEPS: StepDef[] = [
   {
     ...DIRECTION,
-    headingEn: 'The feeling',
+    headingEn: 'Mood and impression',
     descTh: 'ความรู้สึกที่อยากให้คนได้รับ',
     questions: ['visual.1', 'visual.2'],
   },
@@ -171,7 +171,7 @@ const DESIGN_STEPS: StepDef[] = [
   },
   {
     ...INFO,
-    headingEn: 'This project',
+    headingEn: 'The job ahead',
     descTh: 'งานชิ้นนี้ต้องทำหน้าที่อะไร และจะถูกใช้ที่ไหน',
     questions: ['project.3', 'project.4'],
   },
