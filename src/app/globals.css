@@ -3392,10 +3392,25 @@ dialog::backdrop {
    * is zero here anyway: the column centres itself and the rail lives in the
    * space that leaves.
    */
+  /**
+   * The whole composition is centred, not just the column.
+   *
+   * The column was centred in the window and the rail hung 58px off its left
+   * edge — outside the thing being centred — so the group as a person sees it
+   * sat half that distance right of the middle. The shell takes the rail's lead
+   * as left padding, which pushes the centred column right by half of it, and
+   * the rail then lands half of it left of the middle. Group centred, column
+   * not: which is correct, because the group is what is looked at.
+   */
   :root {
     --rail-gutter: 0px;
+    --rail-lead: 58px;
     --col: min(880px, 100vw - 340px);
-    --rail-x: calc(50vw - var(--col) / 2 - 58px);
+    --rail-x: calc(50vw - var(--col) / 2 - var(--rail-lead) / 2);
+  }
+  .survey-shell {
+    padding-left: var(--rail-lead);
+    padding-right: 0;
   }
 
   /**
@@ -3458,7 +3473,9 @@ dialog::backdrop {
   }
   /* the rail's own disc, not an `<i>` — `rail.tsx` renders `<b class="qdisc">`,
      so `.qrail i` matched nothing and both discs drew */
-  .qrail .qdisc {
+  /* the masthead carries the disc where there is one; the welcome, the send
+     screen and the completion have none, so the rail carries its own */
+  .survey-shell:has(.qmast) .qrail .qdisc {
     display: none;
   }
   /**
@@ -3480,7 +3497,7 @@ dialog::backdrop {
     display: flex;
     position: absolute;
     top: 50%;
-    left: -58px;
+    left: calc(var(--rail-lead) * -1);
     right: auto;
     bottom: auto;
     transform: translate(-50%, -50%);
@@ -3566,6 +3583,69 @@ dialog::backdrop {
   z-index: 4;
   pointer-events: none;
 }
+/**
+ * The last look before sending: every question, and what was given for it.
+ *
+ * A list, not a grid. This screen has shown three things in a day — the blanks
+ * named and nothing else, then a grid of points with the shape of the whole
+ * questionnaire but none of its content. Neither let a client *check their
+ * answers*, which is the one thing a person wants before an irreversible send.
+ *
+ * Every row is a button back to its own question, so a correction is one tap
+ * from the thing being corrected.
+ */
+.qanda {
+  list-style: none;
+  margin: 30px 0 0;
+  padding: 0;
+  border-top: 1px solid var(--hairline);
+}
+.qanda li {
+  border-bottom: 1px solid var(--hairline);
+}
+.qanda button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  padding: 15px 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+.qa-q {
+  display: block;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-3);
+}
+/* the number hangs, so every question and every answer share one left edge */
+.qa-q i {
+  display: inline-block;
+  width: 26px;
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+}
+.qa-a {
+  display: block;
+  margin-top: 3px;
+  margin-left: 26px;
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+/* nothing given yet — the one thing on this screen standing in the way */
+.qanda .blank .qa-a {
+  color: var(--caution);
+}
+@media (hover: hover) {
+  .qanda button:hover .qa-q {
+    color: var(--ink);
+  }
+}
+
 /* The masthead draws its own disc only on a phone — see the 620px block. The
    selector carries both classes because `.qdisc` sets `display: flex` further
    down this file, and a bare `.mastdisc` ties on specificity and loses. */
@@ -4314,8 +4394,34 @@ dialog::backdrop {
    * the screen while the questions pass under them. It is the one fixture on a
    * phone; the wide layout gets that from the rail instead.
    */
-  .qrail {
+  /**
+   * The Cut is the masthead's own bottom edge on a phone, so the rail is drawn
+   * only on the screens that have no masthead — the welcome, the send screen
+   * and the completion. There it is the same horizontal line at the same
+   * height with the same disc on it, so those three are not the only screens
+   * without the brand's mark on them.
+   */
+  .survey-shell:has(.qmast) .qrail {
     display: none;
+  }
+  .qrail {
+    position: absolute;
+    inset: var(--rail-y) 0 auto;
+    width: auto;
+    height: var(--cut-width);
+  }
+  .qrail .qdisc {
+    top: 50%;
+    left: auto;
+    right: var(--sp-lg);
+    transform: translateY(-50%);
+  }
+  /* and the screen starts under it. On a question screen the Cut is the
+     masthead's own edge and the content follows it; on these three the rail is
+     a band at a fixed height with nothing above it, so the slide has to clear
+     it or the line runs through the first heading — which it did. */
+  .survey-shell:not(:has(.qmast)) .slide {
+    padding-top: calc(var(--rail-y) + 34px);
   }
   .qmast {
     position: sticky;

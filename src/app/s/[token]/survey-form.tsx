@@ -411,6 +411,34 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
       .sort((a, b) => a.n - b.n);
   }, [cards, values]);
 
+  /**
+   * Every question and the answer to it, for the last look before sending.
+   *
+   * Unlike `points`, this includes the identity fields: name, position and
+   * email are required, they block sending, and until now a missing *position*
+   * blocked it with nothing on the screen saying so — the summary above the
+   * list names the other two and has never named that one.
+   *
+   * A question split over several cards is listed once, pointing at the card it
+   * starts on, which is the rule `blanks` and `points` both follow.
+   */
+  const review = useMemo(() => {
+    const seen = new Set<string>();
+    return cards.flatMap((c, i) =>
+      c.questions
+        .filter((q) => !seen.has(q.ref) && seen.add(q.ref))
+        .map((q) => ({
+          ref: q.ref,
+          number: q.number,
+          textEn: q.textEn,
+          textTh: q.textTh,
+          step: i + 1,
+          answer: answerPreview(q.type, values[q.ref]),
+          answered: isAnswered(q.type, values[q.ref]),
+        })),
+    );
+  }, [cards, values]);
+
   const blanks = useMemo(() => {
     /* A split battery occupies several cards but is still one question — it is
        listed once, pointing at the slide it starts on. */
@@ -425,9 +453,24 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
       );
   }, [cards, values]);
 
+  /**
+   * The blanks, split the way the screen shows them.
+   *
+   * `blanks` holds both kinds and is what the send button is gated on, because
+   * both kinds are required. But the screen shows them in two different
+   * objects: the grid draws one point per *numbered* question, and the three
+   * identity fields have no number and no point.
+   *
+   * Counted together, the sentence above the grid read "24 questions still need
+   * an answer" over twenty-one points — a number the client cannot reconcile
+   * with anything they can see. Each number on this screen now belongs to
+   * something on it.
+   */
+  const numberedBlanks = blanks.filter(({ question }) => question.number !== null);
+  const detailBlanks = blanks.filter(({ question }) => question.number === null);
+
   /* numbered questions only — name and email are not numbered anywhere else */
-  const answered =
-    survey.questionCount - blanks.filter(({ question }) => question.number !== null).length;
+  const answered = survey.questionCount - numberedBlanks.length;
 
   async function submit() {
     /* the button is disabled while anything is blank; this is the second door,
@@ -498,7 +541,15 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
    * it covers, and the disc counts those. Null on the identity card, which is
    * outside the count entirely.
    */
-  const railAt = card ? counts.position[step - 1] : null;
+  /**
+   * Zero, not nothing, before the questions start.
+   *
+   * The identity card is outside the count and carried no masthead at all — no
+   * line, no disc. The mark belongs on every screen, so it reads `0/9` there
+   * and on the welcome: honest about where you are, and the brand's object is
+   * on the page from the first screen rather than arriving at the second.
+   */
+  const railAt = card ? (counts.position[step - 1] ?? 0) : 0;
 
   /* Terminal, so it is tested before every other screen. It was tested after
      `sending`, which is still true when the send succeeds — the answers reached
@@ -621,32 +672,53 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                   )}
                 </dl>
 
-                {blanks.length > 0 && (
+                {numberedBlanks.length > 0 && (
                   <>
                     {/* Every question is required, so this is the wall rather
                         than a note. It is here and not on each question
                         because a respondent who wants to think about one and
                         come back can — they simply cannot leave without it. */}
                     <p className="blankcount blocking">
-                      {blanks.length === 1
+                      {numberedBlanks.length === 1
                         ? 'One question still needs an answer before you can send.'
-                        : `${blanks.length} questions still need an answer before you can send.`}
+                        : `${numberedBlanks.length} questions still need an answer before you can send.`}
                     </p>
                     <p className="blankcount blocking th">
-                      {blanks.length === 1
+                      {numberedBlanks.length === 1
                         ? 'ยังเหลืออีก 1 ข้อ ก่อนส่งคำตอบได้'
-                        : `ยังเหลืออีก ${blanks.length} ข้อ ก่อนส่งคำตอบได้`}
+                        : `ยังเหลืออีก ${numberedBlanks.length} ข้อ ก่อนส่งคำตอบได้`}
                     </p>
-                    {/* The grid replaces a list that named the blanks and
-                        nothing else — you could read it and still not know
-                        whether two missing out of twenty-one was nearly done
-                        or barely started. Each point carries its question's
-                        text as its accessible name and its tooltip, so nothing
-                        the list said is gone; it is just no longer twenty-one
-                        lines long. */}
-                    <QuestionGrid points={points} onPick={(step) => leaveSend(step)} />
                   </>
                 )}
+
+                {/**
+                 * The last look: every question and what was given for it.
+                 *
+                 * This screen has shown three things in a day — a list naming
+                 * only the blanks, then a grid of points that showed the shape
+                 * of the whole thing but none of its content. Neither let a
+                 * client *check their answers*, which is the one thing a person
+                 * wants on the screen before an irreversible send.
+                 *
+                 * Every row is a way back to its own question. The identity
+                 * fields are in it, so the three things that can block a send
+                 * without appearing anywhere else now appear here.
+                 */}
+                <ul className="qanda">
+                  {review.map((r) => (
+                    <li key={r.ref} className={r.answered ? undefined : 'blank'}>
+                      <button type="button" onClick={() => leaveSend(r.step)}>
+                        <span className="qa-q">
+                          {r.number !== null && <i>{r.number}</i>}
+                          {LEAD === 'th' ? r.textTh || r.textEn : r.textEn}
+                        </span>
+                        <span className="qa-a">
+                          {r.answered ? r.answer : 'Not answered yet · ยังไม่ได้กรอก'}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
                 {error && <p className="qwarn">{error}</p>}
               </div>
               {/* the same round arrow as every other back on this survey */}

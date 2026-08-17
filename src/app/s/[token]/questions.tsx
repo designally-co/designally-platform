@@ -123,7 +123,7 @@ export function Masthead({
    * is selected on `.survey-shell:has(> .qmast)`, and a screen that removed the
    * element would quietly take a different one.
    */
-  const bare = !counted && !section?.en && !section?.th && !action;
+  const bare = !counted && !section?.en && !section?.th && !action && !count;
 
   return (
     <div className={bare ? 'qmast bare' : 'qmast'} ref={box}>
@@ -154,7 +154,10 @@ export function Masthead({
        * before a single question had been read.
        */}
       <span className="qhead">
-        {(section?.en || section?.th || heading) && (
+        {/* `count` counts: the identity screen has no section and no subject,
+            and the disc lives inside this block — without it in the test the
+            block never rendered and that screen lost its mark. */}
+        {(section?.en || section?.th || heading || count) && (
           <span className="qsection">
             {/**
              * English only, both of them — asked for 17 August 2026.
