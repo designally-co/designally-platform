@@ -1319,13 +1319,28 @@ label.f span {
    48px between sections. Not the 80px marketing rhythm.
    ============================================================ */
 
+/**
+ * The toolbar. Reasoning lives in app/toolbar.tsx; this is what it costs in CSS.
+ *
+ * **No background of its own.** It was `rgba(245, 245, 247, 0.8)` behind a 20px
+ * blur — a cool grey that is not in this brand, over a warm parchment page, and
+ * the only hardcoded surface colour left in the file. Apple's own guidance now
+ * argues against it: "Reduce the use of toolbar backgrounds and tinted controls
+ * … use the content layer to inform the color and appearance of the toolbar."
+ * The bar is the page, and the hairline is the scroll edge effect — it appears
+ * when there is content under it and not before. A border that is always there
+ * draws a boundary around nothing.
+ */
 .topbar {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: rgba(245, 245, 247, 0.8);
-  backdrop-filter: saturate(180%) blur(20px);
-  border-bottom: 1px solid var(--divider);
+  background: var(--parchment);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+.topbar.past {
+  border-bottom-color: var(--divider);
 }
 .topbar .inner {
   max-width: 880px;
@@ -1333,15 +1348,103 @@ label.f span {
   padding: 14px 28px;
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 14px;
 }
-.topbar .today {
+
+/**
+ * The title slot. Two lines share it — the date while the greeting is on
+ * screen, the count of what needs you once it has gone — so they are stacked
+ * and cross-faded rather than given a slot each. Only one is useful at a time.
+ *
+ * The height is reserved by the taller of the two so the bar cannot resize
+ * mid-scroll, which would move the primary action under a moving cursor.
+ */
+.barttl {
+  position: relative;
+  display: grid;
+  min-width: 0;
   font-size: 14px;
   color: var(--ink-3);
   letter-spacing: 0;
+  line-height: 1.4;
 }
-.topbar .topbar-cta {
+.barttl .ttl {
+  grid-area: 1 / 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+}
+.barttl .ttl.on {
+  opacity: 1;
+  transform: none;
+}
+
+/**
+ * The trailing edge: the More menu, then the one primary action, last.
+ *
+ * The gap is the HIG's fixed space — "Placing an action with a text label next
+ * to an action with a symbol can create the illusion of a single action." Two
+ * labelled buttons touching read as one control, and More sitting flush against
+ * New survey read as a split button that was never built.
+ */
+.bartrail {
+  position: relative;
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+}
+
+/* borders, not shadows — DESIGN.md. The menu is a canvas tile on the parchment,
+   the same lift every other surface in the app uses. */
+.barmenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 20;
+  min-width: 232px;
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-lg);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.barmenu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-radius: var(--r-sm);
+  padding: 9px 11px;
+  font: inherit;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: inherit;
+  letter-spacing: 0;
+  cursor: pointer;
+}
+.barmenu form {
+  display: block;
+}
+.barmenu small {
+  display: block;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ink-3);
+  line-height: 1.4;
+  margin-top: 2px;
+}
+@media (hover: hover) {
+  .barmenu button:hover {
+    background: var(--parchment);
+  }
 }
 .linkish {
   font-size: 14px;
@@ -1928,45 +2031,6 @@ label.f span {
   }
 }
 
-/* ---- three destinations ---- */
-.elsewhere {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: var(--sp-xs);
-  padding-top: 28px;
-  border-top: 1px solid var(--hairline);
-}
-.elsewhere button {
-  display: block;
-  text-align: left;
-  background: transparent;
-  border: 0;
-  cursor: pointer;
-  padding: 14px 12px;
-  border-radius: var(--r-sm);
-  transition: background 0.18s;
-}
-@media (hover: hover) {
-  .elsewhere button:hover {
-    background: var(--canvas);
-  }
-}
-.elsewhere .et {
-  display: block;
-  font-size: 17px;
-  font-weight: 600;
-  color: var(--primary-mark);
-  letter-spacing: 0;
-  margin-bottom: 3px;
-}
-.elsewhere .es {
-  display: block;
-  font-size: 14px;
-  color: var(--ink-3);
-  letter-spacing: 0;
-  line-height: 1.43;
-}
-
 /* ============================================================
    Sheets
    ============================================================ */
@@ -2412,8 +2476,21 @@ dialog::backdrop {
 @media (max-width: 520px) {
   .topbar .inner {
     padding: 12px 20px;
-    gap: 12px;
-    flex-wrap: wrap;
+    gap: 10px;
+  }
+  /**
+   * One row on a phone, and the wordmark is what goes.
+   *
+   * It used to wrap to two rows — 105px of a 844px screen, permanently, on a
+   * sticky bar. The HIG's iOS section is the argument for which item loses:
+   * "Prioritize only the most important items for inclusion in the main toolbar
+   * area. Because space is so limited, carefully consider which actions are
+   * essential." The title says where you are and the two controls do the work;
+   * the mark says the name of the app whose tab you are already looking at, and
+   * the same page says it in 40px type a moment later.
+   */
+  .topbar .wordmark {
+    display: none;
   }
   .page {
     padding: 32px 20px 40px;

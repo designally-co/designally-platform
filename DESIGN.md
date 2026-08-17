@@ -823,12 +823,18 @@ Full-screen dialog. Backdrop `rgba(0,0,0,0.32)`. Inner sheet 760px on `--canvas-
 
 The team app is **one landing page**. There are no tabs and no sidebar.
 
+0. **The toolbar** — sticky, no background of its own, a hairline that appears only once content
+   is under it. Leading: the wordmark, then one title slot holding the date until the greeting
+   scrolls under the bar and **"Needs you · 1"** after. Trailing: More, fixed space, then the one
+   primary action, **New survey**, last. Spec and the Apple HIG reading behind it are in
+   `docs/navigation-decisions.md` and the header of `app/toolbar.tsx`.
 1. **Needs you** — white utility card on the parchment page, rich rows, one Action Blue pill each
 2. **All projects** — the table, action-needed rows first, marked with the blue dot
-3. **One destination** — Past projects, as a plain row at the foot, opening its own panel. There
-   were three until 17 August 2026; *Question templates* went with the fixed questionnaire and
-   *What's coming* with the kick-off. The row keeps its shape for one item — a lone destination
-   is not promoted to a button.
+
+**Nothing at the foot.** Three destinations sat there until 17 August 2026. *Question templates*
+went with the fixed questionnaire and *What's coming* with the kick-off; **Past projects** went
+upward the same day, into the toolbar's More menu, because a destination at the foot of a
+ten-row table is the longest reach in the app for work the team returns to.
 
 Everything else is a panel opened from this page. Navigation holds places you can go; this product has one place.
 

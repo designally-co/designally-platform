@@ -11,6 +11,7 @@ import ProjectSheet from './sheets/project';
 import AnswersSheet from './sheets/answers';
 import InsightsSheet from './sheets/insights';
 import PastSheet from './sheets/past';
+import Toolbar from './toolbar';
 import Toast, { useToast } from './toast';
 import { reanalyse } from '@/lib/team/actions';
 
@@ -78,22 +79,14 @@ export default function Today({
 
   return (
     <>
-      <header className="topbar">
-        <div className="inner">
-          <span className="wordmark">
-            Design<em>ally</em>
-          </span>
-          <span className="today">{today}</span>
-          <button className="btn btn-primary btn-sm topbar-cta" onClick={() => setPanel('new')}>
-            New survey
-          </button>
-          <form action={signOut}>
-            <button className="linkish" type="submit">
-              Sign out
-            </button>
-          </form>
-        </div>
-      </header>
+      <Toolbar
+        today={today}
+        needsCount={needs.length}
+        archivedCount={archived.length}
+        onNewSurvey={() => setPanel('new')}
+        onPastProjects={() => setPanel('past')}
+        signOut={signOut}
+      />
 
       <main className="page">
         <h1 className="greet">{heading}</h1>
@@ -228,14 +221,6 @@ export default function Today({
           </div>
         )}
 
-        <div className="elsewhere">
-          <button onClick={() => setPanel('past')}>
-            <span className="et">Past projects</span>
-            <span className="es">
-              {archived.length} archived · insights stay searchable
-            </span>
-          </button>
-        </div>
       </main>
 
       {panel === 'new' && (
