@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import MoreMenu from './menu';
+
 /**
  * The team app's toolbar.
  *
@@ -64,8 +66,6 @@ export default function Toolbar({
 }) {
   /* true once the greeting has scrolled under the bar */
   const [past, setPast] = useState(false);
-  const [menu, setMenu] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -84,22 +84,6 @@ export default function Toolbar({
     io.observe(greet);
     return () => io.disconnect();
   }, []);
-
-  useEffect(() => {
-    if (!menu) return;
-    const away = (e: MouseEvent) => {
-      if (!menuRef.current?.contains(e.target as Node)) setMenu(false);
-    };
-    const esc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMenu(false);
-    };
-    document.addEventListener('mousedown', away);
-    document.addEventListener('keydown', esc);
-    return () => {
-      document.removeEventListener('mousedown', away);
-      document.removeEventListener('keydown', esc);
-    };
-  }, [menu]);
 
   /**
    * The title names where you are, in the app's own words: "Needs you" is what
@@ -122,31 +106,25 @@ export default function Toolbar({
         </span>
 
         {/* trailing — the More menu, then the one primary action */}
-        <div className="bartrail" ref={menuRef}>
-          <button
-            className="linkish"
-            aria-expanded={menu}
-            aria-haspopup="true"
-            onClick={() => setMenu((m) => !m)}
-          >
-            More
-          </button>
-          {menu && (
-            <div className="barmenu">
-              <button
-                onClick={() => {
-                  setMenu(false);
-                  onPastProjects();
-                }}
-              >
-                Past projects
-                <small>{archivedCount} archived · insights stay searchable</small>
-              </button>
-              <form action={signOut}>
-                <button type="submit">Sign out</button>
-              </form>
-            </div>
-          )}
+        <div className="bartrail">
+          <MoreMenu>
+            {(close) => (
+              <>
+                <button
+                  onClick={() => {
+                    close();
+                    onPastProjects();
+                  }}
+                >
+                  Past projects
+                  <small>{archivedCount} archived · insights stay searchable</small>
+                </button>
+                <form action={signOut}>
+                  <button type="submit">Sign out</button>
+                </form>
+              </>
+            )}
+          </MoreMenu>
           <button className="btn btn-primary btn-sm" onClick={onNewSurvey}>
             New survey
           </button>

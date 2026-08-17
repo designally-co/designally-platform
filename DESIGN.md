@@ -815,7 +815,14 @@ Sub-nav, sheet headers, brief action bars: `rgba(245,245,247,0.8)` with `saturat
 
 ### Sheets
 
-Full-screen dialog. Backdrop `rgba(0,0,0,0.32)`. Inner sheet 760px on `--canvas-parchment`, entering with an 18px rise over 420ms. Header sticky and frosted; body padding `32px 28px 72px`.
+Full-screen dialog. Backdrop `rgba(0,0,0,0.32)`. Inner sheet 760px on `--canvas-parchment`, entering with an 18px rise over 420ms. Body padding `32px 28px 72px`.
+
+**The header is a toolbar**, the same three slots as the page's: title · actions · Close, with
+Close in its own group after the actions. Everything that can be *done* to what the sheet is
+about lives there — one visible action at most, the rest behind More — and the body describes
+rather than acts. It was sticky and frosted over `rgba(245, 245, 247, 0.8)` until 17 August 2026;
+it is the sheet's own parchment now, with a permanent hairline, because a sheet always has
+content under its header.
 
 ---
 

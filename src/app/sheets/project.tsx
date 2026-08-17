@@ -11,11 +11,14 @@ import {
 } from '@/lib/team/actions';
 import type { ProjectView } from '@/lib/team/projects';
 import { forDisplay } from '@/lib/survey/link';
+import MoreMenu from '../menu';
 import Sheet from './sheet';
 
 /**
- * Everything about one client. Five sections: who answered · right now ·
- * the link · documents · archive. The job ends at the summary.
+ * Everything about one client. Four sections — who answered · right now · the
+ * link · documents — and a toolbar holding everything that can be *done* to it:
+ * copy the link, close collection or reopen it, archive. The job ends at the
+ * summary.
  *
  * **Who answered comes before the action**, reordered 17 August 2026. The order
  * used to follow docs/complete-flow.md, which is the order things *happen* —
@@ -43,6 +46,7 @@ export default function ProjectSheet({
   onActed: (message: string) => void;
 }) {
   const [confirmArchive, setConfirmArchive] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
   /**
@@ -65,8 +69,101 @@ export default function ProjectSheet({
       onActed(message);
     });
 
+  const link = p.token ? `${origin}/s/${p.token}` : null;
+
+  const share = async () => {
+    if (!link) return;
+    try {
+      await navigator.clipboard.writeText(link);
+      setError(null);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+      setError('Could not reach the clipboard. The link is under "The link" below.');
+    }
+  };
+
+  /**
+   * Everything this project can have done to it, on the trailing edge.
+   *
+   * Copy link is the one action taken often enough to stay visible — sending
+   * the link again is most of what this sheet is opened for, and until now the
+   * only way to do it was to select the URL out of a box with the mouse.
+   *
+   * The rest go behind More, per the HIG: "Prioritize less important actions
+   * for inclusion in the More menu." Closing collection keeps its prominent
+   * button in the card above whenever the app is actually asking; what is here
+   * is the always-available version, for a team that knows on day one that four
+   * answers from the right people are enough.
+   *
+   * Archive confirms inside the menu rather than closing it. It moved here from
+   * a section at the foot of the sheet on 17 August 2026, and the sentence that
+   * section existed to say — nothing is deleted — comes with it, because that
+   * is the fact somebody needs at the moment they press it.
+   */
+  const actions = (
+    <>
+      {link && (
+        <button className="linkish" onClick={share}>
+          {copied ? 'Copied' : 'Copy link'}
+        </button>
+      )}
+      <MoreMenu>
+        {(close) => (
+          <>
+            {!p.closedOn && p.surveyId && p.answers > 0 && (
+              <button
+                disabled={pending}
+                onClick={() => {
+                  close();
+                  run(() => closeCollection(p.surveyId!), 'Collection closed · ปิดรับคำตอบแล้ว');
+                }}
+              >
+                Close collection and write the insights
+                <small>Stops new answers and starts the analysis. It takes a few minutes.</small>
+              </button>
+            )}
+            {p.closedOn && (
+              <button
+                disabled={pending}
+                onClick={() => {
+                  close();
+                  run(() => reopenCollection(p.id), 'Collection reopened.');
+                }}
+              >
+                Reopen for more answers
+                <small>The insights are left alone — they were true of what they read.</small>
+              </button>
+            )}
+            {confirmArchive ? (
+              <>
+                <button
+                  className="danger"
+                  disabled={pending}
+                  onClick={() => {
+                    close();
+                    run(() => archiveProject(p.id), `${p.clientName} archived · เก็บเข้าคลังแล้ว`);
+                  }}
+                >
+                  {pending ? 'Archiving…' : `Yes, archive ${p.clientName}`}
+                </button>
+                <button onClick={() => setConfirmArchive(false)}>Cancel</button>
+              </>
+            ) : (
+              <button onClick={() => setConfirmArchive(true)}>
+                Archive project
+                <small>Nothing is deleted — it stays searchable. · ข้อมูลไม่ถูกลบ ค้นหาได้เสมอ</small>
+              </button>
+            )}
+          </>
+        )}
+      </MoreMenu>
+    </>
+  );
+
   return (
-    <Sheet title="Project" onClose={onClose}>
+    <Sheet title="Project" actions={actions} onClose={onClose}>
       <div className="pd-head">
         <h1>{p.clientName}</h1>
         <div className="pkg">
@@ -203,23 +300,11 @@ export default function ProjectSheet({
              * knows whether four answers from the right people beat ten from
              * the wrong ones, and they may know that on day one. The five-day
              * prompt is the app catching up, never the gate opening.
+             *
+             * The always-available version lives in the toolbar's More menu
+             * from 17 August 2026. The prominent button stays in this card
+             * whenever the app is the one asking.
              */}
-            {!p.closedOn && p.surveyId && p.answers > 0 && (
-              <>
-                <button
-                  className="btn btn-quiet btn-sm"
-                  disabled={pending}
-                  onClick={() =>
-                    run(() => closeCollection(p.surveyId!), 'Collection closed · ปิดรับคำตอบแล้ว')
-                  }
-                >
-                  {pending ? 'Closing and analysing…' : 'Close collection and write the insights'}
-                </button>
-                <p className="hintline">
-                  Closing stops new answers and starts the analysis. It takes a few minutes.
-                </p>
-              </>
-            )}
           </>
         )}
       </div>
@@ -268,18 +353,10 @@ export default function ProjectSheet({
               </span>
             </div>
           )}
-          {/* A stakeholder replying the day after collection closed is not an
-              edge case. Reopening leaves the insights alone: what it says was true
-              of the answers it was written from, and it keeps saying so. */}
-          {p.closedOn && (
-            <button
-              className="btn btn-quiet btn-sm"
-              disabled={pending}
-              onClick={() => run(() => reopenCollection(p.id), 'Collection reopened.')}
-            >
-              {pending ? 'Reopening…' : 'Reopen for more answers'}
-            </button>
-          )}
+          {/* Reopening is in the toolbar's More menu. A stakeholder replying the
+              day after collection closed is not an edge case, and reopening
+              leaves the insights alone: what they say was true of the answers
+              they were written from, and they keep saying so. */}
         </div>
       )}
 
@@ -307,35 +384,9 @@ export default function ProjectSheet({
 
       {error && <p className="formerror">{error}</p>}
 
-      {/* gate 4 — archive */}
-      <div className="pd-sec pd-archive">
-        <h2>Finished with this project?</h2>
-        <p>
-          Archiving moves it out of your live list. Nothing is deleted — the survey, the answers
-          and the insights stay searchable. Only your team can do this; the app never archives
-          anything by itself. · ข้อมูลไม่ถูกลบ ค้นหาได้เสมอ
-        </p>
-        {confirmArchive ? (
-          <div className="confirmrow">
-            <button
-              className="btn btn-primary btn-sm"
-              disabled={pending}
-              onClick={() =>
-                run(() => archiveProject(p.id), `${p.clientName} archived · เก็บเข้าคลังแล้ว`)
-              }
-            >
-              {pending ? 'Archiving…' : `Yes, archive ${p.clientName}`}
-            </button>
-            <button className="linkish" onClick={() => setConfirmArchive(false)}>
-              Cancel
-            </button>
-          </div>
-        ) : (
-          <button className="btn btn-quiet btn-sm" onClick={() => setConfirmArchive(true)}>
-            Archive project
-          </button>
-        )}
-      </div>
+      {/* Gate 3 — archive — is in the toolbar's More menu, with the sentence
+          this section existed to say attached to it: nothing is deleted. Only
+          your team can do it, and the app never archives anything by itself. */}
     </Sheet>
   );
 }

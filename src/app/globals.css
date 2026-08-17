@@ -1415,6 +1415,10 @@ label.f span {
   flex-direction: column;
   align-items: stretch;
 }
+.moreslot {
+  position: relative;
+  display: flex;
+}
 .barmenu button {
   display: block;
   width: 100%;
@@ -1433,16 +1437,28 @@ label.f span {
 .barmenu form {
   display: block;
 }
+/* 1.6, not 1.4 — these wrap to two and three lines and some of them carry
+   Thai, which stacks four levels and clips tone marks at Latin-tuned leading.
+   DESIGN.md §2: 1.6 in a paragraph, 1.25 only on a line that stands alone. */
 .barmenu small {
   display: block;
   font-size: 13px;
   font-weight: 400;
   color: var(--ink-3);
-  line-height: 1.4;
+  line-height: 1.6;
   margin-top: 2px;
 }
+/* the one destructive item in any menu. Colour is the whole signal — it is
+   already the second press, and the label already names the client. */
+.barmenu button.danger {
+  color: var(--critical);
+}
+.barmenu button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
 @media (hover: hover) {
-  .barmenu button:hover {
+  .barmenu button:not(:disabled):hover {
     background: var(--parchment);
   }
 }
@@ -2056,12 +2072,18 @@ dialog::backdrop {
 .sheet.narrow {
   width: min(560px, 100%);
 }
+/**
+ * The sheet's toolbar. Same three slots as the page's — title, actions,
+ * Close — and the same correction: it was `rgba(245, 245, 247, 0.8)` behind a
+ * 20px blur, a cool grey that is not in this brand, over the sheet's own warm
+ * parchment. The hairline stays permanent here, unlike the page's: a sheet
+ * always has content under its header, so the line is always telling the truth.
+ */
 .sheet-top {
   position: sticky;
   top: 0;
   z-index: 2;
-  background: rgba(245, 245, 247, 0.8);
-  backdrop-filter: saturate(180%) blur(20px);
+  background: var(--parchment);
   border-bottom: 1px solid var(--divider);
   display: flex;
   align-items: center;
@@ -2072,8 +2094,11 @@ dialog::backdrop {
   font-size: 15.5px;
   font-weight: 600;
 }
-.sheet-top .x {
+/* the actions group takes the space, so Close keeps its own group after it */
+.sheet-top .bartrail {
   margin-left: auto;
+}
+.sheet-top .x {
   font-size: 14px;
   color: var(--ink-2);
   background: transparent;
@@ -2277,25 +2302,6 @@ dialog::backdrop {
 }
 .pd-due .hintline {
   margin: 0;
-}
-
-.pd-archive {
-  border-top: 1px solid var(--divider);
-  padding-top: var(--sp-lg);
-  margin-bottom: 0;
-}
-.pd-archive p {
-  font-size: 14px;
-  color: var(--ink-2);
-  margin-bottom: 14px;
-  max-width: 60ch;
-  line-height: 1.6;
-}
-.confirmrow {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  flex-wrap: wrap;
 }
 
 /* ---- shared sheet furniture ---- */

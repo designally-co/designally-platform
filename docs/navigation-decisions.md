@@ -62,6 +62,14 @@ that is not in this brand, on a warm page.
 **Words, not symbols.** The HIG prefers symbols for toolbar items. The rule below wins: a bare
 glyph needs a legend where words do not.
 
+**Every sheet has the same bar.** Title · actions · Close, in that order, Close in its own group:
+"Group navigation controls and critical actions like Done, Close, or Save in dedicated, familiar,
+and visually distinct sections." On the project sheet that is **Copy link** — the action taken
+often enough to stay visible, and until 17 August 2026 there was no way to copy the link from
+here at all — then More holding *Close collection* or *Reopen*, and *Archive project*, which
+confirms inside the menu rather than closing it. Nothing that can be *done* to a project is
+anywhere else on the sheet now; the body only describes it.
+
 **On a phone the wordmark goes, not the title.** One row rather than two — a wrapped sticky bar
 cost 105px of an 844px screen, permanently.
 
