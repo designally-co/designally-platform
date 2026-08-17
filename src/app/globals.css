@@ -2166,9 +2166,11 @@ dialog::backdrop {
 /**
  * The way out.
  *
- * The same disc as the survey's back control — `--fill`, no border, the shared
- * chevron — because it is the same object doing the same job, and the team
- * should not have to learn a second one. DESIGN.md sizes it 52px where a thumb
+ * The same disc as the survey's back control — no border, the shared chevron —
+ * because it is the same object doing the same job, and the team should not
+ * have to learn a second one. It keeps `--fill` where the survey's went white
+ * on 17 August 2026: this one sits in a sheet header, on the team's side, and
+ * nobody asked for it to change. DESIGN.md sizes it 52px where a thumb
  * uses it and 40px where only a cursor does; a sheet header is both, so it
  * takes 44 on a pointer, which is the touch floor, and the full 52 on a phone.
  *
@@ -3444,30 +3446,112 @@ dialog::backdrop {
   font-size: inherit;
   color: inherit;
 }
-/* the questions in a group sit apart enough to be separate asks */
-.slide .qgrouph ~ .sq {
-  margin-bottom: 34px;
+/**
+ * The group is a list, and one row of it is open.
+ *
+ * A hairline between rows, not a 34px void. The void was there to say "these
+ * are separate asks", which is a job a line does better and in no vertical
+ * space — and the space it cost was what made three questions read as three
+ * screens stacked.
+ */
+.qgroup {
+  border-top: 1px solid var(--hairline);
 }
-.slide .qgrouph ~ .sq:last-of-type {
+.qgroup > * {
+  border-bottom: 1px solid var(--hairline);
+}
+.qopen {
+  padding: 26px 0 30px;
+}
+.slide .qopen .sq {
   margin-bottom: 0;
 }
+
 /**
- * The question is what a person came to read.
+ * A folded row: the number, the question, and — once answered — the answer.
  *
- * 20px against the context block's 15px and the ink against its muted greys —
- * the two steps that matter, taken with size and weight rather than with a
- * second face or a second colour. Still short of the 33px a lone question
- * takes, because two or three of those on one screen read as three screens.
+ * No tick. The client's own words are the status, which is the rule in
+ * `docs/navigation-decisions.md` applied rather than worked around: a row
+ * showing an answer has been answered, a row showing only a question has not,
+ * and neither needs a legend.
  *
- * Line-height governs the English only; the Thai under it is `.th`, which
- * carries the 1.7 the client surface gives every Thai line.
+ * The number hangs, so every question on the screen starts at one left edge —
+ * the open one included, since its own badge sits at the same 34px.
  */
-.slide .qgrouph ~ .sq .qq {
-  font-size: clamp(1.15rem, 2.4vw, 1.28rem);
-  font-weight: 600;
-  line-height: 1.45;
-  color: var(--ink);
+.folded {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 0;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--hairline);
+  padding: 18px 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition: opacity 0.18s;
 }
+.folded .fnum {
+  font-weight: 600;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.5;
+}
+.folded .fbody {
+  min-width: 0;
+}
+/* two lines of the question, because a row nobody can read is a row they have
+   to open to find out whether they want to open it */
+.folded .fq {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+/* answered: the question steps back and the answer is what you read */
+.folded.done .fq {
+  font-weight: 400;
+  color: var(--ink-3);
+}
+.folded .fa {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  overflow: hidden;
+  margin-top: 3px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+@media (hover: hover) {
+  /* the same hover every quiet control on this survey has — the line darkens.
+     No accent: nobody is needed here, they are only pointing at it. */
+  .folded:hover .fq {
+    color: var(--ink);
+  }
+  .folded.done:hover .fq {
+    color: var(--ink-2);
+  }
+}
+/**
+ * The open question takes the full 33px of `.slide .qq`, and there is no
+ * override here any more.
+ *
+ * There was one, for a day: two or three questions at headline size on one
+ * screen read as three screens stacked, so a grouped question stepped down to
+ * 20px. One at a time is the other answer to that problem and the better one —
+ * with a single question open, it *is* the screen, and the size it was stepped
+ * down from is the size it should be.
+ */
 /* the question's number, small and in front of its text */
 .slide .qq .qn {
   font-style: normal;
@@ -3756,30 +3840,30 @@ dialog::backdrop {
  * muted chevron say it is available without asking to be pressed.
  */
 /**
- * Back — a filled disc, not an outlined one.
+ * Back — a white disc.
  *
- * It was `--canvas` inside a hairline, the same object as the quiet secondary
- * elsewhere. White inside a thin line on an almost-white page gave it a
- * boundary and no body: the ring read as the control and the glyph sat in a
- * hole. A soft fill gives it a shape at a glance, and it stays quieter than the
- * accented action beside it because it is grey, not because it is barely there.
+ * Asked for 17 August 2026. It was the warm grey `--fill`, which gave it a body
+ * at a glance; white puts it in the same family as every other quiet control on
+ * this page — `--canvas` inside a hairline, the treatment `.pickone` uses.
  *
- * The glyph measures 3.83:1 on this fill — above the 3:1 floor for a graphical
- * object, which is what carries the meaning here. The disc itself is 1.23:1
- * against the page and is not asked to carry any.
+ * White is 1.07:1 against the parchment page, so the fill cannot draw the
+ * boundary and the hairline has to: it measures 1.66:1 on white, and the
+ * charcoal glyph inside clears 11:1. The disc is still quieter than the
+ * accented action beside it — it is now the page's own white, not a shape.
  */
 .okback {
   place-items: center;
   width: 52px;
   height: 52px;
   flex: 0 0 auto;
-  border: 0;
+  border: 1px solid var(--hairline);
   border-radius: var(--r-pill);
-  background: var(--fill);
+  background: var(--canvas);
   color: var(--glyph);
   cursor: pointer;
   transition:
     background-color 0.18s,
+    border-color 0.18s,
     color 0.18s,
     transform 0.12s var(--ease);
 }
@@ -3802,14 +3886,18 @@ dialog::backdrop {
    change. On a 44px disc, 0.99 is four tenths of a pixel — no feedback at all
    on the one control that has no label to flicker. It keeps the deeper fill. */
 .okback:active {
-  background: var(--fill-press);
+  background: var(--divider);
+  border-color: var(--ink-3);
   color: var(--ink);
   transform: scale(0.99);
 }
 @media (hover: hover) {
-  /* a filled control deepens its own fill — DESIGN.md section 5, Hover */
+  /* a filled control deepens its own fill — DESIGN.md section 5, Hover. A white
+     one has no fill to deepen, so the step is off white onto the page's own
+     grey and the line darkens with it. */
   .okback:hover {
-    background: var(--fill-deep);
+    background: var(--parchment);
+    border-color: var(--ink-3);
     color: var(--ink);
   }
 }

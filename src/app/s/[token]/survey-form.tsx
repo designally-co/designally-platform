@@ -2,11 +2,11 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 
-import { isAnswered, type DraftValues } from '@/lib/survey/answers';
+import { answerPreview, isAnswered, type DraftValues } from '@/lib/survey/answers';
 import type { SurveyPayload, SurveyQuestion, SurveyStep } from '@/lib/survey/load';
 import Chevron from '../../chevron';
 import { LangContext, type Lang } from './lang';
-import Question, { IdentityField, Masthead, type ValueUpdate } from './questions';
+import Question, { Folded, IdentityField, Masthead, type ValueUpdate } from './questions';
 
 const WELCOME = 0;
 
@@ -125,6 +125,42 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
    * from number 21.
    */
   const [dir, setDir] = useState<'next' | 'back'>('next');
+
+  /**
+   * Which question on the current screen is open.
+   *
+   * A screen holds two to four questions and shows one of them at a time: the
+   * rest collapse to their number, their question clamped to two lines, and —
+   * once answered — what the client wrote. Built 17 August 2026, after the
+   * grouped screen turned out to be three copies of the old single-question
+   * screen stacked, each with its own headline-weight ask, its own language
+   * control and its own hint, so one screen read as three.
+   *
+   * The branding team asked for two to four questions per screen so somebody
+   * can see what a section covers before answering it. That still holds: every
+   * question is on the screen and readable, and the ones behind you show your
+   * own answer rather than a placeholder.
+   *
+   * Null means "work it out" — the first unanswered question, or the first if
+   * they are all done. Stored as a ref rather than an index, and checked
+   * against the current card below, so moving between screens resets it
+   * without an effect firing a second render to do it.
+   */
+  const [openQ, setOpenQ] = useState<{ step: number; ref: string } | null>(null);
+  /**
+   * Whether the question about to open was *asked for*.
+   *
+   * Opening one by tapping its row, by pressing Enter, or by coming back from
+   * the send screen to fix a blank all mean the client wants to type — so the
+   * field takes focus. Arriving at a screen does not: focusing there raises the
+   * phone keyboard over the question before anybody has read it, which is the
+   * behaviour every questionnaire is disliked for.
+   */
+  const wantsFocus = useRef(false);
+  const openQuestionTo = (ref: string, at = step) => {
+    wantsFocus.current = true;
+    setOpenQ({ step: at, ref });
+  };
 
   const draftKey = useRef<string>('');
   const storageKey = draftStorageKey(survey.token);
@@ -351,15 +387,19 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   /* the questions end at the last card; past it is the send screen */
   const advance = (n: number) => (n >= cards.length ? openSend() : setStep(n + 1));
 
+
   const goTo = useCallback((index: number, direction: 'next' | 'back' = 'next') => {
     setDir(direction);
     setStep(index);
   }, []);
 
-  const leaveSend = useCallback((index: number) => {
+  const leaveSend = useCallback((index: number, ref?: string) => {
     setDir('back');
     setFromSend(true);
     setSending(false);
+    /* the blank list points at one question, so open that one rather than
+       whichever the screen would have chosen for itself */
+    if (ref) openQuestionTo(ref, index);
     setStep(index);
   }, []);
 
@@ -451,6 +491,82 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
 
   /* the welcome is the absence of a card, not a card of its own */
   const card = step > WELCOME ? cards[step - 1] : undefined;
+
+  /**
+   * The accordion, resolved for whatever card is on screen.
+   *
+   * `grouped` is null on a one-question screen — the personality scales are a
+   * step of their own, and collapsing the only thing on a screen would leave
+   * nothing to look at. Those render exactly as they did.
+   *
+   * `openQuestion` falls back rather than resetting: an `openQ` belonging to
+   * another screen simply does not match, so the answer is recomputed. No
+   * effect, and therefore no second render on every step.
+   */
+  const grouped = card && card.kind === 'group' && card.questions.length > 1 ? card : null;
+
+  /**
+   * Which question a screen opens on, decided **once per screen**.
+   *
+   * It has to be a memo and not a plain expression. Derived live from `values`,
+   * "the first unanswered question" moved the moment the client typed their
+   * first character: question one stopped being unanswered, so the open row
+   * jumped to question two and took the field out from under them mid-word.
+   * Caught by walking the flow rather than by reading it — pressing Enter after
+   * typing left the screen instead of opening question two, because by then the
+   * open question already *was* question two and there was nothing below it.
+   *
+   * `grouped` is `cards[step - 1]`, and `cards` is memoised, so the identity is
+   * stable for as long as the screen is — one evaluation per screen, and the
+   * answers are read at the moment of arrival rather than tracked.
+   */
+  const valuesNow = useRef(values);
+  valuesNow.current = values;
+  const openByDefault = useMemo(
+    () =>
+      grouped
+        ? (grouped.questions.find((q) => !isAnswered(q.type, valuesNow.current[q.ref])) ??
+            grouped.questions[0]
+          ).ref
+        : null,
+    [grouped],
+  );
+
+  /* an `openQ` from another screen is not this screen's business */
+  const chosen = openQ && openQ.step === step ? openQ.ref : openByDefault;
+  const openQuestion = grouped
+    ? (grouped.questions.find((q) => q.ref === chosen) ?? grouped.questions[0])
+    : null;
+  /* the next one still to answer *below* this one — going back up is a tap */
+  const nextOnScreen =
+    grouped && openQuestion
+      ? grouped.questions
+          .slice(grouped.questions.indexOf(openQuestion) + 1)
+          .find((q) => !isAnswered(q.type, values[q.ref]))
+      : undefined;
+
+  /**
+   * What Enter does. The next question on this screen if there is one, the
+   * next screen if there is not.
+   *
+   * Without this, Enter on the first of three questions left the other two
+   * unanswered behind a screen the client had already left — the exact hazard
+   * of showing one at a time. The hint beside Continue says which it will be,
+   * because the two are no longer the same act: Continue always leaves the
+   * screen, and skipping is a thing a person is allowed to do deliberately.
+   */
+  const forward = () => (nextOnScreen ? openQuestionTo(nextOnScreen.ref) : advance(step));
+
+  /* the field of a question somebody asked to open takes focus; one that opened
+     because it was next on a screen they have just arrived at does not */
+  useEffect(() => {
+    if (!wantsFocus.current) return;
+    wantsFocus.current = false;
+    const field = document.querySelector<HTMLElement>(
+      '.qopen textarea, .qopen input:not([type=radio]):not([type=checkbox])',
+    );
+    field?.focus();
+  }, [openQuestion?.ref]);
 
   /* Terminal, so it is tested before every other screen. It was tested after
      `sending`, which is still true when the send succeeds — the answers reached
@@ -577,7 +693,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                     <ul className="blanklist">
                       {blanks.map(({ question, index }) => (
                         <li key={question.ref}>
-                          <button type="button" onClick={() => leaveSend(index)}>
+                          <button type="button" onClick={() => leaveSend(index, question.ref)}>
                             <b>{question.number ?? '·'}</b>
                             <span>{question.textEn}</span>
                           </button>
@@ -707,22 +823,37 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                         {card.descTh && <span className="th">{card.descTh}</span>}
                       </p>
                     )}
-                    {card.questions.map((q) => (
-                      <Question
-                        key={q.ref}
-                        question={q}
-                        value={values[q.ref]}
-                        onChange={(v) => setValue(q.ref, v)}
-                        /* Enter moves to the next screen, not the next question
-                           — the questions on a screen are read together, and a
-                           key that jumped between them would fight the scroll */
-                        onEnter={() => advance(step)}
-                      />
-                    ))}
+                    <div className="qgroup">
+                      {card.questions.map((q) =>
+                        !grouped || q.ref === openQuestion?.ref ? (
+                          <div className="qopen" key={q.ref}>
+                            <Question
+                              question={q}
+                              value={values[q.ref]}
+                              onChange={(v) => setValue(q.ref, v)}
+                              /* Enter goes to the next question on this screen,
+                                 and only leaves the screen once none is left */
+                              onEnter={forward}
+                            />
+                          </div>
+                        ) : (
+                          <Folded
+                            key={q.ref}
+                            question={q}
+                            value={values[q.ref]}
+                            onOpen={() => openQuestionTo(q.ref)}
+                          />
+                        ),
+                      )}
+                    </div>
                   </>
                 )}
               </div>
-              <Ok onClick={() => advance(step)} onBack={() => goTo(step - 1, 'back')} />
+              <Ok
+                onClick={() => advance(step)}
+                onBack={() => goTo(step - 1, 'back')}
+                enterGoes={nextOnScreen ? 'question' : 'screen'}
+              />
             </div>
           </section>
         ) : (
@@ -839,7 +970,20 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
  * puts on the floor next to it. On a pointer device the chevron pair in the
  * corner does that job instead, so the arrow here is hidden.
  */
-function Ok({ onClick, onBack }: { onClick: () => void; onBack: () => void }) {
+function Ok({
+  onClick,
+  onBack,
+  enterGoes = 'screen',
+}: {
+  onClick: () => void;
+  onBack: () => void;
+  /**
+   * Where Enter lands from here. Continue always leaves the screen; Enter
+   * finishes the screen first, so on a group with questions still to answer
+   * the two are not the same act and the hint has to say which is which.
+   */
+  enterGoes?: 'question' | 'screen';
+}) {
   return (
     <div className="okrow">
       <button className="okback" onClick={onBack} type="button" aria-label="Previous question">
@@ -850,7 +994,9 @@ function Ok({ onClick, onBack }: { onClick: () => void; onBack: () => void }) {
       </button>
       {/* only what this button does. The paragraph's Shift+Enter now sits under
           the box it belongs to — see questions.tsx. */}
-      <span className="okhint">or press Enter</span>
+      <span className="okhint">
+        {enterGoes === 'question' ? 'Enter goes to the next question' : 'or press Enter'}
+      </span>
     </div>
   );
 }

@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useEffect, useId, useRef, useState, type CSSProperties } from 'react';
 
 import type { QuestionConfig } from '@/lib/db/schema';
-import type { RawValue } from '@/lib/survey/answers';
+import { answerPreview, isAnswered, type RawValue } from '@/lib/survey/answers';
 import type { SurveyQuestion } from '@/lib/survey/load';
 import { OTHER_LABEL, useLang, useOtherText, useText } from './lang';
 
@@ -707,4 +707,47 @@ export default function Question(props: Props) {
     case 'linear_scale':
       return <ScaleAnswer {...props} />;
   }
+}
+
+/**
+ * A question on this screen that is not the one you are on.
+ *
+ * It keeps its number and its question, clamped to two lines, and — once
+ * answered — what the client wrote, clamped to one. **There is no tick.** The
+ * answer is the status: a row showing your own words has been answered, a row
+ * showing only the question has not, and `docs/navigation-decisions.md` carries
+ * a status in words rather than a mark that needs a legend. Which also means
+ * the only ink on the screen belongs either to a question or to an answer.
+ *
+ * Two lines, not one. A collapsed row a client cannot read is a row they have
+ * to open to find out whether they want to open it, and the point of showing
+ * two to four questions on a screen was that a section can be seen before it
+ * is answered.
+ *
+ * The whole row is the control, and it is a `<button>` rather than a `<label>`
+ * — nothing here is a form control, and a label would hand the click to the
+ * field hidden inside the row that is open.
+ */
+export function Folded({
+  question,
+  value,
+  onOpen,
+}: {
+  question: SurveyQuestion;
+  value: RawValue | undefined;
+  onOpen: () => void;
+}) {
+  const t = useText();
+  const answered = isAnswered(question.type, value);
+  const preview = answerPreview(question.type, value);
+
+  return (
+    <button type="button" className={answered ? 'folded done' : 'folded'} onClick={onOpen}>
+      <span className="fnum">{question.number ?? '·'}</span>
+      <span className="fbody">
+        <span className="fq">{t(question.textEn, question.textTh)}</span>
+        {answered && preview && <span className="fa">{preview}</span>}
+      </span>
+    </button>
+  );
 }

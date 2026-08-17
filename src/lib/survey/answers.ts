@@ -27,6 +27,47 @@ export function emptyValue(type: QuestionType): RawValue {
   }
 }
 
+/**
+ * A one-line reading of an answer, for the collapsed row on a question group.
+ *
+ * The row it appears on is the only proof that question has been answered —
+ * there is no tick beside it. `docs/navigation-decisions.md` carries the
+ * status in words rather than a glyph, and here the words are the client's
+ * own: what they wrote *is* the state.
+ *
+ * Verbatim and untruncated. The CSS clamps it to a line, so a long answer
+ * ellipses at whatever width the screen happens to be rather than at a
+ * character count guessed here — and the Thai measured in characters is not
+ * the Thai measured in ink.
+ */
+export function answerPreview(type: QuestionType, raw: RawValue | undefined): string {
+  if (!isAnswered(type, raw)) return '';
+  switch (type) {
+    case 'paragraph':
+    case 'short_text':
+      return (raw as string).trim();
+    case 'multiple_choice': {
+      const v = raw as { choice: string; other?: string };
+      return v.other?.trim() ? `${v.choice} — ${v.other.trim()}` : v.choice;
+    }
+    case 'checkboxes': {
+      const v = raw as { choices: string[]; other?: string };
+      /* the separator the client surface uses between a pair of short strings
+         everywhere else — chips, poles, bilingual labels */
+      return [...v.choices, v.other?.trim()].filter(Boolean).join(' · ');
+    }
+    case 'linear_scale':
+      /**
+       * Unreachable today and deliberately not invented: the only linear_scale
+       * step holds that question alone (`steps.ts` — "ten pairs is a screenful,
+       * and nothing shares that breath"), so it never collapses. A row of ten
+       * positions has no honest one-line reading, and "8 of 10 set" is the
+       * shape rule 3 spent a paragraph refusing.
+       */
+      return '';
+  }
+}
+
 export function isAnswered(type: QuestionType, raw: RawValue | undefined): boolean {
   if (raw === undefined || raw === null) return false;
   switch (type) {

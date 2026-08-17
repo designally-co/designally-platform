@@ -753,6 +753,8 @@ Three states, no others: hover deepens the fill to `--surface-fill-deep` and tak
 
 The glyph measures **3.83:1** on the fill — above the 3:1 floor for a graphical object, which is the thing carrying the meaning. The disc is 1.23:1 against the page and is not asked to carry any.
 
+**Changed 17 August 2026 — the survey's back control is white.** Asked for. On the survey, and there only, the disc is `--canvas` with a 1px `--hairline` — the quiet-action treatment from two paragraphs above, the same object as `.pickone`. White is 1.07:1 against the parchment page, so the fill cannot draw the boundary and the hairline has to: it is 1.66:1 on white, and the `--glyph` chevron inside clears 11:1, comfortably past the 3:1 floor. Hover and press have no fill to deepen, so they step *off* white — `--parchment`, then `--divider` — and the line darkens to `--ink-3` with them. This is the 13 August correction below being spent back deliberately: it is the one control on the screen whose neighbour is the accented primary, so it can afford to be the page's own white and let the pill carry the weight. Everywhere else — the sheet header's back, the deck stepper — the disc stays `--surface-fill`.
+
 **Corrected 13 August 2026 — the stepper is this too.** It was specified here as the exception: a bare glyph with no container until hover, on the grounds that it duplicates a gesture the scroll already offers and should not look as loud as the first way. What that produced was a control a pointer had to find before it looked like anything. Quieter is a matter of *size*, not of withholding the shape — so it is the same disc at 40px, and there is one icon button in this product rather than two that resemble each other.
 
 **Dark utility** — `--ink` fill, white text, `caption` (14px), `sm` radius (8px), padding `8px 15px`. Neutral commits in the team app.
@@ -885,7 +887,8 @@ no border, the shared `--glyph` chevron — at the far leading edge, on its own.
 cursor reaches it. It was a text `Close` pill on the trailing edge until 17 August 2026; Apple's
 HIG asks for the standard symbol, at the leading edge, and never the word, and it is the one
 glyph this product spends (see `docs/navigation-decisions.md`). It is the same object as the
-survey's back control, at the same size, drawn from the same component.
+survey's back control, at the same size, drawn from the same component — except for its fill,
+which stayed `--surface-fill` when the survey's went white on 17 August 2026.
 
 Actions take the trailing edge — one visible at most, the rest behind **More** — and the body
 describes rather than acts. They are **bare marks, not discs**: 44px hit area, a 20px glyph at
