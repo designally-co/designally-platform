@@ -166,6 +166,34 @@ Three decisions inside that are worth keeping:
 `font-variant-numeric: tabular-nums` so the figures do not jitter as the count passes 9
 and 19.
 
+### Inside a group, the question is the loudest thing
+
+A screen holds two to four questions under a heading naming their subject. The heading was
+set on the display face at 28px/700 and the questions stepped *down* from it to 19px — so
+the largest, boldest type on a screen whose whole job is answering two questions belonged
+to a label. *Where the brand stands, and who it speaks to*, over *tell us your brand story*
+and *who are your core customers*: it says nothing the next two lines do not, in type that
+makes it read first.
+
+**The heading and its description are one quiet context block now** — body face, 15px,
+one size, two inks: `--ink-2` for what this screen is about, `--ink-3` for why. Not an
+eyebrow; nothing follows that it labels. It is the last thing read before the work, and it
+is set like it.
+
+**The question is 20px in `--ink` at 600.** Two steps up from the block, both taken with
+size and weight rather than a second face or a second colour — and still short of the 33px
+a lone question takes, because two or three of those on one screen read as three screens
+stacked, which is what the old heading weight was compensating for.
+
+The display face does not leave the screen with the heading: the masthead numeral is
+46–64px of it, and that is where the brand's voice belongs here.
+
+**`.qgrouph` is scoped through `.slide`** and has to be. It is an `<h2>`, and `.slide h2`
+is (0,1,1) against a bare `.qgrouph`'s (0,1,0) — so the size written on `.qgrouph` never
+applied, at any point, and the heading rendered a step *larger* than the value its own
+comment explained. The fourth instance of this collision in `globals.css`; the fix is the
+same every time.
+
 ### The five named pieces, and where they are
 
 | Piece | Where |

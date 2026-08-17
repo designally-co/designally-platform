@@ -3383,25 +3383,61 @@ dialog::backdrop {
 /**
  * A screen's heading, and the two to four questions under it.
  *
- * The heading is the subject the questions share, so it takes the display face
- * and the question text steps down from it — inside a group the questions are
- * items, not headlines, and setting them at the old single-question size made
- * three of them read as three separate screens stacked.
+ * **The questions are the loudest thing on the card. The heading is not.**
+ *
+ * It was the other way round: the heading took the display face at 28px/700
+ * and the questions stepped *down* from it to 19px — so the largest, boldest
+ * type on a screen whose entire job is answering two questions belonged to a
+ * label naming the subject those two questions already name. "Where the brand
+ * stands, and who it speaks to" over "tell us your brand story" and "who are
+ * your core customers" tells a reader nothing the next two lines do not, in
+ * type that makes them read it first.
+ *
+ * The reason it was set that way still holds and is handled differently now:
+ * three questions at the old *single*-question size read as three separate
+ * screens stacked, so they do need to sit below a headline weight. They sit
+ * below it by being 20px rather than 33px — a step down from a headline, not
+ * a step down from a heading that is itself a step down from a headline.
+ *
+ * So the heading and its description become one quiet context block, in the
+ * body face, at one size, in two inks: what this screen is about, then why. It
+ * is not an eyebrow — nothing follows it that it labels — it is the last thing
+ * you read before the work, and it reads like it.
+ *
+ * The display face does not leave the screen with it: the masthead numeral is
+ * 46–64px of it, and that is the brand's mark here.
  */
-.qgrouph {
-  font-family: var(--font-display);
-  font-size: clamp(1.35rem, 2.9vw, 1.75rem);
-  font-weight: 700;
-  line-height: 1.22;
-  color: var(--ink);
-  text-wrap: balance;
-  margin-bottom: 7px;
+/**
+ * Scoped through `.slide`, and it has to be: the heading is an `<h2>`, and
+ * `.slide h2` further down this file is (0,1,1) against a bare `.qgrouph`'s
+ * (0,1,0). It wins on specificity wherever either sits in the file.
+ *
+ * Which means the size written here before — `clamp(1.35rem, 2.9vw, 1.75rem)`,
+ * with a comment explaining the choice — never applied at all. The heading was
+ * rendering at `.slide h2`'s 2.05rem the whole time, a step *larger* than the
+ * value that was supposedly set. The fourth time this collision has appeared in
+ * this file; the fix is the same every time — scope through the container.
+ */
+.slide .qgrouph {
+  /* the body face, not the display one. At 15px it sits directly above its own
+     description at 15px, and two faces on two adjacent lines of one size is a
+     seam rather than a hierarchy — the block is one voice in two inks. The
+     display face keeps the masthead numeral, which is where it belongs. */
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 0;
+  color: var(--ink-2);
+  text-wrap: pretty;
+  margin-bottom: 1px;
 }
 .qgroupd {
-  font-size: 14.5px;
+  font-size: 15px;
+  line-height: 1.5;
   color: var(--ink-3);
   max-width: 54ch;
-  margin-bottom: 30px;
+  margin-bottom: 34px;
 }
 .qgroupd .th {
   display: block;
@@ -3415,12 +3451,22 @@ dialog::backdrop {
 .slide .qgrouph ~ .sq:last-of-type {
   margin-bottom: 0;
 }
-/* inside a group the question is an item, not the headline the masthead used
-   to introduce — it steps down so the group heading stays the loudest thing */
+/**
+ * The question is what a person came to read.
+ *
+ * 20px against the context block's 15px and the ink against its muted greys —
+ * the two steps that matter, taken with size and weight rather than with a
+ * second face or a second colour. Still short of the 33px a lone question
+ * takes, because two or three of those on one screen read as three screens.
+ *
+ * Line-height governs the English only; the Thai under it is `.th`, which
+ * carries the 1.7 the client surface gives every Thai line.
+ */
 .slide .qgrouph ~ .sq .qq {
-  font-size: clamp(1.02rem, 2vw, 1.18rem);
+  font-size: clamp(1.15rem, 2.4vw, 1.28rem);
   font-weight: 600;
   line-height: 1.45;
+  color: var(--ink);
 }
 /* the question's number, small and in front of its text */
 .slide .qq .qn {
