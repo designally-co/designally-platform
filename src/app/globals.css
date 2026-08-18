@@ -2391,16 +2391,25 @@ textarea {
 .iversions li {
   display: flex;
   align-items: center;
-  gap: var(--sp-sm);
+  gap: var(--sp-xs);
   border-top: 1px solid var(--divider);
 }
+/**
+ * A menu row, not a document row.
+ *
+ * These were sized for a section in a scrolling sheet, where a run was a thing
+ * you read. In the bar's menu a run is a thing you pick, and four of them at 78px
+ * made a list you scroll to see three. 12px of padding and 15/13 type came down
+ * to 7 and 14/12, which is a 50px row — over the 44 a finger needs and half what
+ * it was.
+ */
 .iversions .pick {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
   text-align: left;
-  padding: 12px 0;
+  padding: 7px 0;
   border: 0;
   background: none;
   font-family: inherit;
@@ -2408,13 +2417,14 @@ textarea {
   cursor: pointer;
 }
 .iversions .pick b {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
+  line-height: 1.4;
 }
 .iversions .pick span {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--ink-3);
-  line-height: 1.7;
+  line-height: 1.5;
 }
 /* the accent marks what is chosen, never what is hovered */
 /**
@@ -2740,12 +2750,18 @@ textarea {
   border: 1px solid var(--hairline);
   border-radius: var(--r-card);
 }
-.vermenu .hintline {
-  margin-bottom: 0;
-}
-/* No rule above the first row: the caption above it is already the boundary,
-   and a line under a caption makes it a table header. */
-.vermenu .iversions li:first-child {
+/**
+ * No rules between the rows.
+ *
+ * `.iversions` drew a `--divider` above every row, which earned its keep in a
+ * section of a scrolling document where the rows had to be told apart from the
+ * prose around them. In a menu they have the menu's own edge and its ground, and
+ * four lines separated by three rules is a table of one column.
+ *
+ * What still needs marking is the run you are reading, and that is the tint
+ * below.
+ */
+.vermenu .iversions li {
   border-top: 0;
 }
 /* The row while it is being asked about — the block needs the width the two
@@ -2788,14 +2804,13 @@ textarea {
   border-radius: var(--r-sm);
   margin: 2px 0;
   padding: 0 var(--sp-xs);
-  border-top-color: transparent;
 }
 .vermenu .iversions .drop {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   padding: 0;
   border-radius: var(--r-pill);
   color: var(--ink-3);

@@ -270,7 +270,10 @@ export default function InsightsSheet({
 
             {listing && (
               <div className="vermenu" role="dialog" aria-label="Every run of this analysis">
-                <p className="hintline">Every run, newest first:</p>
+                {/* No caption. The bar's own second line names the run on
+                    screen, and a menu of four timestamps under a *Earlier runs*
+                    button does not need telling what it is or which way it
+                    runs. */}
                 <ul className="iversions">
                   {versions.map((v) =>
                     dropping === v.id ? (
