@@ -17,6 +17,7 @@ import {
   surveys,
   type Package,
 } from '@/lib/db/schema';
+import { surveyOrigin } from '@/lib/survey/origin';
 import { CURRENT_QUESTION_VERSION, PACKAGE_BLOCKS } from '@/lib/survey/packages';
 import { makeToken } from '@/lib/survey/token';
 import { packageLabel } from '@/lib/team/labels';
@@ -503,4 +504,46 @@ export async function deleteResponse(
 
   revalidatePath('/');
   return { ok: true };
+}
+
+/**
+ * The survey link as a QR code, drawn on demand.
+ *
+ * A server action rather than a client import: `qrcode` is around 50KB and the
+ * share panel is opened for a fraction of the projects a team looks at, so
+ * putting the encoder in the bundle charges every page load for a thing most of
+ * them never draw.
+ *
+ * SVG rather than a raster. It is what a design studio wants — it scales to a
+ * printed card or a slide with no second export at a bigger size — and it makes
+ * "save" a file the browser already has rather than a canvas to rasterise.
+ *
+ * Error correction M, which is the level that survives a QR being printed small
+ * or photographed at an angle without inflating the module count: this URL
+ * lands at 29 modules, and a client scanning it is doing so on a phone, once.
+ *
+ * The action returns the *whole* SVG rather than the URL it encodes, because
+ * the URL is already on screen beside it — this exists to be looked at with a
+ * camera, not read.
+ */
+export async function surveyQr(token: string): Promise<{ svg: string } | { error: string }> {
+  const session = await auth();
+  if (!session?.user) return { error: 'Not signed in.' };
+
+  /* The token is the whole authorisation a survey link carries, so it is worth
+     being certain this one exists rather than drawing a code for anything a
+     caller sends. */
+  const db = await getDb();
+  const [row] = await db.select({ id: surveys.id }).from(surveys).where(eq(surveys.token, token)).limit(1);
+  if (!row) return { error: 'No survey with that link.' };
+
+  const { default: QRCode } = await import('qrcode');
+  const svg = await QRCode.toString(`${await surveyOrigin()}/s/${token}`, {
+    type: 'svg',
+    errorCorrectionLevel: 'M',
+    /* no quiet zone from the encoder — the panel gives it padding, and a
+       margin baked into the file is a margin somebody has to crop out */
+    margin: 0,
+  });
+  return { svg };
 }

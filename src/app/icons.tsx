@@ -77,3 +77,37 @@ export function MoreMark() {
     </svg>
   );
 }
+
+/**
+ * The share glyph — a box with an arrow leaving the top of it.
+ *
+ * The platform's own, not the platform's *look*: this is Apple's arrangement
+ * because it is the one a designer on a Mac has pressed ten thousand times, and
+ * a mark whose meaning has to be learned is a mark that does not work on a
+ * toolbar with no labels. The verb is in the tooltip and the accessible name,
+ * the way `LinkMark`'s is.
+ *
+ * It replaces the chain link on the project sheet, which copied on press. A
+ * chain link promises the clipboard and nothing else; this opens the panel that
+ * holds the link, the copy, and the code a client can point a camera at.
+ */
+export function ShareMark() {
+  return (
+    <svg {...box}>
+      <path d="M12 3.5 L12 14.5" {...stroke} />
+      <path d="M8.2 7.3 L12 3.5 L15.8 7.3" {...stroke} />
+      <path d="M7 10.5 H5.5 A1.5 1.5 0 0 0 4 12 v7 A1.5 1.5 0 0 0 5.5 20.5 h13 A1.5 1.5 0 0 0 20 19 v-7 a1.5 1.5 0 0 0-1.5-1.5 H17" {...stroke} />
+    </svg>
+  );
+}
+
+/** Saving the QR — an arrow into a tray, the share mark's opposite. */
+export function SaveMark() {
+  return (
+    <svg {...box}>
+      <path d="M12 3.5 L12 14.5" {...stroke} />
+      <path d="M8.2 10.7 L12 14.5 L15.8 10.7" {...stroke} />
+      <path d="M4.5 17.5 v1.5 A1.5 1.5 0 0 0 6 20.5 h12 a1.5 1.5 0 0 0 1.5-1.5 v-1.5" {...stroke} />
+    </svg>
+  );
+}

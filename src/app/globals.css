@@ -4813,3 +4813,135 @@ dialog::backdrop {
    builds its own document and prints that — see the note there for why a
    de-chromed copy of this sheet was the wrong shape, and why the <dialog>
    being nested rather than portalled made it a blank one. */
+
+/* ============================================================
+   Share — the link, the copy, and the code, in one panel.
+   ============================================================ */
+
+.shareslot {
+  position: relative;
+  display: flex;
+}
+
+/**
+ * The panel, hung off the share control the way `.barmenu` hangs off More.
+ *
+ * Wider than a menu, because it holds a URL that must be readable end to end
+ * and a code that must be scannable off the screen — 300px puts the QR at a
+ * size a phone locks onto from arm's length, which is the distance somebody
+ * across a table is holding theirs at.
+ */
+.sharepanel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 20;
+  width: 300px;
+  max-width: calc(100vw - 32px);
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-lg);
+  padding: 14px;
+}
+.sharehint {
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink-3);
+}
+
+.sharerow {
+  display: grid;
+  gap: 8px;
+}
+/**
+ * The URL, wrapping rather than scrolling.
+ *
+ * `anywhere`, not `break-all`: a link you cannot see the end of is a link
+ * nobody can check they are sending the right one, and a token broken across
+ * lines at an arbitrary point is still a token you can read. It is text and not
+ * a read-only input, which browsers style as unavailable and which invites an
+ * edit that would do nothing.
+ */
+.sharelink {
+  display: block;
+  padding: 9px 11px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-sm);
+  background: var(--parchment);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+.sharecopy,
+.sharesave {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  /* 40px, above the 44px touch floor's sibling minimum for a pointer-first
+     surface — this sheet is the team app, which is a desk */
+  min-height: 40px;
+  padding: 0 13px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-pill);
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.18s;
+}
+.sharecopy svg,
+.sharesave svg {
+  width: 17px;
+  height: 17px;
+  flex: none;
+}
+@media (hover: hover) {
+  .sharecopy:hover,
+  .sharesave:hover {
+    border-color: var(--ink-3);
+  }
+}
+
+.shareqr {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--hairline);
+}
+/**
+ * The code's own quiet zone.
+ *
+ * The encoder is asked for `margin: 0` so the file a person saves has no
+ * whitespace baked into it, which means the panel owns the margin — and a QR
+ * with nothing around it is a QR a camera struggles to find an edge on. White
+ * and not `--canvas`: a scanner reads contrast between modules and their
+ * ground, and parchment is a ground the spec does not assume.
+ */
+.qrframe {
+  width: 172px;
+  height: 172px;
+  padding: 12px;
+  background: #fff;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-sm);
+  /* the encoder emits paths with no fill of their own */
+  color: #000;
+}
+.qrframe svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* while the action is in flight — a box the size of the thing arriving, so the
+   panel does not jump when it does */
+.qrframe.loading {
+  background: var(--parchment);
+}

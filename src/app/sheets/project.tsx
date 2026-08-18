@@ -10,8 +10,7 @@ import {
   setDueDate,
 } from '@/lib/team/actions';
 import type { ProjectView } from '@/lib/team/projects';
-import { forDisplay } from '@/lib/survey/link';
-import { CheckMark, LinkMark } from '../icons';
+import ShareLink from './share';
 import MoreMenu from '../menu';
 import Sheet from './sheet';
 
@@ -47,7 +46,6 @@ export default function ProjectSheet({
   onActed: (message: string) => void;
 }) {
   const [confirmArchive, setConfirmArchive] = useState(false);
-  const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
   /**
@@ -72,28 +70,18 @@ export default function ProjectSheet({
 
   const link = p.token ? `${origin}/s/${p.token}` : null;
 
-  const share = async () => {
-    if (!link) return;
-    try {
-      await navigator.clipboard.writeText(link);
-      setError(null);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      setCopied(false);
-      setError('Could not reach the clipboard. The link is under "The link" below.');
-    }
-  };
-
   /**
    * Everything this project can have done to it, on the trailing edge.
    *
-   * Copy link is the one action taken often enough to stay visible — sending
-   * the link again is most of what this sheet is opened for, and until now the
-   * only way to do it was to select the URL out of a box with the mouse. It is
-   * a chain link, bare, per the HIG; the verb is in the tooltip and the
-   * accessible name, and the mark turns into a tick for two seconds, which is
-   * the only thing that says it worked.
+   * Share is the one action taken often enough to stay visible — sending the
+   * link again is most of what this sheet is opened for. It is a bare glyph per
+   * the HIG, with the verb in the tooltip and the accessible name.
+   *
+   * It was a chain link that copied on press, with the URL itself in a section
+   * headed "The link" further down the sheet. Two halves of one job in two
+   * places: the button gave you the link without showing it, the section showed
+   * it without giving it to you, and neither put it on a phone. Both are the
+   * share panel now — see share.tsx.
    *
    * The rest go behind More, per the HIG: "Prioritize less important actions
    * for inclusion in the More menu." Closing collection keeps its prominent
@@ -108,22 +96,8 @@ export default function ProjectSheet({
    */
   const actions = (
     <>
-      {link && (
-        <>
-          <button
-            className="iconbtn"
-            aria-label={copied ? 'Link copied' : 'Copy link'}
-            title={copied ? 'Copied' : 'Copy link'}
-            onClick={share}
-          >
-            {copied ? <CheckMark /> : <LinkMark />}
-          </button>
-          {/* a swapped glyph is silent to a screen reader, and changing the
-              button's own name mid-press is not reliably announced */}
-          <span className="visually-hidden" role="status">
-            {copied ? 'Link copied' : ''}
-          </span>
-        </>
+      {link && p.token && (
+        <ShareLink token={p.token} url={link} closed={!!p.closedOn} />
       )}
       <MoreMenu>
         {(close) => (
@@ -325,18 +299,17 @@ export default function ProjectSheet({
         )}
       </div>
 
-      {/* the survey link, so it can be sent again */}
+      {/**
+       * The date, and no longer the link.
+       *
+       * "The link" headed this section with the URL in a box beneath it, and
+       * both are in the share panel on the toolbar now — the link and the way
+       * to send it belong to one control, and this section is about *when* the
+       * answers are wanted rather than where they go.
+       */}
       {p.token && (
         <div className="pd-sec">
-          <h2>The link</h2>
-          <div className="linkbox">
-            <span>{forDisplay(origin)}/s/{p.token}</span>
-          </div>
-          <p className="hintline">
-            {p.closedOn
-              ? 'Closed — anyone opening it now is told so.'
-              : 'Still open. Forward it to anyone who should have a say.'}
-          </p>
+          <h2>The date</h2>
 
           {/**
            * The date the team asked for. Two weeks at creation, changed here.
