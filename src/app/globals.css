@@ -3070,6 +3070,80 @@ textarea {
 }
 
 /**
+ * The Collection panel — what closes the survey later, and what closes it now.
+ *
+ * Canvas inside the Edge, rows split by `--divider`: the same construction
+ * `.linkbox` and the version menu use, and the reason it is that and not
+ * something more elaborate is that this system draws a container with a line.
+ * A second bezel around it, or a shadow under it, would be two devices doing
+ * one job on a panel of two rows.
+ *
+ * The rows are a label and a control, which is why they justify apart rather
+ * than stacking: the eye reads the column of labels down the left and the
+ * column of controls down the right, and the two rows being the same shape is
+ * what says they are the same kind of thing.
+ */
+.collbox {
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-lg);
+  /* so a row's own ground stops at the curve rather than squaring it off */
+  overflow: hidden;
+}
+.collrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-md);
+  padding: var(--sp-sm) var(--sp-md);
+}
+.collrow + .collrow {
+  border-top: 1px solid var(--divider);
+}
+/* The label stops being a field label and becomes half of a row, so it loses
+   the margin that was holding a control beneath it. */
+.collrow .f {
+  margin-bottom: 0;
+}
+.collrow .dpwrap {
+  flex: none;
+}
+
+/**
+ * A row asking a question.
+ *
+ * Parchment, which is this system's recessed ground — the same one
+ * `.delconfirm` stands on. It is a row rather than a block floating inside the
+ * panel: the question is *about* the row above it, and a card inside a card is
+ * the thing that made the response confirmation look wrong this morning.
+ */
+.collask {
+  display: block;
+  background: var(--parchment);
+  padding: var(--sp-sm) var(--sp-md);
+}
+.collask p {
+  margin: 0 0 var(--sp-xs);
+  font-size: 13px;
+  /* Thai never below 1.6 on a line that can carry a client's name */
+  line-height: 1.6;
+  text-wrap: pretty;
+  color: var(--ink-2);
+}
+.collask p b {
+  font-weight: 600;
+  color: var(--ink);
+}
+.collask .why {
+  color: var(--ink-3);
+}
+.collask .iacts .btn {
+  min-height: 36px;
+  padding: 6px 16px;
+  font-size: 14.5px;
+}
+
+/**
  * Closing, under the date it sits with.
  *
  * A rule above it, because the two controls in this section are not a list:
@@ -3082,24 +3156,44 @@ textarea {
  * standing button that shouts would be the section demanding a decision every
  * time somebody opens a project to read an answer.
  */
-.closenow {
-  margin-top: var(--sp-md);
-  padding-top: var(--sp-md);
-  border-top: 1px solid var(--divider);
-}
-.closenow .btn {
+.collrow .btn-outline {
   display: inline-flex;
   align-items: center;
   gap: var(--sp-xs);
+  /* a row's control, not a section's: shorter than a CTA and sized to the row */
+  min-height: 38px;
+  padding: 6px 16px;
+  font-size: 15px;
 }
-.closenow .btn svg {
+.collrow .btn-outline svg {
   width: 17px;
   height: 17px;
   flex: none;
 }
+
+/* At 390 a label and its control stop fitting side by side, so the row becomes
+   two lines and the control takes the width it needs. */
+@media (max-width: 620px) {
+  .collrow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--sp-xs);
+  }
+  .collrow .dpwrap,
+  .collrow .btn-outline {
+    width: 100%;
+  }
+  .collrow .btn-outline {
+    justify-content: center;
+  }
+}
 /* the closed state's own line, and the way back from it */
 .pd-sec .isay + .btn-outline {
   margin-top: var(--sp-xs);
+}
+.pd-sec .collbox + .hintline {
+  display: block;
+  margin-top: var(--sp-sm);
 }
 
 /* ---- The date field ----------------------------------------------------

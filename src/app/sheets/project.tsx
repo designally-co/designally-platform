@@ -580,51 +580,56 @@ export default function ProjectSheet({
            * it means no date, which is how every survey sent before this
            * existed already behaves.
            */}
+          {/**
+           * The two ways a survey stops, as one object with two rows.
+           *
+           * They were five stacked things — a label, a field, a paragraph, a
+           * rule and a button — which said nothing about being related. They
+           * are the same act at two times, so they are two rows of one panel
+           * divided by a hairline: *what closes it later*, and *what closes it
+           * now*. The relationship is the layout rather than a sentence
+           * explaining it, which is what let the paragraph come down to a line.
+           *
+           * Canvas inside the Edge at `--r-lg`, rows split by `--divider` — the
+           * same construction `.linkbox` and the version menu already use. No
+           * shadow, no glass, no second bezel: this system draws containers
+           * with a line, and a panel of two rows in a 615px sheet is not a place
+           * to start drawing them another way.
+           */}
           {!p.closedOn && (
-            <div className="pd-due">
-              {/* A span, not a `<label for>` — the control is a group of three
-                  boxes and `for` binds only to a form control. */}
-              {/* "Closes on" and "Close now" name the same act at two times,
-                  which is what this section is: one control that shuts the link
-                  on a date, one that shuts it this minute. It read "Asking for
-                  answers by", which was right while the date only asked. */}
-              <span className="f" id={`due-${p.id}`}>
-                Closes on
-              </span>
-              {/* No `min` here, unlike the New survey sheet. A project's date can
-                  legitimately be moved to one already past — a team recording
-                  what they actually told the client, after the fact — and
-                  `setDueDate` accepts it. The refusal on creation is about a
-                  slip putting a brand-new project straight into Needs you. */}
-              {/* Typing moves the field and nothing else. The date shuts a
-                  client's link, so it is not a thing to commit on a keystroke —
-                  and a three-box control passes through several legal dates on
-                  the way to the one somebody means. */}
-              <DateField
-                labelledBy={`due-${p.id}`}
-                value={due}
-                disabled={pending}
-                onChange={setDue}
-              />
-              {dueChanged ? (
-                /**
-                 * The confirmation, in the shape the sheet's others take.
-                 *
-                 * It reads the *consequence* rather than restating the date,
-                 * because the three cases differ in what they do to the client:
-                 * a date forward reopens a shut link, a date already past shuts
-                 * it now, and no date at all leaves it open for good.
-                 */
-                <div className="delconfirm">
+            <div className="collbox">
+              <div className="collrow">
+                {/* A span, not a `<label for>`: the control is a group of three
+                    boxes and `for` binds only to a form control. */}
+                <span className="f" id={`due-${p.id}`}>
+                  Closes on
+                </span>
+                {/* No `min`, unlike the New survey sheet — a project's date can
+                    legitimately be moved to one already past, and `setDueDate`
+                    accepts it. Typing moves the field and nothing else: the date
+                    shuts a client's link, and a three-box control passes through
+                    several legal dates on the way to the one somebody means. */}
+                <DateField
+                  labelledBy={`due-${p.id}`}
+                  value={due}
+                  disabled={pending}
+                  onChange={setDue}
+                />
+              </div>
+
+              {dueChanged && (
+                /* A row of its own, spanning the panel — the question is about
+                   the row above it and belongs inside the same object. */
+                <div className="collrow collask">
                   <p>
-                    <b>{due ? `Change the date to ${niceDay(due)}?` : 'Remove the date?'}</b>
-                  </p>
-                  <p className="why">
-                    {!due
-                      ? 'The client is shown no date and the link stays open until somebody closes it.'
-                      : due < today
-                        ? 'It has already passed, so the link stops taking answers straight away.'
-                        : 'The client is shown it, and the link stops taking answers after it.'}
+                    <b>{due ? `Change to ${niceDay(due)}?` : 'Remove the date?'}</b>{' '}
+                    <span className="why">
+                      {!due
+                        ? 'The link stays open until somebody closes it.'
+                        : due < today
+                          ? 'It has already passed, so the link stops serving straight away.'
+                          : 'The client sees it, and the link stops serving after it.'}
+                    </span>
                   </p>
                   <div className="iacts">
                     <button
@@ -648,13 +653,54 @@ export default function ProjectSheet({
                     </button>
                   </div>
                 </div>
-              ) : (
-                <span className="hintline">
-                  The client sees this date and the link stops serving after it. Move it forward to
-                  let somebody back in. It does not write the analysis — <b>Close now</b> does.
-                </span>
+              )}
+
+              {p.answers > 0 && p.surveyId && (
+                confirming === 'close' ? (
+                  <div className="collrow collask">
+                    <p>
+                      <b>Close it now?</b>{' '}
+                      <span className="why">
+                        The analysis is written and the link stops serving. You can reopen it
+                        afterwards.
+                      </span>
+                    </p>
+                    <div className="iacts">
+                      <button
+                        className="btn btn-ink"
+                        disabled={pending}
+                        onClick={() => {
+                          setConfirming(null);
+                          run(() => closeCollection(p.surveyId!), 'Collection closed.');
+                        }}
+                      >
+                        {pending ? 'Closing…' : 'Close'}
+                      </button>
+                      <button className="btn btn-quiet" onClick={() => setConfirming(null)}>
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="collrow">
+                    <span className="f">Or stop now</span>
+                    <button className="btn btn-outline" onClick={() => setConfirming('close')}>
+                      <LockMark />
+                      <span>Close now</span>
+                    </button>
+                  </div>
+                )
               )}
             </div>
+          )}
+
+          {/* One line, under the panel rather than inside it. The panel says
+              what the two controls do; this says the one thing neither can show
+              — that only the second of them writes the analysis. */}
+          {!p.closedOn && (
+            <p className="hintline">
+              The client sees the date. Closing writes the analysis; the date only shuts the link.
+            </p>
           )}
           {p.closedOn ? (
             <>
@@ -675,50 +721,12 @@ export default function ProjectSheet({
                 {pending ? 'Reopening…' : 'Reopen for answers'}
               </button>
             </>
-          ) : (
-            p.answers > 0 &&
-            p.surveyId && (
-              <div className="closenow">
-                {confirming === 'close' ? (
-                  /* The line is what a person cannot see from the button: that
-                     the analysis starts here, and that this is reversible. */
-                  <div className="delconfirm">
-                    <p>
-                      <b>Close collection now?</b>
-                    </p>
-                    <p className="why">
-                      The analysis is written, and the link stops taking answers. You can reopen
-                      it afterwards.
-                    </p>
-                    <div className="iacts">
-                      <button
-                        className="btn btn-ink"
-                        disabled={pending}
-                        onClick={() => {
-                          setConfirming(null);
-                          run(() => closeCollection(p.surveyId!), 'Collection closed.');
-                        }}
-                      >
-                        {pending ? 'Closing…' : 'Close'}
-                      </button>
-                      <button className="btn btn-quiet" onClick={() => setConfirming(null)}>
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <button className="btn btn-outline" onClick={() => setConfirming('close')}>
-                    <LockMark />
-                    <span>Close now</span>
-                  </button>
-                )}
-              </div>
-            )
-          )}
-          {/* Reopening is in the toolbar's More menu. A stakeholder replying the
-              day after collection closed is not an edge case, and reopening
-              leaves the insights alone: what they say was true of the answers
-              they were written from, and they keep saying so. */}
+          ) : null}
+          {/* Reopening sits with the closed line above, not in a menu. A
+              stakeholder replying the day after collection closed is not an
+              edge case, and reopening leaves the insights alone: what they say
+              was true of the answers they were written from, and they keep
+              saying so. */}
         </div>
       )}
 
