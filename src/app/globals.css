@@ -4042,15 +4042,18 @@ dialog::backdrop {
   color: var(--ink-3);
 }
 @media (hover: hover) {
-  /* the same hover every other quiet control has — the line darkens, and the
-     name underlines so the card reads as a way through rather than a label.
-     No accent: nobody is needed here, they are only pointing at it. */
+  /**
+   * The line darkens, and that is all.
+   *
+   * The name used to underline as well, on the argument that it made the card
+   * read as a way through rather than a label. It is a card with a border, a
+   * ground and a cursor — it already reads as a way through — and the underline
+   * put link decoration on a name, which is the one thing on the card that is
+   * somebody's rather than the app's. DESIGN.md §5 gives one rule for a hover
+   * here: the line darkens to `--ink-3`, nothing else.
+   */
   .person:hover {
     border-color: var(--ink-3);
-  }
-  .person:hover b {
-    text-decoration: underline;
-    text-underline-offset: 3px;
   }
 }
 /* A document opens the same way a person does, so it is drawn the same way —
