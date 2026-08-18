@@ -535,56 +535,6 @@ export default function ProjectSheet({
         )}
       </div>
 
-      {/* right now */}
-      <div className="pd-now">
-        <div className="lab">{p.action ? 'NEEDS YOUR TEAM' : 'WAITING'}</div>
-        {p.action ? (
-          <>
-            <p>
-              <b>{p.action.say}</b> {p.action.emphasis}
-            </p>
-            <p className="when">{p.action.when}</p>
-            {/**
-             * This card says what is going on. It no longer does anything about
-             * it, as of 18 August 2026.
-             *
-             * It carried a primary button branching three ways — close, write
-             * the insights, review them — and every one of those is what the
-             * Insights section below now does, with the picker attached. Two
-             * buttons a thumb apart running the same analysis is how you get a
-             * team choosing four respondents in one place and generating from
-             * all five in the other.
-             *
-             * What is left is the half the section cannot say: *why now*. The
-             * date has passed, or it has been quiet five days — a reason, and
-             * the date it is reckoned from.
-             */}
-          </>
-        ) : (
-          <>
-            <p>
-              {p.closedOn
-                ? `Collection closed on ${p.closedOn}${p.closedByName ? ` by ${p.closedByName}` : ''}, with ${p.answers} ${p.answers === 1 ? 'answer' : 'answers'}.`
-                : p.answers
-                  ? `${p.answers} ${p.answers === 1 ? 'answer' : 'answers'} so far, the last one ${p.lastAnswerOn}. Nothing for your team to do — the app will speak up if it goes quiet.`
-                  : 'The link has been sent. No answers yet.'}
-            </p>
-
-            {/**
-             * Closing is always available, not only once the app has noticed a
-             * quiet survey (docs/team-workflow-after-survey.md). Only a person
-             * knows whether four answers from the right people beat ten from
-             * the wrong ones, and they may know that on day one. The five-day
-             * prompt is the app catching up, never the gate opening.
-             *
-             * The always-available version lives in the toolbar's More menu
-             * from 17 August 2026. The prominent button stays in this card
-             * whenever the app is the one asking.
-             */}
-          </>
-        )}
-      </div>
-
       {/**
        * The date, and no longer the link.
        *
@@ -674,26 +624,59 @@ export default function ProjectSheet({
       <div className="pd-sec pd-insights">
         <h2>Insights</h2>
 
+        {/**
+         * The *needs your team* banner, folded in — 18 August 2026, asked for.
+         *
+         * It was a card of its own two sections up, saying what was going on and
+         * nothing about it: its button had already gone, because all three of
+         * the things it prompted for are what this section does. Closing
+         * collection is this section's own Generate; writing the insights after
+         * a failure is a re-run; reviewing them is *Open the insights*. A prompt
+         * that far from the only control answering it is two places to read
+         * before pressing one button.
+         *
+         * The accent label comes with it and keeps its rule: it appears only
+         * when a person is actually needed (DESIGN.md §1). With nothing
+         * outstanding the section states where the analysis stands and stays
+         * quiet, which is what the card's own *WAITING* was for.
+         *
+         * `say`/`emphasis`/`when` are used when there is an action because they
+         * are situational and richer — *the date you asked for has passed*, and
+         * the date it is reckoned from. The plain line underneath is the resting
+         * state, and the two never both appear.
+         */}
+        {p.action ? (
+          <>
+            <p className="ineed">NEEDS YOUR TEAM</p>
+            <p className="isay">
+              <b>{p.action.say}</b> {p.action.emphasis}
+            </p>
+            <p className="iwhen">{p.action.when}</p>
+          </>
+        ) : p.insights ? (
+          <p className="isay">
+            <b>Written {p.insightsWrittenOn}</b>
+            {p.insightsVersions.length > 1 ? ` · ${p.insightsVersions.length} versions kept` : ''}
+          </p>
+        ) : (
+          <p className="isay">
+            <b>Not written yet</b>
+            {p.closedOn
+              ? ` · collection closed ${p.closedOn}${p.closedByName ? ` by ${p.closedByName}` : ''}`
+              : p.answers
+                ? ' · collection is open'
+                : ''}
+          </p>
+        )}
+
         {!p.people.length ? (
           <p className="quiet">
-            Nobody has answered yet. The analysis reads the answers, so it has nothing to read.
+            {p.token
+              ? 'Nobody has answered yet. The analysis reads the answers, so it has nothing to read.'
+              : 'No link has been issued for this project yet.'}
           </p>
         ) : (
           <>
-            {/* What exists, before what can be done about it. */}
-            {p.insights ? (
-              <p className="isay">
-                <b>Written {p.insightsWrittenOn}</b>
-                {p.insightsVersions.length > 1
-                  ? ` · ${p.insightsVersions.length} versions kept`
-                  : ''}
-              </p>
-            ) : (
-              <p className="isay">
-                <b>Not written yet</b>
-                {p.closedOn ? ' · collection is closed' : ''}
-              </p>
-            )}
 
             {/**
              * Whose answers to read. One row each, everyone ticked.

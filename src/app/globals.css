@@ -2455,16 +2455,48 @@ textarea {
  * saying a person is needed here (DESIGN.md section 1). A banner drawn as a
  * coloured panel would have claimed that twice.
  */
+/**
+ * The section's status line — the *needs your team* card's own words, now that
+ * the card has gone into it.
+ *
+ * 15px rather than the card's 16: it is a line inside a section now, over a
+ * heading rather than alone in a box of its own, and it stops competing with
+ * the `<h2>` above it.
+ */
 .pd-insights .isay {
-  font-size: 14px;
-  /* Thai never below 1.6 on a line that can carry a date and a name */
+  font-size: 15px;
+  /* Thai never below 1.6 on a line that can carry a client's name */
   line-height: 1.6;
+  text-wrap: pretty;
   color: var(--ink-3);
-  margin-bottom: var(--sp-md);
+  margin-bottom: var(--sp-sm);
 }
 .pd-insights .isay b {
   font-weight: 600;
   color: var(--ink);
+}
+/**
+ * "A person is needed here", and only then.
+ *
+ * DESIGN.md §1: the accent is never decorative. This is the one thing on the
+ * sheet allowed to wear it, and it is absent whenever `action` is null — which
+ * is the same condition that empties the row from Needs you. The card's
+ * counterpart said *WAITING* in the same slot; a label announcing that nothing
+ * is happening is a line of type spent on nothing.
+ */
+.pd-insights .ineed {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--primary-mark);
+  margin-bottom: var(--sp-xs);
+}
+/* When the prompt is reckoned from — the date that passed, the day it closed. */
+.pd-insights .iwhen {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink-3);
+  margin-bottom: var(--sp-md);
 }
 
 /* The two buttons wrap rather than shrink: "Close collection and generate" is a
@@ -3362,34 +3394,7 @@ dialog::backdrop {
    `.pd-head` was the client's name as an <h1> with the package and code under
    it, at the top of the body. The sticky bar carries all three now, so the
    block was the same three facts a second time, 26px above themselves. */
-.pd-now {
-  background: var(--canvas);
-  border: 1px solid var(--hairline);
-  border-radius: var(--r-card);
-  padding: 22px var(--sp-lg);
-  margin-bottom: 30px;
-}
-.pd-now .lab {
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  color: var(--primary-mark);
-  margin-bottom: var(--sp-xs);
-}
-.pd-now p {
-  font-size: 16px;
-  line-height: 1.6;
-  text-wrap: pretty;
-  margin-bottom: 14px;
-}
-.pd-now p b {
-  font-weight: 600;
-  color: inherit;
-}
-.pd-now .when {
-  font-size: 14px;
-  color: var(--ink-3);
-}
+
 .pd-sec {
   margin-bottom: 30px;
 }

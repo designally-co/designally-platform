@@ -19,11 +19,17 @@ and it asks first: that press is gate 1, it stops the link, and it puts a name o
 the close. Once closed it reads *Generate insights* or *Generate again* and asks
 nothing — every run is kept and none is overwritten.
 
-The *right now* card above it no longer has a button. It had one that branched
-three ways, and all three are what the Insights section does now; two controls a
-thumb apart running the same analysis is how a team ticks four respondents in one
-place and generates from five in the other. The card keeps the half the section
-cannot say — *why now*: the date has passed, or it has been quiet five days.
+The *right now* card is gone, folded into that section. It had already lost its
+button — it branched three ways and all three are what the Insights section does,
+and two controls a thumb apart running the same analysis is how a team ticks four
+respondents in one place and generates from five in the other. What was left was a
+prompt two sections above the only control that answers it, so it moved to sit on
+top of that control: the accent label, the reason, and the date the reason is
+reckoned from, directly over the button.
+
+The accent label appears only when something is genuinely outstanding, which is
+the same condition that puts the project in *Needs you*. At rest the section says
+where the analysis stands and stays quiet.
 
 **Answers can arrive after a version is written, and a new one can be asked for at
 any time** (18 August 2026). The ordinary shape is: close, read, reopen because
