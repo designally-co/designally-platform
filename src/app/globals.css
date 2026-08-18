@@ -5457,10 +5457,11 @@ dialog::backdrop {
  * node is complete and only its box is short.
  */
 .sharelink {
-  /* full width and stacked now — the link is the thing being sent, Copy under
-     it is the sending. They were a row while Copy was a disc. */
+  flex: 1;
+  min-width: 0;
+  /* the same 44 as the disc beside it, so the row has one height rather than a
+     box and a control that nearly line up */
   min-height: 44px;
-  margin-bottom: 8px;
   display: flex;
   align-items: center;
   padding: 0 12px;
@@ -5482,27 +5483,66 @@ dialog::backdrop {
    centimetre from one, and at 40 against their 44 the panel read as a slightly
    different set of controls rather than the same ones. */
 /**
- * Copy is the panel's action, so it is a button and not a disc.
+ * Copy: a disc beside the link, and filled.
  *
- * A 44px circle beside the link was right while the link was the row and Copy
- * an accessory to it — and wrong once the panel was ordered around the thing
- * people open it to do. It takes `.btn.btn-primary` in the markup, so it
- * inherits the accent and the charcoal label DESIGN.md settled on: white on the
- * CI orange is 3.24:1 at this size, charcoal on the same orange is 5.19.
+ * It was outlined white, which beside a grey link box made two pieces of
+ * furniture with nothing saying which one did something. The accent is how this
+ * system marks the thing a person is meant to press, and copying the link is
+ * what the panel is opened for.
+ *
+ * `--primary` with a white mark measures 5.03:1 — past the 4.5 for text and the
+ * 3:1 a graphical object needs, and the reason `--primary` is `#c73f29` rather
+ * than the CI's own orange, which is 3.24 under white. Hover takes
+ * `--primary-deep`, which DESIGN.md set at 5.85 for exactly this: darken, never
+ * lighten.
  *
  * The mark still turns into a tick, which is the half that says it worked.
  */
 .sharecopy {
-  /* flex, or the mark and the label are two inline boxes and the button comes
-     out 61px instead of `.btn`'s 44 — `gap` on a block does nothing */
+  flex: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  gap: 8px;
-  margin-bottom: 4px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: var(--primary);
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.18s;
 }
+@media (hover: hover) {
+  .sharecopy:hover {
+    background: var(--primary-deep);
+  }
+}
+/**
+ * Save, laid on the code it saves — dark, in a white halo.
+ *
+ * It was a white disc with a hairline, the same object the toolbar carries, and
+ * on a field of black-and-white noise it read as a gap in the modules rather
+ * than a control. A hairline cannot separate white from a surface that is
+ * already half white.
+ *
+ * Inverted, it has nothing to be confused with: `--ink` at 16.1:1 under its
+ * white mark, and a 5px ring of `--canvas` doing the separating. Black is the
+ * code's own colour, so this introduces no hue to a two-colour object — the
+ * ring is what makes it an object rather than a blot.
+ *
+ * Not the accent, though it would certainly be visible. DESIGN.md §1 gives the
+ * accent one meaning — a person is needed here — and the panel already spends
+ * it on Copy, which is the action it is opened for. Two accents in 320px is one
+ * accent and one decoration.
+ */
 .sharesave {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -5511,17 +5551,14 @@ dialog::backdrop {
      sheet is used at a desk and the touch floor is a phone's rule — true, and
      beside the point: what decides the number here is the controls it stands
      next to, and every one of those is 44. */
-  min-height: 44px;
-  padding: 0 13px;
-  border: 1px solid var(--hairline);
+  padding: 0;
+  /* the halo, and the only thing separating the disc from the modules */
+  border: 5px solid var(--canvas);
   border-radius: var(--r-pill);
-  background: var(--canvas);
-  color: var(--ink);
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 600;
+  background: var(--ink);
+  color: var(--canvas);
   cursor: pointer;
-  transition: border-color 0.18s;
+  transition: background-color 0.18s;
 }
 .sharecopy svg,
 .sharesave svg {
@@ -5531,7 +5568,7 @@ dialog::backdrop {
 }
 @media (hover: hover) {
   .sharesave:hover {
-    border-color: var(--ink-3);
+    background: var(--ink-2);
   }
 }
 
@@ -5539,9 +5576,7 @@ dialog::backdrop {
    same thing, not two sections — a line across the panel says they are separate
    business, and space says the same boundary without the claim. */
 .shareqr {
-  display: grid;
-  justify-items: center;
-  gap: 10px;
+  position: relative;
   margin-top: 14px;
 }
 /**

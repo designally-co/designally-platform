@@ -141,21 +141,30 @@ export default function ShareLink({ token, url, closed }: { token: string; url: 
           </p>
 
           {/**
-           * The link, then Copy, then the code.
+           * The link and its Copy, on one line.
            *
-           * Copy was a 40px disc beside the link and the code was the largest
-           * thing in the panel — which is the wrong way round for how this is
-           * used. Most opens end in a link pasted into an email or a LINE
-           * message; the camera is the other job, and it still gets the whole
-           * width, just not the first place.
+           * Copy is filled rather than outlined: it is the action this panel is
+           * opened for, and the accent is what the system uses to say so. A
+           * white disc beside a grey box read as two pieces of furniture, with
+           * nothing marking which one does something.
+           *
+           * A disc rather than a labelled button, because the row is the link —
+           * a full-width `Copy link` under it pushed the code down a line and
+           * spent the panel's loudest element on a verb the mark already says.
            */}
-          <span className="sharelink" title={url}>
-            {forDisplay(url)}
-          </span>
-          <button className="btn btn-primary sharecopy" onClick={copy}>
-            {copied ? <CheckMark /> : <LinkMark />}
-            {copied ? 'Copied' : 'Copy link'}
-          </button>
+          <div className="sharerow">
+            <span className="sharelink" title={url}>
+              {forDisplay(url)}
+            </span>
+            <button
+              className="sharecopy"
+              aria-label={copied ? 'Link copied' : 'Copy link'}
+              title={copied ? 'Copied' : 'Copy link'}
+              onClick={copy}
+            >
+              {copied ? <CheckMark /> : <LinkMark />}
+            </button>
+          </div>
 
           {/* a swapped glyph is silent to a screen reader */}
           <span className="visually-hidden" role="status">
@@ -170,9 +179,25 @@ export default function ShareLink({ token, url, closed }: { token: string; url: 
                     what keeps it correct if this sheet is ever on the dark
                     Field, and what stops a printed code coming out orange. */}
                 <div className="qrframe" dangerouslySetInnerHTML={{ __html: qr }} />
-                <button className="sharesave" onClick={save}>
+                {/**
+                 * Save sits on the code rather than under it.
+                 *
+                 * The panel is ordered around copying a link; a full-width
+                 * button for the rarer job was the second loudest thing in it.
+                 * On the code it is where the thing it saves is, and it costs
+                 * the panel a row.
+                 *
+                 * Centred, which is the one place it is safe. A QR's three
+                 * corner squares are *finder* patterns — a decoder locates the
+                 * symbol with them before any error correction runs, so
+                 * covering one breaks the code outright no matter how much
+                 * redundancy it carries. The centre is data, and at 44px on a
+                 * 256px code the disc hides 2.3% of the area against the ~15%
+                 * level M recovers. Printing it much smaller than this would
+                 * be the reason to raise the level, not the button.
+                 */}
+                <button className="sharesave" aria-label="Save the code" title="Save the code" onClick={save}>
                   <SaveMark />
-                  Save the code
                 </button>
               </>
             ) : error ? null : (
