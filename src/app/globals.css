@@ -5571,17 +5571,27 @@ dialog::backdrop {
   color: var(--ink);
 }
 /**
- * The app's own field, not a smaller copy of it.
+ * Compact, and still a rectangle — which takes a smaller radius, not the same
+ * one.
  *
- * It was overridden to 38px at 15px type on the argument that a panel wants
- * something more compact than a form. That made it look like `.input` and
- * measure like something else — a second field with no name, which is how a
- * system grows two of everything. It takes `.input` whole: 44px, 17px type,
- * `--r-lg`, and `--canvas` white, which on the red wash reads as the thing in
- * front the way a hovered row does.
+ * A corner radius is only "rounded" relative to the height it sits on. At the
+ * form's 44px, `--r-lg`'s 18 leaves 8px of straight edge on each end and reads
+ * as a rounded rectangle. At 38px the same 18 is one pixel short of 19, which
+ * is the capsule — so the field that was supposed to stop looking like a pill
+ * would have become one by being made shorter.
+ *
+ * `--r-md` at 11 is 58% of this height against `--r-lg`'s 82% of the form's, so
+ * the two read as the same shape at two sizes. That is what the rungs are for.
+ *
+ * `--canvas` white from `.input` is doing work here too: on the red wash the
+ * field is the thing in front, the way a hovered row is.
  */
 .delconfirm .input {
   width: 100%;
+  height: 38px;
+  padding: 0 12px;
+  font-size: 15px;
+  border-radius: var(--r-md);
 }
 /* Quiet rather than red while unavailable — an accent on a control nobody can
    use yet is the accent saying a person is needed at a place they cannot act,
