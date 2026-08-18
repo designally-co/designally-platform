@@ -111,3 +111,22 @@ export function SaveMark() {
     </svg>
   );
 }
+
+/**
+ * The bin, for deleting a response.
+ *
+ * The one mark in this app that names a destructive act, and it is the one
+ * symbol a person has never had to learn. The lid is a separate stroke from the
+ * body because at 20px a single outline reads as a cup.
+ */
+export function TrashMark() {
+  return (
+    <svg {...box}>
+      <path d="M4.5 6.5 H19.5" {...stroke} />
+      <path d="M9.5 6.5 V4.8 A1.3 1.3 0 0 1 10.8 3.5 h2.4 A1.3 1.3 0 0 1 14.5 4.8 V6.5" {...stroke} />
+      <path d="M6.5 6.5 l0.8 12.2 A1.8 1.8 0 0 0 9.1 20.5 h5.8 a1.8 1.8 0 0 0 1.8-1.8 L17.5 6.5" {...stroke} />
+      <path d="M10.4 10 v6.5" {...stroke} />
+      <path d="M13.6 10 v6.5" {...stroke} />
+    </svg>
+  );
+}

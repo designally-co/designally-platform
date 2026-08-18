@@ -1592,6 +1592,25 @@ label.f span {
     background-color 0.18s,
     transform 0.12s var(--ease);
 }
+/**
+ * The disc that destroys something keeps the same mark colour as the other two.
+ *
+ * It was going to take `--critical`, which is what this app gives an
+ * irreversible act everywhere else. Measured on the disc it is **2.54:1**
+ * against `--fill` — under the 3:1 a graphical object has to clear, on the one
+ * control where being seen matters most. The alternatives were both worse than
+ * the problem: a darker red is a colour DESIGN.md §1 has never measured, added
+ * at speed for one glyph, and a red disc rather than a red mark makes the bar
+ * three shapes again.
+ *
+ * The bin carries it instead, which is the thing a person actually reads — no
+ * colour has ever been what tells somebody a bin deletes. The warning that
+ * matters is a sentence, and it is one press away in the panel.
+ */
+.iconbtn.danger {
+  color: var(--glyph);
+}
+
 .iconbtn:active {
   background: var(--fill-press);
   color: var(--ink);
@@ -4981,6 +5000,13 @@ dialog::backdrop {
   padding: 10px 11px 11px;
   border-top: 1px solid var(--hairline);
   margin-top: 4px;
+}
+/* on the response toolbar it is the whole popover rather than a section at the
+   foot of a menu, so there is nothing above it to be divided from */
+.barmenu > .delconfirm:only-child {
+  border-top: 0;
+  margin-top: 0;
+  padding-top: 4px;
 }
 .delconfirm p {
   margin: 0;

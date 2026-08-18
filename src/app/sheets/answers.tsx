@@ -11,6 +11,7 @@ import {
   printableHtml,
   scaleReading,
 } from '@/lib/team/export';
+import { SaveMark, TrashMark } from '../icons';
 import MoreMenu from '../menu';
 import Sheet from './sheet';
 
@@ -285,30 +286,77 @@ export default function AnswersSheet({
       title={`What ${clientName} said`}
       backLabel={backLabel}
       onClose={onClose}
+      /**
+       * Two controls, and they are the two things you do to a response: take a
+       * copy of it, or remove it.
+       *
+       * It was one ellipsis holding both. An ellipsis is right when the items
+       * behind it are the leftovers — the HIG's "less important actions" — and
+       * these are not leftovers, they are the entire set. Naming them costs two
+       * discs on a bar that has room for them and saves a press to find out
+       * what is there.
+       *
+       * Download keeps a popover because it has two formats: the mark names the
+       * act and the menu names the shape, which is one decision each rather
+       * than two buttons that differ only in file extension.
+       *
+       * **Delete moved up here from the foot of the sheet, and that is a real
+       * trade.** It sat under the answers deliberately: the reason to delete a
+       * response is in the response, and a Delete above the evidence is one
+       * pressed on a name alone — which is exactly why it was moved off the
+       * project sheet in the first place. What protects it now is the guard
+       * rather than the position, and the guard is the stronger half: the first
+       * press only ever opens this panel, and the server refuses outright if a
+       * confirmed insights read these answers.
+       */
       actions={
         data.respondents.length ? (
-          <MoreMenu label={`Export ${person.name}'s answers`}>
-            {(close) => (
-              <>
-                <button
-                  onClick={() => {
-                    download(person);
-                    close();
-                  }}
-                >
-                  Download · Markdown
-                </button>
-                <button
-                  onClick={() => {
-                    close();
-                    print(person);
-                  }}
-                >
-                  Print · PDF
-                </button>
-              </>
-            )}
-          </MoreMenu>
+          <>
+            <MoreMenu label={`Download ${person.name}'s answers`} icon={<SaveMark />}>
+              {(close) => (
+                <>
+                  <button
+                    onClick={() => {
+                      download(person);
+                      close();
+                    }}
+                  >
+                    Markdown
+                    <small>Text, for reading and pasting.</small>
+                  </button>
+                  <button
+                    onClick={() => {
+                      close();
+                      print(person);
+                    }}
+                  >
+                    PDF
+                    <small>A page per person, laid out to print.</small>
+                  </button>
+                </>
+              )}
+            </MoreMenu>
+            <MoreMenu label={`Delete ${person.name}'s answers`} icon={<TrashMark />} danger>
+              {(close) => (
+                <div className="delconfirm">
+                  <p>
+                    This removes every answer {person.name} gave. It cannot be undone.
+                  </p>
+                  <button
+                    className="danger"
+                    disabled={pending}
+                    onClick={() => {
+                      close();
+                      remove();
+                    }}
+                  >
+                    {pending ? 'Deleting…' : 'Delete permanently'}
+                  </button>
+                  <button onClick={close}>Cancel</button>
+                </div>
+              )}
+            </MoreMenu>
+          </>
         ) : null
       }
     >
@@ -351,14 +399,16 @@ export default function AnswersSheet({
             </section>
           ))}
 
-          {/* under the answers, not above them: the reason to delete a response
-              is in the response, and a Delete placed before it is pressed on a
-              name alone — which is what it was on the project sheet. */}
+          {/* The errors stay at the foot, where the answers they are about are.
+              A refusal from the server — a confirmed insights read these — is a
+              sentence to read, and a popover that has closed cannot hold it. */}
           {printError && <p className="formerror">{printError}</p>}
           {error && <p className="formerror">{error}</p>}
-          <button className="ansdrop" disabled={pending} onClick={remove}>
-            {warned ? 'Delete anyway' : `Delete ${person.name}'s answers`}
-          </button>
+          {warned && (
+            <button className="ansdrop" disabled={pending} onClick={remove}>
+              Delete anyway
+            </button>
+          )}
         </>
       )}
     </Sheet>

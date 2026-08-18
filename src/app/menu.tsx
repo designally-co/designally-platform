@@ -28,9 +28,22 @@ import { MoreMark } from './icons';
  */
 export default function MoreMenu({
   label = 'More',
+  icon,
+  danger = false,
   children,
 }: {
   label?: string;
+  /**
+   * The mark on the button. Defaults to the ellipsis, which is what More means.
+   *
+   * Given one, this is not a More menu any more but the same machinery — a
+   * popover that dismisses on Escape and on a click away, and stops Escape
+   * reaching the `<dialog>` it sits inside. A download that has two formats and
+   * a delete that has to be confirmed both need exactly that and nothing else.
+   */
+  icon?: ReactNode;
+  /** the control is destructive, and the mark says so before it is pressed */
+  danger?: boolean;
   children: (close: () => void) => ReactNode;
 }) {
   const [open, setOpen] = useState(false);
@@ -60,14 +73,14 @@ export default function MoreMenu({
   return (
     <div className="moreslot" ref={ref}>
       <button
-        className="iconbtn"
+        className={danger ? 'iconbtn danger' : 'iconbtn'}
         aria-label={label}
         title={label}
         aria-expanded={open}
         aria-haspopup="true"
         onClick={() => setOpen((o) => !o)}
       >
-        <MoreMark />
+        {icon ?? <MoreMark />}
       </button>
       {open && <div className="barmenu">{children(() => setOpen(false))}</div>}
     </div>
