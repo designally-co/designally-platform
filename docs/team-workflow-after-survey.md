@@ -6,6 +6,22 @@ _Designally Platform_
 
 **1 · Nothing.** Answers accumulate. No expected count, no fraction. The team is not asked to watch.
 
+**Collection is one section** (18 August 2026). The date and *Close collection*
+govern the same thing — whether the link is taking answers — and they were in two
+places: a section for the date, a row in the toolbar's More menu for the close.
+They are together now, and the difference between them stays visible: the date is
+a soft shutter that writes nothing and undoes itself when you move it forward,
+closing is gate 1 and puts a name on the record. Reopening came with the close,
+being its inverse.
+
+The More menu keeps only what *finishes* with a project: archive and delete.
+
+**The insights section stopped closing.** Its button read *Close collection and
+generate* and did both — one press instead of two, and a second control that
+closes a survey a few inches from the one that does it deliberately. It says what
+is missing now and points at the section above. Generating still requires a
+closed survey; that has not changed, only who does the closing.
+
 **The project sheet is where the insights are made** (18 August 2026, asked for by
 the team). Three sections in the order the work happens: *Who answered*, where each
 person opens their own answers; *Insights*, where you tick whose answers to read,

@@ -151,15 +151,6 @@ export default function ProjectSheet({
    */
   const [only, setOnly] = useState<string[] | null>(null);
 
-  /**
-   * The banner's own confirmation, separate from the More menu's.
-   *
-   * Closing collection from here is gate 1 exactly as it is from the menu — it
-   * stamps `closed_by`, it stops the link, and it starts a paid analysis — so it
-   * asks first for the same reasons. It cannot share `confirming`: that value
-   * drives the menu, and one field would open both panels at once.
-   */
-  const [confirmGenerate, setConfirmGenerate] = useState(false);
   /** Whether the subset dropdown is open. Shut is the ordinary case: read everyone. */
   const [picking, setPicking] = useState(false);
   const split = useRef<HTMLDivElement>(null);
@@ -222,10 +213,7 @@ export default function ProjectSheet({
   const generate = () =>
     start(async () => {
       setError(null);
-      setConfirmGenerate(false);
-      const result = p.closedOn
-        ? await reanalyse(p.id, only ?? undefined)
-        : await closeCollection(p.surveyId!, only ?? undefined);
+      const result = await reanalyse(p.id, only ?? undefined);
       if (!result.ok) {
         setError(result.error ?? 'That did not work.');
         return;
@@ -245,43 +233,13 @@ export default function ProjectSheet({
   const chosen = only === null ? p.people.length : only.length;
 
   /**
-   * Gate 1, asked before it is crossed.
-   *
-   * Generating while the survey is open closes it on the way, which stops the
-   * link and puts a name on the close — so it asks, the way every other gate on
-   * this sheet does. Once closed it is a re-run and asks nothing: every version
-   * is kept and none is overwritten.
-   *
-   * One block, used from both the plain state and the picker, so the two cannot
-   * drift into asking differently about the same act.
-   */
-  const closeFirst = (
-    <div className="delconfirm">
-      <p>This closes collection first — the link stops taking answers, and your name goes on it.</p>
-      {/* Wrapped, so `.delconfirm > button` does not reach them: that rule
-          compacts a menu row, and these two are buttons on a sheet standing next
-          to other buttons on the same sheet. */}
-      <div className="iacts">
-        {/* Ink, like the other two confirmations: a person pressing this has
-            already been asked. See `.btn-ink`. */}
-        <button className="btn btn-ink" disabled={pending} onClick={generate}>
-          {pending ? 'Working…' : `Close and generate from ${chosen} ${chosen === 1 ? 'answer' : 'answers'}`}
-        </button>
-        <button className="btn btn-quiet" onClick={() => setConfirmGenerate(false)}>
-          Cancel
-        </button>
-      </div>
-    </div>
-  );
-
-  /**
    * Like `run`, but the sheet stays where it is.
    *
-   * `run` ends by closing the project — right for archiving, deleting, closing
-   * collection, all of which finish with the project. Changing the date is not
-   * one of those: it is an edit made *while* reading a project, and closing the
-   * sheet under somebody who has just moved a date by a week is the app
-   * deciding they are done when they are not.
+   * `run` ends by closing the project — right for archiving, deleting and
+   * closing collection, all of which finish with the project. Changing a date
+   * or reopening is not one of those: it is an edit made *while* reading a
+   * project, and closing the sheet under somebody who has just moved a date is
+   * the app deciding they are done when they are not.
    */
   const runStay = (fn: () => Promise<{ ok: boolean; error?: string }>, message: string) =>
     start(async () => {
@@ -380,60 +338,11 @@ export default function ProjectSheet({
       >
         {(close) => (
           <>
-            {/**
-             * Gate 1 asks first, like the two under it.
-             *
-             * It was the one gate that fired on the press. Reopening exists, so
-             * it was never unrecoverable — but it is not free either: closing
-             * runs the analysis, which is a paid call and a minute of waiting,
-             * and it changes what the client sees on the link. A menu row that
-             * does all that between two rows that both ask twice is the one an
-             * elbow finds.
-             *
-             * The line under it is what a person needs to know before pressing
-             * and cannot see from the row: that the analysis starts here, and
-             * that this is reversible.
-             */}
-            {!p.closedOn &&
-              p.surveyId &&
-              p.answers > 0 &&
-              (confirming === 'close' ? (
-                <div className="delconfirm">
-                  <p>The analysis is written now. You can reopen it afterwards.</p>
-                  <div className="iacts">
-                    <button
-                      className="btn btn-ink"
-                      disabled={pending}
-                      onClick={() => {
-                        close();
-                        run(() => closeCollection(p.surveyId!), 'Collection closed.');
-                      }}
-                    >
-                      {pending ? 'Closing…' : 'Close'}
-                    </button>
-                    <button className="btn btn-quiet" onClick={() => setConfirming(null)}>
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <button onClick={() => setConfirming('close')}>
-                  <LockMark />
-                  <span>Close collection</span>
-                </button>
-              ))}
-            {p.closedOn && (
-              <button
-                disabled={pending}
-                onClick={() => {
-                  close();
-                  run(() => reopenCollection(p.id), 'Collection reopened.');
-                }}
-              >
-                <UndoMark />
-                <span>Reopen for answers</span>
-              </button>
-            )}
+            {/* Closing and reopening left this menu on 18 August 2026 — they
+                are in the Collection section with the date, which is the other
+                control over whether the link is taking answers. What is left
+                here is the pair that finish with a project rather than govern
+                it. */}
             {confirming === 'archive' ? (
               /* One line, then the two answers to it. The sentence used to sit
                  *between* the buttons, which put the reason for the decision
@@ -640,13 +549,26 @@ export default function ProjectSheet({
        * to send it belong to one control, and this section is about *when* the
        * answers are wanted rather than where they go.
        */}
-      {/* Closed, and no date ever set, leaves nothing to put under the heading —
-          and a heading with nothing under it is a section that failed to load.
-          The editor is only for a survey still taking answers; a closed one
-          keeps the date as the record of what the client was told. */}
-      {p.token && (!p.closedOn || p.dueOn) && (
+      {/**
+       * Collection — everything that decides whether the link takes answers.
+       *
+       * The date and closing were in two places: a section of its own for the
+       * date, and a row in the toolbar's More menu for the close. They govern
+       * the same thing and they had drifted apart, which was easy to miss while
+       * the date closed nothing. It shuts the link now, so the two are a soft
+       * shutter and a hard one and they belong side by side — you set a date to
+       * stop answers *later*, and you close to stop them *now*.
+       *
+       * The difference is worth keeping visible, and the section keeps it: the
+       * date writes nothing and moving it forward undoes it, while closing is
+       * gate 1, puts a name on the record and runs the analysis. So they are two
+       * controls in one section rather than one control with a switch.
+       *
+       * Reopening came with the close, being its inverse.
+       */}
+      {p.token && (
         <div className="pd-sec">
-          <h2>The date</h2>
+          <h2>Collection</h2>
 
           {/**
            * The date the team asked for. Two weeks at creation, changed here.
@@ -730,8 +652,64 @@ export default function ProjectSheet({
               )}
             </div>
           )}
-          {p.closedOn && p.dueOn && (
-            <p className="quiet">You asked for answers by {p.dueOn}. Collection is closed.</p>
+          {p.closedOn ? (
+            <>
+              <p className="isay">
+                <b>Closed {p.closedOn}</b>
+                {p.closedByName ? ` by ${p.closedByName}` : ''}
+                {p.dueOn ? ` · you asked for answers by ${p.dueOn}` : ''}
+              </p>
+              {/* Reopening asks nothing. It takes no answers away, writes no
+                  gate, and the insights it was closed for stay exactly as they
+                  are — the one control here somebody can press by accident and
+                  lose nothing by. */}
+              <button
+                className="btn btn-outline"
+                disabled={pending}
+                onClick={() => runStay(() => reopenCollection(p.id), 'Collection reopened.')}
+              >
+                {pending ? 'Reopening…' : 'Reopen for answers'}
+              </button>
+            </>
+          ) : (
+            p.answers > 0 &&
+            p.surveyId && (
+              <div className="closenow">
+                {confirming === 'close' ? (
+                  /* The line is what a person cannot see from the button: that
+                     the analysis starts here, and that this is reversible. */
+                  <div className="delconfirm">
+                    <p>
+                      <b>Close collection now?</b>
+                    </p>
+                    <p className="why">
+                      The analysis is written, and the link stops taking answers. You can reopen
+                      it afterwards.
+                    </p>
+                    <div className="iacts">
+                      <button
+                        className="btn btn-ink"
+                        disabled={pending}
+                        onClick={() => {
+                          setConfirming(null);
+                          run(() => closeCollection(p.surveyId!), 'Collection closed.');
+                        }}
+                      >
+                        {pending ? 'Closing…' : 'Close'}
+                      </button>
+                      <button className="btn btn-quiet" onClick={() => setConfirming(null)}>
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button className="btn btn-outline" onClick={() => setConfirming('close')}>
+                    <LockMark />
+                    <span>Close collection</span>
+                  </button>
+                )}
+              </div>
+            )
           )}
           {/* Reopening is in the toolbar's More menu. A stakeholder replying the
               day after collection closed is not an edge case, and reopening
@@ -842,8 +820,24 @@ export default function ProjectSheet({
              * A single respondent gets no chevron: choosing between one person
              * and nobody is not a choice.
              */}
-            {confirmGenerate ? (
-              closeFirst
+            {!p.closedOn ? (
+              /**
+               * Generating needs a closed survey, and closing is the Collection
+               * section's job now.
+               *
+               * This button used to read *Close collection and generate* and do
+               * both — which was one press instead of two, and put a second
+               * control that closes a survey a few inches below the one that
+               * does it deliberately. Two buttons closing the same survey is
+               * how somebody closes it meaning to do the other thing.
+               *
+               * So it says what is missing and where, and the section above is
+               * where it happens.
+               */
+              <p className="ireads">
+                The analysis reads a closed survey. Close collection above when you have enough
+                answers.
+              </p>
             ) : (
               <>
                 <p className="ireads">
@@ -859,17 +853,15 @@ export default function ProjectSheet({
                       <button
                         className="btn btn-primary"
                         disabled={pending || chosen === 0}
-                        onClick={() => (p.closedOn ? generate() : setConfirmGenerate(true))}
+                        onClick={generate}
                       >
                         {pending
                           ? 'Working…'
                           : chosen !== p.people.length
                             ? `Generate from ${chosen} ${chosen === 1 ? 'answer' : 'answers'}`
-                            : p.closedOn
-                              ? p.insights
-                                ? 'Generate again'
-                                : 'Generate insights'
-                              : 'Close collection and generate'}
+                            : p.insights
+                              ? 'Generate again'
+                              : 'Generate insights'}
                       </button>
                       {p.people.length > 1 && (
                         <button

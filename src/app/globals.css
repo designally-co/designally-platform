@@ -3062,6 +3062,39 @@ textarea {
   padding-right: calc(44px + var(--sp-xs));
 }
 
+/**
+ * Closing, under the date it sits with.
+ *
+ * A rule above it, because the two controls in this section are not a list:
+ * one is a field somebody edits and the other is a gate they cross, and a gap
+ * alone read as more of the same. The line is `--divider`, not the Edge — it
+ * separates two parts of one section rather than bounding a new thing.
+ *
+ * An outline pill and not a filled one: closing is available, not urged. The
+ * app asks for it through the *Needs you* card when it has a reason to; a
+ * standing button that shouts would be the section demanding a decision every
+ * time somebody opens a project to read an answer.
+ */
+.closenow {
+  margin-top: var(--sp-md);
+  padding-top: var(--sp-md);
+  border-top: 1px solid var(--divider);
+}
+.closenow .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-xs);
+}
+.closenow .btn svg {
+  width: 17px;
+  height: 17px;
+  flex: none;
+}
+/* the closed state's own line, and the way back from it */
+.pd-sec .isay + .btn-outline {
+  margin-top: var(--sp-xs);
+}
+
 /* ---- The date field ----------------------------------------------------
    A date, as three boxes and a month you can point at. It replaces
    `<input type="date">`, which drew its own segment highlight, its own glyph
