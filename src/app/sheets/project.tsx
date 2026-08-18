@@ -13,6 +13,7 @@ import {
 } from '@/lib/team/actions';
 import type { ProjectView } from '@/lib/team/projects';
 import { answersToMarkdown, exportFilename, printableHtml } from '@/lib/team/export';
+import { SaveMark } from '../icons';
 import ShareLink from './share';
 import MoreMenu from '../menu';
 import Sheet from './sheet';
@@ -161,6 +162,48 @@ export default function ProjectSheet({
       {link && p.token && (
         <ShareLink token={p.token} url={link} closed={!!p.closedOn} />
       )}
+      {/**
+       * Download has its own disc, the way it does on a response.
+       *
+       * It was two items inside More, which put taking a copy of the answers in
+       * the same drawer as closing collection and deleting the project — one of
+       * those is a thing you do to read something and the rest change the
+       * project. A person looking for the file had to open a menu of decisions
+       * to find out it was in there.
+       *
+       * Same control as the answers sheet: the mark names the act, the popover
+       * names the format. What differs is only the subject, and each says its
+       * own in the accessible name — "Download all 5 answers" against
+       * "Download คุณธนวัฒน์'s answers".
+       */}
+      {p.answers > 0 && (
+        <MoreMenu label={`Download all ${p.answers} answers`} icon={<SaveMark />}>
+          {(close) => (
+            <>
+              <button
+                disabled={pending}
+                onClick={() => {
+                  close();
+                  exportAll('md');
+                }}
+              >
+                Markdown
+                <small>Text, for reading and pasting.</small>
+              </button>
+              <button
+                disabled={pending}
+                onClick={() => {
+                  close();
+                  exportAll('pdf');
+                }}
+              >
+                PDF
+                <small>A page per person, laid out to print.</small>
+              </button>
+            </>
+          )}
+        </MoreMenu>
+      )}
       <MoreMenu>
         {(close) => (
           <>
@@ -187,28 +230,6 @@ export default function ProjectSheet({
                 Reopen for more answers
                 <small>The insights are left alone — they were true of what they read.</small>
               </button>
-            )}
-            {p.answers > 0 && (
-              <>
-                <button
-                  disabled={pending}
-                  onClick={() => {
-                    close();
-                    exportAll('md');
-                  }}
-                >
-                  Download all {p.answers} answers · Markdown
-                </button>
-                <button
-                  disabled={pending}
-                  onClick={() => {
-                    close();
-                    exportAll('pdf');
-                  }}
-                >
-                  Print all {p.answers} answers · PDF
-                </button>
-              </>
             )}
             {confirmArchive ? (
               <>
