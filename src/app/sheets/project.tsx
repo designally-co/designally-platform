@@ -5,12 +5,14 @@ import { useState, useTransition } from 'react';
 import {
   archiveProject,
   deleteProject,
+  readAnswers,
   closeCollection,
   reanalyse,
   reopenCollection,
   setDueDate,
 } from '@/lib/team/actions';
 import type { ProjectView } from '@/lib/team/projects';
+import { answersToMarkdown, exportFilename, printableHtml } from '@/lib/team/export';
 import ShareLink from './share';
 import MoreMenu from '../menu';
 import Sheet from './sheet';
@@ -53,6 +55,59 @@ export default function ProjectSheet({
      without meaning to, not a spelling test, and the names are often Thai where
      a trailing space is invisible */
   const matches = typed.trim().toLocaleLowerCase() === p.clientName.trim().toLocaleLowerCase();
+
+  /**
+   * Everybody's answers, from the project — which is the thing that has an
+   * everybody.
+   *
+   * These two were on the answers sheet beside that person's own export, and
+   * they came here on 18 August 2026. That sheet is one response; an item on it
+   * quietly reaching past its subject is a file somebody sends without meaning
+   * to, and the difference between "this person" and "all five" is one line in
+   * a menu read at speed.
+   *
+   * The answers are fetched here rather than held: the project list ships
+   * without them for a reason — every answer of every respondent on every live
+   * project is a great deal of text — so this pays for the read only when
+   * somebody asks for the file.
+   */
+  const exportAll = (as: 'md' | 'pdf') =>
+    start(async () => {
+      setError(null);
+      /* No "reading…" label on the button: `close()` unmounts the menu before
+         this resolves, so it could never render. The file arriving is the
+         feedback, and a failure lands in the sheet's own error line. */
+      const data = await readAnswers(p.id);
+      if (!data || !data.respondents.length) {
+        setError('There are no answers to export yet.');
+        return;
+      }
+      if (as === 'md') {
+        const blob = new Blob([answersToMarkdown(data, p.clientName)], {
+          type: 'text/markdown;charset=utf-8',
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = exportFilename(p.clientName);
+        a.click();
+        requestAnimationFrame(() => URL.revokeObjectURL(url));
+        return;
+      }
+      const w = window.open('', '_blank');
+      if (!w) {
+        setError('Your browser blocked the print window. Allow pop-ups for this site and try again.');
+        return;
+      }
+      w.document.write(printableHtml(data, p.clientName));
+      w.document.close();
+      const go = () => {
+        w.focus();
+        w.print();
+      };
+      if (w.document.fonts?.ready) w.document.fonts.ready.then(go);
+      else w.addEventListener('load', go);
+    });
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
   /**
@@ -132,6 +187,28 @@ export default function ProjectSheet({
                 Reopen for more answers
                 <small>The insights are left alone — they were true of what they read.</small>
               </button>
+            )}
+            {p.answers > 0 && (
+              <>
+                <button
+                  disabled={pending}
+                  onClick={() => {
+                    close();
+                    exportAll('md');
+                  }}
+                >
+                  Download all {p.answers} answers · Markdown
+                </button>
+                <button
+                  disabled={pending}
+                  onClick={() => {
+                    close();
+                    exportAll('pdf');
+                  }}
+                >
+                  Print all {p.answers} answers · PDF
+                </button>
+              </>
             )}
             {confirmArchive ? (
               <>

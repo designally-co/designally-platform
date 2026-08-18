@@ -217,8 +217,14 @@ export default function AnswersSheet({
    * database, and no way for the file to disagree with the view. The object URL
    * is revoked on the next frame; keeping it alive holds the blob in memory for
    * the life of the document.
+   *
+   * One person only. It could export everybody from here — `data` holds them —
+   * and that is exactly why it should not: this sheet is one response, and an
+   * item on it that quietly reaches past its subject is a file somebody sends
+   * without meaning to. The whole set is on the project, which is the thing
+   * that has a whole set.
    */
-  const download = (person?: RespondentAnswers) => {
+  const download = (person: RespondentAnswers) => {
     const blob = new Blob([answersToMarkdown(data, clientName, person)], {
       type: 'text/markdown;charset=utf-8',
     });
@@ -243,7 +249,7 @@ export default function AnswersSheet({
    * would conclude the button is broken.
    */
   const [printError, setPrintError] = useState<string | null>(null);
-  const print = (person?: RespondentAnswers) => {
+  const print = (person: RespondentAnswers) => {
     const w = window.open('', '_blank');
     if (!w) {
       setPrintError('Your browser blocked the print window. Allow pop-ups for this site and try again.');
@@ -281,7 +287,7 @@ export default function AnswersSheet({
       onClose={onClose}
       actions={
         data.respondents.length ? (
-          <MoreMenu label="Export">
+          <MoreMenu label={`Export ${person.name}'s answers`}>
             {(close) => (
               <>
                 <button
@@ -290,15 +296,7 @@ export default function AnswersSheet({
                     close();
                   }}
                 >
-                  Download {person.name}&rsquo;s answers · Markdown
-                </button>
-                <button
-                  onClick={() => {
-                    download();
-                    close();
-                  }}
-                >
-                  Download all {data.respondents.length} · Markdown
+                  Download · Markdown
                 </button>
                 <button
                   onClick={() => {
@@ -306,15 +304,7 @@ export default function AnswersSheet({
                     print(person);
                   }}
                 >
-                  Print {person.name}&rsquo;s answers · PDF
-                </button>
-                <button
-                  onClick={() => {
-                    close();
-                    print();
-                  }}
-                >
-                  Print all {data.respondents.length} · PDF
+                  Print · PDF
                 </button>
               </>
             )}
