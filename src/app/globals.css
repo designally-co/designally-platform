@@ -2727,11 +2727,15 @@ dialog::backdrop {
    Delete as well until 17 August 2026, which made a nested button necessary and
    put a destructive action inside a clickable card; Delete now lives on the
    answers themselves, where the reason to press it is visible. */
+/* `--r-lg`, not `--r-card`. 26 is the radius of a card that floats — the sheet,
+   the popovers, the worklist sitting on the parchment. These are rows inside a
+   sheet, stacked against each other, and at 26 a column of them reads as a
+   handful of loose pills rather than a list. Same for `.doc` under them. */
 .person {
   display: block;
   text-align: left;
   border: 1px solid var(--hairline);
-  border-radius: var(--r-card);
+  border-radius: var(--r-lg);
   background: var(--canvas);
   padding: 11px 15px;
   font: inherit;
@@ -2773,7 +2777,7 @@ dialog::backdrop {
   display: block;
   text-align: left;
   border: 1px solid var(--hairline);
-  border-radius: var(--r-card);
+  border-radius: var(--r-lg);
   background: var(--canvas);
   padding: 11px 15px;
   font: inherit;
@@ -5142,11 +5146,31 @@ dialog::backdrop {
   border-radius: var(--r-card);
   padding: 16px;
 }
-.sharehint {
-  margin: 0 0 10px;
+/**
+ * The link's state, then what that means.
+ *
+ * Two lines and two inks, which DESIGN.md §2 allows across lines and forbids
+ * within one: the state at `--ink`, the consequence at `--ink-3`. The state
+ * takes the label form the system already has — uppercase and tracked, the
+ * treatment `.qsec` gives a section heading — because it is a label on the line
+ * beneath it, which is exactly what that form is for.
+ *
+ * No dot. §2 again: "a status is the word for it, never a star or a dot beside
+ * a name. A bare glyph needs a legend; words don't."
+ */
+.sharestate {
+  margin: 0 0 12px;
   font-size: 13px;
   line-height: 1.6;
   color: var(--ink-3);
+}
+.sharestate b {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink);
 }
 
 .sharerow {
@@ -5223,13 +5247,14 @@ dialog::backdrop {
   }
 }
 
+/* No rule between the link and the code. They are two ways of handing over the
+   same thing, not two sections — a line across the panel says they are separate
+   business, and space says the same boundary without the claim. */
 .shareqr {
   display: grid;
   justify-items: center;
   gap: 10px;
   margin-top: 14px;
-  padding-top: 14px;
-  border-top: 1px solid var(--hairline);
 }
 /**
  * The code's own quiet zone.
@@ -5241,9 +5266,14 @@ dialog::backdrop {
  * ground, and parchment is a ground the spec does not assume.
  */
 .qrframe {
-  width: 172px;
-  height: 172px;
-  padding: 12px;
+  /* The full width of the panel. It was 172px in a 300px box, which is a code
+     sized for the screen it is drawn on rather than for the camera across the
+     table — and the camera is the entire reason it is here. At the panel's
+     width a module is about 9px, which a phone locks onto at arm's length. */
+  width: 100%;
+  aspect-ratio: 1;
+  height: auto;
+  padding: 14px;
   background: #fff;
   border: 1px solid var(--hairline);
   border-radius: var(--r-sm);
@@ -5259,6 +5289,10 @@ dialog::backdrop {
    panel does not jump when it does */
 .qrframe.loading {
   background: var(--parchment);
+}
+/* the panel is wider than a menu now that the code fills it */
+.sharepanel {
+  width: 320px;
 }
 
 /**

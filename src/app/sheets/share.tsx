@@ -116,10 +116,26 @@ export default function ShareLink({ token, url, closed }: { token: string; url: 
 
       {open && (
         <div className="sharepanel" role="dialog" aria-label="Share the survey link">
-          <p className="sharehint">
+          {/**
+           * The status, set as a status rather than as a sentence about one.
+           *
+           * It was a line of grey prose that read like a footnote, on the one
+           * thing in this panel that changes what the link *does*. The state is
+           * a label now — the system's established form for one, uppercase and
+           * tracked, the same treatment `.qsec` gives a section — with the
+           * consequence under it.
+           *
+           * No coloured dot, and that is not an omission. DESIGN.md §2: "a
+           * status is the word for it, never a star or a dot beside a name.
+           * A bare glyph needs a legend; words don't." So the word carries it,
+           * and the two lines take two inks — which the same section allows
+           * across separate lines and forbids inside one.
+           */}
+          <p className="sharestate">
+            <b>{closed ? 'Closed' : 'Open'}</b>
             {closed
-              ? 'Closed — anyone opening this now is told so.'
-              : 'Still open. Forward it to anyone who should have a say.'}
+              ? 'Anyone opening this link now is told so.'
+              : 'Forward it to anyone who should have a say.'}
           </p>
 
           <div className="sharerow">
