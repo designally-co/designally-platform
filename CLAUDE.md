@@ -178,7 +178,13 @@ Seed data for every question block — bilingual, with per-type config — is in
 Do not retype the questions; import that file.
 
 ```
-clients          name, project_code
+clients          name
+                 project_code — retired 18 August 2026, in place. The New
+                 survey sheet asked for "Client and project code" in one box
+                 and split it on an em dash. The code showed in exactly one
+                 place, was searched by nothing, and identified nothing the app
+                 lacks an id for. Losing the split matters more than losing the
+                 code: a client called "Sea — Land" was filed under "Sea".
 projects         client_id, package, archived, archived_at/by
                  stage, kickoff_at — retired 17 August 2026 with the kick-off
                  pages, languages[] — unused since v2

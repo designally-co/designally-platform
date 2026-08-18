@@ -343,20 +343,16 @@ export default function ProjectSheet({
    * the body's own head says under its `<h1>`, so the bar keeps saying it after
    * that has scrolled away.
    *
-   * The code rides with the package on that second line. It was in the body's
-   * head, and when that came out on 18 August 2026 this was the only place it
-   * appeared anywhere in the app — dropping the block without moving it would
-   * have made a project's own reference unreachable from the project.
+   * The project code was on this line for a few hours and is gone with the rest
+   * of it — see `createSurvey`. It was shown here and nowhere else, searched by
+   * nothing, and identified nothing the app does not already have an id for.
    */
   return (
     <Sheet
       title={
         <>
           <b>{p.clientName}</b>
-          <i>
-            {p.packageLabel}
-            {p.projectCode ? ` · ${p.projectCode}` : ''}
-          </i>
+          <i>{p.packageLabel}</i>
         </>
       }
       actions={actions}

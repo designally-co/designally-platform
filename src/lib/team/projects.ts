@@ -68,7 +68,6 @@ export type ProjectAction = {
 export type ProjectView = {
   id: string;
   clientName: string;
-  projectCode: string | null;
   package: Package;
   packageLabel: string;
   archived: boolean;
@@ -346,7 +345,6 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
     return {
       id: project.id,
       clientName: client.name,
-      projectCode: client.projectCode,
       package: project.package,
       packageLabel: packageLabel(project.package),
       archived: project.archived,

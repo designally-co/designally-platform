@@ -37,6 +37,15 @@ export const users = pgTable('users', {
 export const clients = pgTable('clients', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
+  /**
+   * Retired 18 August 2026, in place — never written, never read, never
+   * dropped, like `projects.stage` before it.
+   *
+   * The New survey sheet asked for "Client and project code" in one box and
+   * split it on an em dash. The code was shown in exactly one place, searched
+   * by nothing, and identified nothing the app lacks an id for. Rows that
+   * already carry one keep it.
+   */
   projectCode: text('project_code'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });

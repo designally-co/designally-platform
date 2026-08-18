@@ -77,7 +77,7 @@ export default function NewSurveySheet({
     <Sheet title="New survey" narrow onClose={onClose}>
       <div className="field">
         <label className="f" htmlFor="nClient">
-          Client and project code
+          Client
         </label>
         <input
           id="nClient"
@@ -85,7 +85,7 @@ export default function NewSurveySheet({
           className="input"
           value={client}
           onChange={(e) => setClient(e.target.value)}
-          placeholder="ACME Coffee — ACME-2026-01"
+          placeholder="ACME Coffee"
           disabled={Boolean(link)}
         />
       </div>

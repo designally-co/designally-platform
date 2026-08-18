@@ -70,10 +70,25 @@ export async function createSurvey(formData: FormData): Promise<ActionResult> {
     }
   }
 
-  /* "ACME Coffee — ACME-2026-01" — the code is optional */
-  const [namePart, ...codeParts] = raw.split(/[—–]/);
-  const name = namePart.trim();
-  const projectCode = codeParts.join('—').trim() || null;
+  /**
+   * The whole of what was typed is the client's name.
+   *
+   * This field asked for "Client and project code" and split on an em dash, so
+   * "ACME Coffee — ACME-2026-01" stored a name and a code. The code was shown
+   * in exactly one place, was never searched, filtered or exported, and named
+   * nothing the app knows about — projects have ids and surveys have tokens.
+   * Retired 18 August 2026.
+   *
+   * Dropping the split is the part that matters. A client called "Sea — Land"
+   * or "ธนวัฒน์ — ดีไซน์" was silently cut in half at the dash and filed under
+   * the first word of their own name, which is the kind of defect nobody
+   * reports because it looks like a typo they made.
+   *
+   * `clients.project_code` is retired in place, like `projects.stage` before
+   * it: never written, never read, never dropped. Rows already carrying one
+   * keep it.
+   */
+  const name = raw.trim();
   if (!name) return { ok: false, error: 'Enter a client name · กรุณาใส่ชื่อลูกค้า' };
 
   const db = await getDb();
@@ -108,7 +123,7 @@ export async function createSurvey(formData: FormData): Promise<ActionResult> {
     };
   }
 
-  const [client] = await db.insert(clients).values({ name, projectCode }).returning();
+  const [client] = await db.insert(clients).values({ name }).returning();
   const [project] = await db
     .insert(projects)
     .values({ clientId: client.id, package: pkg })
