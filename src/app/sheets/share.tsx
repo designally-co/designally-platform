@@ -140,32 +140,23 @@ export default function ShareLink({ token, url, closed }: { token: string; url: 
             {closed ? 'Anyone opening it now is told so.' : 'Forward it to anyone who should answer.'}
           </p>
 
-          <div className="sharerow">
-            {/**
-             * One line, truncated, with the button beside it.
-             *
-             * It wrapped to two lines on the reasoning that a link you cannot
-             * see the end of is a link you cannot check. Nobody checks it — the
-             * token is twelve characters of noise and the way it gets used is
-             * Copy, or the camera below. What the line is for is recognising
-             * *which* link this is, and the client and the path do that in the
-             * first thirty characters.
-             *
-             * The scheme is stripped for display and copied in full: `https://`
-             * is the least identifying part of the string and the widest.
-             *
-             * Not an input — a read-only field reads as a disabled one, and
-             * this is text to select and copy rather than edit. `select-all`
-             * still takes the whole URL despite the ellipsis, because the text
-             * node is complete and only its box is short.
-             */}
-            <span className="sharelink" title={url}>
-              {forDisplay(url)}
-            </span>
-            <button className="sharecopy" aria-label={copied ? 'Link copied' : 'Copy link'} onClick={copy}>
-              {copied ? <CheckMark /> : <LinkMark />}
-            </button>
-          </div>
+          {/**
+           * The link, then Copy, then the code.
+           *
+           * Copy was a 40px disc beside the link and the code was the largest
+           * thing in the panel — which is the wrong way round for how this is
+           * used. Most opens end in a link pasted into an email or a LINE
+           * message; the camera is the other job, and it still gets the whole
+           * width, just not the first place.
+           */}
+          <span className="sharelink" title={url}>
+            {forDisplay(url)}
+          </span>
+          <button className="btn btn-primary sharecopy" onClick={copy}>
+            {copied ? <CheckMark /> : <LinkMark />}
+            {copied ? 'Copied' : 'Copy link'}
+          </button>
+
           {/* a swapped glyph is silent to a screen reader */}
           <span className="visually-hidden" role="status">
             {copied ? 'Link copied' : ''}

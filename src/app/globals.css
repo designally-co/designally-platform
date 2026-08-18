@@ -5457,11 +5457,10 @@ dialog::backdrop {
  * node is complete and only its box is short.
  */
 .sharelink {
-  flex: 1;
-  min-width: 0;
-  /* the same 44 as the button beside it, so the row has one height rather than
-     a box and a control that nearly line up */
+  /* full width and stacked now — the link is the thing being sent, Copy under
+     it is the sending. They were a row while Copy was a disc. */
   min-height: 44px;
+  margin-bottom: 8px;
   display: flex;
   align-items: center;
   padding: 0 12px;
@@ -5482,13 +5481,27 @@ dialog::backdrop {
 /* A disc, and the same disc `.iconbtn` is — it is opened from one, sits a
    centimetre from one, and at 40 against their 44 the panel read as a slightly
    different set of controls rather than the same ones. */
+/**
+ * Copy is the panel's action, so it is a button and not a disc.
+ *
+ * A 44px circle beside the link was right while the link was the row and Copy
+ * an accessory to it — and wrong once the panel was ordered around the thing
+ * people open it to do. It takes `.btn.btn-primary` in the markup, so it
+ * inherits the accent and the charcoal label DESIGN.md settled on: white on the
+ * CI orange is 3.24:1 at this size, charcoal on the same orange is 5.19.
+ *
+ * The mark still turns into a tick, which is the half that says it worked.
+ */
 .sharecopy {
-  flex: none;
-  width: 44px;
-  padding: 0;
-  gap: 0;
+  /* flex, or the mark and the label are two inline boxes and the button comes
+     out 61px instead of `.btn`'s 44 — `gap` on a block does nothing */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 8px;
+  margin-bottom: 4px;
 }
-.sharecopy,
 .sharesave {
   display: flex;
   align-items: center;
@@ -5517,7 +5530,6 @@ dialog::backdrop {
   flex: none;
 }
 @media (hover: hover) {
-  .sharecopy:hover,
   .sharesave:hover {
     border-color: var(--ink-3);
   }
