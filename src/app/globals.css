@@ -153,6 +153,30 @@
   --r-pill: 9999px;
 
   /**
+   * The iOS 27 shape ladder, for the team app only — 18 August 2026.
+   *
+   * Additional tokens rather than new values for `--r-lg`, and that is the
+   * whole reason they exist: the survey and the team app share every radius
+   * token in the list above, so moving `--r-lg` to 26 would round the client's
+   * answer fields on the morning the branding team sends a real link. These are
+   * only ever referenced from team surfaces.
+   *
+   * The numbers are Apple's own, from `guidelines/spacing-radii.html` in the
+   * iOS & iPadOS 27 system: grouped card 26, sheet top 34, popover 38. They
+   * read large next to `--r-lg`'s 18 because they are calibrated against a
+   * phone's own 40px screen corner — which a browser window does not have, so
+   * they are used on the objects that float (sheets, popovers) rather than on
+   * everything with a border.
+   *
+   * DESIGN.md §4's ladder says "do not use values between these". These are not
+   * between them; they extend past the top, and §4 is updated to say so.
+   */
+  --r-card: 26px;
+  --r-sheet: 34px;
+  --r-pop: 38px;
+
+
+  /**
    * Where a wide screen starts reading.
    *
    * One line, and everything on the rail layout hangs off it: the rail's
@@ -1526,6 +1550,14 @@ label.f span {
 
 /* borders, not shadows — DESIGN.md. The menu is a canvas tile on the parchment,
    the same lift every other surface in the app uses. */
+/**
+ * The popover, at iPadOS 27's 38px.
+ *
+ * 18px against a menu this size read as a rounded box; 38 is what makes it a
+ * floating object, which is what a popover is.
+ *
+ * It was briefly on glass and is not: see `.sheet-top`.
+ */
 .barmenu {
   position: absolute;
   top: calc(100% + 8px);
@@ -1534,7 +1566,7 @@ label.f span {
   min-width: 232px;
   background: var(--canvas);
   border: 1px solid var(--hairline);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-pop);
   padding: 6px;
   display: flex;
   flex-direction: column;
@@ -1555,9 +1587,18 @@ label.f span {
  * container. The one disc in a sheet header is the back control, and that
  * difference is the point: navigation set apart from actions.
  *
- * 44px, which is the touch floor, around a 20px mark. The glyph is `--ink-3`,
- * measured 6.02:1 on parchment — twice the 3:1 a graphical object has to clear.
- * It carries the whole meaning here, so it is not asked to be subtle.
+ * 44px, which is the touch floor, around a 20px mark.
+ *
+ * **White, not `--fill`.** The sheet is parchment, and a warm-grey disc on a
+ * warm ground is a control the same temperature as the paper it sits on. White
+ * is the one surface in this system that is not the page — it is what the team
+ * app's cards are made of — so a white disc reads as an object *on* the sheet
+ * rather than a patch of it. Asked for 18 August 2026.
+ *
+ * It takes the Edge to do it. White on parchment is 1.06:1, which is no
+ * boundary at all, and DESIGN.md's answer to that is a border and never a
+ * shadow. The glyph is `--glyph` at 15.7:1 on white — it carries the whole
+ * meaning here, so it is not asked to be subtle.
  */
 /**
  * The disc, matching the back control at the other end of the bar.
@@ -1582,8 +1623,8 @@ label.f span {
   width: 44px;
   height: 44px;
   flex: 0 0 auto;
-  border: 0;
-  background: var(--fill);
+  border: 1px solid var(--hairline);
+  background: var(--canvas);
   border-radius: var(--r-pill);
   color: var(--glyph);
   cursor: pointer;
@@ -1612,7 +1653,7 @@ label.f span {
 }
 
 .iconbtn:active {
-  background: var(--fill-press);
+  background: var(--parchment);
   color: var(--ink);
   transform: scale(0.94);
 }
@@ -1622,7 +1663,7 @@ label.f span {
      parchment wash is what gives a borderless button an edge to aim at. */
   .iconbtn:hover {
     color: var(--ink);
-    background: var(--fill-deep);
+    border-color: var(--ink-3);
   }
 }
 /* the menu is open: the button stays lit, so it is clear what the panel
@@ -1757,7 +1798,7 @@ label.f span {
 .worklist {
   background: var(--canvas);
   border: 1px solid var(--hairline);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-card);
   overflow: hidden;
   margin-bottom: var(--sp-xxl);
 }
@@ -1832,7 +1873,7 @@ label.f span {
 .calm {
   background: var(--canvas);
   border: 1px solid var(--hairline);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-card);
   padding: 44px 30px;
   text-align: center;
   margin-bottom: 52px;
@@ -2291,12 +2332,76 @@ dialog {
 dialog::backdrop {
   background: rgba(0, 0, 0, 0.32);
 }
+/**
+ * The sheet as a card that floats, not a page that replaces one — 18 August
+ * 2026, taking iPadOS 27's shape.
+ *
+ * It filled the window edge to edge and reached the full height, so opening a
+ * project *replaced* the worklist: nothing behind it, nothing to return to
+ * visibly, and the back chevron was the only evidence there had been a page.
+ * Inset with the page dimmed behind it, the sheet is a thing on top of the list
+ * rather than the thing instead of it, which is what it always was in the
+ * navigation model — `onClose` has been "a real step back rather than a
+ * dismissal" since it was written.
+ *
+ * 34px, the sheet-top radius from `guidelines/spacing-radii.html`, on all four
+ * corners rather than the top two: Apple rounds the top only because a phone
+ * sheet is anchored to the bottom of the screen, and this one is not anchored
+ * to anything.
+ *
+ * `min-height` goes. It was what forced the full page; the sheet is as tall as
+ * it needs to be and stops at 88% so the list is visible under it, which is the
+ * whole point of insetting it.
+ */
 .sheet {
   background: var(--parchment);
   width: min(760px, 100%);
-  margin: 0 auto;
-  min-height: 100%;
+  max-height: 88dvh;
+  margin: 6dvh auto;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--r-sheet);
+  /* the Edge, at the size a floating object needs to hold its own boundary
+     against a dimmed page — DESIGN.md: borders, not shadows */
+  border: 1px solid var(--hairline);
   animation: slideup 0.42s var(--ease);
+}
+/**
+ * The sheet is the scroller, not the body inside it.
+ *
+ * With the body scrolling, the bar sat above the scroll area and content
+ * stopped at its lower edge — nothing ever passed beneath it, so there was
+ * nothing for a blur to be over. Scrolling the sheet puts the sticky bar
+ * *inside* the same scroller as the content, which is both what makes text run
+ * under it and what keeps the blur safe: the failure recorded in DESIGN.md §6
+ * is a `position: fixed` element in a *different* compositing layer from the
+ * scroller it covers, and sticky-in-scroller is the case that has no such
+ * argument to lose.
+ */
+.sheet {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.sheet-body {
+  flex: 1;
+  min-height: 0;
+}
+/**
+ * Full bleed again on a phone.
+ *
+ * An inset card is an iPad and desktop shape. At 620px the inset is most of the
+ * screen's width spent on showing that there is a page behind, on a surface
+ * where there is no room to spare — and a 34px corner on a full-width sheet is
+ * a rounded rectangle with nothing outside it to be round against.
+ */
+@media (max-width: 620px) {
+  .sheet {
+    max-height: 100%;
+    min-height: 100%;
+    margin: 0 auto;
+    border-radius: 0;
+    border: 0;
+  }
 }
 .sheet.narrow {
   width: min(560px, 100%);
@@ -2308,16 +2413,81 @@ dialog::backdrop {
  * parchment. The hairline stays permanent here, unlike the page's: a sheet
  * always has content under its header, so the line is always telling the truth.
  */
+/**
+ * The bar, opaque and square with the body under it.
+ *
+ * It carried `backdrop-filter` for about an hour on 18 August 2026 and it is
+ * gone: DESIGN.md's vocabulary is ink, line and surface, and a translucent bar
+ * is a fourth thing that has to be explained every time somebody asks why one
+ * surface behaves differently. The Edge under it already says where the bar
+ * ends.
+ *
+ * The padding is equal on all four sides, so the discs have the same air above
+ * them as beside them — 15px against 28px read as buttons pushed up against the
+ * top of the sheet. `--sp-lg`, which the body's own side padding now matches,
+ * so the chevron sits on the same left edge as everything under it.
+ */
 .sheet-top {
   position: sticky;
   top: 0;
   z-index: 2;
+  /* opaque under the controls themselves — a line of a client's answer showing
+     through the middle of a title is not the effect */
   background: var(--parchment);
-  border-bottom: 1px solid var(--divider);
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 15px 28px;
+  padding: var(--sp-lg);
+}
+
+/**
+ * The blur ramp under the bar's lower edge.
+ *
+ * The Edge that used to close the bar is gone, and this is why: a hairline says
+ * the content *stops* at the bar, and the content does not stop — it runs
+ * underneath. A ramp says the same boundary without claiming an end to what is
+ * behind it.
+ *
+ * Three bands rather than one, each masked to a shorter strip with a heavier
+ * blur, so the transition is a gradient of *focus* and not a gradient of
+ * opacity over a single blurred slab. A single band has a visible top edge
+ * wherever the blur begins, which is the artefact this shape exists to avoid.
+ *
+ * **This is the effect DESIGN.md §6 records as removed on 13 August, and the
+ * reason it is safe here is structural, not cosmetic.** That one was a
+ * `position: fixed` sibling of the survey's question deck: fixed inside a
+ * scrolling container joins that scroller's compositing layer, and z-index does
+ * not arbitrate across layers, so it composited over the controls. This is
+ * `position: sticky` *inside* the scroller it covers — one layer, no
+ * arbitration, and nothing of the survey's arrangement anywhere near it. The
+ * survey still has none, and the condition for giving it one is unchanged.
+ */
+.sheet-top::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 26px;
+  pointer-events: none;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, transparent 100%);
+}
+.sheet-top::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 13px;
+  pointer-events: none;
+  z-index: 1;
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, transparent 100%);
 }
 /**
  * The sticky title, one line or two.
@@ -2379,10 +2549,12 @@ dialog::backdrop {
   width: 44px;
   height: 44px;
   flex: 0 0 auto;
-  margin-left: -6px;
-  border: 0;
+  /* No negative margin. It pulled the disc 6px left to sit optically on the
+     old 28px gutter; the bar's padding is equal on all four sides now, and a
+     filled circle's visual edge is its box edge, so 24 left really is 24 top. */
+  border: 1px solid var(--hairline);
   border-radius: var(--r-pill);
-  background: var(--fill);
+  background: var(--canvas);
   color: var(--glyph);
   cursor: pointer;
   transition:
@@ -2391,20 +2563,25 @@ dialog::backdrop {
     transform 0.12s var(--ease);
 }
 .sheet-top .back:active {
-  background: var(--fill-press);
+  background: var(--parchment);
   color: var(--ink);
   transform: scale(0.96);
 }
 @media (hover: hover) {
   /* a filled control deepens its own fill — DESIGN.md section 5, Hover */
   .sheet-top .back:hover {
-    background: var(--fill-deep);
+    border-color: var(--ink-3);
     color: var(--ink);
   }
 }
 .sheet-body {
-  padding: 32px 28px 72px;
+  /* the sides match the bar's, so the header and the content share one left
+     edge — see `.sheet-top` */
+  padding: 32px var(--sp-lg) 72px;
 }
+/* No grabber. iOS puts one at the top of every dismissible sheet, but there it
+   is a control — the sheet drags. This one closes by the chevron and by Escape,
+   so a grabber would be the picture of an affordance the sheet does not have. */
 
 @keyframes slideup {
   from {
@@ -2424,7 +2601,7 @@ dialog::backdrop {
 .pd-now {
   background: var(--canvas);
   border: 1px solid var(--hairline);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-card);
   padding: 22px var(--sp-lg);
   margin-bottom: 30px;
 }
@@ -2491,7 +2668,7 @@ dialog::backdrop {
   display: block;
   text-align: left;
   border: 1px solid var(--hairline);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-card);
   background: var(--canvas);
   padding: 11px 15px;
   font: inherit;
@@ -2533,7 +2710,7 @@ dialog::backdrop {
   display: block;
   text-align: left;
   border: 1px solid var(--hairline);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-card);
   background: var(--canvas);
   padding: 11px 15px;
   font: inherit;
@@ -2729,7 +2906,7 @@ dialog::backdrop {
 .signin .card {
   background: var(--canvas);
   border: 1px solid var(--hairline);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-card);
   padding: var(--sp-xl);
   width: min(440px, 100%);
 }
@@ -2789,7 +2966,6 @@ dialog::backdrop {
   .sheet-top .back {
     width: 52px;
     height: 52px;
-    margin-left: -10px;
   }
 }
 
@@ -2905,7 +3081,7 @@ dialog::backdrop {
 /* unsettled — the DECIDE slides */
 .conflict {
   border: 1px solid var(--hairline);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-card);
   background: var(--canvas);
   padding: 19px 21px;
   margin-bottom: 12px;
@@ -4900,8 +5076,8 @@ dialog::backdrop {
   max-width: calc(100vw - 32px);
   background: var(--canvas);
   border: 1px solid var(--hairline);
-  border-radius: var(--r-lg);
-  padding: 14px;
+  border-radius: var(--r-pop);
+  padding: 16px;
 }
 .sharehint {
   margin: 0 0 10px;

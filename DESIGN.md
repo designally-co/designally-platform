@@ -863,15 +863,30 @@ The `md` value of 17px is not a mistake: it matches the body font size and shows
 ### Radii
 
 ```
-none 0 · sm 8 · md 11 · lg 18 · pill 9999
+none 0 · sm 8 · md 11 · lg 18 · card 26 · sheet 34 · pop 38 · pill 9999
 ```
 
 - `pill` — buttons, chips, inputs, tags. **The pill is the action signal.**
-- `lg` (18px) — cards, panels, list containers
+- `lg` (18px) — the survey's cards: the answer field, the choice tiles, the boards
 - `sm` (8px) — compact utility buttons
 - `md` (11px) — pearl ghost capsules
 
 Do not use values between these. No 12px, no 16px.
+
+**`card` 26 · `sheet` 34 · `pop` 38 — the team app only, added 18 August 2026.**
+Apple's own numbers, from `guidelines/spacing-radii.html` in the iOS & iPadOS 27
+system: grouped card 26, sheet top 34, popover 38.
+
+They are separate tokens rather than new values for `lg`, and that is the point:
+both surfaces share every token above, so moving `lg` to 26 would round the
+client's answer field too. `--r-card`, `--r-sheet` and `--r-pop` are referenced
+from team surfaces and nowhere else.
+
+They read large beside 18 because Apple calibrates them against a phone's own
+40px screen corner. A browser window has no screen corner, so they are used on
+the objects that *float* — the sheet, the popovers, the worklist and the cards
+that sit on the parchment — and not on everything that has a border. The survey
+is untouched and stays on `lg`.
 
 ### Two surfaces
 
@@ -889,6 +904,33 @@ This is not the two-volumes idea in section 7 stretched further. It is a second 
 The system's vocabulary is ink, line and surface. Two materials are admitted beyond it, and only for the jobs named here.
 
 **A fade** sits under a control that content scrolls beneath: the page's own colour, opaque at the floor, ramping to nothing over about 150px. Not a hard band — that only moves the cut to where the band starts.
+
+**A blur ramp** closes the team sheet's pinned bar, added 18 August 2026. Three
+bands under its lower edge, each masked to a shorter strip with a heavier blur,
+so the transition is a gradient of *focus* rather than opacity over one blurred
+slab — a single band shows a hard top edge wherever the blur starts. It replaced
+the hairline that used to close the bar: a line says the content stops there,
+and the content does not stop, it runs underneath.
+
+**This is the effect removed on 13 August, and what makes it safe here is
+structural.** That one was a `position: fixed` sibling of the survey's question
+deck. This is `position: sticky` *inside* the scroller it covers — one
+compositing layer, nothing to arbitrate. The team sheet scrolls as a whole for
+exactly this reason; with the body scrolling instead, content stopped at the
+bar's edge and there was nothing to blur. **The survey still has none, and the
+condition is unchanged: move its controls out of the deck first.**
+
+**Glass was admitted on 18 August 2026 and withdrawn the same day.** The sheet's
+pinned bar and both popovers carried `backdrop-filter: saturate(180%) blur(20px)`
+over a 72% tint for about an hour. It worked — the team app's surfaces are a
+native `<dialog>` in the top layer and two absolute panels in a bar, none of
+them the `position: fixed`-inside-a-scroller case below. It came out anyway: the
+system's vocabulary is ink, line and surface, and a translucent bar is a fourth
+material that has to be explained every time somebody asks why one surface
+behaves differently from the rest. The Edge under the bar already says where the
+bar ends.
+
+The shape from iOS 27 stayed. The material did not.
 
 **Removed 13 August 2026 — it was a progressive blur.** Four stacked backdrop-filter layers, radius doubling toward the edge, each masked to a narrower strip. On a real iPhone it painted over the buttons and blurred them, and the cause was not the blur. **A `position: fixed` element inside a scrolling container is attached to that scroller's compositing layer**, and the survey's controls live inside the deck; the blur, a sibling of the deck, composited above the entire scroller. z-index does not arbitrate across compositing layers — which is exactly why the send screen, whose controls are not inside the deck, never showed the fault. `will-change: transform` on the controls did not help; it is a hint, and WebKit declined it.
 
@@ -960,7 +1002,7 @@ Where a primary sits beside a secondary on a phone's floor, the primary takes al
 
 And its fill depends on the surface beneath it. Pearl was chosen against the team app's parchment page; on the client survey's flat page, pearl is all but invisible, so the quiet action there is `--canvas` with a 1px `--hairline` and an `--ink-muted-48` glyph. Same object, same weight, different ground.
 
-**Icon button — a filled disc.** `pill` radius, `--surface-fill`, **no border**, `--glyph` chevron. **52px where a thumb uses it** — the survey's back control, everywhere it appears — and **40px where only a cursor does**, which is the deck's stepper pair, hidden below 620px because swiping already does its job. The glyph scales with the disc (24px at 52, 18px at 40) so the mark holds its proportions instead of growing chunky in a smaller circle.
+**Icon button — a white disc with the Edge.** `pill` radius, `--canvas`, 1px `--hairline`, `--glyph` mark. **Changed 18 August 2026**: it was `--surface-fill`, a warm grey, and on a parchment sheet that is a control the same temperature as the paper under it. White is the one surface here that is not the page — it is what the team app's cards are made of — so the disc reads as an object *on* the sheet. White on parchment is 1.06:1 and carries no boundary of its own, which is what the border is for; hover and press move the border and the ground rather than the fill. **52px where a thumb uses it** — the survey's back control, everywhere it appears — and **40px where only a cursor does**, which is the deck's stepper pair, hidden below 620px because swiping already does its job. The glyph scales with the disc (24px at 52, 18px at 40) so the mark holds its proportions instead of growing chunky in a smaller circle.
 
 Three states, no others: hover deepens the fill to `--surface-fill-deep` and takes the glyph to `--ink`; **press** deepens it again to `--surface-fill-press` and shrinks the disc to `scale(0.95)`, the same value the primary button uses. Press matters more here than anywhere else in the system — a touch device has no hover, so without it the only feedback for a tap is the screen changing, which on a poor connection is neither immediate nor obviously caused by the tap.
 
