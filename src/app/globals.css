@@ -418,6 +418,24 @@ textarea {
    Inputs — DESIGN.md §5. Single line pills at 44px; a textarea
    cannot be a pill, so it takes lg.
    ============================================================ */
+/**
+ * A field is a surface, not a control — `--r-lg`, from 18 August 2026.
+ *
+ * It was `--r-pill`, on DESIGN.md §5's rule that the pill covers "buttons,
+ * chips, inputs, tags". The rest of that rule is the reason this comes off it:
+ * **the pill is the action signal**, and a box you type into is not an action.
+ * A pill field reads as a button that happens to hold text, which is exactly
+ * what it looked like beside the actual pills on the same sheet.
+ *
+ * The survey settled this first and for its own reasons — see `.slide .input`,
+ * where a field is a card on a page of cards. The team app arrives at the same
+ * shape from the other direction: not because everything around it is a card,
+ * but because everything around it that *is* a pill is something you press.
+ *
+ * 14px of horizontal padding, down from 20. A pill needs the extra to clear its
+ * own curve before the text starts; a rectangle does not, and 20 left the value
+ * floating away from the edge it is measured against.
+ */
 .input {
   width: 100%;
   font-size: 17px;
@@ -425,8 +443,8 @@ textarea {
   color: var(--ink);
   background: var(--canvas);
   border: 1px solid var(--hairline);
-  border-radius: var(--r-pill);
-  padding: 12px 20px;
+  border-radius: var(--r-lg);
+  padding: 12px 14px;
   height: 44px;
 }
 .textarea {

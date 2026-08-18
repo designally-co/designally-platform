@@ -866,7 +866,12 @@ The `md` value of 17px is not a mistake: it matches the body font size and shows
 none 0 · sm 8 · md 11 · lg 18 · card 26 · sheet 34 · pill 9999
 ```
 
-- `pill` — buttons, chips, inputs, tags. **The pill is the action signal.**
+- `pill` — buttons, chips, tags. **The pill is the action signal.**
+- **Inputs came off this list on 18 August 2026**, and the rule above is why: a
+  box you type into is not an action, and a pill field reads as a button that
+  happens to hold text. Fields take `lg` on both surfaces — the survey because a
+  field there is a card on a page of cards, the team app because everything
+  around it still wearing a pill is something you press.
 - `lg` (18px) — the survey's cards: the answer field, the choice tiles, the boards
 - `sm` (8px) — compact utility buttons
 - `md` (11px) — pearl ghost capsules
@@ -1101,9 +1106,22 @@ Both take the same focus treatment: the ring is the accent, and it is the single
 
 ### Inputs
 
-`--canvas` fill, 1px `--hairline`, **`pill` radius**, padding `12px 20px`, height 44px, text at `body` (17px). Apple pills its search input; do the same for single-line fields.
+`--canvas` fill, 1px `--hairline`, **`lg` radius**, padding `12px 14px`, height 44px, text at `body` (17px).
 
-Multi-line textareas use `lg` radius (18px) — a pill cannot hold three lines.
+**It was `pill`, changed 18 August 2026.** The argument for it was Apple's search
+field, and a search field is the exception that proves the rule — it is a
+control you *invoke*, sitting in a bar, and it looks like a button because it
+half is one. Everything here called an input is a value somebody types and
+leaves: a client's name, a due date, a project's name typed to confirm deleting
+it. Beside the actual pills on the same sheet they read as buttons holding text.
+
+14px of horizontal padding, not 20. A pill needs the extra to clear its own
+curve before the text starts; a rectangle does not.
+
+Multi-line textareas were already `lg`, on the reasoning that a pill cannot hold
+three lines. The single-line case now agrees with them for a better reason than
+its own geometry: **the pill is the action signal, and a field is not an
+action.**
 
 Focus: `outline: 2px solid --primary-focus`, offset 2px. No border-colour change, no ring shadow.
 
