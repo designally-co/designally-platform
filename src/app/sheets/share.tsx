@@ -123,7 +123,11 @@ export default function ShareLink({ token, url, closed }: { token: string; url: 
            * thing in this panel that changes what the link *does*. The state is
            * a label now — the system's established form for one, uppercase and
            * tracked, the same treatment `.qsec` gives a section — with the
-           * consequence under it.
+           * consequence under it, one line each. Both wrapped at first, and a
+           * two-line consequence under a one-word label is the paragraph this
+           * was meant to stop being: "anyone who should have a say" became
+           * "anyone who should answer", and "anyone opening this link now" lost
+           * the noun the label above it had already said.
            *
            * No coloured dot, and that is not an omission. DESIGN.md §2: "a
            * status is the word for it, never a star or a dot beside a name.
@@ -133,9 +137,7 @@ export default function ShareLink({ token, url, closed }: { token: string; url: 
            */}
           <p className="sharestate">
             <b>{closed ? 'Closed' : 'Open'}</b>
-            {closed
-              ? 'Anyone opening this link now is told so.'
-              : 'Forward it to anyone who should have a say.'}
+            {closed ? 'Anyone opening it now is told so.' : 'Forward it to anyone who should answer.'}
           </p>
 
           <div className="sharerow">
