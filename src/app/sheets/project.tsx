@@ -13,7 +13,7 @@ import {
 } from '@/lib/team/actions';
 import type { ProjectView } from '@/lib/team/projects';
 import { answersToMarkdown, exportFilename, printableHtml } from '@/lib/team/export';
-import { SaveMark } from '../icons';
+import { ArchiveMark, DocMark, LockMark, PrintMark, SaveMark, TrashMark, UndoMark } from '../icons';
 import ShareLink from './share';
 import MoreMenu from '../menu';
 import Sheet from './sheet';
@@ -187,8 +187,8 @@ export default function ProjectSheet({
                   exportAll('md');
                 }}
               >
-                Markdown
-                <small>Text, for reading and pasting.</small>
+                <DocMark />
+                <span>Markdown</span>
               </button>
               <button
                 disabled={pending}
@@ -197,8 +197,8 @@ export default function ProjectSheet({
                   exportAll('pdf');
                 }}
               >
-                PDF
-                <small>A page per person, laid out to print.</small>
+                <PrintMark />
+                <span>PDF</span>
               </button>
             </>
           )}
@@ -215,8 +215,8 @@ export default function ProjectSheet({
                   run(() => closeCollection(p.surveyId!), 'Collection closed · ปิดรับคำตอบแล้ว');
                 }}
               >
-                Close collection and write the insights
-                <small>Stops new answers and starts the analysis. It takes a few minutes.</small>
+                <LockMark />
+                <span>Close collection</span>
               </button>
             )}
             {p.closedOn && (
@@ -227,8 +227,8 @@ export default function ProjectSheet({
                   run(() => reopenCollection(p.id), 'Collection reopened.');
                 }}
               >
-                Reopen for more answers
-                <small>The insights are left alone — they were true of what they read.</small>
+                <UndoMark />
+                <span>Reopen for answers</span>
               </button>
             )}
             {confirmArchive ? (
@@ -243,12 +243,20 @@ export default function ProjectSheet({
                 >
                   {pending ? 'Archiving…' : `Yes, archive ${p.clientName}`}
                 </button>
+                {/* The sentence the retired Archive section existed to say. It
+                    was on the menu row and the rows are one line now, so it
+                    sits at the moment the decision is made instead — which is
+                    where it was always most use. */}
+                <p className="menunote">
+                  Nothing is deleted — it stays searchable.
+                  <span className="th">ข้อมูลไม่ถูกลบ ค้นหาได้เสมอ</span>
+                </p>
                 <button onClick={() => setConfirmArchive(false)}>Cancel</button>
               </>
             ) : (
               <button onClick={() => setConfirmArchive(true)}>
-                Archive project
-                <small>Nothing is deleted — it stays searchable. · ข้อมูลไม่ถูกลบ ค้นหาได้เสมอ</small>
+                <ArchiveMark />
+                <span>Archive project</span>
               </button>
             )}
 
@@ -313,9 +321,9 @@ export default function ProjectSheet({
                 </button>
               </div>
             ) : (
-              <button onClick={() => setConfirmDelete(true)}>
-                Delete project
-                <small>Removes the answers too. There is no undo.</small>
+              <button className="danger" onClick={() => setConfirmDelete(true)}>
+                <TrashMark />
+                <span>Delete project</span>
               </button>
             )}
           </>

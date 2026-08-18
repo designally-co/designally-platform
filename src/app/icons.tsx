@@ -130,3 +130,69 @@ export function TrashMark() {
     </svg>
   );
 }
+
+/* ── menu marks ──────────────────────────────────────────────────────
+   iOS 27's `MenuItem` puts the symbol on the trailing edge in a 28px slot, and
+   that is where these go — see `.barmenu button`. Same 24-unit grid and the
+   same 1.9 stroke as the toolbar marks above, so a menu and the bar it hangs
+   from are drawn at one weight. */
+
+/** Markdown — a page with its text on it. The file is words, and says so. */
+export function DocMark() {
+  return (
+    <svg {...box}>
+      <path d="M6 3.5 h7.5 L18 8 v12.5 H6 Z" {...stroke} />
+      <path d="M13.5 3.5 V8 H18" {...stroke} />
+      <path d="M9 12.5 h6" {...stroke} />
+      <path d="M9 16 h4" {...stroke} />
+    </svg>
+  );
+}
+
+/** PDF — a printer, because the action is a print and not a save. */
+export function PrintMark() {
+  return (
+    <svg {...box}>
+      <path d="M7.5 9.5 V3.5 h9 v6" {...stroke} />
+      <path d="M7.5 17.5 H6 A2 2 0 0 1 4 15.5 v-4 A2 2 0 0 1 6 9.5 h12 a2 2 0 0 1 2 2 v4 a2 2 0 0 1-2 2 h-1.5" {...stroke} />
+      <path d="M7.5 14 h9 v6.5 h-9 Z" {...stroke} />
+    </svg>
+  );
+}
+
+/**
+ * Closing collection — a padlock, shut.
+ *
+ * Not a tick. A tick means done-and-correct, and closing collection is neither
+ * of those: it is a decision to stop taking answers, which a person makes and
+ * the app records. The lock says no more goes in, which is exactly what it does.
+ */
+export function LockMark() {
+  return (
+    <svg {...box}>
+      <path d="M6.5 10.5 h11 a1.5 1.5 0 0 1 1.5 1.5 v7 a1.5 1.5 0 0 1-1.5 1.5 h-11 A1.5 1.5 0 0 1 5 19 v-7 a1.5 1.5 0 0 1 1.5-1.5 Z" {...stroke} />
+      <path d="M8.5 10.5 V7.5 a3.5 3.5 0 0 1 7 0 v3" {...stroke} />
+    </svg>
+  );
+}
+
+/** Reopening — the turn back. */
+export function UndoMark() {
+  return (
+    <svg {...box}>
+      <path d="M4.5 7 v5 h5" {...stroke} />
+      <path d="M5.6 12 a7 7 0 1 0 1.8-5.1 L4.5 9.4" {...stroke} />
+    </svg>
+  );
+}
+
+/** Archive — a box with its lid on, which is what filing something looks like. */
+export function ArchiveMark() {
+  return (
+    <svg {...box}>
+      <path d="M3.5 5 h17 v3.5 h-17 Z" {...stroke} />
+      <path d="M5 8.5 v10.5 a1.5 1.5 0 0 0 1.5 1.5 h11 a1.5 1.5 0 0 0 1.5-1.5 V8.5" {...stroke} />
+      <path d="M10 12.5 h4" {...stroke} />
+    </svg>
+  );
+}

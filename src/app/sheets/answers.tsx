@@ -11,7 +11,7 @@ import {
   printableHtml,
   scaleReading,
 } from '@/lib/team/export';
-import { SaveMark, TrashMark } from '../icons';
+import { DocMark, PrintMark, SaveMark, TrashMark } from '../icons';
 import MoreMenu from '../menu';
 import Sheet from './sheet';
 
@@ -321,8 +321,8 @@ export default function AnswersSheet({
                       close();
                     }}
                   >
-                    Markdown
-                    <small>Text, for reading and pasting.</small>
+                    <DocMark />
+                    <span>Markdown</span>
                   </button>
                   <button
                     onClick={() => {
@@ -330,8 +330,8 @@ export default function AnswersSheet({
                       print(person);
                     }}
                   >
-                    PDF
-                    <small>A page per person, laid out to print.</small>
+                    <PrintMark />
+                    <span>PDF</span>
                   </button>
                 </>
               )}

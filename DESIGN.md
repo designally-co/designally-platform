@@ -863,7 +863,7 @@ The `md` value of 17px is not a mistake: it matches the body font size and shows
 ### Radii
 
 ```
-none 0 · sm 8 · md 11 · lg 18 · card 26 · sheet 34 · pop 38 · pill 9999
+none 0 · sm 8 · md 11 · lg 18 · card 26 · sheet 34 · pill 9999
 ```
 
 - `pill` — buttons, chips, inputs, tags. **The pill is the action signal.**
@@ -873,9 +873,12 @@ none 0 · sm 8 · md 11 · lg 18 · card 26 · sheet 34 · pop 38 · pill 9999
 
 Do not use values between these. No 12px, no 16px.
 
-**`card` 26 · `sheet` 34 · `pop` 38 — the team app only, added 18 August 2026.**
-Apple's own numbers, from `guidelines/spacing-radii.html` in the iOS & iPadOS 27
-system: grouped card 26, sheet top 34, popover 38.
+**`card` 26 · `sheet` 34 — the team app only, added 18 August 2026.** Apple's
+own numbers, from `guidelines/spacing-radii.html` in the iOS & iPadOS 27 system.
+A third was tried and dropped the same day: Apple's popover radius of **38** is
+sized for an iPad popover covering much of a tablet, and on a 240px menu it
+curves in far enough to crowd the first and last rows. The popovers take `card`,
+which is what a menu of rows is.
 
 They are separate tokens rather than new values for `lg`, and that is the point:
 both surfaces share every token above, so moving `lg` to 26 would round the

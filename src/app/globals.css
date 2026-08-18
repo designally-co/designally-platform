@@ -173,7 +173,6 @@
    */
   --r-card: 26px;
   --r-sheet: 34px;
-  --r-pop: 38px;
 
 
   /**
@@ -1566,7 +1565,7 @@ label.f span {
   min-width: 232px;
   background: var(--canvas);
   border: 1px solid var(--hairline);
-  border-radius: var(--r-pop);
+  border-radius: var(--r-card);
   padding: 6px;
   display: flex;
   flex-direction: column;
@@ -1634,22 +1633,28 @@ label.f span {
     transform 0.12s var(--ease);
 }
 /**
- * The disc that destroys something keeps the same mark colour as the other two.
+ * The disc that destroys something is red, and it took a white disc to get
+ * there.
  *
- * It was going to take `--critical`, which is what this app gives an
- * irreversible act everywhere else. Measured on the disc it is **2.54:1**
- * against `--fill` — under the 3:1 a graphical object has to clear, on the one
- * control where being seen matters most. The alternatives were both worse than
- * the problem: a darker red is a colour DESIGN.md §1 has never measured, added
- * at speed for one glyph, and a red disc rather than a red mark makes the bar
- * three shapes again.
+ * It was going to take `--critical` when the discs were `--fill`, and measured
+ * **2.54:1** against that warm grey — under the 3:1 a graphical object has to
+ * clear, on the one control where being seen matters most. So it kept `--glyph`
+ * and the bin shape carried the meaning alone.
  *
- * The bin carries it instead, which is the thing a person actually reads — no
- * colour has ever been what tells somebody a bin deletes. The warning that
- * matters is a sentence, and it is one press away in the panel.
+ * The discs went white a few hours later, for an unrelated reason: a warm-grey
+ * control on parchment is the same temperature as the paper. `--critical` on
+ * white measures **5.1:1**, past the graphical floor and past the 4.5:1 for
+ * text as well. The constraint that forced the compromise is gone, so the
+ * compromise is too.
  */
 .iconbtn.danger {
-  color: var(--glyph);
+  color: var(--critical);
+}
+@media (hover: hover) {
+  .iconbtn.danger:hover {
+    color: var(--critical);
+    border-color: var(--critical);
+  }
 }
 
 .iconbtn:active {
@@ -1685,8 +1690,32 @@ label.f span {
   white-space: nowrap;
   border: 0;
 }
+/**
+ * A menu item: the words, then the mark on the trailing edge.
+ *
+ * **The mark leads.** iOS 27's own `MenuItem` puts it on the trailing edge in
+ * a 28px slot, and that is right on a phone for the reason iOS gives it: the
+ * menu hangs under the control that opened it and marks on that side fall under
+ * the thumb. This menu is opened with a cursor on a desk, where the convention
+ * is the other one and the reading is left to right — a column of marks down
+ * the leading edge is scannable in a way a column down the trailing edge, past
+ * labels of four different lengths, is not.
+ *
+ * The mark is `--ink-3`, a step below the label. It is a second way to
+ * recognise a row you can already read, not a thing to read first — the label
+ * carries the action and every one of these menus is short.
+ *
+ * **One line each, from 18 August 2026.** Every row carried a sentence of
+ * explanation under its label, which made a four-item menu a paragraph and put
+ * the reading *before* the choosing. A mark and a short label is the whole row
+ * now. The two sentences that were load-bearing rather than descriptive moved
+ * to the confirmations, where the decision is actually made — see the archive
+ * note in project.tsx, and the delete panel, which counts what it will destroy.
+ */
 .barmenu button {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   width: 100%;
   text-align: left;
   background: none;
@@ -1699,6 +1728,32 @@ label.f span {
   color: inherit;
   letter-spacing: 0;
   cursor: pointer;
+}
+/* the words, which take the space the mark does not */
+.barmenu button > span {
+  flex: 1;
+  min-width: 0;
+}
+.barmenu button > svg {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  color: var(--ink-3);
+}
+/* destructive rows carry it through to the mark, the way the label does */
+.barmenu button.danger > svg {
+  color: var(--critical);
+}
+/* a sentence attached to a confirmation rather than to a row — the one place a
+   menu still holds prose, because it is the moment somebody commits */
+.menunote {
+  margin: 6px 11px 2px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--ink-3);
+}
+.menunote .th {
+  display: block;
 }
 .barmenu form {
   display: block;
@@ -1716,6 +1771,14 @@ label.f span {
 }
 /* the one destructive item in any menu. Colour is the whole signal — it is
    already the second press, and the label already names the client. */
+/**
+ * A destructive row is red before it is pressed, not only after.
+ *
+ * `Delete project` opens a confirmation, and until 18 August 2026 the row that
+ * opened it looked like the two above it — the warning only arrived once you
+ * were already inside. It is the row a cursor passes on the way to Archive, so
+ * it says what it is on the way past. 5.1:1 on the white popover.
+ */
 .barmenu button.danger {
   color: var(--critical);
 }
@@ -5076,7 +5139,7 @@ dialog::backdrop {
   max-width: calc(100vw - 32px);
   background: var(--canvas);
   border: 1px solid var(--hairline);
-  border-radius: var(--r-pop);
+  border-radius: var(--r-card);
   padding: 16px;
 }
 .sharehint {
