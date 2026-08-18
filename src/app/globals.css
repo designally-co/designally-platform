@@ -5499,33 +5499,14 @@ dialog::backdrop {
   line-height: 1.6;
   color: var(--ink-2);
 }
-.delconfirm label {
-  font-size: 13px;
-  line-height: 1.6;
-  color: var(--ink-3);
-}
-/* the name is the thing to be copied, so it is the one bit of emphasis */
-.delconfirm label b {
-  font-weight: 600;
-  color: var(--ink);
-}
-/* 38, not the 44 a form field takes. This one is typed into once, under a
-   sentence, in a panel — the touch floor is about controls somebody hunts for
-   on a phone, and this is neither. */
-.delconfirm .input {
-  width: 100%;
-  height: 38px;
-  padding: 0 12px;
-  font-size: 15px;
-}
 /* tighter than a menu row, which is spaced for a list of choices rather than
    for two answers to one question */
 .delconfirm > button {
   padding: 7px 11px;
 }
-/* Disabled until the name matches. Deliberately quiet rather than red while it
-   is unavailable: an accent on a control nobody can use yet is the accent
-   saying a person is needed at a place they cannot act — DESIGN.md section 1. */
+/* Quiet rather than red while unavailable — an accent on a control nobody can
+   use yet is the accent saying a person is needed at a place they cannot act,
+   DESIGN.md §1. Only `pending` disables these now. */
 .delconfirm .danger:disabled {
   opacity: 0.45;
   cursor: not-allowed;

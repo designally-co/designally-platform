@@ -51,11 +51,6 @@ export default function ProjectSheet({
 }) {
   const [confirmArchive, setConfirmArchive] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [typed, setTyped] = useState('');
-  /* trimmed and case-insensitive, matching the action — a guard against acting
-     without meaning to, not a spelling test, and the names are often Thai where
-     a trailing space is invisible */
-  const matches = typed.trim().toLocaleLowerCase() === p.clientName.trim().toLocaleLowerCase();
 
   /**
    * Everybody's answers, from the project — which is the thing that has an
@@ -232,24 +227,22 @@ export default function ProjectSheet({
               </button>
             )}
             {confirmArchive ? (
-              <>
+              /* One line, then the two answers to it. The sentence used to sit
+                 *between* the buttons, which put the reason for the decision
+                 after one of the ways of making it. */
+              <div className="delconfirm">
+                <p>Nothing is deleted — it stays searchable.</p>
                 <button
-                  className="danger"
                   disabled={pending}
                   onClick={() => {
                     close();
                     run(() => archiveProject(p.id), `${p.clientName} archived.`);
                   }}
                 >
-                  {pending ? 'Archiving…' : `Yes, archive ${p.clientName}`}
+                  {pending ? 'Archiving…' : 'Archive project'}
                 </button>
-                {/* The sentence the retired Archive section existed to say. It
-                    was on the menu row and the rows are one line now, so it
-                    sits at the moment the decision is made instead — which is
-                    where it was always most use. */}
-                <p className="menunote">Nothing is deleted — it stays searchable.</p>
                 <button onClick={() => setConfirmArchive(false)}>Cancel</button>
-              </>
+              </div>
             ) : (
               <button onClick={() => setConfirmArchive(true)}>
                 <ArchiveMark />
@@ -273,49 +266,32 @@ export default function ProjectSheet({
              * twice in the same second is not proportional to that.
              */}
             {confirmDelete ? (
+              /**
+               * One line and two buttons, from 18 August 2026.
+               *
+               * It asked for the client's name to be typed, which was the right
+               * guard for what this does — it takes every response on the
+               * project and the insights written from them — and it is gone by
+               * request. What protects it now is that the row only opens this
+               * panel and the panel names the cost: the count of answers, the
+               * insights, and that there is no undo.
+               */
               <div className="delconfirm">
                 <p>
                   This deletes {p.answers} {p.answers === 1 ? 'answer' : 'answers'}
                   {p.insights ? ' and the insights written from them' : ''}. It cannot be undone.
                 </p>
-                <label htmlFor={`del-${p.id}`}>
-                  Type <b>{p.clientName}</b> to confirm
-                </label>
-                <input
-                  id={`del-${p.id}`}
-                  className="input"
-                  value={typed}
-                  autoComplete="off"
-                  disabled={pending}
-                  onChange={(e) => setTyped(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && matches) {
-                      close();
-                      run(() => deleteProject(p.id, typed), `${p.clientName} deleted.`);
-                    }
-                  }}
-                />
                 <button
                   className="danger"
-                  /* the name has to be right before this does anything, so the
-                     button says so by being unavailable rather than by failing
-                     after the press */
-                  disabled={pending || !matches}
+                  disabled={pending}
                   onClick={() => {
                     close();
-                    run(() => deleteProject(p.id, typed), `${p.clientName} deleted.`);
+                    run(() => deleteProject(p.id), `${p.clientName} deleted.`);
                   }}
                 >
                   {pending ? 'Deleting…' : 'Delete permanently'}
                 </button>
-                <button
-                  onClick={() => {
-                    setConfirmDelete(false);
-                    setTyped('');
-                  }}
-                >
-                  Cancel
-                </button>
+                <button onClick={() => setConfirmDelete(false)}>Cancel</button>
               </div>
             ) : (
               <button className="danger" onClick={() => setConfirmDelete(true)}>
