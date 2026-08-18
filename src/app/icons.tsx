@@ -102,16 +102,33 @@ export const DocMark = mark(FileText);
 export const PrintMark = mark(Printer);
 
 /**
- * Back, on the team sheet's leading disc.
+ * Back — the one mark that does not take the wrapper's numbers.
  *
- * It was `chevron.tsx` — 24px at `strokeWidth 2.5` — sitting in a bar of 20px
- * marks at 1.9. Twenty per cent larger and a third heavier than the three
- * discs opposite it, which is a difference you see before you can name it.
- * Through the same wrapper it is the same 20 and 1.9 as everything else.
+ * A chevron is two strokes and an apex; every other mark here is a closed form.
+ * At the same nominal size they are not the same size at all, and `getBBox()`
+ * says by how much — the drawn ink, in pixels, at `size={20}`:
  *
- * `chevron.tsx` keeps the survey, where the disc is 52px and DESIGN.md §5 says
- * the glyph scales with it — 24px there is deliberate, not the same value left
- * unexamined. It also keeps Lucide out of that bundle, which is the whole
- * reason it was not replaced outright.
+ *     ChevronLeft    5.0 x 10.0        Trash2, Lock  15.0 x 16.7
+ *     Share         13.3 x 16.7        Printer, Link 16.7 x 16.7
+ *     Download      15.0 x 15.0
+ *
+ * `ChevronLeft` occupies 6x12 of the 24 grid where the rest occupy 16–20 by
+ * 18–20. Sized to match them it is a quarter of their area and reads as a
+ * smaller icon, which is what it looked like — and going through the wrapper
+ * was what made that exact, not what caused it.
+ *
+ * So it is sized by its ink instead. `size={32}` puts the chevron's height at
+ * 16px, the median of the others; `strokeWidth={1.19}` is `1.9 x 20/24 x 24/32`,
+ * which renders the same 1.58px stroke the wrapper produces at 20. Nominal box
+ * bigger, drawn mark the same weight and height as its neighbours.
+ *
+ * The width stays narrow — 8px against their 13–17 — and that is correct. A
+ * chevron is a tall thin mark and matching its *width* would make it a wedge.
+ *
+ * `chevron.tsx` keeps the survey, where the disc is 52px and DESIGN.md §5 scales
+ * the glyph with the disc. It also keeps Lucide out of that bundle, which is why
+ * it was not replaced outright.
  */
-export const BackMark = mark(ChevronLeft);
+export function BackMark() {
+  return <ChevronLeft size={32} strokeWidth={1.19} aria-hidden="true" />;
+}
