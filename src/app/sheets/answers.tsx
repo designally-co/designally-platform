@@ -402,7 +402,9 @@ export default function AnswersSheet({
                    * it. The question names what is about to happen; the line
                    * under it is the part somebody might not have thought of —
                    * an analysis that read these answers keeps its findings and
-                   * starts reporting the person as deleted.
+                   * starts reporting the person as deleted. It opened with "Gone
+                   * for good", which the red button and the question above it
+                   * had both already said.
                    *
                    * Once the server has refused, its sentence replaces both.
                    * It is more specific than either — it knows how many
@@ -418,7 +420,7 @@ export default function AnswersSheet({
                         <b>Delete {person.name}&apos;s answers?</b>
                       </p>
                       <p className="why">
-                        Gone for good. An analysis that read them will show them as deleted.
+                        An analysis that read them will show them as deleted.
                       </p>
                     </>
                   )}

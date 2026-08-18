@@ -6774,6 +6774,23 @@ dialog::backdrop {
   padding: var(--sp-sm);
   border: 1px solid var(--hairline);
   border-radius: var(--r-card);
+  /**
+   * Canvas, not the critical wash.
+   *
+   * The wash marks a *recessed block inside* something — the archive and delete
+   * confirmations sitting among menu rows, the version confirm sitting among
+   * versions. It says "this part of the panel, not the rest of it".
+   *
+   * Here there is no rest of it: the confirmation is the popover, at the same
+   * level as `.barmenu`, `.sharepanel` and `.vermenu`, and every one of those is
+   * canvas inside the Edge. A pink panel floating on the page would be the only
+   * first-level popover in the app with a coloured ground, and it would be
+   * saying "recessed" about the thing in front.
+   *
+   * Nothing is lost: the filled `--critical` button is what marks this as
+   * destructive, and it does that on any ground.
+   */
+  background: var(--canvas);
 }
 /**
  * A confirmation's two answers, everywhere one is asked.
