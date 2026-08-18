@@ -49,8 +49,25 @@ export default function ProjectSheet({
   onClose: () => void;
   onActed: (message: string) => void;
 }) {
-  const [confirmArchive, setConfirmArchive] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
+  /**
+   * Which confirmation is open — one field, not two flags.
+   *
+   * Archive and Delete each had their own boolean, so both panels could be open
+   * at once: a menu asking two irreversible questions at the same time, with
+   * two red buttons in it and nothing saying which one you had opened. Opening
+   * either now closes the other because there is only one value to hold, rather
+   * than because two handlers each remember to reset the other's flag.
+   */
+  const [confirming, setConfirming] = useState<'archive' | 'delete' | null>(null);
+  const [typed, setTyped] = useState('');
+  /**
+   * The typed name, back on 18 August 2026 after a few hours without it.
+   *
+   * Trimmed and case-insensitive, and checked again on the server: this is a
+   * guard against acting without meaning to, not a spelling test, and the names
+   * are often Thai where a trailing space is invisible.
+   */
+  const matches = typed.trim().toLocaleLowerCase() === p.clientName.trim().toLocaleLowerCase();
 
   /**
    * Everybody's answers, from the project — which is the thing that has an
@@ -226,7 +243,7 @@ export default function ProjectSheet({
                 <span>Reopen for answers</span>
               </button>
             )}
-            {confirmArchive ? (
+            {confirming === 'archive' ? (
               /* One line, then the two answers to it. The sentence used to sit
                  *between* the buttons, which put the reason for the decision
                  after one of the ways of making it. */
@@ -241,10 +258,10 @@ export default function ProjectSheet({
                 >
                   {pending ? 'Archiving…' : 'Archive project'}
                 </button>
-                <button onClick={() => setConfirmArchive(false)}>Cancel</button>
+                <button onClick={() => setConfirming(null)}>Cancel</button>
               </div>
             ) : (
-              <button onClick={() => setConfirmArchive(true)}>
+              <button onClick={() => setConfirming('archive')}>
                 <ArchiveMark />
                 <span>Archive project</span>
               </button>
@@ -265,36 +282,66 @@ export default function ProjectSheet({
              * insights written from them, and a guard you can clear by pressing
              * twice in the same second is not proportional to that.
              */}
-            {confirmDelete ? (
+            {confirming === 'delete' ? (
               /**
-               * One line and two buttons, from 18 August 2026.
+               * A short line, the name typed, and two buttons.
                *
-               * It asked for the client's name to be typed, which was the right
-               * guard for what this does — it takes every response on the
-               * project and the insights written from them — and it is gone by
-               * request. What protects it now is that the row only opens this
-               * panel and the panel names the cost: the count of answers, the
-               * insights, and that there is no undo.
+               * The sentence ran to two and a half lines saying what a count and
+               * three words say: how many answers go, that the insights go with
+               * them, and that nothing comes back.
+               *
+               * The typed name is the guard, restored. Everything else
+               * destructive here is one press inside a panel, which is
+               * proportional to deleting one response — a mistake costs one
+               * person's twenty minutes. This takes every response on the
+               * project, and a panel you can clear by pressing twice in the same
+               * second is not proportional to that.
                */
-              <div className="delconfirm">
+              <div className="delconfirm danger">
                 <p>
-                  This deletes {p.answers} {p.answers === 1 ? 'answer' : 'answers'}
-                  {p.insights ? ' and the insights written from them' : ''}. It cannot be undone.
+                  {p.answers} {p.answers === 1 ? 'answer' : 'answers'}
+                  {p.insights ? ' and the insights' : ''} go. No undo.
                 </p>
+                <label htmlFor={`del-${p.id}`}>
+                  Type <b>{p.clientName}</b> to confirm
+                </label>
+                <input
+                  id={`del-${p.id}`}
+                  className="input"
+                  value={typed}
+                  autoComplete="off"
+                  disabled={pending}
+                  onChange={(e) => setTyped(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && matches) {
+                      close();
+                      run(() => deleteProject(p.id, typed), `${p.clientName} deleted.`);
+                    }
+                  }}
+                />
                 <button
                   className="danger"
-                  disabled={pending}
+                  /* unavailable until the name is right, rather than failing
+                     after the press */
+                  disabled={pending || !matches}
                   onClick={() => {
                     close();
-                    run(() => deleteProject(p.id), `${p.clientName} deleted.`);
+                    run(() => deleteProject(p.id, typed), `${p.clientName} deleted.`);
                   }}
                 >
                   {pending ? 'Deleting…' : 'Delete permanently'}
                 </button>
-                <button onClick={() => setConfirmDelete(false)}>Cancel</button>
+                <button
+                  onClick={() => {
+                    setConfirming(null);
+                    setTyped('');
+                  }}
+                >
+                  Cancel
+                </button>
               </div>
             ) : (
-              <button className="danger" onClick={() => setConfirmDelete(true)}>
+              <button className="danger" onClick={() => setConfirming('delete')}>
                 <TrashMark />
                 <span>Delete project</span>
               </button>

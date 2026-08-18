@@ -573,18 +573,18 @@ export async function surveyQr(token: string): Promise<{ svg: string } | { error
  * be able to read at a glance, and archiving them only moves them somewhere
  * they still are.
  *
- * **The confirmation is the panel, not a typed name.** It asked for the
- * client's name to be typed until 18 August 2026, on the reasoning that a guard
- * you can clear by pressing twice in the same second is not proportional to
- * taking every response on a project — and that reasoning has not changed, the
- * requirement did. The check went from the server with the field, because a
- * name the UI supplies and the server compares against its own copy is not a
- * check, it is a ceremony: it would pass every time, including the time
- * somebody meant to press Archive.
+ * **The confirmation is the client's name, typed.** Everything else destructive
+ * here is one press inside a panel, and that is proportional to deleting one
+ * response — a mistake costs one person's twenty minutes and the button says
+ * whose. This costs every response on the project and the insights written from
+ * them, and a panel you can clear by pressing twice in the same second is not
+ * proportional to that.
  *
- * What is left is that the menu row only opens a panel, and the panel names the
- * cost before the button: how many answers, whether insights go with them, and
- * that there is no undo.
+ * Checked here as well as in the browser, and the two must stay together: the
+ * field is what makes this a check rather than a ceremony. Drop the field and
+ * the caller supplies the same string the server compares against, so it passes
+ * every time — including the time somebody meant to press Archive. It was
+ * briefly like that on 18 August 2026 and is not.
  *
  * The cascade is the database's, declared on the foreign keys: surveys and
  * insights reference the project, responses reference the survey, answers
@@ -592,12 +592,25 @@ export async function surveyQr(token: string): Promise<{ svg: string } | { error
  * is left — one client can have several projects, and deleting the last of them
  * is not a decision to remove the client.
  */
-export async function deleteProject(projectId: string): Promise<ActionResult> {
+export async function deleteProject(projectId: string, typedName: string): Promise<ActionResult> {
   await actingUser();
   const db = await getDb();
 
-  const [row] = await db.select({ id: projects.id }).from(projects).where(eq(projects.id, projectId)).limit(1);
+  const [row] = await db
+    .select({ id: projects.id, client: clients.name })
+    .from(projects)
+    .innerJoin(clients, eq(clients.id, projects.clientId))
+    .where(eq(projects.id, projectId))
+    .limit(1);
+
   if (!row) return { ok: false, error: 'That project no longer exists.' };
+
+  /* Trimmed and case-insensitive: a guard against acting without meaning to,
+     not a spelling test, and the names are often Thai where a trailing space is
+     invisible. */
+  if (typedName.trim().toLocaleLowerCase() !== row.client.trim().toLocaleLowerCase()) {
+    return { ok: false, error: `That does not match. Type ${row.client} exactly to delete it.` };
+  }
 
   await db.delete(projects).where(eq(projects.id, projectId));
 

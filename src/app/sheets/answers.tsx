@@ -396,10 +396,8 @@ export default function AnswersSheet({
             </MoreMenu>
             <MoreMenu label={`Delete ${person.name}'s answers`} icon={<TrashMark />} danger>
               {(close) => (
-                <div className="delconfirm">
-                  <p>
-                    This removes every answer {person.name} gave. It cannot be undone.
-                  </p>
+                <div className="delconfirm danger">
+                  <p>Every answer {person.name} gave. No undo.</p>
                   <button
                     className="danger"
                     disabled={pending}

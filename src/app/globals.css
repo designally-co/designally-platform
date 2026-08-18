@@ -124,6 +124,16 @@
   --affirm: #107f54;
   --caution: #a06000;
   --critical: #d32830;
+  /**
+   * The ground a destructive confirmation stands on.
+   *
+   * `--critical` at about 7% over white. Measured on it: the `Delete
+   * permanently` label at 4.58:1, which clears the 4.5 for text and is the
+   * reason it is not darker — `#fbeaea` and below drop the label to 4.39. Body
+   * ink reads 12.95:1, and the wash itself is 1.11:1 against the white popover,
+   * which is a tint you see without it becoming a colour.
+   */
+  --critical-wash: #fcf0f0;
   --affirm-tint: #e5f7ec;
   --caution-tint: #fff1da;
   --critical-tint: #ffedeb;
@@ -5479,19 +5489,65 @@ dialog::backdrop {
  * floor exists for. Tightening the type would have been the easiest 20px to
  * find and the wrong one. The space between things gave it up instead.
  */
+/**
+ * A recessed block, not a rule.
+ *
+ * It was divided from the rows above by a hairline, which is one more line on a
+ * panel already made of them — and a line says "a new section" where what is
+ * actually true is "you are now answering a question". Ground says that better:
+ * the block sits back, the rows above stay on the popover's own white, and the
+ * boundary is a change of surface rather than a mark drawn between two things.
+ *
+ * `--parchment` on `--canvas` is the team app's own inversion, borrowed inward —
+ * DESIGN.md §3 calls it a grey page with white cards, and this is that at the
+ * size of a panel.
+ *
+ * The radius nests: the popover is 26 with 6px of padding, so 20 is the curve
+ * its inner edge actually describes. `--r-lg` at 18 is the nearest rung and
+ * close enough that the two read as concentric.
+ */
 .delconfirm {
   display: grid;
   gap: 6px;
-  padding: 8px 11px 10px;
-  border-top: 1px solid var(--hairline);
+  padding: 10px 11px;
   margin-top: 4px;
+  background: var(--parchment);
+  border-radius: var(--r-lg);
 }
-/* on the response toolbar it is the whole popover rather than a section at the
-   foot of a menu, so there is nothing above it to be divided from */
+/**
+ * Deleting stands on red; archiving does not.
+ *
+ * Both were parchment, which made the two confirmations the same object with
+ * different words in it — and they are not the same: one is reversible and
+ * keeps every answer, the other takes them. The ground says which before the
+ * sentence is read.
+ *
+ * The wash, not the accent. DESIGN.md §1 reserves the accent for "a person is
+ * needed here"; `--critical` is this system's own colour for an irreversible
+ * act, and at 7% it is a surface rather than a mark — nothing here is being
+ * marked, the whole block is being placed.
+ */
+.delconfirm.danger {
+  background: var(--critical-wash);
+}
+/**
+ * A row inside the block lifts to white on hover, rather than down to parchment.
+ *
+ * `.barmenu button:hover` is `--parchment`, which is now the ground these two
+ * are standing on — the hover was invisible the moment the block was tinted.
+ * Inverting it is the same idea the surface itself uses: white is the thing in
+ * front, parchment is the thing behind.
+ */
+@media (hover: hover) {
+  .delconfirm > button:not(:disabled):hover {
+    background: var(--canvas);
+  }
+}
+/* On the response toolbar it is the whole popover rather than a block at the
+   foot of a menu. It keeps the tint — a panel that is entirely one recessed
+   surface still reads as recessed, and it is the same object either way. */
 .barmenu > .delconfirm:only-child {
-  border-top: 0;
   margin-top: 0;
-  padding-top: 4px;
 }
 .delconfirm p {
   margin: 0;
@@ -5503,6 +5559,26 @@ dialog::backdrop {
    for two answers to one question */
 .delconfirm > button {
   padding: 7px 11px;
+}
+.delconfirm label {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink-3);
+}
+/* the name is the thing to be copied, so it is the one bit of emphasis */
+.delconfirm label b {
+  font-weight: 600;
+  color: var(--ink);
+}
+/* 38, not the 44 a form field takes. This one is typed into once, under a
+   sentence, in a panel — the touch floor is about controls somebody hunts for
+   on a phone, and this is neither. White on the wash, so the field reads as the
+   thing in front the way a hovered row does. */
+.delconfirm .input {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px;
+  font-size: 15px;
 }
 /* Quiet rather than red while unavailable — an accent on a control nobody can
    use yet is the accent saying a person is needed at a place they cannot act,
