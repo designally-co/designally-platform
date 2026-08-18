@@ -796,6 +796,24 @@ This applies to page headings (no greyed closing phrase), the wordmark (one colo
 
 A corollary: markers carried by a coloured glyph are not allowed. A status is the word for it, never a star or a dot beside a name. A bare glyph needs a legend; words don't — and a coloured glyph steals Action Blue from its one meaning. The blue dot in the projects table is the single exception, and only because it carries the accent's own meaning: this project needs a person.
 
+### The team app is English
+
+**Decided 18 August 2026.** Every string the team app draws for itself — labels,
+buttons, menu rows, notes, toasts, validation — is English and nothing else. It
+is used by Designally staff behind a Workspace login, and the bilingual pairs it
+carried ("Collection closed · ปิดรับคำตอบแล้ว") were doubling the length of
+every confirmation for readers who had already read the first half.
+
+**The data is untouched, and that is the whole distinction.** Client names,
+respondent names, positions and every answer are shown exactly as they arrive,
+which on this product is Thai more often than not. So the leading rule below
+still governs the team app wherever *content* appears — a respondent's name in a
+sheet title, an answer in a list, a client's name inside a confirmation — and
+stops governing the chrome around it, which can no longer hold a Thai glyph.
+
+**The survey is unchanged and stays fully bilingual.** It is answered by clients
+on a phone; that surface is the reason the rule below exists.
+
 ### The Thai leading rule — overrides Apple
 
 Thai stacks four levels vertically: base glyph, upper vowel, tone mark, lower vowel. Apple's leading is tuned for Latin and clips it.

@@ -56,7 +56,7 @@ export default function NewSurveySheet({
         return;
       }
       setLink(result.link!);
-      onCreated(`${OPTIONS.find((o) => o.key === pkg)?.label} questionnaire attached · สร้างแบบสอบถามแล้ว`);
+      onCreated(`${OPTIONS.find((o) => o.key === pkg)?.label} questionnaire attached.`);
     });
   };
 
@@ -140,8 +140,7 @@ export default function NewSurveySheet({
       <div className="field">
         <p className="note">
           <b>No need to know who will answer.</b> One link, shared as widely as the client likes.
-          Answers arrive as people find time, and you close collection when there&apos;s enough. ·
-          ไม่ต้องระบุจำนวนผู้ตอบ ลูกค้าส่งลิงก์ต่อได้ตามต้องการ
+          Answers arrive as people find time, and you close collection when there&apos;s enough.
         </p>
       </div>
 

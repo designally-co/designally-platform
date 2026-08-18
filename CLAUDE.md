@@ -71,6 +71,13 @@ changes; only `DATABASE_URL`.
   keeps its own 1–21 number in the data — the send screen's grid, the team's
   reading and the analysis all use it — but it is not printed on the card.
 - **Private** (everything else) — the team app. Behind auth. Designally staff only.
+  **English only, from 18 August 2026** — every string it draws for itself: labels,
+  buttons, menu rows, toasts, validation. The bilingual pairs it carried were
+  doubling the length of every confirmation for readers who had already read the
+  first half. *Data is untouched* — client and respondent names, positions and
+  answers appear exactly as they arrive, which is Thai more often than not, so
+  DESIGN.md §2's leading rule still governs anywhere content is shown.
+  The survey stays fully bilingual; it is the surface the rule was written for.
 
 Keep them in one Next.js app. Do not build two projects.
 
@@ -263,6 +270,10 @@ Each one ends with something usable. Do not start the next before the previous h
 
 - Commit after each working piece. Small commits, plain messages.
 - **Test in Thai every time.** Thai wraps and stacks differently; layouts that pass in English fail in Thai. This is the most common defect in this domain.
+  The team app's own *chrome* is English from 18 August 2026, but every place it
+  shows a name or an answer still has to survive Thai — a sheet title, a
+  confirmation naming a client, a list of respondents. Testing it in Thai means
+  testing it with Thai *data*.
 - Test client surveys at 390px width before considering them done.
 - Run the app and screenshot it rather than asserting that something works.
 - When a product decision changes, update the file in `docs/` in the same commit.

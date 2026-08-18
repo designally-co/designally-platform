@@ -212,7 +212,7 @@ export default function ProjectSheet({
                 disabled={pending}
                 onClick={() => {
                   close();
-                  run(() => closeCollection(p.surveyId!), 'Collection closed · ปิดรับคำตอบแล้ว');
+                  run(() => closeCollection(p.surveyId!), 'Collection closed.');
                 }}
               >
                 <LockMark />
@@ -238,7 +238,7 @@ export default function ProjectSheet({
                   disabled={pending}
                   onClick={() => {
                     close();
-                    run(() => archiveProject(p.id), `${p.clientName} archived · เก็บเข้าคลังแล้ว`);
+                    run(() => archiveProject(p.id), `${p.clientName} archived.`);
                   }}
                 >
                   {pending ? 'Archiving…' : `Yes, archive ${p.clientName}`}
@@ -247,10 +247,7 @@ export default function ProjectSheet({
                     was on the menu row and the rows are one line now, so it
                     sits at the moment the decision is made instead — which is
                     where it was always most use. */}
-                <p className="menunote">
-                  Nothing is deleted — it stays searchable.
-                  <span className="th">ข้อมูลไม่ถูกลบ ค้นหาได้เสมอ</span>
-                </p>
+                <p className="menunote">Nothing is deleted — it stays searchable.</p>
                 <button onClick={() => setConfirmArchive(false)}>Cancel</button>
               </>
             ) : (
@@ -467,7 +464,7 @@ export default function ProjectSheet({
                 }
                 run(
                   () => closeCollection(p.surveyId!, only ?? undefined),
-                  'Collection closed · ปิดรับคำตอบแล้ว',
+                  'Collection closed.',
                 );
               }}
             >

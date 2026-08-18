@@ -43,7 +43,7 @@ export async function createSurvey(formData: FormData): Promise<ActionResult> {
   const raw = String(formData.get('client') ?? '').trim();
   const pkg = String(formData.get('package') ?? '') as Package;
 
-  if (!raw) return { ok: false, error: 'Enter a client name · กรุณาใส่ชื่อลูกค้า' };
+  if (!raw) return { ok: false, error: 'Enter a client name.' };
   if (!PACKAGES.includes(pkg)) return { ok: false, error: 'Choose a package' };
 
   /**
@@ -89,7 +89,7 @@ export async function createSurvey(formData: FormData): Promise<ActionResult> {
    * keep it.
    */
   const name = raw.trim();
-  if (!name) return { ok: false, error: 'Enter a client name · กรุณาใส่ชื่อลูกค้า' };
+  if (!name) return { ok: false, error: 'Enter a client name.' };
 
   const db = await getDb();
 
