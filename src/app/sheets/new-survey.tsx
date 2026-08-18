@@ -18,14 +18,17 @@ const OPTIONS: { key: Package; label: string }[] = [
 
 export default function NewSurveySheet({
   library,
-  origin,
   onClose,
   onCreated,
 }: {
   library: LibraryBlock[];
-  origin: string;
   onClose: () => void;
-  onCreated: (message: string) => void;
+  onCreated: (made: {
+    clientName: string;
+    packageLabel: string;
+    token: string;
+    link: string;
+  }) => void;
 }) {
   const [pkg, setPkg] = useState<Package | null>(null);
   const [client, setClient] = useState('');
@@ -50,8 +53,6 @@ export default function NewSurveySheet({
    * have not touched.
    */
   const [error, setError] = useState<{ text: string; field?: NewSurveyField } | null>(null);
-  const [link, setLink] = useState<string | null>(null);
-  const [token, setToken] = useState<string | null>(null);
   const [pending, start] = useTransition();
 
   const submit = () => {
@@ -66,9 +67,15 @@ export default function NewSurveySheet({
         setError({ text: result.error, field: result.field });
         return;
       }
-      setLink(result.link);
-      setToken(result.token);
-      onCreated(`${OPTIONS.find((o) => o.key === pkg)?.label} questionnaire attached.`);
+      /* The form's job ends here. What was made goes to a sheet of its own —
+         see survey-made.tsx — rather than unfolding underneath three fields
+         that can no longer be changed. */
+      onCreated({
+        clientName: client.trim(),
+        packageLabel: OPTIONS.find((o) => o.key === pkg)?.label ?? '',
+        token: result.token,
+        link: result.link,
+      });
     });
   };
 
@@ -76,9 +83,6 @@ export default function NewSurveySheet({
      error that survives the fix it asked for teaches people to ignore it. */
   const errFor = (field: NewSurveyField) =>
     error?.field === field ? <p className="fielderror">{error.text}</p> : null;
-
-  // the copyable link must be the one that actually resolves
-  const full = link ? `${origin}${link}` : '';
 
   return (
     <Sheet title="New survey" narrow onClose={onClose}>
@@ -97,7 +101,6 @@ export default function NewSurveySheet({
           }}
           placeholder="ACME Coffee"
           aria-invalid={error?.field === 'client' || undefined}
-          disabled={Boolean(link)}
         />
         {errFor('client')}
       </div>
@@ -121,7 +124,6 @@ export default function NewSurveySheet({
                 setPkg(o.key);
                 if (error?.field === 'package') setError(null);
               }}
-              disabled={Boolean(link)}
             >
               {o.label}
               <small>{countQuestions(library, PACKAGE_BLOCKS[o.key])} questions</small>
@@ -153,7 +155,6 @@ export default function NewSurveySheet({
             setDue(v);
             if (error?.field === 'due') setError(null);
           }}
-          disabled={Boolean(link)}
         />
         {errFor('due')}
         {/**
@@ -180,26 +181,9 @@ export default function NewSurveySheet({
           session. Rare, and it has nowhere better to go. */}
       {error && !error.field && <p className="formerror">{error.text}</p>}
 
-      {link && token ? (
-        <div className="field">
-          {/* a caption, not a label — it names no control */}
-          <p className="f">Send this link to the client&apos;s main contact</p>
-          {/**
-           * The same control the project's Share panel uses, because it is the
-           * same job — see link-code.tsx. It had grown its own: a text button
-           * reading *Copy* that reported nothing when pressed, a smaller code,
-           * and a caption where the Save was.
-           */}
-          <LinkAndCode token={token} url={full} />
-          <p className="hintline">
-            Opens without a login. Anyone the client forwards it to can answer.
-          </p>
-        </div>
-      ) : (
-        <button className="btn btn-primary" onClick={submit} disabled={pending}>
+      <button className="btn btn-primary" onClick={submit} disabled={pending}>
           {pending ? 'Creating…' : 'Create'}
-        </button>
-      )}
+      </button>
     </Sheet>
   );
 }

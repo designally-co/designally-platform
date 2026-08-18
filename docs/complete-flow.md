@@ -9,8 +9,8 @@ Every step belongs to the client, the team, or the app.
 | # | Who | Step | Time |
 |---|---|---|---|
 | 1 | Team | Deal signed → create survey: client name, package, and the date to answer by — prefilled at two weeks, changeable, or cleared for none | 1 min |
-| 2 | App | Attaches the right question blocks, makes one link | instant |
-| 3 | Team | Send the link to the client's main contact | — |
+| 2 | App | Attaches the right question blocks, makes one link, and hands it over on a sheet of its own | instant |
+| 3 | Team | Send the link to the client's main contact — copy it, or let them point a camera at the code | — |
 | 4 | Client | Answers; gives name, position and email; forwards the link onward | ~20 min each |
 | 5 | App | Collects and counts — "3 answers so far · last one 2 days ago" | — |
 | 6 | App | After the date passes, or after 5 quiet days: "enough to work with, or wait a little longer?" | — |
@@ -18,6 +18,16 @@ Every step belongs to the client, the team, or the app.
 | 8 | App | Writes the insights: agreements, conflicts, gaps, flags | ~30 sec |
 | 9 | Team | Read the insights — and re-run them on whichever answers they choose | 15–20 min |
 | 10 | **Team** | **Archive the project** ← human decision, whenever they judge it finished | 5 sec |
+
+**Step 2 hands the link over on its own screen** (18 August 2026). The New survey
+sheet used to grow it: three fields, then the link and the code appearing beneath
+them with the fields disabled above — a form pretending to still be a form when
+nothing on it could be changed any more. The survey exists by then, the token is
+minted, and rule 5 has frozen the questions. What is left is one job, *send it*,
+and it gets a screen that opens with the answer already on it.
+
+Closing that sheet loses nothing: the link is on the project behind Share, in the
+same control — see `src/app/sheets/link-code.tsx`, which is both places.
 
 **Step 9 was a gate until 18 August 2026** — *Read and confirm*, with a name recorded
 against it. It is not one now. The platform collects the answers and writes the

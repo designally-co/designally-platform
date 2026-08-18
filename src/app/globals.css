@@ -2910,6 +2910,33 @@ textarea {
   outline-offset: 2px;
 }
 
+/**
+ * The sheet a new survey's link arrives on.
+ *
+ * A heading and a line, then the link — the same control the project's Share
+ * panel uses. It is a screen with one job, so it says what it is at the top
+ * rather than making somebody infer it from a URL in a box.
+ */
+.made h1 {
+  font-family: var(--font-display);
+  font-size: 25px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  /* Thai never below 1.28 at display size — see DESIGN.md §2 */
+  line-height: 1.3;
+  color: var(--ink);
+  margin-bottom: var(--sp-xs);
+}
+.made .lede {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink-3);
+  margin-bottom: var(--sp-lg);
+}
+.made .hintline {
+  margin-top: var(--sp-md);
+}
+
 /* ---- The date field ----------------------------------------------------
    A date, as three boxes and a month you can point at. It replaces
    `<input type="date">`, which drew its own segment highlight, its own glyph

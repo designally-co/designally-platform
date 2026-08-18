@@ -7,6 +7,7 @@ import type { ProjectAnswers } from '@/lib/team/answers';
 import type { ProjectView } from '@/lib/team/projects';
 import { readAnswers } from '@/lib/team/actions';
 import NewSurveySheet from './sheets/new-survey';
+import SurveyMadeSheet from './sheets/survey-made';
 import ProjectSheet from './sheets/project';
 import AnswersSheet from './sheets/answers';
 import InsightsSheet from './sheets/insights';
@@ -36,6 +37,13 @@ export default function Today({
   signOut: () => Promise<void>;
 }) {
   const [panel, setPanel] = useState<Panel>(null);
+  /** the survey just created, while its link is still on screen */
+  const [made, setMade] = useState<{
+    clientName: string;
+    packageLabel: string;
+    token: string;
+    link: string;
+  } | null>(null);
   const [openProject, setOpenProject] = useState<string | null>(null);
   const [openInsights, setOpenInsights] = useState<string | null>(null);
   /* answers are fetched when asked for, not shipped with the page */
@@ -246,9 +254,24 @@ export default function Today({
       {panel === 'new' && (
         <NewSurveySheet
           library={library}
-          origin={origin}
           onClose={() => setPanel(null)}
-          onCreated={(msg) => toast.show(msg)}
+          /* The form is finished the moment the survey exists. What was made
+             gets a sheet of its own rather than unfolding under three fields
+             nobody can change any more — see survey-made.tsx. */
+          onCreated={(m) => {
+            setPanel(null);
+            setMade(m);
+            toast.show(`${m.packageLabel} questionnaire attached.`);
+          }}
+        />
+      )}
+      {made && (
+        <SurveyMadeSheet
+          clientName={made.clientName}
+          packageLabel={made.packageLabel}
+          token={made.token}
+          url={`${origin}${made.link}`}
+          onClose={() => setMade(null)}
         />
       )}
       {panel === 'past' && (
