@@ -204,9 +204,9 @@ export default function ShareLink({ token, url, closed }: { token: string; url: 
                  * — which is the form the system already uses for an action
                  * that is available rather than urged.
                  */}
-                <button className="sharesave" onClick={save}>
+                <button className="btn btn-outline sharesave" onClick={save}>
                   <SaveMark />
-                  <span>Save the code</span>
+                  <span>Save QR code</span>
                 </button>
               </>
             ) : error ? null : (

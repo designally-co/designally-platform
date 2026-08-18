@@ -487,6 +487,27 @@ textarea {
   border-color: var(--primary-mark);
   color: var(--primary-mark);
 }
+
+/**
+ * The ghost pill in ink — an available action, not a wanted one.
+ *
+ * `.btn-quiet` is the same shape in the accent, and the accent means *a person
+ * is needed here*. Saving the code is something a person may want and nobody is
+ * waiting on: it should be plainly pressable and say nothing about urgency.
+ * Ink on the Edge does that, and it is the same pair the toolbar's own discs
+ * use — `--canvas` inside `--hairline`, ink glyph.
+ */
+.btn-outline {
+  background: transparent;
+  border-color: var(--hairline);
+  color: var(--ink);
+}
+@media (hover: hover) {
+  .btn-outline:not(:disabled):hover {
+    /* the one rule for a hover in this system: the line darkens, nothing else */
+    border-color: var(--ink-3);
+  }
+}
 @media (hover: hover) {
   .btn-quiet:hover {
     background: var(--primary-tint);
@@ -6376,40 +6397,31 @@ dialog::backdrop {
  * it on Copy, which is the action it is opened for. Two accents in 320px is one
  * accent and one decoration.
  */
+/**
+ * Save the code — a full-width pill under it, from 18 August 2026.
+ *
+ * It was a quiet menu row: mark leading, 13px, `--ink-3`, no edge. That was
+ * right when the argument was "available rather than urged", and it turned out
+ * to under-read — a row of small grey text under a 232px black-and-white square
+ * looks like a caption for the square, not a control. A pill is unmistakably a
+ * button while an ink outline still says nothing about urgency, which is what
+ * the quiet row was for.
+ *
+ * Full width because it belongs to the code above it and there is nothing to sit
+ * beside; a pill floating left under a full-width object is a loose end.
+ */
 .sharesave {
-  /* the row the menu uses, so it reads as available rather than urged */
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  gap: var(--sp-xs);
   width: 100%;
-  min-height: 40px;
-  margin-top: 6px;
-  padding: 0 10px;
-  border: 0;
-  border-radius: var(--r-sm);
-  background: none;
-  font: inherit;
-  font-size: 13px;
-  color: var(--ink-3);
-  text-align: left;
-  cursor: pointer;
-  transition: background-color 0.16s, color 0.16s;
+  margin-top: var(--sp-sm);
 }
 .sharesave svg {
   width: 17px;
   height: 17px;
   flex: none;
-}
-.sharesave:hover {
-  background: var(--parchment);
-  color: var(--ink);
-}
-.sharesave:focus-visible {
-  /* the system's ring — `var(--ring)` was a token this stylesheet never
-     defined, so with `outline: none` above it these controls had no focus
-     indicator at all */
-  outline: 2px solid var(--primary-focus);
-  outline-offset: 2px;
 }
 @media (hover: hover) {
   /* fills on hover — the edge is already there, so the change is the ground */
