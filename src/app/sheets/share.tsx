@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import { useAnchored } from '../anchored';
 import { ShareMark } from '../icons';
 import LinkAndCode from './link-code';
 
@@ -27,6 +28,16 @@ import LinkAndCode from './link-code';
 export default function ShareLink({ token, url, closed }: { token: string; url: string; closed: boolean }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  /**
+   * Fixed, not absolute — the sheet is `overflow: hidden` so it can clip to its
+   * own 34px corners, and this panel is nearly 500px tall. On a project with
+   * nobody answered yet the sheet is shorter than that, and the code was being
+   * sliced off at the bottom edge.
+   *
+   * Right-aligned, because it hangs off a disc on the toolbar's trailing edge
+   * and has to open back into the sheet.
+   */
+  const at = useAnchored(open, ref, 320, 500, 'right');
 
   /* The same dismissal `MoreMenu` uses, and the same reason for capturing
      Escape: this sits inside a native <dialog>, which closes on Escape too, and
@@ -63,8 +74,13 @@ export default function ShareLink({ token, url, closed }: { token: string; url: 
         <ShareMark />
       </button>
 
-      {open && (
-        <div className="sharepanel" role="dialog" aria-label="Share the survey link">
+      {open && at && (
+        <div
+          className="sharepanel"
+          role="dialog"
+          aria-label="Share the survey link"
+          style={{ top: at.top, left: at.left, width: at.width }}
+        >
           {/**
            * The status, set as a status rather than as a sentence about one.
            *

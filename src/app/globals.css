@@ -6448,12 +6448,10 @@ dialog::backdrop {
  * across a table is holding theirs at.
  */
 .sharepanel {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  z-index: 20;
-  width: 300px;
-  max-width: calc(100vw - 32px);
+  /* fixed and placed by `useAnchored` — the sheet clips to its own corners and
+     this panel is taller than a short project sheet */
+  position: fixed;
+  z-index: 90;
   background: var(--canvas);
   border: 1px solid var(--hairline);
   border-radius: var(--r-card);
@@ -6673,9 +6671,7 @@ dialog::backdrop {
   background: var(--parchment);
 }
 /* the panel is wider than a menu now that the code fills it */
-.sharepanel {
-  width: 320px;
-}
+
 
 /**
  * The delete confirmation, inside the More menu.

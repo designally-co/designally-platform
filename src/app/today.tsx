@@ -308,6 +308,17 @@ export default function Today({
       )}
       {project && (
         <ProjectSheet
+          /**
+           * Keyed, so a different project is a different component.
+           *
+           * Without it React reuses the instance and every `useState(p.…)`
+           * initialiser keeps the first project's value: the date field showed
+           * the previous project's date, which — now that the field compares
+           * itself against what is saved to decide whether to ask — meant a
+           * confirmation appearing on a sheet nobody had touched, offering to
+           * change one project's date to another's.
+           */
+          key={project.id}
           project={project}
           origin={origin}
           onOpenInsights={() => {
@@ -327,6 +338,10 @@ export default function Today({
             setOpenProject(null);
             toast.show(msg);
           }}
+          /* Says it happened and leaves the sheet open — for the changes a
+             person makes *while* reading a project rather than to finish with
+             it. See `runStay` in the sheet. */
+          onToast={(msg) => toast.show(msg)}
         />
       )}
 

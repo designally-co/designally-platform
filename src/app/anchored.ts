@@ -69,6 +69,12 @@ export function useAnchored(
   anchor: React.RefObject<HTMLElement | null>,
   width: number,
   height: number,
+  /**
+   * Which edge the panel lines up with. `right` for anything hanging off a
+   * toolbar's trailing edge — the share panel, the version list — so it opens
+   * back into the sheet rather than off the side of it.
+   */
+  align: 'left' | 'right' = 'left',
 ) {
   const [at, setAt] = useState<Anchored | null>(null);
   /* Read through a ref so `place` can stay stable across renders — as a
@@ -86,12 +92,13 @@ export function useAnchored(
       below < size.current.height && box.top > size.current.height
         ? box.top - size.current.height - 8
         : box.bottom + 8;
-    /* Kept on screen: a control near the right edge would otherwise hang a
-       panel off it, and there is nothing to scroll it back into view. */
-    const left = Math.max(8, Math.min(box.left, window.innerWidth - w - 8));
+    /* Kept on screen: a control near an edge would otherwise hang a panel off
+       it, and there is nothing to scroll it back into view. */
+    const wanted = align === 'right' ? box.right - w : box.left;
+    const left = Math.max(8, Math.min(wanted, window.innerWidth - w - 8));
     const origin = fixedOrigin(el);
     setAt({ top: top - origin.y, left: left - origin.x, width: w });
-  }, [anchor]);
+  }, [anchor, align]);
 
   useEffect(() => {
     if (!open) return;

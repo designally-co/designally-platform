@@ -11,6 +11,7 @@ import {
   reopenCollection,
   setDueDate,
 } from '@/lib/team/actions';
+import { dayIn } from '@/lib/team/due';
 import type { ProjectView } from '@/lib/team/projects';
 import { answersToMarkdown, exportFilename, printableHtml } from '@/lib/team/export';
 import { ArchiveMark, DocMark, DownMark, LockMark, PrintMark, SaveMark, TrashMark, UndoMark } from '../icons';
@@ -37,6 +38,15 @@ import Sheet from './sheet';
  * so rather than being hidden, because "nothing produced yet" is a true
  * statement about the project and an empty space is not.
  */
+/** "26 September 2026" — the way the team app writes a date everywhere else. */
+function niceDay(day: string) {
+  return new Date(`${day}T12:00:00`).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+}
+
 export default function ProjectSheet({
   project: p,
   origin,
@@ -44,6 +54,7 @@ export default function ProjectSheet({
   onReadAnswers,
   onClose,
   onActed,
+  onToast,
 }: {
   project: ProjectView;
   origin: string;
@@ -51,6 +62,8 @@ export default function ProjectSheet({
   onReadAnswers: (responseId: string) => void;
   onClose: () => void;
   onActed: (message: string) => void;
+  /** says it happened without closing the sheet — see `runStay` */
+  onToast: (message: string) => void;
 }) {
   /**
    * Which confirmation is open — one field, not two flags.
@@ -158,6 +171,15 @@ export default function ProjectSheet({
   /* The date field is controlled now, so the sheet holds it. It was
      `defaultValue` on a native input, which the browser kept for us. */
   const [due, setDue] = useState(p.dueDay ?? '');
+  /**
+   * Whether the field is showing something other than what is saved.
+   *
+   * This is the whole state the confirmation needs — no second copy of the date
+   * waiting to be committed, and nothing to reset on cancel except the field
+   * itself. `p.dueDay` is the truth; `due` is what somebody has typed.
+   */
+  const dueChanged = due !== (p.dueDay ?? '');
+  const today = dayIn(new Date());
 
   /**
    * The caller's sentence, unless the server has a better one.
@@ -251,6 +273,26 @@ export default function ProjectSheet({
       </div>
     </div>
   );
+
+  /**
+   * Like `run`, but the sheet stays where it is.
+   *
+   * `run` ends by closing the project — right for archiving, deleting, closing
+   * collection, all of which finish with the project. Changing the date is not
+   * one of those: it is an edit made *while* reading a project, and closing the
+   * sheet under somebody who has just moved a date by a week is the app
+   * deciding they are done when they are not.
+   */
+  const runStay = (fn: () => Promise<{ ok: boolean; error?: string }>, message: string) =>
+    start(async () => {
+      setError(null);
+      const result = await fn();
+      if (!result.ok) {
+        setError(result.error ?? 'That did not work.');
+        return;
+      }
+      onToast(message);
+    });
 
   const link = p.token ? `${origin}/s/${p.token}` : null;
 
@@ -628,22 +670,64 @@ export default function ProjectSheet({
                   what they actually told the client, after the fact — and
                   `setDueDate` accepts it. The refusal on creation is about a
                   slip putting a brand-new project straight into Needs you. */}
+              {/* Typing moves the field and nothing else. The date shuts a
+                  client's link, so it is not a thing to commit on a keystroke —
+                  and a three-box control passes through several legal dates on
+                  the way to the one somebody means. */}
               <DateField
                 labelledBy={`due-${p.id}`}
                 value={due}
                 disabled={pending}
-                onChange={(v) => {
-                  setDue(v);
-                  run(
-                    () => setDueDate(p.id, v || null),
-                    v ? 'Date updated. The client sees it on the welcome screen.' : 'Date cleared.',
-                  );
-                }}
+                onChange={setDue}
               />
-              <span className="hintline">
-                The client sees this, and the link stops taking answers after it. Move it forward
-                to let somebody back in.
-              </span>
+              {dueChanged ? (
+                /**
+                 * The confirmation, in the shape the sheet's others take.
+                 *
+                 * It reads the *consequence* rather than restating the date,
+                 * because the three cases differ in what they do to the client:
+                 * a date forward reopens a shut link, a date already past shuts
+                 * it now, and no date at all leaves it open for good.
+                 */
+                <div className="delconfirm">
+                  <p>
+                    <b>{due ? `Change the date to ${niceDay(due)}?` : 'Remove the date?'}</b>
+                  </p>
+                  <p className="why">
+                    {!due
+                      ? 'The client is shown no date and the link stays open until somebody closes it.'
+                      : due < today
+                        ? 'It has already passed, so the link stops taking answers straight away.'
+                        : 'The client is shown it, and the link stops taking answers after it.'}
+                  </p>
+                  <div className="iacts">
+                    <button
+                      className="btn btn-ink"
+                      disabled={pending}
+                      onClick={() =>
+                        runStay(
+                          () => setDueDate(p.id, due || null),
+                          due ? `Date changed to ${niceDay(due)}.` : 'Date removed.',
+                        )
+                      }
+                    >
+                      {pending ? 'Saving…' : 'Save'}
+                    </button>
+                    <button
+                      className="btn btn-quiet"
+                      disabled={pending}
+                      onClick={() => setDue(p.dueDay ?? '')}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <span className="hintline">
+                  The client sees this, and the link stops taking answers after it. Move it forward
+                  to let somebody back in.
+                </span>
+              )}
             </div>
           )}
           {p.closedOn && p.dueOn && (
