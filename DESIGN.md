@@ -1162,9 +1162,29 @@ Placeholder `--ink-muted-48` — at the corrected `#6e6e73` this meets 4.5:1 on 
 
 ### Option chips
 
-Apple's configurator grammar. `--canvas` fill, 1px `--hairline`, `pill` radius, padding `12px 16px`, `caption` (14px). Selected: border upgrades to **2px solid `--primary-focus`**, fill unchanged.
+`--canvas` fill, 1px `--hairline`, padding `12px 16px`, `caption` (14px). Radius is `md` in the team app and `lg` on the survey — see Radii. Selected: **pale `--primary-tint` field, 2px solid `--primary`**, label stays ink, padding drops a pixel so nothing shifts.
 
-Note that Apple signals selection with border weight, not fill — quieter and better for a grid of many options. Use it for package pickers, question types, decision outcomes and word chips.
+**Corrected 18 August 2026.** Selection was a 2px `--primary-focus` border on an unchanged fill — a blue-grey borrowed from the focus ring, which already means *the keyboard is here*. Two states in one colour, and neither of them the accent this system actually reserves for choice. The survey's own chips had settled the right ladder months earlier and it holds everywhere now:
+
+```
+hover      white field, 1px orange line       — you are pointing at this
+selected   pale orange field, 2px orange line — you chose this
+button     solid orange, white label          — this is the action
+```
+
+Three rungs in one hue, separated by how much orange each spends. Use it for package pickers, question types, word chips and the day cells in a calendar.
+
+### Date field
+
+Three boxes and a month you can point at, replacing `<input type="date">` — the one control on a team sheet the system could not reach, because the browser draws its own segment highlight, glyph and popup in its own colours inside our field.
+
+The field is an `.input` built from the same numbers: 44 tall, `md` radius, the Edge, and the input focus ring — borrowed onto the box, because focus actually lands on a segment and a ring around a 2ch span reads as a defect. Segments are `tabular-nums` so a day does not shuffle the month sideways as it is typed; type digits and the caret hops boxes, arrows step and wrap. Order is **day / month / year**, matching every other date the team app prints.
+
+Two quiet discs on the trailing edge: clear, and open. Neither is the action on the sheet, so both are `--ink-3` earning ink on hover.
+
+The calendar is `position: fixed`, Monday-first, with day cells on the chip ladder above. Fixed, because absolute would count toward the sheet's scrollable height — the point of the sheet hugging its content is lost if opening a calendar grows a scrollbar — and because `.sheet` is `overflow: hidden` for its own corners and would clip it. Fixed has one cost: an ancestor with a transform, filter or `will-change` becomes its containing block, so the coordinates are measured against whatever that turns out to be. The sheet's entrance animation is exactly such an ancestor for 420ms.
+
+### Tags
 
 ### Tags
 

@@ -6,8 +6,9 @@ import type { Package } from '@/lib/db/schema';
 import { countQuestions, type LibraryBlock } from '@/lib/team/library-types';
 import { PACKAGE_BLOCKS } from '@/lib/survey/packages';
 import { createSurvey, surveyQr, type NewSurveyField } from '@/lib/team/actions';
-import { DEFAULT_DUE_DAYS, defaultDueDay } from '@/lib/team/due';
+import { DEFAULT_DUE_DAYS, dayIn, defaultDueDay } from '@/lib/team/due';
 import { forDisplay } from '@/lib/survey/link';
+import DateField from '../date-field';
 import Sheet from './sheet';
 
 const OPTIONS: { key: Package; label: string }[] = [
@@ -38,6 +39,9 @@ export default function NewSurveySheet({
    * whenever this bundle was built.
    */
   const [due, setDue] = useState(() => defaultDueDay());
+  /* Today in Bangkok, worked out in the browser for the same reason the prefill
+     is: a constant baked at build time goes stale overnight. */
+  const [today] = useState(() => dayIn(new Date()));
   /**
    * The one thing that went wrong, and which control it is about.
    *
@@ -163,20 +167,24 @@ export default function NewSurveySheet({
         {/* "Asking for answers by" beside "Client" and "Package" — one label
             arguing its own case next to two nouns. "Answers by" fits the pair
             and keeps rule 1 intact, which "Deadline" would not: the app asks for
-            this date and enforces nothing. */}
-        <label className="f" htmlFor="nDue">
+            this date and enforces nothing.
+
+            A span, not a <label for>: what it names is a group of three boxes,
+            and `for` binds only to a form control. See date-field.tsx. */}
+        <span className="f" id="nDue">
           Answers by
-        </label>
-        <input
-          id="nDue"
-          type="date"
-          className="input"
+        </span>
+        <DateField
+          labelledBy="nDue"
           value={due}
-          onChange={(e) => {
-            setDue(e.target.value);
+          /* The server refuses a date already gone — a past due date would put
+             the project into Needs you the moment the link was copied — so the
+             calendar refuses it first, on the same boundary. */
+          min={today}
+          onChange={(v) => {
+            setDue(v);
             if (error?.field === 'due') setError(null);
           }}
-          aria-invalid={error?.field === 'due' || undefined}
           disabled={Boolean(link)}
         />
         {errFor('due')}

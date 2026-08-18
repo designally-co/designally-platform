@@ -15,6 +15,7 @@ import type { ProjectView } from '@/lib/team/projects';
 import { answersToMarkdown, exportFilename, printableHtml } from '@/lib/team/export';
 import { ArchiveMark, DocMark, LockMark, PrintMark, SaveMark, TrashMark, UndoMark } from '../icons';
 import { submitted } from '@/lib/team/when';
+import DateField from '../date-field';
 import ShareLink from './share';
 import MoreMenu from '../menu';
 import Sheet from './sheet';
@@ -145,6 +146,10 @@ export default function ProjectSheet({
    * drives the menu, and one field would open both panels at once.
    */
   const [confirmGenerate, setConfirmGenerate] = useState(false);
+
+  /* The date field is controlled now, so the sheet holds it. It was
+     `defaultValue` on a native input, which the browser kept for us. */
+  const [due, setDue] = useState(p.dueDay ?? '');
 
   /**
    * The caller's sentence, unless the server has a better one.
@@ -608,19 +613,27 @@ export default function ProjectSheet({
            */}
           {!p.closedOn && (
             <div className="pd-due">
-              <label htmlFor={`due-${p.id}`}>Asking for answers by</label>
-              <input
-                id={`due-${p.id}`}
-                type="date"
-                className="input"
-                defaultValue={p.dueDay ?? ''}
+              {/* A span, not a `<label for>` — the control is a group of three
+                  boxes and `for` binds only to a form control. */}
+              <span className="f" id={`due-${p.id}`}>
+                Asking for answers by
+              </span>
+              {/* No `min` here, unlike the New survey sheet. A project's date can
+                  legitimately be moved to one already past — a team recording
+                  what they actually told the client, after the fact — and
+                  `setDueDate` accepts it. The refusal on creation is about a
+                  slip putting a brand-new project straight into Needs you. */}
+              <DateField
+                labelledBy={`due-${p.id}`}
+                value={due}
                 disabled={pending}
-                onChange={(e) =>
+                onChange={(v) => {
+                  setDue(v);
                   run(
-                    () => setDueDate(p.id, e.target.value || null),
-                    e.target.value ? 'Date updated. The client sees it on the welcome screen.' : 'Date cleared.',
-                  )
-                }
+                    () => setDueDate(p.id, v || null),
+                    v ? 'Date updated. The client sees it on the welcome screen.' : 'Date cleared.',
+                  );
+                }}
               />
               <span className="hintline">
                 The client sees this. It does not close the survey — you do.

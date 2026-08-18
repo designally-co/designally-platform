@@ -2508,6 +2508,239 @@ textarea {
   border-color: transparent;
 }
 
+/* ---- The date field ----------------------------------------------------
+   A date, as three boxes and a month you can point at. It replaces
+   `<input type="date">`, which drew its own segment highlight, its own glyph
+   and its own popup inside our field — the one control on a team sheet the
+   system could not reach. See date-field.tsx.
+   ------------------------------------------------------------------------ */
+.dpwrap {
+  position: relative;
+}
+
+/* The field is an `.input` and says so by being built of the same numbers: 44
+   tall, `--r-md`, the Edge, and the same focus ring. Nothing here is a new
+   control; it is the one that already existed, with the browser's parts
+   replaced by ours. */
+.dpfield {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-xxs);
+  height: 44px;
+  padding: 0 var(--sp-xxs) 0 14px;
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  transition:
+    border-color 0.18s var(--ease),
+    box-shadow 0.18s var(--ease);
+}
+/* Focus lands on a segment, not on the box, so the box has to borrow it —
+   otherwise the ring appears around a 2ch span floating in a field. */
+.dpfield:focus-within,
+.dpfield[data-open] {
+  border-color: var(--primary-mark);
+  box-shadow: 0 0 0 3px var(--primary-tint);
+}
+.dpfield[aria-disabled='true'] {
+  opacity: 0.5;
+}
+
+.dpsegs {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  font-size: 17px;
+  color: var(--ink);
+  /* Tabular figures, so the day does not shuffle the month sideways as it is
+     typed. Every digit the same width is the whole reason this face has them. */
+  font-variant-numeric: tabular-nums;
+}
+.dpseg {
+  padding: 2px 3px;
+  border-radius: var(--r-sm);
+  outline: none;
+  cursor: default;
+}
+.dpseg[data-empty] {
+  color: var(--ink-4);
+}
+/* The selection tint, which is what the field's own focus ring is made of — a
+   segment is inside the control, so it takes the quieter half of the pair. */
+.dpseg:focus-visible {
+  background: var(--primary-tint);
+  color: var(--ink);
+}
+.dpsep {
+  color: var(--ink-4);
+}
+
+/* Both trailing controls are quiet discs. Neither is the action on the sheet —
+   the accent belongs to Create — so they take `--ink-3` and earn ink on hover,
+   which is the one rule DESIGN.md gives for a control with no label. */
+.dpclear,
+.dpopen {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: none;
+  color: var(--ink-3);
+  cursor: pointer;
+  transition:
+    background-color 0.16s,
+    color 0.16s;
+}
+.dpclear {
+  font-size: 19px;
+  line-height: 1;
+}
+@media (hover: hover) {
+  .dpclear:hover,
+  .dpopen:hover {
+    background: var(--parchment);
+    color: var(--ink);
+  }
+}
+.dpclear:focus-visible,
+.dpopen:focus-visible {
+  /* the system's ring — `var(--ring)` was a token this stylesheet never
+     defined, so with `outline: none` above it these controls had no focus
+     indicator at all */
+  outline: 2px solid var(--primary-focus);
+  outline-offset: 2px;
+}
+
+/* The calendar, on the menu's own terms: canvas inside the Edge at `--r-card`,
+   which is what every other popover in the team app is. */
+.dppop {
+  /* fixed, and placed in JS — see `place` in date-field.tsx. Absolute would
+     count toward the sheet's scrollable height and be clipped by its corners. */
+  position: fixed;
+  z-index: 90;
+  padding: var(--sp-sm);
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-card);
+}
+.dphead {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-xxs);
+  margin-bottom: var(--sp-xs);
+}
+.dpmonth {
+  flex: 1;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.dpnav {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: none;
+  color: var(--ink-3);
+  cursor: pointer;
+  transition:
+    background-color 0.16s,
+    color 0.16s;
+}
+@media (hover: hover) {
+  .dpnav:hover {
+    background: var(--parchment);
+    color: var(--ink);
+  }
+}
+.dpnav:focus-visible {
+  /* the system's ring — `var(--ring)` was a token this stylesheet never
+     defined, so with `outline: none` above it these controls had no focus
+     indicator at all */
+  outline: 2px solid var(--primary-focus);
+  outline-offset: 2px;
+}
+
+.dpdow,
+.dpgrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+.dpdow {
+  margin-bottom: var(--sp-xxs);
+}
+.dpdow span {
+  text-align: center;
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--ink-3);
+}
+.dpgrid {
+  gap: 1px;
+}
+.dpblank {
+  height: 40px;
+}
+.dpday {
+  height: 40px;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    background-color 0.14s,
+    color 0.14s;
+}
+@media (hover: hover) {
+  .dpday:not(:disabled):hover {
+    background: var(--parchment);
+  }
+}
+.dpday:focus-visible {
+  /* the system's ring — `var(--ring)` was a token this stylesheet never
+     defined, so with `outline: none` above it these controls had no focus
+     indicator at all */
+  outline: 2px solid var(--primary-focus);
+  outline-offset: 2px;
+}
+/* A day already gone. Shown and refused rather than removed: a gap in a
+   calendar reads as a broken calendar, and the server refuses it too. */
+.dpday:disabled {
+  color: var(--ink-4);
+  opacity: 0.45;
+  cursor: default;
+}
+/* Today is a fact about the calendar, not a choice — a ring, so it can sit
+   under the chosen day without either one hiding the other. */
+.dpday[data-today] {
+  box-shadow: inset 0 0 0 1px var(--hairline);
+}
+/* Chosen, in the ladder the survey's chips settled and the package options
+   already borrowed: pale orange field, orange line, ink label. */
+.dpday[aria-pressed='true'] {
+  background: var(--primary-tint);
+  box-shadow: inset 0 0 0 2px var(--primary);
+  font-weight: 600;
+}
+
+
+
 /* ---- All projects ---- */
 .ptable {
   width: 100%;
@@ -2718,7 +2951,7 @@ dialog::backdrop {
   /* clears the bar laid over it *and* the ramp beneath it — the bar's own three
      numbers plus `--bar-ramp`, so none of the three can drift apart. Without
      the ramp in this sum the first card sat in the blur and came up soft. */
-  padding-top: calc(16px + 44px + var(--sp-lg) + var(--bar-ramp));
+  padding-top: calc(var(--sp-lg) + 44px + var(--sp-lg) + var(--bar-ramp));
 }
 
 /**
@@ -2776,7 +3009,7 @@ dialog::backdrop {
      plus `--sp-md` of inset. It has to be re-derived whenever `.sheet-top`'s
      padding changes, which is the cost of a track that starts under a bar CSS
      cannot measure. */
-  margin: calc(16px + 44px + var(--sp-lg) + var(--sp-md)) 0 var(--sp-lg);
+  margin: calc(var(--sp-lg) + 44px + var(--sp-lg) + var(--sp-md)) 0 var(--sp-lg);
 }
 .sheetscroll::-webkit-scrollbar-thumb {
   background: var(--fill);
@@ -2880,7 +3113,12 @@ dialog::backdrop {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 16px 16px 24px;
+  /* 24 on all four sides from 18 August 2026 — it was 16 top and sides for a
+     few hours. The bar's discs then sat closer to the sheet's edge than the
+     body's fields did to theirs, which is the one alignment a header cannot get
+     wrong: it is the first thing above them and the eye reads a single margin
+     down the side of a sheet. */
+  padding: var(--sp-lg);
 }
 
 /**
@@ -5797,8 +6035,11 @@ dialog::backdrop {
   color: var(--ink);
 }
 .sharesave:focus-visible {
-  outline: none;
-  box-shadow: var(--ring);
+  /* the system's ring — `var(--ring)` was a token this stylesheet never
+     defined, so with `outline: none` above it these controls had no focus
+     indicator at all */
+  outline: 2px solid var(--primary-focus);
+  outline-offset: 2px;
 }
 @media (hover: hover) {
   /* fills on hover — the edge is already there, so the change is the ground */

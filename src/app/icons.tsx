@@ -32,8 +32,10 @@
  */
 import {
   Archive,
+  Calendar,
   Check,
   ChevronLeft,
+  ChevronRight,
   Download,
   FileText,
   Link as LinkIcon,
@@ -100,6 +102,26 @@ export const DocMark = mark(FileText);
 
 /** PDF — a printer, because the action is a print and not a save. */
 export const PrintMark = mark(Printer);
+
+/** The date field's own calendar, replacing the one the browser drew. */
+export const CalendarMark = mark(Calendar);
+
+/**
+ * A month back and a month forward.
+ *
+ * Sized by their ink, like `BackMark` and for the same reason: a chevron is two
+ * strokes and an apex where every other mark here is a closed form, so at the
+ * wrapper's 20 it reads as a smaller icon beside them. `size={26}` puts the
+ * drawn height at 13px, which is right for a 32px nav button, and
+ * `strokeWidth={1.46}` is `1.9 x 20/24 x 24/26` — the same 1.58px stroke the
+ * wrapper produces.
+ */
+export function PrevMark() {
+  return <ChevronLeft size={26} strokeWidth={1.46} aria-hidden="true" />;
+}
+export function NextMark() {
+  return <ChevronRight size={26} strokeWidth={1.46} aria-hidden="true" />;
+}
 
 /**
  * Back — the one mark that does not take the wrapper's numbers.
