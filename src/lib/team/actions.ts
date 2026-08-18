@@ -542,7 +542,10 @@ export async function deleteResponse(
         ok: false,
         error:
           `${row.respondentName}'s answers were read by ${cited.length === 1 ? 'an analysis' : `${cited.length} analyses`}. ` +
-          `Deleting them leaves it citing somebody whose answers are gone. Press again to delete.`,
+          /* No "press again" — the button that comes back says *Delete anyway*,
+             and a refusal that also narrates the control beside it is telling
+             somebody what they can already see. */
+          `Deleting them leaves ${cited.length === 1 ? 'it' : 'them'} citing somebody whose answers are gone.`,
       };
     }
   }

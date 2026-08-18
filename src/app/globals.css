@@ -6818,6 +6818,15 @@ dialog::backdrop {
   text-wrap: pretty;
   color: var(--ink-2);
 }
+.delconfirm p b {
+  font-weight: 600;
+  color: var(--ink);
+}
+/* The consequence, under the question. Quieter, because it is the half you read
+   second — and one step of ink, not two, since the pair is one thought. */
+.delconfirm .why {
+  color: var(--ink-3);
+}
 .delconfirm label {
   font-size: 13px;
   line-height: 1.6;

@@ -394,10 +394,34 @@ export default function AnswersSheet({
             <MoreMenu label={`Delete ${person.name}'s answers`} icon={<TrashMark />} danger>
               {(close) => (
                 <div className="delconfirm danger">
-                  {/* What goes, or — once the server has refused once — why it
-                      refused. The second is the more useful sentence and it
-                      replaces the first rather than stacking under it. */}
-                  <p>{error ?? `Removes every answer ${person.name} gave.`}</p>
+                  {/**
+                   * Two lines: the act, then what it costs.
+                   *
+                   * "Removes every answer Buk gave" was one line doing both, and
+                   * the half that names the person was buried in the middle of
+                   * it. The question names what is about to happen; the line
+                   * under it is the part somebody might not have thought of —
+                   * an analysis that read these answers keeps its findings and
+                   * starts reporting the person as deleted.
+                   *
+                   * Once the server has refused, its sentence replaces both.
+                   * It is more specific than either — it knows how many
+                   * analyses cited them — and stacking it under a question that
+                   * has already been answered would make three lines of a panel
+                   * with two buttons in it.
+                   */}
+                  {error ? (
+                    <p>{error}</p>
+                  ) : (
+                    <>
+                      <p>
+                        <b>Delete {person.name}&apos;s answers?</b>
+                      </p>
+                      <p className="why">
+                        Gone for good. An analysis that read them will show them as deleted.
+                      </p>
+                    </>
+                  )}
                   <div className="iacts">
                     <button
                       className="btn btn-danger"
