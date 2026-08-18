@@ -3078,10 +3078,13 @@ textarea {
  * A second bezel around it, or a shadow under it, would be two devices doing
  * one job on a panel of two rows.
  *
- * The rows are a label and a control, which is why they justify apart rather
- * than stacking: the eye reads the column of labels down the left and the
- * column of controls down the right, and the two rows being the same shape is
- * what says they are the same kind of thing.
+ * One row: a label, the date it closes on, and the button that closes it now.
+ * It was two rows with a label each, which spent a line on "Or stop now" — a
+ * label for a button that already says what it does — and made the panel twice
+ * the height of the one control anybody opens this section to find.
+ *
+ * The date sits with its label and the button is pushed to the far edge, so the
+ * row reads as *when it closes* on one side and *close it* on the other.
  */
 .collbox {
   background: var(--canvas);
@@ -3093,9 +3096,12 @@ textarea {
 .collrow {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-md);
-  padding: var(--sp-sm) var(--sp-md);
+  gap: var(--sp-sm);
+  padding: var(--sp-xs) var(--sp-sm) var(--sp-xs) var(--sp-md);
+}
+/* the far edge — everything before it is the date and its label */
+.collnow {
+  margin-left: auto;
 }
 .collrow + .collrow {
   border-top: 1px solid var(--divider);
@@ -3171,20 +3177,27 @@ textarea {
   flex: none;
 }
 
-/* At 390 a label and its control stop fitting side by side, so the row becomes
-   two lines and the control takes the width it needs. */
+/**
+ * Below 620 the three parts stop fitting on one line, so the row wraps rather
+ * than squeezing: the label and the date keep their line, the button takes the
+ * next one whole. `flex-wrap` and not a column, so the label and date stay
+ * together — they are one thought and stacking them would make three lines out
+ * of two.
+ */
 @media (max-width: 620px) {
   .collrow {
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--sp-xs);
+    flex-wrap: wrap;
+    padding: var(--sp-sm) var(--sp-md);
   }
-  .collrow .dpwrap,
-  .collrow .btn-outline {
+  .collrow .dpwrap {
+    flex: 1;
+    min-width: 0;
+  }
+  .collnow {
     width: 100%;
-  }
-  .collrow .btn-outline {
     justify-content: center;
+    margin-left: 0;
+    margin-top: var(--sp-xs);
   }
 }
 /* the closed state's own line, and the way back from it */

@@ -598,6 +598,11 @@ export default function ProjectSheet({
            */}
           {!p.closedOn && (
             <div className="collbox">
+              {/* One row: the date it closes on, and the button that closes it
+                  now. They were two rows with a label each, which spent a line
+                  on "Or stop now" — a label for a button that already says what
+                  it does — and made a panel twice the height of the one control
+                  anybody came here to find. */}
               <div className="collrow">
                 {/* A span, not a `<label for>`: the control is a group of three
                     boxes and `for` binds only to a form control. */}
@@ -615,6 +620,17 @@ export default function ProjectSheet({
                   disabled={pending}
                   onChange={setDue}
                 />
+
+                {p.answers > 0 && p.surveyId && (
+                  <button
+                    className="btn btn-outline collnow"
+                    disabled={pending}
+                    onClick={() => setConfirming('close')}
+                  >
+                    <LockMark />
+                    <span>Close now</span>
+                  </button>
+                )}
               </div>
 
               {dueChanged && (
@@ -655,41 +671,31 @@ export default function ProjectSheet({
                 </div>
               )}
 
-              {p.answers > 0 && p.surveyId && (
-                confirming === 'close' ? (
-                  <div className="collrow collask">
-                    <p>
-                      <b>Close it now?</b>{' '}
-                      <span className="why">
-                        The analysis is written and the link stops serving. You can reopen it
-                        afterwards.
-                      </span>
-                    </p>
-                    <div className="iacts">
-                      <button
-                        className="btn btn-ink"
-                        disabled={pending}
-                        onClick={() => {
-                          setConfirming(null);
-                          run(() => closeCollection(p.surveyId!), 'Collection closed.');
-                        }}
-                      >
-                        {pending ? 'Closing…' : 'Close'}
-                      </button>
-                      <button className="btn btn-quiet" onClick={() => setConfirming(null)}>
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="collrow">
-                    <span className="f">Or stop now</span>
-                    <button className="btn btn-outline" onClick={() => setConfirming('close')}>
-                      <LockMark />
-                      <span>Close now</span>
+              {confirming === 'close' && (
+                <div className="collrow collask">
+                  <p>
+                    <b>Close it now?</b>{' '}
+                    <span className="why">
+                      The analysis is written and the link stops serving. You can reopen it
+                      afterwards.
+                    </span>
+                  </p>
+                  <div className="iacts">
+                    <button
+                      className="btn btn-ink"
+                      disabled={pending}
+                      onClick={() => {
+                        setConfirming(null);
+                        run(() => closeCollection(p.surveyId!), 'Collection closed.');
+                      }}
+                    >
+                      {pending ? 'Closing…' : 'Close'}
+                    </button>
+                    <button className="btn btn-quiet" onClick={() => setConfirming(null)}>
+                      Cancel
                     </button>
                   </div>
-                )
+                </div>
               )}
             </div>
           )}
