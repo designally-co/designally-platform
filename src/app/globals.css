@@ -5150,20 +5150,25 @@ dialog::backdrop {
 }
 
 .sharerow {
-  display: grid;
+  display: flex;
+  align-items: center;
   gap: 8px;
 }
 /**
- * The URL, wrapping rather than scrolling.
+ * The URL on one line, truncated, with the button beside it.
  *
- * `anywhere`, not `break-all`: a link you cannot see the end of is a link
- * nobody can check they are sending the right one, and a token broken across
- * lines at an arbitrary point is still a token you can read. It is text and not
- * a read-only input, which browsers style as unavailable and which invites an
- * edit that would do nothing.
+ * It wrapped to two lines and the copy button sat under it, on the reasoning
+ * that a link you cannot see the end of is one nobody can check. Nobody checks
+ * it: the token is twelve characters of noise, and the line's job is to say
+ * *which* link this is — which the host and the path do long before the end.
+ * The full URL is on the `title` and on the clipboard.
+ *
+ * `user-select: all` still takes the whole thing despite the ellipsis: the text
+ * node is complete and only its box is short.
  */
 .sharelink {
-  display: block;
+  flex: 1;
+  min-width: 0;
   padding: 9px 11px;
   border: 1px solid var(--hairline);
   border-radius: var(--r-sm);
@@ -5171,8 +5176,19 @@ dialog::backdrop {
   font-size: 13px;
   line-height: 1.55;
   color: var(--ink);
-  overflow-wrap: anywhere;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   user-select: all;
+}
+/* Copy is the mark alone now that it stands beside the link rather than under
+   it — the word cost the line the characters that say which link this is, and
+   the mark still turns into a tick, which is the part that says it worked. */
+.sharecopy {
+  flex: none;
+  width: 40px;
+  padding: 0;
+  gap: 0;
 }
 .sharecopy,
 .sharesave {

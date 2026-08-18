@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import { forDisplay } from '@/lib/survey/link';
 import { surveyQr } from '@/lib/team/actions';
 import { CheckMark, LinkMark, SaveMark, ShareMark } from '../icons';
 
@@ -122,14 +123,29 @@ export default function ShareLink({ token, url, closed }: { token: string; url: 
           </p>
 
           <div className="sharerow">
-            {/* Not an input: a read-only field reads as a disabled one, and
-                this is text to be selected, copied and scanned rather than
-                edited. It wraps rather than scrolling sideways — a link you
-                cannot see the end of is a link you cannot check. */}
-            <span className="sharelink">{url}</span>
-            <button className="sharecopy" onClick={copy}>
+            {/**
+             * One line, truncated, with the button beside it.
+             *
+             * It wrapped to two lines on the reasoning that a link you cannot
+             * see the end of is a link you cannot check. Nobody checks it — the
+             * token is twelve characters of noise and the way it gets used is
+             * Copy, or the camera below. What the line is for is recognising
+             * *which* link this is, and the client and the path do that in the
+             * first thirty characters.
+             *
+             * The scheme is stripped for display and copied in full: `https://`
+             * is the least identifying part of the string and the widest.
+             *
+             * Not an input — a read-only field reads as a disabled one, and
+             * this is text to select and copy rather than edit. `select-all`
+             * still takes the whole URL despite the ellipsis, because the text
+             * node is complete and only its box is short.
+             */}
+            <span className="sharelink" title={url}>
+              {forDisplay(url)}
+            </span>
+            <button className="sharecopy" aria-label={copied ? 'Link copied' : 'Copy link'} onClick={copy}>
               {copied ? <CheckMark /> : <LinkMark />}
-              {copied ? 'Copied' : 'Copy'}
             </button>
           </div>
           {/* a swapped glyph is silent to a screen reader */}
