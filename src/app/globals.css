@@ -456,6 +456,13 @@ textarea {
   border-radius: var(--r-lg);
   padding: 12px 14px;
   height: 44px;
+  /* the caret is the one place the accent is unarguable: it marks exactly where
+     the person is, which is what the accent means */
+  caret-color: var(--primary-mark);
+  transition:
+    border-color 0.18s var(--ease),
+    box-shadow 0.18s var(--ease),
+    background-color 0.18s var(--ease);
 }
 .textarea {
   width: 100%;
@@ -469,11 +476,41 @@ textarea {
   min-height: 96px;
   resize: vertical;
 }
+/**
+ * Hover and focus, shared by both surfaces — moved here 18 August 2026.
+ *
+ * They lived on `.slide .input`, so the survey's fields darkened on hover and
+ * took the accent's ring on focus while the team app's did neither: no hover at
+ * all, and a browser-style outline offset two pixels off the box. Two fields
+ * that look the same and answer differently.
+ *
+ * A field's states belong to the field, not to the page it is on. What stays
+ * scoped to `.slide` is what is genuinely the survey's — its size, its leading,
+ * its 62px minimum.
+ */
+@media (hover: hover) {
+  /* the line darkens, the same hover every quiet control here has. Without it a
+     field gave no sign it was a field until you clicked in it. */
+  .input:hover:not(:focus),
+  .textarea:hover:not(:focus) {
+    border-color: var(--ink-3);
+  }
+}
 .input:focus,
 .textarea:focus {
-  outline: 2px solid var(--primary-focus);
-  outline-offset: 2px;
-  border-color: var(--hairline);
+  outline: 0;
+  border-color: var(--primary-mark);
+  /* the system's one shadow, spent here. Three pixels of the accent's own tint
+     — a ring, not a glow: no offset, no blur, so it reads as a second line
+     rather than as light coming off the box. */
+  box-shadow: 0 0 0 3px var(--primary-tint);
+}
+/* the selection tint rather than the browser's blue — the tint is already the
+   ground the focus ring uses */
+.input::selection,
+.textarea::selection {
+  background: var(--primary-tint);
+  color: var(--ink);
 }
 .input::placeholder,
 .textarea::placeholder {
@@ -4505,28 +4542,9 @@ dialog::backdrop {
   font-size: clamp(1.05rem, 1.9vw, 1.22rem);
   line-height: 1.6;
   color: var(--ink);
-  /* the caret is the one place the accent is unarguable: it marks exactly
-     where the person is, which is what the accent means */
-  caret-color: var(--primary-mark);
-  transition:
-    border-color 0.18s var(--ease),
-    box-shadow 0.18s var(--ease),
-    background-color 0.18s var(--ease);
-}
-/* the survey's own selection, rather than the browser's blue — the tint is
-   already the ground the focus ring uses */
-.slide .input::selection,
-.slide .textarea::selection {
-  background: var(--primary-tint);
-  color: var(--ink);
-}
-@media (hover: hover) {
-  /* the line darkens, the same hover every quiet control on this survey has.
-     Without it a field gave no sign it was a field until you clicked in it. */
-  .slide .input:hover:not(:focus),
-  .slide .textarea:hover:not(:focus) {
-    border-color: var(--ink-3);
-  }
+  /* caret, transition, hover, focus and selection are `.input`'s own — see the
+     base rule. What is left here is what the survey actually changes: size,
+     leading, and the 62px a paragraph answer needs. */
 }
 /* Grows with its content (useAutosize) to about half the screen, then scrolls
    inside itself so the question above and OK below stop moving. field-sizing
@@ -4537,15 +4555,6 @@ dialog::backdrop {
   max-height: 46dvh;
   overflow-y: auto;
   resize: none;
-}
-.slide .input:focus,
-.slide .textarea:focus {
-  outline: 0;
-  border-color: var(--primary-mark);
-  /* the system's one shadow, spent here. Three pixels of the accent's own tint
-     — a ring, not a glow: no offset, no blur, so it reads as a second line
-     rather than as light coming off the box. */
-  box-shadow: 0 0 0 3px var(--primary-tint);
 }
 .slide .input::placeholder,
 .slide .textarea::placeholder {
