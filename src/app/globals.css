@@ -211,10 +211,10 @@
    */
   --scrollbar: 8px;
 
-  /* The air around the new-link sheet's single column — see `.sheet.made-w`.
+  /* The air around the new-link sheet's single column — see `.sheet.onecol-w`.
      Off the spacing scale on purpose, and named so the four places that need it
      cannot drift apart. */
-  --made-pad: 68px;
+  --onecol-pad: 68px;
 
 
   /**
@@ -2923,18 +2923,23 @@ textarea {
  * rather than making somebody infer it from a URL in a box.
  */
 /**
- * One column, and it is the sheet's own.
+ * A sheet that is one column, and the column is the sheet.
+ *
+ * Two use it: the New survey form and the sheet that hands over the link it
+ * makes. Both hold one thing, both drop the toolbar for a close laid over the
+ * content, and both stand their column well clear of the edges. It was `.made`,
+ * named for the second of them, until the first wanted the same shape.
  *
  * The heading, the line under it, the link, the code and the note all measure
  * the same, and that measure is the sheet's own column.
  *
- * The number that decides it is the sheet's width — `.sheet.made-w` below — so
+ * The number that decides it is the sheet's width — `.sheet.onecol-w` below — so
  * there is one place to change it and nothing to keep in step. It was tried at
  * both ends: a 560px sheet around a 288px column left 62px of nothing down
  * either side, and the column stretched to fill 560 made a 500px code nobody
  * needs. 420 is the sheet, and everything on it is 370.
  */
-.made {
+.onecol {
   width: 100%;
 }
 /**
@@ -2945,7 +2950,7 @@ textarea {
  * somewhere below. They were 8 apart and sitting in a 44px box, which made the
  * inside gap 20 and the pair no closer to each other than to anything else.
  */
-.made h1 {
+.onecol h1 {
   font-family: var(--font-display);
   font-size: 25px;
   font-weight: 600;
@@ -2955,13 +2960,13 @@ textarea {
   color: var(--ink);
   margin-bottom: var(--sp-xxs);
 }
-.made .lede {
+.onecol .lede {
   font-size: 15px;
   line-height: 1.6;
   color: var(--ink-3);
   margin-bottom: var(--sp-lg);
 }
-.made .hintline {
+.onecol .hintline {
   margin-top: var(--sp-md);
   text-wrap: pretty;
 }
@@ -3062,7 +3067,7 @@ textarea {
  * `min-height` did instead was put twelve pixels of slack under a heading whose
  * next line is meant to belong to it.
  */
-.sheet.bare .made h1 {
+.sheet.bare .onecol h1 {
   padding-right: calc(44px + var(--sp-xs));
 }
 
@@ -3613,15 +3618,15 @@ dialog::backdrop {
 /**
  * Cut to its column.
  *
- * The sheet that hands over a new link holds one column and nothing else, so its
- * width *is* that column's: 480, less `--made-pad` either side and two
- * hairlines, leaves 342. Everything on the sheet measures that, and the two
- * numbers that decide it — the sheet's width and its padding — sit next to each
- * other here.
+ * These sheets hold one column and nothing else, so the column is whatever the
+ * sheet leaves: `narrow`'s 560, less `--onecol-pad` either side and two
+ * hairlines — 422. There is no width of their own to keep in step with the
+ * others; they take the sheet width the app already has.
  *
- * 68 is not on the spacing scale, and is deliberate: this sheet is one object
- * held well clear of its own edges, which is not a rhythm the scale has a step
- * for. It is named rather than typed four times.
+ * The padding is theirs, though. 68 is not on the spacing scale and is not meant
+ * to be: a sheet that is one object wants that object held well clear of its own
+ * edges, which is not a rhythm the scale has a step for. Named rather than typed
+ * four times.
  *
  * **Above 620 only.** Below it every sheet is full-bleed, and a width here would
  * beat that rule on specificity and leave a 338px card floating on a 390px
@@ -3635,20 +3640,38 @@ dialog::backdrop {
  * empty parchment above the first word.
  */
 @media (min-width: 621px) {
-  .sheet.made-w {
-    width: min(480px, 100%);
+  /**
+   * Two sheets, one shape, two widths — because they hold different things.
+   *
+   * `form-w` is set by its widest indivisible object: "Brand Strategy +
+   * Identity" is 174px of text in a chip with 38 of padding, so an option needs
+   * 212, the pair needs 431 with their gap, and the sheet needs that plus
+   * `--onecol-pad` twice and two hairlines. 580 with a little to spare, and the
+   * package sits on one line.
+   *
+   * `link-w` is set by the opposite constraint. Its column *is* the QR, so width
+   * becomes height, and past about 460 the sheet grows taller than 88dvh and
+   * starts to scroll — which this sheet is not allowed to do. A code read by a
+   * camera at arm's length gains nothing from the extra pixels anyway.
+   */
+  .sheet.form-w {
+    width: min(580px, 100%);
   }
-  /* `.sheet.made-w`, not `.made-w`: the bare sheet's own `padding-top` is
+  .sheet.link-w {
+    width: min(460px, 100%);
+  }
+
+  /* `.sheet.onecol-w`, not `.onecol-w`: the bare sheet's own `padding-top` is
      `.sheet.bare .sheetscroll` at (0,3,0) and would otherwise win. */
-  .sheet.made-w .sheetscroll {
+  .sheet.onecol-w .sheetscroll {
     scrollbar-gutter: auto;
     /* The same on every side, so the column stands the same distance from all
        four edges — this sheet has no bar to clear and no reason to sit tighter
        at the top than at the sides. */
-    padding-top: var(--made-pad);
+    padding-top: var(--onecol-pad);
   }
-  .sheet.made-w .sheet-body {
-    padding: 0 var(--made-pad) var(--made-pad);
+  .sheet.onecol-w .sheet-body {
+    padding: 0 var(--onecol-pad) var(--onecol-pad);
   }
 }
 /**

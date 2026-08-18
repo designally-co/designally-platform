@@ -46,12 +46,12 @@ export default function SurveyMadeSheet({
        */
       title={null}
       narrow
-      width="made-w"
+      width="onecol-w link-w"
       bare
       backLabel="Done"
       onClose={onClose}
     >
-      <div className="made">
+      <div className="onecol">
         <h1>The link is ready.</h1>
         <p className="lede">Send it to the client&apos;s main contact. They can forward it on.</p>
 
