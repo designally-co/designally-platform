@@ -211,6 +211,11 @@
    */
   --scrollbar: 8px;
 
+  /* The air around the new-link sheet's single column — see `.sheet.made-w`.
+     Off the spacing scale on purpose, and named so the four places that need it
+     cannot drift apart. */
+  --made-pad: 68px;
+
 
   /**
    * Where a wide screen starts reading.
@@ -3609,9 +3614,14 @@ dialog::backdrop {
  * Cut to its column.
  *
  * The sheet that hands over a new link holds one column and nothing else, so its
- * width *is* that column's: 480, less `--sp-xxl` of padding either side and two
- * hairlines, leaves 382. Everything on the sheet measures that, and one number
- * moves all of it.
+ * width *is* that column's: 480, less `--made-pad` either side and two
+ * hairlines, leaves 342. Everything on the sheet measures that, and the two
+ * numbers that decide it — the sheet's width and its padding — sit next to each
+ * other here.
+ *
+ * 68 is not on the spacing scale, and is deliberate: this sheet is one object
+ * held well clear of its own edges, which is not a rhythm the scale has a step
+ * for. It is named rather than typed four times.
  *
  * **Above 620 only.** Below it every sheet is full-bleed, and a width here would
  * beat that rule on specificity and leave a 338px card floating on a 390px
@@ -3632,13 +3642,13 @@ dialog::backdrop {
      `.sheet.bare .sheetscroll` at (0,3,0) and would otherwise win. */
   .sheet.made-w .sheetscroll {
     scrollbar-gutter: auto;
-    /* `--sp-xxl` on every side, so the column stands the same distance from all
+    /* The same on every side, so the column stands the same distance from all
        four edges — this sheet has no bar to clear and no reason to sit tighter
        at the top than at the sides. */
-    padding-top: var(--sp-xxl);
+    padding-top: var(--made-pad);
   }
   .sheet.made-w .sheet-body {
-    padding: 0 var(--sp-xxl) var(--sp-xxl);
+    padding: 0 var(--made-pad) var(--made-pad);
   }
 }
 /**
