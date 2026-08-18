@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useCallback, useRef, useState, useTransition } from 'react';
 
 import {
   archiveProject,
@@ -13,8 +13,9 @@ import {
 } from '@/lib/team/actions';
 import type { ProjectView } from '@/lib/team/projects';
 import { answersToMarkdown, exportFilename, printableHtml } from '@/lib/team/export';
-import { ArchiveMark, DocMark, LockMark, PrintMark, SaveMark, TrashMark, UndoMark } from '../icons';
+import { ArchiveMark, DocMark, DownMark, LockMark, PrintMark, SaveMark, TrashMark, UndoMark } from '../icons';
 import { submitted } from '@/lib/team/when';
+import { useAnchored, useDismiss } from '../anchored';
 import DateField from '../date-field';
 import ShareLink from './share';
 import MoreMenu from '../menu';
@@ -146,6 +147,13 @@ export default function ProjectSheet({
    * drives the menu, and one field would open both panels at once.
    */
   const [confirmGenerate, setConfirmGenerate] = useState(false);
+  /** Whether the subset dropdown is open. Shut is the ordinary case: read everyone. */
+  const [picking, setPicking] = useState(false);
+  const split = useRef<HTMLDivElement>(null);
+  /* Roughly the dropdown's own size; it only decides whether to open down or
+     up, and a list of three or four names is short either way. */
+  const at = useAnchored(picking, split, 260, 200);
+  useDismiss(picking, split, useCallback(() => setPicking(false), []));
 
   /* The date field is controlled now, so the sheet holds it. It was
      `defaultValue` on a native input, which the browser kept for us. */
@@ -203,12 +211,44 @@ export default function ProjectSheet({
       /* A close with nobody to read comes back ok with a warning and no
          analysis — there is nothing to open, so say it rather than opening an
          empty sheet. */
+      setPicking(false);
       if (result.warning) {
         onActed(result.warning);
         return;
       }
       onOpenInsights();
     });
+
+  /** How many answers the next run will read — everyone unless a subset is ticked. */
+  const chosen = only === null ? p.people.length : only.length;
+
+  /**
+   * Gate 1, asked before it is crossed.
+   *
+   * Generating while the survey is open closes it on the way, which stops the
+   * link and puts a name on the close — so it asks, the way every other gate on
+   * this sheet does. Once closed it is a re-run and asks nothing: every version
+   * is kept and none is overwritten.
+   *
+   * One block, used from both the plain state and the picker, so the two cannot
+   * drift into asking differently about the same act.
+   */
+  const closeFirst = (
+    <div className="delconfirm">
+      <p>This closes collection first — the link stops taking answers, and your name goes on it.</p>
+      {/* Wrapped, so `.delconfirm > button` does not reach them: that rule
+          compacts a menu row, and these two are buttons on a sheet standing next
+          to other buttons on the same sheet. */}
+      <div className="iacts">
+        <button className="btn btn-primary" disabled={pending} onClick={generate}>
+          {pending ? 'Working…' : `Close and generate from ${chosen} ${chosen === 1 ? 'answer' : 'answers'}`}
+        </button>
+        <button className="btn btn-quiet" onClick={() => setConfirmGenerate(false)}>
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
 
   const link = p.token ? `${origin}/s/${p.token}` : null;
 
@@ -647,7 +687,14 @@ export default function ProjectSheet({
          */}
         {p.action ? (
           <>
-            <p className="ineed">NEEDS YOUR TEAM</p>
+            {/* The Point — DESIGN.md §"five named pieces" gives it three jobs and
+                one of them is literally "the team app's needs you". It is the
+                brand's own mark for this exact moment, so the banner wears it
+                rather than inventing something to be branded with. */}
+            <p className="ineed">
+              <span className="pt" aria-hidden="true" />
+              NEEDS YOUR TEAM
+            </p>
             <p className="isay">
               <b>{p.action.say}</b> {p.action.emphasis}
             </p>
@@ -679,89 +726,110 @@ export default function ProjectSheet({
           <>
 
             {/**
-             * Whose answers to read. One row each, everyone ticked.
+             * One control, not two — asked for 18 August 2026.
              *
-             * A single respondent gets no picker: a checkbox whose only legal
-             * state is ticked is furniture.
+             * It was a filled *Generate insights* beside a quiet *Select
+             * responses*, which is two buttons for one act: the second does not
+             * generate anything, it changes what the first will read. As a split
+             * button that relationship is the shape — press the wide half to run
+             * it, press the chevron to say what it runs on, and the wide half's
+             * label reports the answer either way.
+             *
+             * Everyone is ticked when it opens. The dropdown is a refinement of
+             * a default, not a question standing between the team and the thing
+             * they came to press.
+             *
+             * A single respondent gets no chevron: choosing between one person
+             * and nobody is not a choice.
              */}
-            {p.people.length > 1 && (
-              <div className="whoreads">
-                <p className="hintline">Read the answers of:</p>
-                {p.people.map((person) => {
-                  const on = only === null || only.includes(person.id);
-                  return (
-                    <label key={person.id} className="pickwho">
-                      <input
-                        type="checkbox"
-                        checked={on}
-                        disabled={pending}
-                        onChange={() => {
-                          const base = only ?? p.people.map((x) => x.id);
-                          const next = on
-                            ? base.filter((id) => id !== person.id)
-                            : [...base, person.id];
-                          /* everyone selected is the same as no selection — keep
-                             it null so the run records it that way */
-                          setOnly(next.length === p.people.length ? null : next);
-                        }}
-                      />
-                      <span>{person.name}</span>
-                    </label>
-                  );
-                })}
-              </div>
-            )}
+            {confirmGenerate ? (
+              closeFirst
+            ) : (
+              <>
+                <p className="ireads">
+                  {chosen === p.people.length
+                    ? `Reads all ${p.answers} ${p.answers === 1 ? 'answer' : 'answers'}.`
+                    : `Reads ${chosen} of ${p.people.length} answers.`}{' '}
+                  Every run is kept as a version, so this replaces nothing.
+                </p>
 
-            <div className="iacts">
-              {/**
-               * Generating while the survey is open closes it on the way, and
-               * that is gate 1 — so it asks first, the way every other gate on
-               * this sheet does. Once closed it is a re-run and asks nothing:
-               * every version is kept and nothing is overwritten.
-               */}
-              {confirmGenerate ? (
-                <div className="delconfirm">
-                  <p>
-                    This closes collection first — the link stops taking answers, and your name
-                    goes on it.
-                  </p>
-                  {/* Wrapped, so `.delconfirm > button` does not reach them:
-                      that rule compacts a menu row, and these two are buttons on
-                      a sheet standing next to other buttons on the same sheet. */}
-                  <div className="iacts">
-                    <button className="btn btn-primary" disabled={pending} onClick={generate}>
-                      {pending ? 'Working…' : 'Close and generate'}
-                    </button>
-                    <button className="btn btn-quiet" onClick={() => setConfirmGenerate(false)}>
-                      Cancel
-                    </button>
+                <div className="iacts">
+                  <div className="splitwrap" ref={split}>
+                    <div className="split" data-open={picking || undefined}>
+                      <button
+                        className="btn btn-primary"
+                        disabled={pending || chosen === 0}
+                        onClick={() => (p.closedOn ? generate() : setConfirmGenerate(true))}
+                      >
+                        {pending
+                          ? 'Working…'
+                          : chosen !== p.people.length
+                            ? `Generate from ${chosen} ${chosen === 1 ? 'answer' : 'answers'}`
+                            : p.closedOn
+                              ? p.insights
+                                ? 'Generate again'
+                                : 'Generate insights'
+                              : 'Close collection and generate'}
+                      </button>
+                      {p.people.length > 1 && (
+                        <button
+                          className="splitmore"
+                          aria-label="Choose whose answers to read"
+                          title="Choose whose answers to read"
+                          aria-haspopup="true"
+                          aria-expanded={picking}
+                          disabled={pending}
+                          onClick={() => setPicking((o) => !o)}
+                        >
+                          <DownMark />
+                        </button>
+                      )}
+                    </div>
+
+                    {picking && at && (
+                      <div
+                        className="splitmenu"
+                        role="group"
+                        aria-label="Whose answers to read"
+                        style={{ top: at.top, left: at.left, width: at.width }}
+                      >
+                        <p className="hintline">Read the answers of:</p>
+                        {p.people.map((person) => {
+                          const on = only === null || only.includes(person.id);
+                          return (
+                            <label key={person.id} className="pickwho">
+                              <input
+                                type="checkbox"
+                                checked={on}
+                                disabled={pending}
+                                onChange={() => {
+                                  const base = only ?? p.people.map((x) => x.id);
+                                  const next = on
+                                    ? base.filter((id) => id !== person.id)
+                                    : [...base, person.id];
+                                  /* everyone ticked is the same as no selection —
+                                     keep it null so the run records it that way */
+                                  setOnly(next.length === p.people.length ? null : next);
+                                }}
+                              />
+                              <span>{person.name}</span>
+                            </label>
+                          );
+                        })}
+                        {chosen === 0 && (
+                          <p className="hintline warn">Tick at least one person.</p>
+                        )}
+                      </div>
+                    )}
                   </div>
+
+                  {p.insights && (
+                    <button className="btn btn-quiet" disabled={pending} onClick={onOpenInsights}>
+                      Open the insights
+                    </button>
+                  )}
                 </div>
-              ) : (
-                <button
-                  className="btn btn-primary"
-                  disabled={pending || only?.length === 0}
-                  onClick={() => (p.closedOn ? generate() : setConfirmGenerate(true))}
-                >
-                  {pending
-                    ? 'Working…'
-                    : p.closedOn
-                      ? p.insights
-                        ? 'Generate again'
-                        : 'Generate insights'
-                      : 'Close collection and generate'}
-                </button>
-              )}
-
-              {p.insights && (
-                <button className="btn btn-quiet" disabled={pending} onClick={onOpenInsights}>
-                  Open the insights
-                </button>
-              )}
-            </div>
-
-            {only?.length === 0 && (
-              <p className="hintline">Tick at least one person for the analysis to read.</p>
+              </>
             )}
           </>
         )}

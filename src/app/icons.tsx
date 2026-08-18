@@ -35,6 +35,7 @@ import {
   Calendar,
   Check,
   ChevronLeft,
+  ChevronDown,
   ChevronRight,
   Download,
   FileText,
@@ -121,6 +122,11 @@ export function PrevMark() {
 }
 export function NextMark() {
   return <ChevronRight size={26} strokeWidth={1.46} aria-hidden="true" />;
+}
+
+/** The half of a split button that opens the other half's options. */
+export function DownMark() {
+  return <ChevronDown size={22} strokeWidth={1.73} aria-hidden="true" />;
 }
 
 /**

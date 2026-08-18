@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { useAnchored, useDismiss } from './anchored';
 import { CalendarMark, NextMark, PrevMark } from './icons';
 
 /**
@@ -143,8 +144,9 @@ export default function DateField({
   const [parts, setParts] = useState<Parts>(() => toParts(value));
   const [open, setOpen] = useState(false);
   const wrap = useRef<HTMLDivElement>(null);
-  /** viewport coordinates for the calendar — see `place` */
-  const [at, setAt] = useState<{ top: number; left: number; width: number } | null>(null);
+  /* 316 x 330 is the calendar's own size to within a row; it only decides
+     whether to open downward or up. See `useAnchored`. */
+  const at = useAnchored(open, wrap, 316, 330);
 
   /* The value can change under us — cleared on the project sheet, or reset when
      a different project opens into the same component. Typing is the other
@@ -192,88 +194,7 @@ export default function DateField({
     if (p.y) setView({ y: Number(p.y), m: Number(p.m) });
   }, [open, value]);
 
-  /**
-   * The calendar floats over the page rather than sitting in the sheet.
-   *
-   * It was `position: absolute` under the field, which is the ordinary way to
-   * hang a popover and is wrong inside a sheet, twice over. An absolutely
-   * positioned box still counts toward its scroller's scrollable area, so
-   * opening the calendar made the New survey sheet — which had just been made to
-   * hug its content — grow a scrollbar and jump. And `.sheet` is
-   * `overflow: hidden` so it can clip to its own 34px corners, which means a
-   * calendar reaching past the sheet's edge was cut off rather than shown.
-   *
-   * `position: fixed` answers both: out of the scroller's flow entirely, and its
-   * containing block is the viewport, so no ancestor's `overflow: hidden` clips
-   * it. The cost is that fixed coordinates do not follow anything, so they are
-   * measured on open and re-measured while the page moves under them.
-   *
-   * It flips above the field when there is no room below — on a phone, a field
-   * near the fold otherwise opens a calendar mostly off-screen.
-   */
-  const place = useCallback(() => {
-    const box = wrap.current?.getBoundingClientRect();
-    if (!box) return;
-    const width = Math.min(316, window.innerWidth - 16);
-    const height = 330;
-    const below = window.innerHeight - box.bottom;
-    const top = below < height && box.top > height ? box.top - height - 8 : box.bottom + 8;
-    /* Kept on screen: a field near the right edge would otherwise hang a
-       calendar off it, and there is nothing to scroll it back into view. */
-    const left = Math.max(8, Math.min(box.left, window.innerWidth - width - 8));
-    /* Both are viewport numbers; if `fixed` counts from something else here,
-       take that something's corner back off them. */
-    const origin = fixedOrigin(wrap.current!);
-    setAt({ top: top - origin.y, left: left - origin.x, width });
-  }, []);
-
-
-  useEffect(() => {
-    if (!open) return;
-    place();
-    /* Capture, so the sheet's own scroller is heard and not just the window. */
-    window.addEventListener('scroll', place, true);
-    window.addEventListener('resize', place);
-    /**
-     * And again when an animation ends anywhere above us.
-     *
-     * `fixedOrigin` is measured once per placement, and what it measures can
-     * stop being true: the sheet's entrance animation holds a transform for
-     * 420ms and then drops it, so a calendar opened inside that window is
-     * placed against the sheet and then finds itself against the viewport. One
-     * listener, and it re-places on the frame the transform goes.
-     */
-    document.addEventListener('animationend', place, true);
-    document.addEventListener('transitionend', place, true);
-    return () => {
-      window.removeEventListener('scroll', place, true);
-      window.removeEventListener('resize', place);
-      document.removeEventListener('animationend', place, true);
-      document.removeEventListener('transitionend', place, true);
-    };
-  }, [open, place]);
-
-  /* Same dismissal as MoreMenu, and the same reason for capturing Escape: this
-     sits inside a native <dialog>, which closes on Escape too, and the first
-     press should shut the calendar rather than the whole sheet. */
-  useEffect(() => {
-    if (!open) return;
-    const away = (e: MouseEvent) => {
-      if (!wrap.current?.contains(e.target as Node)) setOpen(false);
-    };
-    const esc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.stopPropagation();
-        setOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', away);
-    document.addEventListener('keydown', esc, true);
-    return () => {
-      document.removeEventListener('mousedown', away);
-      document.removeEventListener('keydown', esc, true);
-    };
-  }, [open]);
+  useDismiss(open, wrap, useCallback(() => setOpen(false), []));
 
   /**
    * One segment: type digits, or hold an arrow key.

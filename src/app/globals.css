@@ -2456,20 +2456,33 @@ textarea {
  * coloured panel would have claimed that twice.
  */
 /**
- * The section's status line — the *needs your team* card's own words, now that
- * the card has gone into it.
+ * The banner's sentence — the largest type on the sheet, and deliberately.
  *
- * 15px rather than the card's 16: it is a line inside a section now, over a
- * heading rather than alone in a box of its own, and it stops competing with
- * the `<h2>` above it.
+ * This is the one thing on a project a person has to read before deciding
+ * anything, and it spent a while at 15px looking like a caption under a
+ * heading. It takes the display face at 18 with the display's own tracking, and
+ * the sentence balances rather than ragging — two lines of prompt with one word
+ * on the second is the difference between a headline and a paragraph that
+ * happens to be short.
+ *
+ * No card around it, and that is a decision rather than an omission. The floor
+ * this project builds to bans a coloured rule down the side of a callout and
+ * allows no shadow but the focus ring, which leaves a box — and a box inside a
+ * section, on a sheet, is the third nested container in a row. What marks this
+ * as urgent is the Point and the accent above it, which is what the accent is
+ * for.
+ *
+ * 1.6 leading, because the resting version of this line carries whoever closed
+ * collection and that name is Thai more often than not.
  */
 .pd-insights .isay {
-  font-size: 15px;
-  /* Thai never below 1.6 on a line that can carry a client's name */
+  font-family: var(--font-display);
+  font-size: 18px;
+  letter-spacing: -0.015em;
   line-height: 1.6;
-  text-wrap: pretty;
+  text-wrap: balance;
   color: var(--ink-3);
-  margin-bottom: var(--sp-sm);
+  margin-bottom: var(--sp-xs);
 }
 .pd-insights .isay b {
   font-weight: 600;
@@ -2485,13 +2498,52 @@ textarea {
  * is happening is a line of type spent on nothing.
  */
 .pd-insights .ineed {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-xs);
   font-size: 11.5px;
   font-weight: 700;
   letter-spacing: 0.05em;
   color: var(--primary-mark);
   margin-bottom: var(--sp-xs);
 }
+/**
+ * The Point.
+ *
+ * The CI names five pieces and gives this one three jobs; the third is "the
+ * team app's needs you". It is 9px — the size it is beside a client's name in
+ * the worklist, so the two readings of the same signal are the same object
+ * rather than two dots that happen to both be orange.
+ *
+ * `--primary`, not the CI's `#ef6148`: at 9px this is a graphical object and
+ * has to clear 3:1, which the pure hue does not manage on parchment. The CI
+ * orange keeps the Cut and the dark Field, where it is free to be itself.
+ */
+.pd-insights .ineed .pt {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: var(--r-pill);
+  background: var(--primary);
+}
+
+/**
+ * What the button will read, and what a run costs you.
+ *
+ * Quieter than the sentence above it and separated from it: that one is why you
+ * are here, this one is what happens next. It sits directly over the buttons so
+ * it is read on the way to them rather than instead of them.
+ */
+.pd-insights .ireads {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink-3);
+  margin-bottom: var(--sp-sm);
+}
 /* When the prompt is reckoned from — the date that passed, the day it closed. */
+/* When the prompt is reckoned from — the date that passed, the day it closed.
+   Tucked under the sentence rather than spaced from it: it is that sentence's
+   own footnote, and the gap belongs below the pair, not inside it. */
 .pd-insights .iwhen {
   font-size: 13.5px;
   line-height: 1.6;
@@ -2538,6 +2590,86 @@ textarea {
 .newqr .qrframe.loading {
   background: var(--parchment);
   border-color: transparent;
+}
+
+/**
+ * A split button — run it, or say what it runs on.
+ *
+ * Two halves of one control rather than two controls: the chevron does not
+ * generate anything, it changes what the wide half will read, and the wide
+ * half's label reports the answer. Set beside each other as separate buttons
+ * they read as alternatives, which is the one thing they are not.
+ *
+ * The seam is a line of the label's own colour at 24%, not a gap and not a
+ * border: a gap would make them two objects again, and a full-strength rule
+ * through a filled pill reads as damage.
+ */
+.split {
+  display: inline-flex;
+  align-items: stretch;
+}
+.split > .btn {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.splitmore {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  min-height: 44px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-left: 1px solid color-mix(in srgb, var(--on-primary) 24%, transparent);
+  border-radius: 0 var(--r-pill) var(--r-pill) 0;
+  background: var(--primary);
+  color: var(--on-primary);
+  cursor: pointer;
+  transition: background-color 0.16s var(--ease);
+}
+@media (hover: hover) {
+  .splitmore:not(:disabled):hover {
+    background: var(--primary-deep);
+  }
+}
+.splitmore:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.splitmore:focus-visible {
+  outline: 2px solid var(--primary-focus);
+  outline-offset: 2px;
+}
+/* The chevron turns to point at what it opened, which is the one bit of motion
+   on this control — see DESIGN.md §4: one authored moment, not scattered. */
+.split[data-open] .splitmore svg {
+  transform: rotate(180deg);
+}
+.splitmore svg {
+  transition: transform 0.22s var(--ease);
+}
+
+.splitwrap {
+  position: relative;
+}
+/* Fixed and placed in JS, like the calendar and for the same two reasons — see
+   `useAnchored`. Absolute would count toward the sheet's scrollable height and
+   be clipped by the sheet's own corners. */
+.splitmenu {
+  position: fixed;
+  z-index: 90;
+  padding: var(--sp-xs) var(--sp-sm) var(--sp-sm);
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-card);
+}
+.splitmenu .hintline {
+  margin-bottom: var(--sp-xxs);
+}
+.splitmenu .hintline.warn {
+  margin-top: var(--sp-xs);
+  margin-bottom: 0;
+  color: var(--critical);
 }
 
 /* ---- The date field ----------------------------------------------------

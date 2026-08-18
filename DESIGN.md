@@ -1174,6 +1174,16 @@ button     solid orange, white label          — this is the action
 
 Three rungs in one hue, separated by how much orange each spends. Use it for package pickers, question types, word chips and the day cells in a calendar.
 
+### Split button — run it, or say what it runs on
+
+One control, two halves: a filled primary and a 42px chevron sharing a pill, seamed by a line of the label's own colour at 24%. The chevron opens a dropdown that changes what the primary will read; the primary's label reports the answer — *Generate insights* when everything is ticked, *Generate from 3 answers* when it is not.
+
+Use it where a second button would not be an alternative but a qualifier. The insights banner had *Generate insights* beside a quiet *Select responses*, and read as two things you could do; the second does not generate anything, it says what the first reads. Set as halves of one pill that relationship is the shape rather than a caption.
+
+Everything is ticked when the dropdown opens. It refines a default, and a default that has to be assembled before the button works is not a default.
+
+The dropdown is `position: fixed` and placed by `useAnchored` — see Date field for why a popover in a sheet body cannot be absolute. One respondent, no chevron: choosing between one person and nobody is not a choice.
+
 ### Date field
 
 Three boxes and a month you can point at, replacing `<input type="date">` — the one control on a team sheet the system could not reach, because the browser draws its own segment highlight, glyph and popup in its own colours inside our field.

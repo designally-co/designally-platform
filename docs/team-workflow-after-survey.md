@@ -9,10 +9,10 @@ _Designally Platform_
 **The project sheet is where the insights are made** (18 August 2026, asked for by
 the team). Three sections in the order the work happens: *Who answered*, where each
 person opens their own answers; *Insights*, where you tick whose answers to read,
-press once, and land on what came back; and *The date*. The picker sits open rather
-than behind a link — everyone stays ticked, because that is the answer almost every
-time, but choosing is half of what the team described doing here and a control you
-have to go looking for is not offered.
+press once, and land on what came back; and *The date*. The choice of whose answers to
+read is the dropdown half of that button: everyone is ticked when it opens, and the
+button's own label says what it will read — *Generate insights*, or *Generate from
+3 answers*.
 
 While the survey is still open the button reads **Close collection and generate**,
 and it asks first: that press is gate 1, it stops the link, and it puts a name on
