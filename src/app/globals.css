@@ -1953,7 +1953,7 @@ label.f span {
   padding: 0;
   list-style: none;
   display: grid;
-  /* the opposition · which end · the raw point */
+  /* the opposition · the point · which end it counts from */
   grid-template-columns: auto auto auto;
   justify-content: start;
   gap: 7px 22px;
@@ -1970,21 +1970,35 @@ label.f span {
 .ansscale .pair {
   color: var(--ink-3);
 }
-/* the answer, and the only part of the row that differs between two people */
-.ansscale .lean {
-  font-weight: 600;
-}
+/**
+ * The point, which is what the row is read for.
+ *
+ * It was `--ink-3` under a 600-weight reading, which put the emphasis on the
+ * gloss and left the answer as the quietest thing on its own line. The team
+ * reads the numbers: they are what differs between two respondents and what any
+ * comparison is made on. The figure takes the weight, `of 5` stays quiet beside
+ * it — a fraction, not two facts — and DESIGN.md's rule holds either way, since
+ * the contrast inside the line is weight and never colour.
+ */
 .ansscale .pos {
-  color: var(--ink-3);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.ansscale .pos b {
+  font-weight: 600;
 }
 .ansscale .pos i {
   font-style: normal;
+  color: var(--ink-3);
+}
+/* which end the point counts from — the one thing the number cannot say on its
+   own, and nothing more than that, so it sits behind it */
+.ansscale .lean {
+  color: var(--ink-3);
 }
 /* a pair this question version no longer has — the number without a name is
    still worth more than nothing */
 .ansscale .pair.unlabelled {
-  grid-column: 1 / 3;
   font-size: 12px;
 }
 

@@ -37,9 +37,14 @@ import Sheet from './sheet';
  *
  * So the row says which end, in words:
  *
- *     Serious – Fun             toward Serious     2 of 5
- *     Corporate – Friendly      at Friendly        5 of 5
- *     Realistic – Idealistic    balanced           3 of 5
+ *     Serious – Fun             2 of 5     toward Serious
+ *     Corporate – Friendly      5 of 5     at Friendly
+ *     Realistic – Idealistic    3 of 5     balanced
+ *
+ * The point carries the row and the words support it. The team reads the
+ * numbers — they are what differs between two people and what a comparison is
+ * made on — so the reading sits after them, in `--ink-3`, doing the one job the
+ * number cannot do alone: saying which end of the pair it is counting from.
  *
  * The three readings are the only ones the data supports. An endpoint is `at`,
  * because the client chose the last available point and there is nothing beyond
@@ -87,14 +92,19 @@ function Scale({
                 <span className="pair">
                   {pair.left_en} – {pair.right_en}
                 </span>
+                <span className="pos">
+                  <b>{point}</b> <i>of {value.points}</i>
+                </span>
                 <span className="lean">{reading(point, value.points, pair.left_en, pair.right_en)}</span>
               </>
             ) : (
-              <span className="pair unlabelled">pair {Number(index) + 1}</span>
+              <>
+                <span className="pair unlabelled">pair {Number(index) + 1}</span>
+                <span className="pos">
+                  <b>{point}</b> <i>of {value.points}</i>
+                </span>
+              </>
             )}
-            <span className="pos">
-              {point} <i>of {value.points}</i>
-            </span>
           </li>
         );
       })}
