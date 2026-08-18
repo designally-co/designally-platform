@@ -2464,11 +2464,68 @@ dialog::backdrop {
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
-  /* Thin, and in the sheet's own inks rather than the platform's. A 17px
-     system scrollbar is a slab of another operating system's chrome down the
-     side of a card built out of hairlines. */
-  scrollbar-width: thin;
-  scrollbar-color: var(--fill) transparent;
+}
+
+/**
+ * Firefox only, and the guard is load-bearing.
+ *
+ * Chrome supports both the standard properties and the WebKit pseudo-elements,
+ * and setting either `scrollbar-width` or `scrollbar-color` makes it *ignore*
+ * `::-webkit-scrollbar` entirely — which is how an 8px custom bar came out as
+ * Chrome's own 11px thin one. `@supports not selector(::-webkit-scrollbar)` is
+ * false in Chrome, so the standard properties apply only where the pseudo
+ * elements do not exist.
+ *
+ * Firefox has no way to inset a track, so it gets a thin scrollbar in the
+ * sheet's inks and no more. A different scrollbar, not a broken one.
+ */
+@supports not selector(::-webkit-scrollbar) {
+  .sheetscroll {
+    scrollbar-width: thin;
+    scrollbar-color: var(--fill) transparent;
+  }
+}
+
+/**
+ * The scrollbar starts under the bar, and stops short of the corners.
+ *
+ * The bar is sticky *inside* this scroller — that is what lets content run
+ * beneath it — so the scrollbar's own track runs the full height and up the
+ * side of the header, which is a rail beside a title that never scrolls.
+ *
+ * `::-webkit-scrollbar-track` takes a margin, and that is the whole trick: the
+ * track begins where the bar ends and stops 12px short of the bottom, so the
+ * thumb travels only beside the part that actually moves and never reaches the
+ * 34px corners.
+ *
+ * The top margin is derived, not measured — `--sp-lg` twice is the bar's own
+ * padding and 44px is the disc it is built around, which is what sets its
+ * height. A wrapped title grows the bar past this and the track starts a few
+ * pixels high; nothing overlaps and nothing breaks.
+ *
+ * Firefox gets the `scrollbar-width: thin` above and no inset. It is a
+ * different scrollbar, not a broken one.
+ */
+.sheetscroll::-webkit-scrollbar {
+  width: 8px;
+}
+.sheetscroll::-webkit-scrollbar-track {
+  background: transparent;
+  margin: calc(var(--sp-lg) * 2 + 44px) 0 12px;
+}
+.sheetscroll::-webkit-scrollbar-thumb {
+  background: var(--fill);
+  border-radius: var(--r-pill);
+  /* the border is transparent and clipped to the padding box, which is how a
+     webkit thumb is inset from its own track without a wrapper */
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+@media (hover: hover) {
+  .sheetscroll::-webkit-scrollbar-thumb:hover {
+    background: var(--fill-deep);
+    background-clip: padding-box;
+  }
 }
 .sheet-body {
   flex: 1;

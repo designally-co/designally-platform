@@ -164,6 +164,23 @@ function submitted(at: Date) {
   });
 }
 
+/**
+ * The questions, without the identity block.
+ *
+ * Name, position and email were the first three rows of every response, and
+ * every one of them repeated something already on the screen: the name is in
+ * the bar, the position and the address are in the heading directly above. Three
+ * rows of "Your name / ชื่อของคุณ / Buk" before the first thing anybody came
+ * here to read.
+ *
+ * They are dropped from the *view* only. The export keeps them — a file that
+ * leaves the app has no bar and no heading to carry them, and a set of answers
+ * with no name on it is a set of answers nobody can attribute. See
+ * `answersToMarkdown`, which takes `data` untouched.
+ */
+const asked = (p: RespondentAnswers) => p.answers.filter((a) => a.blockKey !== 'identity');
+const blanks = (p: RespondentAnswers) => asked(p).filter((a) => a.value === null).length;
+
 function Answer({ a }: { a: ReadableAnswer }) {
   return (
     <li className={a.value ? 'ansrow' : 'ansrow blank'}>
@@ -407,40 +424,40 @@ export default function AnswersSheet({
         <>
           {[person].map((p) => (
             <section className="ansperson" key={p.id}>
-              {/**
-               * Whose answers these are, which the tabs used to say.
-               *
-               * The sheet's own title names the *client* — "What ARUN+ said" —
-               * so without this the page had five people's worth of answers on
-               * it and no name anywhere. The position is here for the reason it
-               * was on the tab: a founder and a new hire dissenting is not the
-               * same finding twice.
-               */}
-              {/* Role and email only. The name moved to the bar, which is
-                  sticky and survives the scroll — repeating it here is the
-                  stutter `.pd-head` was removed from the project sheet for.
-                  These two stay because the bar does not carry them: the
-                  position changes what a disagreement means, and the address is
-                  how somebody gets followed up. */}
+              {/* Role and email. The name is in the bar, which is sticky and
+                  survives the scroll; these two are not, and both earn their
+                  place — the position changes what a disagreement means, and
+                  the address is how somebody gets followed up. */}
               {(p.role || p.email) && (
                 <h3 className="ansname">
                   {p.role && <span>{p.role}</span>}
                   {p.email && <span>{p.email}</span>}
                 </h3>
               )}
-              {/* No name in it any more: it named the person because the only
-                  other place they appeared was a tab across the top. The
-                  heading is the line directly above this one now, and a Thai
-                  name is long enough that repeating it here reads as a stutter
-                  rather than as a subject. */}
-              <p className="quiet anssum">
-                {p.blank > 0
-                  ? `Left ${p.blank} of ${p.answered + p.blank} blank. A question nobody could answer is a finding, not a gap in the data.`
-                  : 'Answered every question.'}
-              </p>
+              {/**
+               * A blank is worth a sentence. A full response is not.
+               *
+               * This said "Answered every question." on almost every response,
+               * which is a line that is true, identical on all of them, and
+               * therefore says nothing — a survey is not sent with a blank in
+               * it, so the full case is the case. What is left is the exception,
+               * and the exception is a real finding: DESIGN.md's insight spec
+               * calls a question nobody could answer the most valuable signal
+               * there is, so it keeps its sentence.
+               *
+               * Counted over the questions on screen rather than every row —
+               * the identity fields are not shown and would put a "of 24" over
+               * a list of twenty-one.
+               */}
+              {blanks(p) > 0 && (
+                <p className="quiet anssum">
+                  Left {blanks(p)} of {asked(p).length} blank. A question nobody could
+                  answer is a finding, not a gap in the data.
+                </p>
+              )}
 
               <ul className="anslist">
-                {p.answers.map((a, i) => (
+                {asked(p).map((a, i) => (
                   <Answer a={a} key={i} />
                 ))}
               </ul>
