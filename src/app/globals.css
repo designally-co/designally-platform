@@ -440,6 +440,37 @@ textarea {
   outline-offset: 2px;
 }
 
+/**
+ * The affirmative answer inside a confirmation, when nothing is destroyed.
+ *
+ * Ink, not the accent — and the rule underneath is DESIGN.md §1. The accent
+ * means *a person is needed here*. Inside a confirmation a person has already
+ * been got: they pressed Archive, they read the sentence, and the button is
+ * their answer to a question the app asked. Wearing the accent there spends the
+ * one colour that summons somebody on the moment they have already arrived, and
+ * it does it beside the *Needs you* rows and the Point, which mean it properly.
+ *
+ * So a confirmation has two kinds of affirmative and neither is orange: `ink`
+ * for ordinary acts — archive, close collection — and `--btn-danger` for the
+ * ones that destroy something. White on `--ink` is 16.85:1.
+ *
+ * Hover lightens here, which is the one place in this system it does: DESIGN.md
+ * says a hover darkens, and `--ink` is the darkest value there is.
+ */
+.btn-ink {
+  background: var(--ink);
+  color: var(--canvas);
+}
+@media (hover: hover) {
+  .btn-ink:not(:disabled):hover {
+    background: var(--ink-2);
+  }
+}
+.btn-ink:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
 .btn-primary {
   background: var(--primary);
   /* charcoal, not white: white on the CI orange is 3.24:1 and this label runs
@@ -1901,7 +1932,16 @@ textarea {
  * to the confirmations, where the decision is actually made — see the archive
  * note in project.tsx, and the delete panel, which counts what it will destroy.
  */
-.barmenu button {
+/**
+ * A menu row. Not the buttons inside a confirmation that has opened in one.
+ *
+ * `:not(.btn)` because this rule is `(0,1,1)` and `.btn-primary` is `(0,1,0)` —
+ * so a filled button placed in a menu lost its background, its border and its
+ * colour to a rule about rows and came out as bare text. Excluding `.btn` here
+ * fixes it once, at the source, rather than restating every variant at a higher
+ * specificity for each place a confirmation can appear.
+ */
+.barmenu button:not(.btn) {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -1919,11 +1959,11 @@ textarea {
   cursor: pointer;
 }
 /* the words, which take the space the mark does not */
-.barmenu button > span {
+.barmenu button:not(.btn) > span {
   flex: 1;
   min-width: 0;
 }
-.barmenu button > svg {
+.barmenu button:not(.btn) > svg {
   flex: none;
   width: 20px;
   height: 20px;
@@ -1978,12 +2018,12 @@ textarea {
 .barmenu button.danger {
   color: var(--critical);
 }
-.barmenu button:disabled {
+.barmenu button:not(.btn):disabled {
   opacity: 0.5;
   cursor: default;
 }
 @media (hover: hover) {
-  .barmenu button:not(:disabled):hover {
+  .barmenu button:not(.btn):not(:disabled):hover {
     background: var(--parchment);
   }
 }
@@ -2786,46 +2826,24 @@ textarea {
  * `nowrap` on the row and no wrapping inside either label, so a longer
  * translation shrinks the padding rather than breaking the line.
  */
-.vermenu .delconfirm .iacts {
-  margin-top: var(--sp-xxs);
-  flex-wrap: nowrap;
-}
+
 /**
- * Smaller than a CTA, because they are answers inside a menu.
+ * Cancel is neutral in every confirmation, for the reason the affirmative is.
  *
- * `.btn` is 44px and 17px type — the size of the thing you press on a sheet,
- * standing next to 44px discs. In a 300px popover it is the size of the popover
- * itself, and two of them turn a question into a landing page.
- *
- * 36 and 14.5. **Below the 44px touch floor deliberately**, and the menu had
- * already made that call: its own delete bins are 32px and its rows are 53. A
- * confirmation reached by pressing a 32px bin cannot then insist on 44px
- * answers — the target that got you here was smaller than both.
+ * `.btn-quiet` is an accent-outlined pill, and the accent means *a person is
+ * needed here*. Backing out of a question you already answered by opening it is
+ * not that. It began scoped to the danger blocks — where an orange outline on a
+ * red wash also put two hues in one small object — and there was never a reason
+ * the ordinary ones should differ: once the affirmative went to ink, Cancel was
+ * the only orange left in an archive confirmation, which made the way *out* the
+ * loudest thing in it.
  */
-.vermenu .delconfirm .iacts .btn {
-  /* Half the block each. Two pills floating left in a box they do not fill
-     leaves a ragged edge down the right of the only red thing in the menu; at
-     full width the block reads as one object with two answers in it, and each
-     target grows by half again. */
-  flex: 1;
-  min-height: 36px;
-  padding: 6px 12px;
-  font-size: 14.5px;
-}
-/**
- * Cancel goes neutral inside a danger confirm.
- *
- * `.btn-quiet` is an accent-outlined pill, which on the critical wash puts two
- * hues in one small block and makes the way out as coloured as the thing it
- * backs out of. One colour speaks here and it is the red; the other button is
- * the ordinary, unremarkable answer and should look like it.
- */
-.delconfirm.danger .btn-quiet {
+.delconfirm .btn-quiet {
   color: var(--ink-2);
   border-color: var(--hairline);
 }
 @media (hover: hover) {
-  .delconfirm.danger .btn-quiet:hover {
+  .delconfirm .btn-quiet:hover {
     border-color: var(--ink-3);
     background: var(--canvas);
   }
@@ -6510,35 +6528,52 @@ dialog::backdrop {
 .delconfirm.danger {
   background: var(--critical-wash);
 }
-/**
- * A row inside the block lifts to white on hover, rather than down to parchment.
- *
- * `.barmenu button:hover` is `--parchment`, which is now the ground these two
- * are standing on — the hover was invisible the moment the block was tinted.
- * Inverting it is the same idea the surface itself uses: white is the thing in
- * front, parchment is the thing behind.
- */
-@media (hover: hover) {
-  .delconfirm > button:not(:disabled):hover {
-    background: var(--canvas);
-  }
-}
 /* On the response toolbar it is the whole popover rather than a block at the
    foot of a menu. It keeps the tint — a panel that is entirely one recessed
    surface still reads as recessed, and it is the same object either way. */
 .barmenu > .delconfirm:only-child {
   margin-top: 0;
 }
+/**
+ * A confirmation's two answers, everywhere one is asked.
+ *
+ * One row, half the block each, smaller than a CTA.
+ *
+ * **Smaller on purpose.** `.btn` is 44px and 17px type — the size of the thing
+ * you press on a sheet, standing beside 44px discs. Inside a 300px popover it is
+ * nearly the width of the popover, and two of them turn a question into a
+ * landing page. These are 36 and 14.5, which is below the 44px touch floor and
+ * is the call the menus around them already made: the version menu's delete bins
+ * are 32px and `.barmenu`'s rows are 44 with 20px marks. A confirmation reached
+ * by pressing a 32px bin cannot then insist its answers be 44.
+ *
+ * **Filling the block, not floating in it.** Two pills against a ragged right
+ * edge read as leftovers; at half each the block is one object with two answers
+ * in it, and each target gains half its width again.
+ *
+ * The verbs lost their objects when they moved in here — *Archive project* is
+ * *Archive*, *Delete permanently* is *Delete*. The sentence above each one names
+ * what is going and the row that opened it named the act; a button repeating
+ * both is the third telling.
+ */
+.delconfirm .iacts {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--sp-xs);
+  margin-top: var(--sp-xxs);
+}
+.delconfirm .iacts .btn {
+  flex: 1;
+  min-height: 36px;
+  padding: 6px 12px;
+  font-size: 14.5px;
+}
+
 .delconfirm p {
   margin: 0;
   font-size: 13px;
   line-height: 1.6;
   color: var(--ink-2);
-}
-/* tighter than a menu row, which is spaced for a list of choices rather than
-   for two answers to one question */
-.delconfirm > button {
-  padding: 7px 11px;
 }
 .delconfirm label {
   font-size: 13px;

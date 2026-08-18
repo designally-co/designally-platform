@@ -382,17 +382,21 @@ export default function AnswersSheet({
                 <div className="delconfirm danger">
                   {/* the button says permanently; this says what goes */}
                   <p>Removes every answer {person.name} gave.</p>
-                  <button
-                    className="danger"
-                    disabled={pending}
-                    onClick={() => {
-                      close();
-                      remove();
-                    }}
-                  >
-                    {pending ? 'Deleting…' : 'Delete permanently'}
-                  </button>
-                  <button onClick={close}>Cancel</button>
+                  <div className="iacts">
+                    <button
+                      className="btn btn-danger"
+                      disabled={pending}
+                      onClick={() => {
+                        close();
+                        remove();
+                      }}
+                    >
+                      {pending ? 'Deleting…' : 'Delete'}
+                    </button>
+                    <button className="btn btn-quiet" onClick={close}>
+                      Cancel
+                    </button>
+                  </div>
                 </div>
               )}
             </MoreMenu>

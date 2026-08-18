@@ -240,7 +240,9 @@ export default function ProjectSheet({
           compacts a menu row, and these two are buttons on a sheet standing next
           to other buttons on the same sheet. */}
       <div className="iacts">
-        <button className="btn btn-primary" disabled={pending} onClick={generate}>
+        {/* Ink, like the other two confirmations: a person pressing this has
+            already been asked. See `.btn-ink`. */}
+        <button className="btn btn-ink" disabled={pending} onClick={generate}>
           {pending ? 'Working…' : `Close and generate from ${chosen} ${chosen === 1 ? 'answer' : 'answers'}`}
         </button>
         <button className="btn btn-quiet" onClick={() => setConfirmGenerate(false)}>
@@ -356,16 +358,21 @@ export default function ProjectSheet({
               (confirming === 'close' ? (
                 <div className="delconfirm">
                   <p>The analysis is written now. You can reopen it afterwards.</p>
-                  <button
-                    disabled={pending}
-                    onClick={() => {
-                      close();
-                      run(() => closeCollection(p.surveyId!), 'Collection closed.');
-                    }}
-                  >
-                    {pending ? 'Closing…' : 'Close collection'}
-                  </button>
-                  <button onClick={() => setConfirming(null)}>Cancel</button>
+                  <div className="iacts">
+                    <button
+                      className="btn btn-ink"
+                      disabled={pending}
+                      onClick={() => {
+                        close();
+                        run(() => closeCollection(p.surveyId!), 'Collection closed.');
+                      }}
+                    >
+                      {pending ? 'Closing…' : 'Close'}
+                    </button>
+                    <button className="btn btn-quiet" onClick={() => setConfirming(null)}>
+                      Cancel
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <button onClick={() => setConfirming('close')}>
@@ -391,16 +398,21 @@ export default function ProjectSheet({
                  after one of the ways of making it. */
               <div className="delconfirm">
                 <p>Nothing is deleted — it stays searchable.</p>
-                <button
-                  disabled={pending}
-                  onClick={() => {
-                    close();
-                    run(() => archiveProject(p.id), `${p.clientName} archived.`);
-                  }}
-                >
-                  {pending ? 'Archiving…' : 'Archive project'}
-                </button>
-                <button onClick={() => setConfirming(null)}>Cancel</button>
+                <div className="iacts">
+                  <button
+                    className="btn btn-ink"
+                    disabled={pending}
+                    onClick={() => {
+                      close();
+                      run(() => archiveProject(p.id), `${p.clientName} archived.`);
+                    }}
+                  >
+                    {pending ? 'Archiving…' : 'Archive'}
+                  </button>
+                  <button className="btn btn-quiet" onClick={() => setConfirming(null)}>
+                    Cancel
+                  </button>
+                </div>
               </div>
             ) : (
               <button onClick={() => setConfirming('archive')}>
@@ -470,26 +482,29 @@ export default function ProjectSheet({
                     }
                   }}
                 />
-                <button
-                  className="danger"
-                  /* unavailable until the name is right, rather than failing
-                     after the press */
-                  disabled={pending || !matches}
-                  onClick={() => {
-                    close();
-                    run(() => deleteProject(p.id, typed), `${p.clientName} deleted.`);
-                  }}
-                >
-                  {pending ? 'Deleting…' : 'Delete permanently'}
-                </button>
-                <button
-                  onClick={() => {
-                    setConfirming(null);
-                    setTyped('');
-                  }}
-                >
-                  Cancel
-                </button>
+                <div className="iacts">
+                  <button
+                    className="btn btn-danger"
+                    /* unavailable until the name is right, rather than failing
+                       after the press */
+                    disabled={pending || !matches}
+                    onClick={() => {
+                      close();
+                      run(() => deleteProject(p.id, typed), `${p.clientName} deleted.`);
+                    }}
+                  >
+                    {pending ? 'Deleting…' : 'Delete'}
+                  </button>
+                  <button
+                    className="btn btn-quiet"
+                    onClick={() => {
+                      setConfirming(null);
+                      setTyped('');
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
               </div>
             ) : (
               <button className="danger" onClick={() => setConfirming('delete')}>
