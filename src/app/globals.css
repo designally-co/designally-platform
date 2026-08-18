@@ -184,6 +184,28 @@
   --r-card: 26px;
   --r-sheet: 34px;
 
+  /**
+   * How far the sheet bar's blur ramp reaches below it.
+   *
+   * Referenced twice — by the ramp itself and by the padding that keeps content
+   * out from under it — and it is a token for that reason. It was 26px written
+   * in one place, and the scroller cleared the bar's height alone, so the first
+   * card in every sheet sat inside the ramp and came up soft.
+   */
+  --bar-ramp: 26px;
+
+  /**
+   * The sheet scrollbar's width, and the amount the body's right padding gives
+   * back to it.
+   *
+   * A scrollbar inside a scroller takes its width out of the content box, so
+   * equal left and right padding does not produce equal margins — the reading
+   * column sat 25 from the left and 33 from the right. Both places read this,
+   * so the compensation cannot fall out of step with the bar it compensates
+   * for. It is the same lesson as `--bar-ramp`: a number used twice is a token.
+   */
+  --scrollbar: 8px;
+
 
   /**
    * Where a wide screen starts reading.
@@ -2556,9 +2578,10 @@ dialog::backdrop {
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
-  /* clears the bar laid over it — the same three numbers `.sheet-top` is
-     padded by, so the two cannot drift apart */
-  padding-top: calc(16px + 44px + var(--sp-lg));
+  /* clears the bar laid over it *and* the ramp beneath it — the bar's own three
+     numbers plus `--bar-ramp`, so none of the three can drift apart. Without
+     the ramp in this sum the first card sat in the blur and came up soft. */
+  padding-top: calc(16px + 44px + var(--sp-lg) + var(--bar-ramp));
 }
 
 /**
@@ -2608,7 +2631,7 @@ dialog::backdrop {
  * different scrollbar, not a broken one.
  */
 .sheetscroll::-webkit-scrollbar {
-  width: 8px;
+  width: var(--scrollbar);
 }
 .sheetscroll::-webkit-scrollbar-track {
   background: transparent;
@@ -2751,7 +2774,7 @@ dialog::backdrop {
   left: 0;
   right: 0;
   top: 100%;
-  height: 26px;
+  height: var(--bar-ramp);
   pointer-events: none;
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
@@ -2880,10 +2903,38 @@ dialog::backdrop {
     color: var(--ink);
   }
 }
+/**
+ * The body is inset further than the bar, and that is the right way round.
+ *
+ * They shared 16px so the chevron and the first card sat on one left edge. A
+ * disc wants that — it is a 44px target whose whole job is to be reachable at
+ * the corner — and a column of text does not: at 16 on a 760px sheet the
+ * answers ran to the edges with nothing holding them.
+ *
+ * `--sp-lg` here against the bar's 16 costs eight pixels of alignment and buys
+ * the reading a margin. Toolbar controls sitting slightly outside the text
+ * column is the ordinary arrangement, not a defect — it is the same relationship
+ * a book's running head has with its body.
+ *
+ * No top padding. Clearing the bar and its ramp is the scroller's job, and
+ * doing it in two places is how the two drift.
+ */
 .sheet-body {
-  /* the sides match the bar's, so the header and the content share one left
-     edge — see `.sheet-top` */
-  padding: 8px 16px 72px;
+  padding: 0 var(--sp-lg) 72px;
+}
+/**
+ * The right padding gives back what the scrollbar took.
+ *
+ * Only where the scrollbar is ours to measure: `::-webkit-scrollbar` is the
+ * thing that fixes its width at `--scrollbar`, so the compensation is scoped to
+ * browsers that support it. Firefox's thin scrollbar is its own width and gets
+ * symmetric padding instead — a few pixels out, rather than a guess at a number
+ * the browser never told us.
+ */
+@supports selector(::-webkit-scrollbar) {
+  .sheet-body {
+    padding-right: calc(var(--sp-lg) - var(--scrollbar));
+  }
 }
 /* No grabber. iOS puts one at the top of every dismissible sheet, but there it
    is a control — the sheet drags. This one closes by the chevron and by Escape,
