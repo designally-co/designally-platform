@@ -1,12 +1,19 @@
 /**
  * The chevron. One mark, drawn once.
  *
- * It was defined inside the survey form and is shared from 17 August 2026,
- * when the team app's sheets took a back control of their own — Apple's HIG:
- * "Use the standard Back and Close buttons… Prefer the standard symbols for
- * each, and don't use a text label that says Back or Close." Two chevrons drawn
- * twice would have drifted, and this one carries an optical correction that
- * would not have survived being redrawn from scratch.
+ * The survey's, and only the survey's, from 18 August 2026. It was shared with
+ * the team app's sheets for a day; those took Lucide's `ChevronLeft` through the
+ * same wrapper as every other mark on that toolbar, because at 24px and stroke
+ * 2.5 this one sat beside three 20px marks at 1.9 and read as a size larger —
+ * see `BackMark` in icons.tsx.
+ *
+ * It stays here because the survey's back control is a 52px disc and DESIGN.md
+ * §5 scales the glyph with it: 24px there is a decision, not this value left
+ * unexamined. And it keeps Lucide out of a bundle answered on a phone, in Thai,
+ * on a poor connection.
+ *
+ * The optical correction below went with the mark to the team app as a 1px
+ * transform in CSS — the finding is about the shape, not the drawing.
  */
 export default function Chevron({ up, back }: { up?: boolean; back?: boolean }) {
   return (

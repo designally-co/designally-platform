@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, type ReactNode } from 'react';
 
-import Chevron from '../chevron';
+import { BackMark } from '../icons';
 
 /**
  * A full-screen dialog on the parchment page, entering with an 18px rise.
@@ -76,7 +76,7 @@ export default function Sheet({
       <div className={`sheet${narrow ? ' narrow' : ''}`}>
         <div className="sheet-top">
           <button className="back" onClick={onClose} aria-label={backLabel}>
-            <Chevron back />
+            <BackMark />
           </button>
           <span className="t">{title}</span>
           <div className="bartrail">{actions}</div>

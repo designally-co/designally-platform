@@ -16,10 +16,11 @@
  * it is the one place to change if a mark is ever wrong.
  *
  * A single wrapper sets size and weight, so nothing downstream can drift: 20px
- * on a 24 grid at `strokeWidth 1.9`, which is the weight `chevron.tsx` draws
- * and the reason a toolbar disc, a menu row and the survey's back control read
- * as one family. `aria-hidden` on all of them — every one sits inside a control
- * whose accessible name is text.
+ * on a 24 grid at `strokeWidth 1.9`. Every mark in the team app goes through it,
+ * which is what makes a toolbar disc and a menu row one family — and what
+ * caught the back chevron, the one control that was not going through it and
+ * was 24px at 2.5 beside them. `aria-hidden` on all of them: each sits inside a
+ * control whose accessible name is text.
  *
  * **`chevron.tsx` stays hand-drawn, and that is deliberate.** It is the
  * survey's only mark, and the survey is answered on a phone, in Thailand, on a
@@ -32,6 +33,7 @@
 import {
   Archive,
   Check,
+  ChevronLeft,
   Download,
   FileText,
   Link as LinkIcon,
@@ -49,8 +51,9 @@ import {
  *
  * 20px inside a 44px disc and beside a 14.5px menu label — the value the hand
  * drawn set used, kept so nothing shifted when the drawings changed. 1.9 rather
- * than Lucide's default 2: it is what `chevron.tsx` is drawn at, and a tenth of
- * a pixel is the difference between one family and two.
+ * than Lucide's default 2, because 1.9 is what the hand-drawn set was, and a
+ * tenth of a pixel across eleven marks is the difference between one family and
+ * two.
  */
 function mark(Icon: LucideIcon) {
   const Mark = () => <Icon size={20} strokeWidth={1.9} aria-hidden="true" />;
@@ -97,3 +100,18 @@ export const DocMark = mark(FileText);
 
 /** PDF — a printer, because the action is a print and not a save. */
 export const PrintMark = mark(Printer);
+
+/**
+ * Back, on the team sheet's leading disc.
+ *
+ * It was `chevron.tsx` — 24px at `strokeWidth 2.5` — sitting in a bar of 20px
+ * marks at 1.9. Twenty per cent larger and a third heavier than the three
+ * discs opposite it, which is a difference you see before you can name it.
+ * Through the same wrapper it is the same 20 and 1.9 as everything else.
+ *
+ * `chevron.tsx` keeps the survey, where the disc is 52px and DESIGN.md §5 says
+ * the glyph scales with it — 24px there is deliberate, not the same value left
+ * unexamined. It also keeps Lucide out of that bundle, which is the whole
+ * reason it was not replaced outright.
+ */
+export const BackMark = mark(ChevronLeft);

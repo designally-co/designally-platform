@@ -2625,6 +2625,24 @@ dialog::backdrop {
     color 0.18s,
     transform 0.12s var(--ease);
 }
+/**
+ * The chevron, nudged toward its point.
+ *
+ * `chevron.tsx` carried this as a transform and the finding came with it when
+ * the mark became Lucide's, because Lucide's is box-centred and the observation
+ * is about the shape rather than the drawing: a chevron's open end is two
+ * strokes apart and covers area, its apex is a single node covering almost
+ * none, so the perceived weight sits at the open end and a box-centred chevron
+ * reads as pushed that way. Inside a disc the apex lands near the middle and it
+ * stops being an arrow.
+ *
+ * 1px, not the 1.5 the 24px version used — the mark is 20px here, and the
+ * correction scales with it.
+ */
+.sheet-top .back svg {
+  transform: translateX(-1px);
+}
+
 .sheet-top .back:active {
   background: var(--parchment);
   color: var(--ink);
