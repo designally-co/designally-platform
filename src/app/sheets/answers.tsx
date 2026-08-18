@@ -27,22 +27,46 @@ import Sheet from './sheet';
  */
 
 /**
- * A scale answer, with the words the client was actually looking at.
+ * A scale answer, said in words.
  *
- * It read "4 of 5 · pair 1" through to "3 of 5 · pair 10" — ten numbers about
- * ten things the reader could not see. The answer stores only the pair's index,
- * so the labels have to be carried from the question; see `ReadableAnswer.pairs`.
+ * It read "4 of 5 · pair 1" — ten numbers about ten things the reader could not
+ * see. The pair labels fixed the second half of that and left the first: "2 of
+ * 5" between Serious and Fun is only meaningful if you already know that 1 is
+ * the left word, which nothing on the row said. A mark on a track said it, and
+ * a mark on a track is a thing you have to look at rather than read.
  *
- * The poles are named in the order they were on screen, and the position is
- * stated against them: `1` was the left word and `points` was the right one, so
- * "2 of 5" between Serious and Fun means nearer Serious. Reading it any other
- * way is a mistake nothing on the old row could prevent.
+ * So the row says which end, in words:
  *
- * English only. The client chose their language, the team reads in one.
+ *     Serious – Fun             toward Serious     2 of 5
+ *     Corporate – Friendly      at Friendly        5 of 5
+ *     Realistic – Idealistic    balanced           3 of 5
  *
- * A pair the question no longer has still renders — a survey answered at an
- * earlier version can carry an index this version dropped, and losing the
- * number would be worse than showing it bare.
+ * The three readings are the only ones the data supports. An endpoint is `at`,
+ * because the client chose the last available point and there is nothing beyond
+ * it; the exact middle is `balanced`; everything else is `toward`. No degree
+ * words — "strongly", "fairly" — because the scale has five points and no
+ * definition of what any of them mean, and inventing one here would be the view
+ * putting words in the client's mouth. How far is what the number is for, and
+ * it stays on the row.
+ *
+ * Generalises past this questionnaire: version 2 ran these 0–10, and a scale
+ * with an even number of points has no exact middle, so nothing is `balanced`
+ * on one.
+ *
+ * English only. The client chose their language; the team reads in one.
+ */
+function reading(point: number, points: number, leftEn: string, rightEn: string) {
+  if (point <= 1) return `at ${leftEn}`;
+  if (point >= points) return `at ${rightEn}`;
+  /* exact middle only — 3 of 5 is balanced, nothing in 4 points is */
+  if (points % 2 === 1 && point === (points + 1) / 2) return 'balanced';
+  return point < (points + 1) / 2 ? `toward ${leftEn}` : `toward ${rightEn}`;
+}
+
+/**
+ * A pair the question no longer carries still renders as its number: a survey
+ * answered at an earlier version can hold an index this version dropped, and
+ * losing the reading is worse than showing it unnamed.
  */
 function Scale({
   value,
@@ -56,17 +80,15 @@ function Scale({
     <ul className="ansscale">
       {entries.map(([index, point]) => {
         const pair = pairs?.[Number(index)];
-        /* how far along, so the eye can rank ten rows without doing the
-           arithmetic ten times. 1 sits at the left word, `points` at the right. */
-        const along = value.points > 1 ? (point - 1) / (value.points - 1) : 0.5;
         return (
           <li key={index}>
             {pair ? (
-              <span className="pair">
-                <b>{pair.left_en}</b>
-                <i style={{ '--at': along } as React.CSSProperties} aria-hidden="true" />
-                <b>{pair.right_en}</b>
-              </span>
+              <>
+                <span className="pair">
+                  {pair.left_en} – {pair.right_en}
+                </span>
+                <span className="lean">{reading(point, value.points, pair.left_en, pair.right_en)}</span>
+              </>
             ) : (
               <span className="pair unlabelled">pair {Number(index) + 1}</span>
             )}
