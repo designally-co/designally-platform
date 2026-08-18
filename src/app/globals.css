@@ -2548,12 +2548,17 @@ dialog::backdrop {
  */
 .sheet {
   overflow: hidden;
+  /* the bar is positioned against this — see `.sheet-top` */
+  position: relative;
 }
 .sheetscroll {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
+  /* clears the bar laid over it — the same three numbers `.sheet-top` is
+     padded by, so the two cannot drift apart */
+  padding-top: calc(16px + 44px + var(--sp-lg));
 }
 
 /**
@@ -2594,10 +2599,10 @@ dialog::backdrop {
  * `--sp-md` under the bar and `--sp-lg` above the floor gives a shorter thumb
  * as well as a shorter rail, on the same scroll.
  *
- * The top margin is derived, not measured — `--sp-lg` twice is the bar's own
- * padding and 44px is the disc it is built around, which is what sets its
- * height. A wrapped title grows the bar past this and the track starts a few
- * pixels high; nothing overlaps and nothing breaks.
+ * The top margin is derived, not measured — the bar's own padding above and
+ * below plus the 44px disc it is built around, which is what sets its height.
+ * A wrapped title grows the bar past this and the track starts a few pixels
+ * high; nothing overlaps and nothing breaks.
  *
  * Firefox gets the `scrollbar-width: thin` above and no inset. It is a
  * different scrollbar, not a broken one.
@@ -2607,7 +2612,11 @@ dialog::backdrop {
 }
 .sheetscroll::-webkit-scrollbar-track {
   background: transparent;
-  margin: calc(var(--sp-lg) * 2 + 44px + var(--sp-md)) 0 var(--sp-lg);
+  /* the bar's own three numbers — 16 above the disc, the 44px disc, 24 below —
+     plus `--sp-md` of inset. It has to be re-derived whenever `.sheet-top`'s
+     padding changes, which is the cost of a track that starts under a bar CSS
+     cannot measure. */
+  margin: calc(16px + 44px + var(--sp-lg) + var(--sp-md)) 0 var(--sp-lg);
 }
 .sheetscroll::-webkit-scrollbar-thumb {
   background: var(--fill);
@@ -2666,14 +2675,44 @@ dialog::backdrop {
  * surface behaves differently. The Edge under it already says where the bar
  * ends.
  *
- * The padding is equal on all four sides, so the discs have the same air above
- * them as beside them — 15px against 28px read as buttons pushed up against the
- * top of the sheet. `--sp-lg`, which the body's own side padding now matches,
- * so the chevron sits on the same left edge as everything under it.
+ * 16 on three sides and 24 at the foot, asked for 18 August 2026.
+ *
+ * Equal on top and both sides is the part that matters and is kept: 15 against
+ * 28 read as buttons shoved up against the top of the sheet. Tighter at 16 the
+ * bar is 84px rather than 92, which on a sheet inset to 88dvh is eight pixels
+ * back to the content.
+ *
+ * The foot keeps 24 because it is not the same measurement. Above and beside
+ * the discs is air around a control; below them is the gap before the first
+ * thing you read, and the blur ramp lives in it.
+ *
+ * 16 is not on the spacing scale — `--sp-sm` is 12 and `--sp-md` is 17 — so it
+ * is written as a literal rather than borrowed from a token that means
+ * something else.
  */
 .sheet-top {
-  position: sticky;
+  /**
+   * Laid over the scroller rather than pinned inside it.
+   *
+   * Sticky-inside-the-scroller made content run under the bar, which is what it
+   * is for — and put the scrollbar inside the bar's own box, so its right
+   * padding was 16 plus an 8px gutter while its left was 16. The trailing discs
+   * sat eight pixels further from the edge than the chevron.
+   *
+   * Absolute against the sheet, the bar spans the full width and its two side
+   * paddings measure against the same edges. The scroller keeps the scrollbar
+   * and clears the bar with a matching `padding-top`; content still passes
+   * beneath, because the bar is painted over it rather than sitting above it in
+   * the flow.
+   *
+   * The height is deterministic — 16 + the 44px disc + 24 — because the title's
+   * name line is `nowrap` with an ellipsis and its second line is one short
+   * string. That is what lets a padding stand in for a measurement.
+   */
+  position: absolute;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 2;
   /* opaque under the controls themselves — a line of a client's answer showing
      through the middle of a title is not the effect */
@@ -2681,7 +2720,7 @@ dialog::backdrop {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: var(--sp-lg);
+  padding: 16px 16px 24px;
 }
 
 /**
@@ -2763,6 +2802,11 @@ dialog::backdrop {
    heading. `--ink-3` at 6.02:1. */
 .sheet-top .t i {
   font-style: normal;
+  /* one line, like the name above it — the bar's height is a constant the
+     scroller's padding depends on */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-size: 12.5px;
   font-weight: 400;
   line-height: 1.45;
@@ -2839,7 +2883,7 @@ dialog::backdrop {
 .sheet-body {
   /* the sides match the bar's, so the header and the content share one left
      edge — see `.sheet-top` */
-  padding: 32px var(--sp-lg) 72px;
+  padding: 8px 16px 72px;
 }
 /* No grabber. iOS puts one at the top of every dismissible sheet, but there it
    is a control — the sheet drags. This one closes by the chevron and by Escape,
