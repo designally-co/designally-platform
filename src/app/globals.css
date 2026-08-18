@@ -6528,10 +6528,19 @@ dialog::backdrop {
 .delconfirm.danger {
   background: var(--critical-wash);
 }
-/* On the response toolbar it is the whole popover rather than a block at the
-   foot of a menu. It keeps the tint — a panel that is entirely one recessed
-   surface still reads as recessed, and it is the same object either way. */
-.barmenu > .delconfirm:only-child {
+/**
+ * No margin when there is nothing above it to be separated from.
+ *
+ * `.delconfirm`'s 4px `margin-top` holds it off the menu row it opens under. As
+ * the menu's first child there is no such row, and the 4px becomes padding the
+ * menu did not ask for: the block sat 11px from the top while the last row sat
+ * 7px from the bottom, so a two-item menu was visibly heavier at one end.
+ *
+ * `:first-child` rather than `:only-child`, which is what this was — it covered
+ * the response toolbar, where the confirmation is the whole popover, and missed
+ * the archive confirmation, which is first of two.
+ */
+.barmenu > .delconfirm:first-child {
   margin-top: 0;
 }
 /**
