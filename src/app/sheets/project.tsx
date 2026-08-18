@@ -216,7 +216,17 @@ export default function ProjectSheet({
           )}
         </MoreMenu>
       )}
-      <MoreMenu>
+      {/* Closing the menu forgets which confirmation was open. It is held on
+          the sheet rather than in the menu, so without this a person who opened
+          Delete, thought better of it and clicked away found it still expanded —
+          and a red panel waiting behind a button they pressed for something
+          else. */}
+      <MoreMenu
+        onClose={() => {
+          setConfirming(null);
+          setTyped('');
+        }}
+      >
         {(close) => (
           <>
             {!p.closedOn && p.surveyId && p.answers > 0 && (

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 
 import { MoreMark } from './icons';
 
@@ -30,6 +30,7 @@ export default function MoreMenu({
   label = 'More',
   icon,
   danger = false,
+  onClose,
   children,
 }: {
   label?: string;
@@ -44,22 +45,42 @@ export default function MoreMenu({
   icon?: ReactNode;
   /** the control is destructive, and the mark says so before it is pressed */
   danger?: boolean;
+  /**
+   * The menu has shut — by the button, by Escape, or by a click away.
+   *
+   * A caller holding state *inside* the menu needs this, and the project sheet
+   * does: which confirmation is expanded lives on the sheet, not here, so
+   * closing the menu left Archive or Delete still open behind it and the next
+   * press reopened onto an expanded destructive panel nobody had asked for
+   * twice.
+   *
+   * Fires only on a real close, never on mount.
+   */
+  onClose?: () => void;
   children: (close: () => void) => ReactNode;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
+  /* One way out, so the three that exist — the button, Escape, a click away —
+     cannot each remember to tell the caller and one of them forget. */
+  const shut = useCallback(() => {
+    if (!open) return;
+    setOpen(false);
+    onClose?.();
+  }, [open, onClose]);
+
   useEffect(() => {
     if (!open) return;
     const away = (e: MouseEvent) => {
-      if (!ref.current?.contains(e.target as Node)) setOpen(false);
+      if (!ref.current?.contains(e.target as Node)) shut();
     };
     const esc = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         /* the sheet is a native <dialog>, which closes on Escape too — stop it
            here so the first press dismisses the menu and not the whole sheet */
         e.stopPropagation();
-        setOpen(false);
+        shut();
       }
     };
     document.addEventListener('mousedown', away);
@@ -68,7 +89,7 @@ export default function MoreMenu({
       document.removeEventListener('mousedown', away);
       document.removeEventListener('keydown', esc, true);
     };
-  }, [open]);
+  }, [open, shut]);
 
   return (
     <div className="moreslot" ref={ref}>
@@ -78,11 +99,11 @@ export default function MoreMenu({
         title={label}
         aria-expanded={open}
         aria-haspopup="true"
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => (open ? shut() : setOpen(true))}
       >
         {icon ?? <MoreMark />}
       </button>
-      {open && <div className="barmenu">{children(() => setOpen(false))}</div>}
+      {open && <div className="barmenu">{children(shut)}</div>}
     </div>
   );
 }
