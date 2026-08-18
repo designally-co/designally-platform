@@ -2388,6 +2388,19 @@ label.f span {
 /* ============================================================
    Sheets
    ============================================================ */
+/**
+ * The dialog is the frame; the sheet centres in it.
+ *
+ * The sheet had `margin: 6dvh auto`, which is a top offset and not a position:
+ * a short sheet — a New survey form, a project with two respondents — sat 6dvh
+ * from the top with the rest of the screen empty under it, hanging rather than
+ * placed. Centring is the same 6dvh when the content is tall enough to reach
+ * `max-height`, and correct when it is not.
+ *
+ * `align-items: center` on a flex parent can trap an over-tall child above the
+ * scroll origin. It cannot here: the sheet caps at 88dvh and clips, and the
+ * scrolling happens on `.sheetscroll` inside it.
+ */
 dialog {
   border: 0;
   padding: 0;
@@ -2396,6 +2409,9 @@ dialog {
   max-height: none;
   width: 100%;
   height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 dialog::backdrop {
   background: rgba(0, 0, 0, 0.32);
@@ -2425,7 +2441,9 @@ dialog::backdrop {
   background: var(--parchment);
   width: min(760px, 100%);
   max-height: 88dvh;
-  margin: 6dvh auto;
+  /* no margin — the dialog centres it, and 6dvh of top margin was what kept a
+     short sheet pinned to the top of the screen */
+  margin: 0;
   display: flex;
   flex-direction: column;
   border-radius: var(--r-sheet);
@@ -2494,9 +2512,15 @@ dialog::backdrop {
  * side of the header, which is a rail beside a title that never scrolls.
  *
  * `::-webkit-scrollbar-track` takes a margin, and that is the whole trick: the
- * track begins where the bar ends and stops 12px short of the bottom, so the
- * thumb travels only beside the part that actually moves and never reaches the
- * 34px corners.
+ * track begins below the bar and stops well short of the bottom, so the thumb
+ * travels only beside the part that actually moves and never reaches the 34px
+ * corners.
+ *
+ * **Inset at both ends, and that is what shortens the thumb.** A thumb's length
+ * is the browser's arithmetic — visible over total, times the track — and no
+ * property caps it. The track is the only term you can set, so a rail inset
+ * `--sp-md` under the bar and `--sp-lg` above the floor gives a shorter thumb
+ * as well as a shorter rail, on the same scroll.
  *
  * The top margin is derived, not measured — `--sp-lg` twice is the bar's own
  * padding and 44px is the disc it is built around, which is what sets its
@@ -2511,7 +2535,7 @@ dialog::backdrop {
 }
 .sheetscroll::-webkit-scrollbar-track {
   background: transparent;
-  margin: calc(var(--sp-lg) * 2 + 44px) 0 12px;
+  margin: calc(var(--sp-lg) * 2 + 44px + var(--sp-md)) 0 var(--sp-lg);
 }
 .sheetscroll::-webkit-scrollbar-thumb {
   background: var(--fill);
@@ -2541,9 +2565,12 @@ dialog::backdrop {
  */
 @media (max-width: 620px) {
   .sheet {
+    /* full bleed, so there is nothing to centre — `width: 100%` and both
+       heights at 100% fill the dialog whatever its alignment says */
+    width: 100%;
     max-height: 100%;
     min-height: 100%;
-    margin: 0 auto;
+    margin: 0;
     border-radius: 0;
     border: 0;
   }
