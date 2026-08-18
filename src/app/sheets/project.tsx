@@ -458,7 +458,7 @@ export default function ProjectSheet({
              * and the button did another. Branch on the kind.
              */}
             <button
-              className="btn btn-primary btn-sm"
+              className="btn btn-primary"
               disabled={pending || only?.length === 0}
               onClick={() => {
                 if (p.action!.kind === 'review-insights') return onOpenInsights();

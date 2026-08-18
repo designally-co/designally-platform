@@ -360,7 +360,12 @@ textarea {
   cursor: pointer;
   border: 1px solid transparent;
   border-radius: var(--r-pill);
-  padding: 11px 22px;
+  /* 9, not 11. `min-height: 44` was never binding: a 17px label sets a 24px
+     line box, and 24 + 22 + 2 of border came to 48 — so every CTA stood 4px
+     taller than the 44px discs it sits beside in the toolbar. 24 + 18 + 2 is
+     44, and the min-height is now the floor it was written to be rather than a
+     number the padding walked past. */
+  padding: 9px 22px;
   min-height: 44px;
   white-space: nowrap;
   transition:
@@ -5211,7 +5216,12 @@ dialog::backdrop {
 .sharelink {
   flex: 1;
   min-width: 0;
-  padding: 9px 11px;
+  /* the same 44 as the button beside it, so the row has one height rather than
+     a box and a control that nearly line up */
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
   border: 1px solid var(--hairline);
   border-radius: var(--r-sm);
   background: var(--parchment);
@@ -5226,9 +5236,12 @@ dialog::backdrop {
 /* Copy is the mark alone now that it stands beside the link rather than under
    it — the word cost the line the characters that say which link this is, and
    the mark still turns into a tick, which is the part that says it worked. */
+/* A disc, and the same disc `.iconbtn` is — it is opened from one, sits a
+   centimetre from one, and at 40 against their 44 the panel read as a slightly
+   different set of controls rather than the same ones. */
 .sharecopy {
   flex: none;
-  width: 40px;
+  width: 44px;
   padding: 0;
   gap: 0;
 }
@@ -5238,9 +5251,11 @@ dialog::backdrop {
   align-items: center;
   justify-content: center;
   gap: 7px;
-  /* 40px, above the 44px touch floor's sibling minimum for a pointer-first
-     surface — this sheet is the team app, which is a desk */
-  min-height: 40px;
+  /* 44, matching `.iconbtn` and `.btn`. It was 40 on the argument that this
+     sheet is used at a desk and the touch floor is a phone's rule — true, and
+     beside the point: what decides the number here is the controls it stands
+     next to, and every one of those is 44. */
+  min-height: 44px;
   padding: 0 13px;
   border: 1px solid var(--hairline);
   border-radius: var(--r-pill);

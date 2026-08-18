@@ -129,7 +129,7 @@ export default function Toolbar({
               </>
             )}
           </MoreMenu>
-          <button className="btn btn-primary btn-sm" onClick={onNewSurvey}>
+          <button className="btn btn-primary" onClick={onNewSurvey}>
             New survey
           </button>
         </div>

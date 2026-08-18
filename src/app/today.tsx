@@ -133,7 +133,7 @@ export default function Today({
                 </div>
                 <div className="act">
                   <button
-                    className="btn btn-primary btn-sm"
+                    className="btn btn-primary"
                     disabled={writing}
                     onClick={() => {
                       if (p.action!.kind === 'review-insights') return setOpenInsights(p.id);

@@ -153,7 +153,7 @@ export default function NewSurveySheet({
           <p className="f">Send this link to the client&apos;s main contact</p>
           <div className="linkbox">
             <span>{forDisplay(full)}</span>
-            <button className="btn btn-quiet btn-sm" style={{ marginLeft: 'auto' }} onClick={copy}>
+            <button className="btn btn-quiet" style={{ marginLeft: 'auto' }} onClick={copy}>
               {copied ? 'Copied' : 'Copy'}
             </button>
           </div>

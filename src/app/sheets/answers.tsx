@@ -146,6 +146,24 @@ function Value({ value, pairs }: { value: AnswerValue; pairs?: ReadableAnswer['p
   }
 }
 
+/**
+ * When a response was submitted, for the sheet's bar.
+ *
+ * Date and time, not a relative "2 days ago": five responses to one survey
+ * arrive within a week of each other and "3 days ago" against "4 days ago" is
+ * harder to order at a glance than two dates. Local formatting, because the
+ * team reads these in Bangkok.
+ */
+function submitted(at: Date) {
+  return new Date(at).toLocaleString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
 function Answer({ a }: { a: ReadableAnswer }) {
   return (
     <li className={a.value ? 'ansrow' : 'ansrow blank'}>
@@ -283,7 +301,30 @@ export default function AnswersSheet({
 
   return (
     <Sheet
-      title={`What ${clientName} said`}
+      /**
+       * Whose answers, and when they were given.
+       *
+       * It read "What ARUN+ said" — the *client's* name, on a sheet that shows
+       * one person. Five respondents from one client all carried the same
+       * title, so the bar said nothing about which of them you were reading.
+       *
+       * Two lines, the shape the project sheet's bar takes: the name, and under
+       * it the moment it was submitted. The date is the second fact worth
+       * having up there because it is the one thing that orders five otherwise
+       * identical responses — who answered before the deadline, who came in
+       * after a nudge.
+       *
+       * No count of answered or blank. Every question is answered on almost
+       * every one of these, so the number is the same on all five and says
+       * nothing; where it is not, `.anssum` says so in words directly under the
+       * heading, which is where a fact that varies belongs.
+       */
+      title={
+        <>
+          <b>{person.name}</b>
+          <i>{submitted(person.submittedAt)}</i>
+        </>
+      }
       backLabel={backLabel}
       onClose={onClose}
       /**
@@ -375,11 +416,18 @@ export default function AnswersSheet({
                * was on the tab: a founder and a new hire dissenting is not the
                * same finding twice.
                */}
-              <h3 className="ansname">
-                {p.name}
-                {p.role && <span>{p.role}</span>}
-                {p.email && <span>{p.email}</span>}
-              </h3>
+              {/* Role and email only. The name moved to the bar, which is
+                  sticky and survives the scroll — repeating it here is the
+                  stutter `.pd-head` was removed from the project sheet for.
+                  These two stay because the bar does not carry them: the
+                  position changes what a disagreement means, and the address is
+                  how somebody gets followed up. */}
+              {(p.role || p.email) && (
+                <h3 className="ansname">
+                  {p.role && <span>{p.role}</span>}
+                  {p.email && <span>{p.email}</span>}
+                </h3>
+              )}
               {/* No name in it any more: it named the person because the only
                   other place they appeared was a tab across the top. The
                   heading is the line directly above this one now, and a Thai
