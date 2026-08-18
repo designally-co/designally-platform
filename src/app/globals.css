@@ -2410,6 +2410,32 @@ label.f span {
   margin-top: var(--sp-sm);
 }
 
+/**
+ * The new survey's code, under the link it encodes.
+ *
+ * The same object as the share panel's `.qrframe` and deliberately not the same
+ * size: there it fills a 320px popover because the job is a client holding a
+ * phone across a table, and here it sits in a form still being read, so it is
+ * capped and centred rather than stretched to the sheet's width.
+ */
+.newqr {
+  margin-top: var(--sp-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-sm);
+}
+.newqr .qrframe {
+  width: 100%;
+  max-width: 232px;
+}
+/* Reserves the square before the code arrives, so the button under it does not
+   jump the moment the server answers. */
+.newqr .qrframe.loading {
+  background: var(--parchment);
+  border-color: transparent;
+}
+
 /* ---- All projects ---- */
 .ptable {
   width: 100%;
@@ -3177,9 +3203,20 @@ dialog::backdrop {
   gap: var(--sp-xs);
 }
 /* selection is border weight, not fill — Apple's configurator grammar */
+/**
+ * A package choice — `--r-lg`, the same as the field above and below it.
+ *
+ * It was `--r-pill`, which put three radii on one short form: an 18px text
+ * input, two fully-round options, an 18px date input. DESIGN.md keeps the pill
+ * for the primary button and the disc for the survey's back control, and both
+ * are deliberate — but a pill there means *press me*, and using the same shape
+ * for a thing you choose between spends the loudest shape in the system on the
+ * quietest job on the sheet. The Create button below is still a pill, and now it
+ * is the only one, which is the point.
+ */
 .opt {
   border: 1px solid var(--hairline);
-  border-radius: var(--r-pill);
+  border-radius: var(--r-lg);
   background: var(--canvas);
   padding: 12px 18px;
   min-height: 44px;
@@ -3211,11 +3248,30 @@ dialog::backdrop {
   align-items: center;
   background: var(--canvas);
   border: 1px solid var(--hairline);
-  border-radius: var(--r-sm);
+  /* `--r-lg`, with the inputs it sits under — it was `--r-sm`, a fourth radius
+     on a sheet that now has one */
+  border-radius: var(--r-lg);
   padding: 11px 14px;
   font-size: 13.5px;
   font-family: ui-monospace, Menlo, monospace;
+}
+/**
+ * The URL wraps; the button does not.
+ *
+ * `overflow-wrap: anywhere` was on the box, so it applied to both children —
+ * and at 390px the URL took the width and broke "Copy" across two lines into an
+ * oval. It belongs to the thing that needs it: a URL has no spaces to break at,
+ * which is the whole reason the property is here. `min-width: 0` lets the span
+ * actually shrink, since a flex item's default `min-width: auto` refuses to go
+ * below its content.
+ */
+.linkbox > span {
+  min-width: 0;
   overflow-wrap: anywhere;
+}
+.linkbox > .btn {
+  flex: none;
+  margin-left: auto;
 }
 
 /* ---- past projects ---- */

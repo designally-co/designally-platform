@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 
 import type { Package } from '@/lib/db/schema';
 import { countQuestions, type LibraryBlock } from '@/lib/team/library-types';
 import { PACKAGE_BLOCKS } from '@/lib/survey/packages';
-import { createSurvey } from '@/lib/team/actions';
+import { createSurvey, surveyQr } from '@/lib/team/actions';
 import { DEFAULT_DUE_DAYS, defaultDueDay } from '@/lib/team/due';
 import { forDisplay } from '@/lib/survey/link';
 import Sheet from './sheet';
@@ -40,8 +40,30 @@ export default function NewSurveySheet({
   const [due, setDue] = useState(() => defaultDueDay());
   const [error, setError] = useState<string | null>(null);
   const [link, setLink] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [qr, setQr] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [pending, start] = useTransition();
+
+  /**
+   * The code, drawn once the survey exists.
+   *
+   * Fetched rather than bundled: the encoder is a server action so it stays out
+   * of a bundle that is loaded to *create* a survey, and most of the time nobody
+   * gets as far as a code. Failing is silent — the link above it is the thing
+   * this sheet promised, and a red line under a working URL saying the picture
+   * did not draw would be alarming about nothing.
+   */
+  useEffect(() => {
+    if (!token) return;
+    let live = true;
+    surveyQr(token).then((r) => {
+      if (live && 'svg' in r) setQr(r.svg);
+    });
+    return () => {
+      live = false;
+    };
+  }, [token]);
 
   const submit = () => {
     setError(null);
@@ -56,6 +78,7 @@ export default function NewSurveySheet({
         return;
       }
       setLink(result.link!);
+      setToken(result.token ?? null);
       onCreated(`${OPTIONS.find((o) => o.key === pkg)?.label} questionnaire attached.`);
     });
   };
@@ -152,13 +175,34 @@ export default function NewSurveySheet({
           <p className="f">Send this link to the client&apos;s main contact</p>
           <div className="linkbox">
             <span>{forDisplay(full)}</span>
-            <button className="btn btn-quiet" style={{ marginLeft: 'auto' }} onClick={copy}>
+            <button className="btn btn-quiet" onClick={copy}>
               {copied ? 'Copied' : 'Copy'}
             </button>
           </div>
           <p className="hintline">
             Opens without a login. Anyone the client forwards it to can answer.
           </p>
+
+          {/**
+           * The same link, for a camera.
+           *
+           * How this reaches a client is often a person in a room holding a
+           * laptop and a client holding a phone, and a twelve-character token
+           * read aloud is a token typed wrong. The share panel on the project
+           * has carried a code for that reason since it was built; this sheet
+           * is where the link is newest and most likely to be handed over on
+           * the spot, and it was the one place you could not.
+           */}
+          <div className="newqr">
+            {qr ? (
+              /* the encoder's SVG carries no colour of its own, so
+                 `currentColor` on the frame paints it */
+              <div className="qrframe" dangerouslySetInnerHTML={{ __html: qr }} />
+            ) : (
+              <div className="qrframe loading" aria-hidden="true" />
+            )}
+            <p className="hintline">Or let them point a camera at this.</p>
+          </div>
         </div>
       ) : (
         <button className="btn btn-primary" onClick={submit} disabled={pending}>

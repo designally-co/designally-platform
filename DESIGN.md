@@ -890,6 +890,14 @@ none 0 · sm 8 · md 11 · lg 18 · card 26 · sheet 34 · pill 9999
   happens to hold text. Fields take `lg` on both surfaces — the survey because a
   field there is a card on a page of cards, the team app because everything
   around it still wearing a pill is something you press.
+- **So did the team app's package selector, later the same day.** The New survey
+  sheet had three radii down one short form — an 18px text field, two fully-round
+  package options, an 18px date field — and the options were the odd one. A pill
+  means *press me*; a thing you choose *between* is the quietest job on that
+  sheet, and giving it the loudest shape in the system left the Create button
+  with nothing of its own to say. One radius on every field now, and exactly one
+  pill on the sheet. `.linkbox` came off `sm` in the same pass, for the same
+  reason: it was a fourth.
 - `lg` (18px) — the survey's cards: the answer field, the choice tiles, the boards
 - `sm` (8px) — compact utility buttons
 - `md` (11px) — pearl ghost capsules

@@ -62,7 +62,12 @@ async function actingUser() {
 }
 
 export type ActionResult =
-  | { ok: true; link?: string; warning?: string }
+  /* `token` rides along with `link` for the one caller that needs both: the New
+     survey sheet shows the URL to copy *and* draws its code, and `surveyQr`
+     takes the token rather than the URL — it checks the survey exists before it
+     draws anything. Splitting `/s/<token>` back apart at the call site would
+     tie that sheet to the shape of a route it does not own. */
+  | { ok: true; link?: string; token?: string; warning?: string }
   | { ok: false; error: string };
 
 export async function createSurvey(formData: FormData): Promise<ActionResult> {
@@ -173,7 +178,7 @@ export async function createSurvey(formData: FormData): Promise<ActionResult> {
     .returning();
 
   revalidatePath('/');
-  return { ok: true, link: `/s/${survey.token}` };
+  return { ok: true, link: `/s/${survey.token}`, token: survey.token };
 }
 
 /**
