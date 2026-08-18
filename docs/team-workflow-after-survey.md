@@ -6,6 +6,20 @@ _Designally Platform_
 
 **1 · Nothing.** Answers accumulate. No expected count, no fraction. The team is not asked to watch.
 
+**Answers can arrive after a version is written, and a new one can be asked for at
+any time** (18 August 2026). The ordinary shape is: close, read, reopen because
+somebody was missed, take their answer, close again. The insights sheet has a
+*Write it again* section for exactly this — it runs the analysis on whichever
+respondents you tick, and keeps every run as a version. A confirmed version is
+never touched or demoted by a later run: it keeps its signature and its place in
+the list, and the new one arrives above it unconfirmed. The picker marks who
+answered *after* the version on screen, which is read from that run's stored
+`sources` rather than from a date.
+
+Closing collection a second time also writes a new version, and reads everybody.
+That is the difference between the two: closing is the gate and takes the survey
+as it stands; *Write it again* is the one that lets you choose.
+
 **2 · Close collection** — the one judgement call. "Close and analyse" is always available; the app promotes the project into "Needs you" when the survey's date passes, and again after 5 quiet days, and asks *"enough to work with, or wait a little longer?"* It never closes a survey on its own.
 
 **3 · The insights write themselves** — about 30 seconds.

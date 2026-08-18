@@ -5,6 +5,7 @@ import { useState, useTransition } from 'react';
 import {
   confirmInsights,
   deleteInsights,
+  reanalyse,
   readInsightsVersion,
   unconfirmInsights,
 } from '@/lib/team/actions';
@@ -146,6 +147,27 @@ export default function InsightsSheet({
   const openVersion = versions.find((v) => v.id === openId) ?? current;
   const insights = (shown?.insights ?? project.insights) as Insights;
   const people = project.answers;
+
+  /**
+   * Whose answers the next run should read. Null is everyone, which is the
+   * default and what the button says when nothing has been touched.
+   */
+  const [only, setOnly] = useState<string[] | null>(null);
+  const [picking, setPicking] = useState(false);
+
+  /**
+   * Who answered after the version on screen was written.
+   *
+   * The useful question when re-running is not *when* somebody answered, it is
+   * whether the version you are looking at already read them — which is exactly
+   * what `sources` records, and it is stored per run for this reason. Runs
+   * written before sources were stored have none, and then nobody is marked
+   * rather than everybody being marked wrongly.
+   */
+  const readAlready = new Set(openVersion?.sources?.map((s) => s.id) ?? []);
+  const sinceThis = openVersion?.sources
+    ? project.people.filter((p) => !readAlready.has(p.id))
+    : [];
 
   function act(run: () => Promise<{ ok: boolean; error?: string }>, done: string) {
     start(async () => {
@@ -312,12 +334,117 @@ export default function InsightsSheet({
           </section>
         )}
 
+        {/**
+         * Running it again, on whichever answers you choose.
+         *
+         * `reanalyse` and the versions list have both existed for a while and
+         * nothing reached them once an analysis had been written: the only
+         * button that called it appeared when a run had *failed*. So the
+         * ordinary case — closed, read, reopened, somebody else answered,
+         * closed again — could produce a second version only by closing
+         * collection a second time, which reads everyone and gives no say in
+         * it. The stale line directly below has been telling people to
+         * regenerate since it was written, at a screen with no way to.
+         *
+         * Every run is kept. A confirmed version is not touched or demoted by a
+         * new one — it keeps its signature and its place in the list, and the
+         * new run arrives above it unconfirmed. That is what makes this safe to
+         * offer beside a signed analysis rather than only instead of one.
+         *
+         * The picker answers the three questions actually asked of it: everyone
+         * (the default), the same people this version read, or only those it
+         * did not. The last two are the reason `sources` is stored per run.
+         */}
+        {project.people.length > 0 && (
+          <section className="isec">
+            <h2>Write it again</h2>
+            {project.closedOn ? (
+              <>
+                <p>
+                  A new version, from the answers you choose. This one stays exactly as it is —
+                  every run is kept, and a confirmed one keeps its signature.
+                </p>
+
+                {sinceThis.length > 0 && (
+                  <p className="stale">
+                    {sinceThis.length === 1
+                      ? `${sinceThis[0].name} answered after this version was written.`
+                      : `${sinceThis.length} people answered after this version was written.`}
+                  </p>
+                )}
+
+                {project.people.length > 1 &&
+                  (picking ? (
+                    <div className="whoreads">
+                      <p className="hintline">Read the answers of:</p>
+                      {project.people.map((person) => {
+                        const on = only === null || only.includes(person.id);
+                        return (
+                          <label key={person.id} className="pickwho">
+                            <input
+                              type="checkbox"
+                              checked={on}
+                              onChange={() => {
+                                const base = only ?? project.people.map((x) => x.id);
+                                const next = on
+                                  ? base.filter((id) => id !== person.id)
+                                  : [...base, person.id];
+                                /* everyone selected is the same as no selection —
+                                   keep it null so the run records it that way */
+                                setOnly(next.length === project.people.length ? null : next);
+                              }}
+                            />
+                            <span>{person.name}</span>
+                            {!readAlready.has(person.id) && openVersion?.sources && (
+                              <small>new since this version</small>
+                            )}
+                          </label>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="whoreads">
+                      <button className="linky" onClick={() => setPicking(true)}>
+                        {only
+                          ? `Reading ${only.length} of ${project.people.length} answers — change`
+                          : 'Choose whose answers to read'}
+                      </button>
+                    </div>
+                  ))}
+
+                {/* quiet, not primary: confirming is what this sheet is for,
+                    and a second filled button beside it would put the redo and
+                    the sign-off at the same weight */}
+                <button
+                  className="btn btn-quiet"
+                  disabled={busy || only?.length === 0}
+                  onClick={() =>
+                    act(() => reanalyse(project.id, only ?? undefined), 'A new version is written.')
+                  }
+                >
+                  {busy ? 'Writing…' : 'Write the insights again'}
+                </button>
+              </>
+            ) : (
+              /* `reanalyse` refuses an open survey and says so; saying it here
+                 instead is the difference between a disabled button that
+                 explains itself and an error after a wait. */
+              <p className="quiet">
+                The survey is open again, so there is nothing settled to read. Close collection to
+                write another version.
+              </p>
+            )}
+          </section>
+        )}
+
         {/* gate 2 — rule 2 records who acted, rule 1 never does it on a timer */}
         <section className="isec gate">
+          {/* The instruction moved to *Write it again* above, which is the
+              thing it was asking for and did not exist when this was written. */}
           {project.insightsStale && (
             <p className="stale">
               Answers arrived after this was confirmed. What it says was true of the answers it was
-              written from — regenerate to take the newer ones in.
+              written from, and still is.
             </p>
           )}
           {openVersion?.confirmedOn ? (

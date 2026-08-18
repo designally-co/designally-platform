@@ -2271,6 +2271,14 @@ label.f span {
   height: 18px;
   accent-color: var(--primary);
 }
+/* "new since this version" — a fact about the row, at the weight of one. It is
+   not the accent: nobody has to act on it, and DESIGN.md §1 keeps the accent
+   for the places somebody does. */
+.pickwho small {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--ink-3);
+}
 
 /**
  * The versions this project's analysis has been through.
