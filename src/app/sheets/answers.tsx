@@ -287,7 +287,20 @@ export default function AnswersSheet({
     else w.addEventListener('load', go);
   };
 
-  const remove = () =>
+  /**
+   * Closes the popover on success, and not before.
+   *
+   * It used to close first and then ask the server, which meant a refusal — an
+   * analysis cited this person, press again — arrived at a popover that was no
+   * longer there. The sentence and the second press then had to live at the foot
+   * of the sheet, three screens below the button that caused them, under the
+   * answers they were about.
+   *
+   * Keeping it open costs nothing: `deleteResponse` is one round trip, the
+   * button says `Deleting…` while it runs, and the refusal has somewhere to be
+   * read — inside the thing that asked the question.
+   */
+  const remove = (done: () => void) =>
     start(async () => {
       setError(null);
       const result = await deleteResponse(person.id, warned);
@@ -296,6 +309,7 @@ export default function AnswersSheet({
         setWarned(true);
         return;
       }
+      done();
       onDeleted(`${person.name}'s answers deleted.`);
     });
 
@@ -380,18 +394,17 @@ export default function AnswersSheet({
             <MoreMenu label={`Delete ${person.name}'s answers`} icon={<TrashMark />} danger>
               {(close) => (
                 <div className="delconfirm danger">
-                  {/* the button says permanently; this says what goes */}
-                  <p>Removes every answer {person.name} gave.</p>
+                  {/* What goes, or — once the server has refused once — why it
+                      refused. The second is the more useful sentence and it
+                      replaces the first rather than stacking under it. */}
+                  <p>{error ?? `Removes every answer ${person.name} gave.`}</p>
                   <div className="iacts">
                     <button
                       className="btn btn-danger"
                       disabled={pending}
-                      onClick={() => {
-                        close();
-                        remove();
-                      }}
+                      onClick={() => remove(close)}
                     >
-                      {pending ? 'Deleting…' : 'Delete'}
+                      {pending ? 'Deleting…' : warned ? 'Delete anyway' : 'Delete'}
                     </button>
                     <button className="btn btn-quiet" onClick={close}>
                       Cancel
@@ -450,16 +463,10 @@ export default function AnswersSheet({
             </section>
           ))}
 
-          {/* The errors stay at the foot, where the answers they are about are.
-              A refusal from the server — a confirmed insights read these — is a
-              sentence to read, and a popover that has closed cannot hold it. */}
+          {/* Printing has no popover of its own to fail in — it opens a window
+              and the window is where it goes wrong — so its errors still land
+              here. Deleting keeps its refusal in the panel that asked. */}
           {printError && <p className="formerror">{printError}</p>}
-          {error && <p className="formerror">{error}</p>}
-          {warned && (
-            <button className="ansdrop" disabled={pending} onClick={remove}>
-              Delete anyway
-            </button>
-          )}
         </>
       )}
     </Sheet>

@@ -2394,27 +2394,6 @@ textarea {
   line-height: 1.7;
 }
 
-/* Delete is quiet until pointed at — it removes twenty minutes of somebody's
-   work and should not read as a primary action. It sat on the respondent's card
-   on the project sheet until 17 August 2026 and now sits under their answers,
-   which is where a person can see what they would be deleting. */
-.ansdrop {
-  display: block;
-  margin: var(--sp-md) 0 0;
-  border: 0;
-  background: none;
-  font-family: inherit;
-  font-size: 13px;
-  color: var(--ink-3);
-  cursor: pointer;
-  padding: 4px 2px;
-}
-@media (hover: hover) {
-  .ansdrop:hover {
-    color: var(--critical);
-  }
-}
-
 /* whose answers the analysis reads — closed until asked for */
 .whoreads {
   margin-bottom: var(--sp-md);
@@ -6834,7 +6813,9 @@ dialog::backdrop {
 .delconfirm p {
   margin: 0;
   font-size: 13px;
+  /* Thai never below 1.6 on a line that can carry a respondent's name */
   line-height: 1.6;
+  text-wrap: pretty;
   color: var(--ink-2);
 }
 .delconfirm label {
