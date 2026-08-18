@@ -3071,15 +3071,36 @@ dialog::backdrop {
   padding: 0 var(--sp-lg) var(--sp-lg);
 }
 /**
- * The right padding gives back what the scrollbar took.
+ * The right padding gives back what the scrollbar took — and the gutter makes
+ * sure there is always something to give back to.
  *
- * Only where the scrollbar is ours to measure: `::-webkit-scrollbar` is the
- * thing that fixes its width at `--scrollbar`, so the compensation is scoped to
- * browsers that support it. Firefox's thin scrollbar is its own width and gets
- * symmetric padding instead — a few pixels out, rather than a guess at a number
- * the browser never told us.
+ * The compensation alone was only right half the time. It subtracts
+ * `--scrollbar` from the right padding whether or not a scrollbar is there, so a
+ * sheet with nothing to scroll — the New survey form, a short project — sat 24
+ * from the left and 16 from the right, and the shorter the sheet the more
+ * obviously lopsided it was. CSS cannot ask whether a scrollbar is currently
+ * showing, and measuring it in JavaScript means a resize observer per sheet to
+ * answer a question about padding.
+ *
+ * `scrollbar-gutter: stable` removes the question. The 8px is reserved from the
+ * moment the sheet opens, occupied by a bar or not, so the compensation is
+ * always compensating for something real and content sits 24 from both edges in
+ * both states. It also stops the reflow a sheet made when it crossed its own
+ * scrolling threshold — growing a scrollbar used to shove every line 8px left.
+ *
+ * The app settled this once already, for the survey's own page; see
+ * `scrollbar-gutter` at the top of this file. Same problem, same answer.
+ *
+ * Both scoped to `::-webkit-scrollbar` support, because that is what fixes the
+ * width at `--scrollbar` and makes the bar classic rather than an overlay.
+ * Firefox's thin scrollbar is its own width and gets symmetric padding and no
+ * gutter — a few pixels out, rather than a guess at a number the browser never
+ * told us.
  */
 @supports selector(::-webkit-scrollbar) {
+  .sheetscroll {
+    scrollbar-gutter: stable;
+  }
   .sheet-body {
     padding-right: calc(var(--sp-lg) - var(--scrollbar));
   }
