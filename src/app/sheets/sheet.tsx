@@ -74,14 +74,20 @@ export default function Sheet({
   return (
     <dialog ref={ref} onClose={onClose} onCancel={onClose}>
       <div className={`sheet${narrow ? ' narrow' : ''}`}>
-        <div className="sheet-top">
-          <button className="back" onClick={onClose} aria-label={backLabel}>
-            <BackMark />
-          </button>
-          <span className="t">{title}</span>
-          <div className="bartrail">{actions}</div>
+        {/* The scroller is inside the sheet, not the sheet itself. `.sheet`
+            clips to its own 34px radius, so the scrollbar cannot run past the
+            corners — see the note in globals.css. The bar is inside it too,
+            which is what keeps content passing under a sticky header. */}
+        <div className="sheetscroll">
+          <div className="sheet-top">
+            <button className="back" onClick={onClose} aria-label={backLabel}>
+              <BackMark />
+            </button>
+            <span className="t">{title}</span>
+            <div className="bartrail">{actions}</div>
+          </div>
+          <div className="sheet-body">{children}</div>
         </div>
-        <div className="sheet-body">{children}</div>
       </div>
     </dialog>
   );

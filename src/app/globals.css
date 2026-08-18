@@ -2435,20 +2435,40 @@ dialog::backdrop {
   animation: slideup 0.42s var(--ease);
 }
 /**
- * The sheet is the scroller, not the body inside it.
+ * The scroller sits inside the sheet, and the sheet clips it.
  *
- * With the body scrolling, the bar sat above the scroll area and content
- * stopped at its lower edge — nothing ever passed beneath it, so there was
- * nothing for a blur to be over. Scrolling the sheet puts the sticky bar
- * *inside* the same scroller as the content, which is both what makes text run
- * under it and what keeps the blur safe: the failure recorded in DESIGN.md §6
- * is a `position: fixed` element in a *different* compositing layer from the
- * scroller it covers, and sticky-in-scroller is the case that has no such
+ * `.sheet` scrolled itself for a few hours. The scrollbar then belongs to the
+ * element carrying the 34px radius, and a scrollbar track is a rectangle: it
+ * ran the full height of the box and straight across both right-hand corners,
+ * so a 17px column of it sat outside the curve the sheet is drawn with.
+ *
+ * One element in between fixes it. `.sheet` keeps the radius, the border and
+ * `overflow: hidden`, so it clips everything to its own shape; `.sheetscroll`
+ * inside it does the scrolling, and its scrollbar is cut by the corners like
+ * any other content.
+ *
+ * The bar is inside the scroller, which is the part that matters and the reason
+ * this is not simply the body scrolling again. With the body as the scroller
+ * the bar sits above the scroll area and content stops at its lower edge —
+ * nothing passes beneath it, and there is nothing for the blur ramp to be over.
+ * Sticky inside the scroller it covers is also the arrangement that keeps that
+ * blur safe: DESIGN.md §6's failure is a `position: fixed` element in a
+ * different compositing layer from the scroller it covers, and this has no such
  * argument to lose.
  */
 .sheet {
+  overflow: hidden;
+}
+.sheetscroll {
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
+  /* Thin, and in the sheet's own inks rather than the platform's. A 17px
+     system scrollbar is a slab of another operating system's chrome down the
+     side of a card built out of hairlines. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--fill) transparent;
 }
 .sheet-body {
   flex: 1;
