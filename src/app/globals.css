@@ -2918,17 +2918,28 @@ textarea {
  * rather than making somebody infer it from a URL in a box.
  */
 /**
- * One column, the width of the thing it is about.
+ * One column, and it is the sheet's own.
  *
- * The heading, the line under it, the link, the code and the note beneath all
- * measure 288 — the code's own width, which is the widest thing here and the
- * only one with a reason for its size. A note running the full width of a 412px
- * sheet under a 288px column is a different object on the same screen.
+ * The heading, the line under it, the link, the code and the note all measure
+ * the same, and that measure is the sheet's own column.
+ *
+ * The number that decides it is the sheet's width — `.sheet.made-w` below — so
+ * there is one place to change it and nothing to keep in step. It was tried at
+ * both ends: a 560px sheet around a 288px column left 62px of nothing down
+ * either side, and the column stretched to fill 560 made a 500px code nobody
+ * needs. 420 is the sheet, and everything on it is 370.
  */
 .made {
-  max-width: 288px;
-  margin-inline: auto;
+  width: 100%;
 }
+/**
+ * The heading and the line under it are one thing, and are spaced like one.
+ *
+ * 4px between them and 24 after — the gap inside the pair has to be smaller
+ * than the gap around it or they read as two separate statements with the link
+ * somewhere below. They were 8 apart and sitting in a 44px box, which made the
+ * inside gap 20 and the pair no closer to each other than to anything else.
+ */
 .made h1 {
   font-family: var(--font-display);
   font-size: 25px;
@@ -2937,7 +2948,7 @@ textarea {
   /* Thai never below 1.28 at display size — see DESIGN.md §2 */
   line-height: 1.3;
   color: var(--ink);
-  margin-bottom: var(--sp-xs);
+  margin-bottom: var(--sp-xxs);
 }
 .made .lede {
   font-size: 15px;
@@ -2956,15 +2967,15 @@ textarea {
  * Each part used to carry its own: the row took whatever held it, the code and
  * the pill were capped at 288. In the 320px share panel that is invisible —
  * everything is 288 there — and on the sheet that hands over a new link it was a
- * full-width row above a centred square. They are three parts of one object.
+ * full-width row above a centred square. They are three parts of one object, so
+ * the width belongs to the object.
  *
- * 288 because that is what the panel already measured, so the panel does not
- * move: 320 less its 16px padding either side. Centred, so the wider sheet puts
- * the column under its own heading rather than ragged against one edge.
+ * The container's width, whatever that is — 286 in the share panel, the body's
+ * column on the sheet that hands over a new link. One number controls it in each
+ * place, which is the sheet's own width, and the parts cannot drift apart.
  */
 .linkcode {
-  max-width: 288px;
-  margin-inline: auto;
+  width: 100%;
 }
 
 /**
@@ -3010,6 +3021,44 @@ textarea {
    padding the disc used to stand in. */
 .sheet-top.dismissing .t {
   margin-left: 2px;
+}
+
+/**
+ * A sheet with no toolbar: the close is laid over the content instead.
+ *
+ * Against `.sheet` rather than the scroller, so it holds its corner whether or
+ * not the body ever scrolls. `.sheet` is `overflow: hidden` and this is inside
+ * it, so it is clipped by the same 34px corners as everything else.
+ */
+.sheetclose.floating {
+  position: absolute;
+  /* 24 from the sheet's own corner. Offsets count from the padding box, so the
+     hairline puts it at 25 from the outside — the border is the edge. */
+  top: var(--sp-lg);
+  right: var(--sp-lg);
+  z-index: 5;
+}
+/* Nothing above to clear — the scroller starts where the body does. */
+.sheet.bare .sheetscroll {
+  padding-top: var(--sp-lg);
+}
+/* The close keeps its own 24 while the content stands at 48, so the heading's
+   line and the disc are not on the same measure — the disc belongs to the sheet,
+   the heading to the column. */
+/**
+ * The one block that shares its line with the close.
+ *
+ * A heading running the full column would pass under a disc floating at the top
+ * right, so it stops short of it — 44 of disc plus the `--sp-xs` between them.
+ *
+ * It used to hold the disc's height as well, to keep the line *below* it clear.
+ * That was needed while the content started at 24 and is not now it starts at
+ * 48: the heading's own line already ends past the disc's bottom edge. What the
+ * `min-height` did instead was put twelve pixels of slack under a heading whose
+ * next line is meant to belong to it.
+ */
+.sheet.bare .made h1 {
+  padding-right: calc(44px + var(--sp-xs));
 }
 
 /* ---- The date field ----------------------------------------------------
@@ -3555,6 +3604,42 @@ dialog::backdrop {
 }
 .sheet.narrow {
   width: min(560px, 100%);
+}
+/**
+ * Cut to its column.
+ *
+ * The sheet that hands over a new link holds one column and nothing else, so its
+ * width *is* that column's: 480, less `--sp-xxl` of padding either side and two
+ * hairlines, leaves 382. Everything on the sheet measures that, and one number
+ * moves all of it.
+ *
+ * **Above 620 only.** Below it every sheet is full-bleed, and a width here would
+ * beat that rule on specificity and leave a 338px card floating on a 390px
+ * phone. It does not belong in the same breath as the phone layout, so it is not
+ * in it.
+ *
+ * It does not scroll, so it does not reserve a scrollbar: the gutter is what
+ * made the two margins 21 and 29 rather than a pair. And with nothing passing
+ * under the bar, the scroller stops clearing a blur ramp it has no use for —
+ * 24 above the disc, the disc, 12, and then the heading, instead of 118px of
+ * empty parchment above the first word.
+ */
+@media (min-width: 621px) {
+  .sheet.made-w {
+    width: min(480px, 100%);
+  }
+  /* `.sheet.made-w`, not `.made-w`: the bare sheet's own `padding-top` is
+     `.sheet.bare .sheetscroll` at (0,3,0) and would otherwise win. */
+  .sheet.made-w .sheetscroll {
+    scrollbar-gutter: auto;
+    /* `--sp-xxl` on every side, so the column stands the same distance from all
+       four edges — this sheet has no bar to clear and no reason to sit tighter
+       at the top than at the sides. */
+    padding-top: var(--sp-xxl);
+  }
+  .sheet.made-w .sheet-body {
+    padding: 0 var(--sp-xxl) var(--sp-xxl);
+  }
 }
 /**
  * The sheet's toolbar. Same three slots as the page's — title, actions,

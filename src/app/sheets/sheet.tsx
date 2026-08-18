@@ -36,7 +36,9 @@ import { BackMark, CloseMark } from '../icons';
 export default function Sheet({
   title,
   narrow = false,
+  width,
   dismiss = false,
+  bare = false,
   actions,
   backLabel = 'Back',
   onClose,
@@ -44,6 +46,8 @@ export default function Sheet({
 }: {
   title: ReactNode;
   narrow?: boolean;
+  /** an extra width class, for a sheet cut to the one column it holds */
+  width?: string;
   /**
    * A close disc on the trailing edge instead of a back chevron on the leading
    * one — for a sheet that *dismisses* rather than goes back.
@@ -62,6 +66,18 @@ export default function Sheet({
    * belonging to the sheet, not as one of its actions.
    */
   dismiss?: boolean;
+  /**
+   * No toolbar at all — just a close disc laid over the content.
+   *
+   * For a sheet with one thing on it and nothing to put in a bar: no title to
+   * clip, no actions to group, and nothing scrolling underneath that a blur ramp
+   * has to soften. The bar was then 44px of furniture plus 118px of clearance
+   * above the first word, all of it holding a close button.
+   *
+   * The disc is `position: absolute` against `.sheet`, so it stays put whether
+   * or not the body ever scrolls.
+   */
+  bare?: boolean;
   /**
    * The sheet's toolbar actions, on the trailing edge before Close.
    *
@@ -92,26 +108,33 @@ export default function Sheet({
 
   return (
     <dialog ref={ref} onClose={onClose} onCancel={onClose}>
-      <div className={`sheet${narrow ? ' narrow' : ''}`}>
+      <div className={`sheet${narrow ? ' narrow' : ''}${bare ? ' bare' : ''}${width ? ` ${width}` : ''}`}>
+        {bare && (
+          <button className="sheetclose floating" onClick={onClose} aria-label={backLabel}>
+            <CloseMark />
+          </button>
+        )}
         {/* The scroller is inside the sheet, not the sheet itself. `.sheet`
             clips to its own 34px radius, so the scrollbar cannot run past the
             corners — see the note in globals.css. The bar is inside it too,
             which is what keeps content passing under a sticky header. */}
         <div className="sheetscroll">
-          <div className={`sheet-top${dismiss ? ' dismissing' : ''}`}>
-            {!dismiss && (
-              <button className="back" onClick={onClose} aria-label={backLabel}>
-                <BackMark />
-              </button>
-            )}
-            <span className="t">{title}</span>
-            <div className="bartrail">{actions}</div>
-            {dismiss && (
-              <button className="sheetclose" onClick={onClose} aria-label={backLabel}>
-                <CloseMark />
-              </button>
-            )}
-          </div>
+          {!bare && (
+            <div className={`sheet-top${dismiss ? ' dismissing' : ''}`}>
+              {!dismiss && (
+                <button className="back" onClick={onClose} aria-label={backLabel}>
+                  <BackMark />
+                </button>
+              )}
+              <span className="t">{title}</span>
+              <div className="bartrail">{actions}</div>
+              {dismiss && (
+                <button className="sheetclose" onClick={onClose} aria-label={backLabel}>
+                  <CloseMark />
+                </button>
+              )}
+            </div>
+          )}
           <div className="sheet-body">{children}</div>
         </div>
       </div>

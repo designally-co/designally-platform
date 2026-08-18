@@ -46,7 +46,8 @@ export default function SurveyMadeSheet({
        */
       title={null}
       narrow
-      dismiss
+      width="made-w"
+      bare
       backLabel="Done"
       onClose={onClose}
     >
