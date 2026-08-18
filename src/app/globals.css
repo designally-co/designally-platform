@@ -2702,7 +2702,19 @@ textarea {
   display: inline-flex;
   align-items: stretch;
 }
-.split > .btn {
+/**
+ * Square on the right only when there is something to be square against.
+ *
+ * One respondent gets no chevron — choosing between one person and nobody is
+ * not a choice — and the button was keeping the flat edge anyway: a pill with
+ * its right end sliced off and nothing beside it. The seam belongs to the pair,
+ * so it is conditional on the pair existing.
+ *
+ * `:has()` rather than a class, because the condition *is* "the other half is
+ * rendered" and the stylesheet can see that directly. It is already how
+ * `.board` and `.pickone` read their own state here.
+ */
+.split:has(.splitmore) > .btn {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
