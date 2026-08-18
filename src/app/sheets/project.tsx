@@ -584,8 +584,12 @@ export default function ProjectSheet({
             <div className="pd-due">
               {/* A span, not a `<label for>` — the control is a group of three
                   boxes and `for` binds only to a form control. */}
+              {/* "Closes on" and "Close now" name the same act at two times,
+                  which is what this section is: one control that shuts the link
+                  on a date, one that shuts it this minute. It read "Asking for
+                  answers by", which was right while the date only asked. */}
               <span className="f" id={`due-${p.id}`}>
-                Asking for answers by
+                Closes on
               </span>
               {/* No `min` here, unlike the New survey sheet. A project's date can
                   legitimately be moved to one already past — a team recording
@@ -646,8 +650,8 @@ export default function ProjectSheet({
                 </div>
               ) : (
                 <span className="hintline">
-                  The client sees this, and the link stops taking answers after it. Move it forward
-                  to let somebody back in.
+                  The client sees this date and the link stops serving after it. Move it forward to
+                  let somebody back in. It does not write the analysis — <b>Close now</b> does.
                 </span>
               )}
             </div>
@@ -705,7 +709,7 @@ export default function ProjectSheet({
                 ) : (
                   <button className="btn btn-outline" onClick={() => setConfirming('close')}>
                     <LockMark />
-                    <span>Close collection</span>
+                    <span>Close now</span>
                   </button>
                 )}
               </div>
@@ -835,8 +839,8 @@ export default function ProjectSheet({
                * where it happens.
                */
               <p className="ireads">
-                The analysis reads a closed survey. Close collection above when you have enough
-                answers.
+                The analysis reads a closed survey. Close it above — on the date, or with{' '}
+                <b>Close now</b> when you have enough answers.
               </p>
             ) : (
               <>

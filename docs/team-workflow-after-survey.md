@@ -9,9 +9,11 @@ _Designally Platform_
 **Collection is one section** (18 August 2026). The date and *Close collection*
 govern the same thing — whether the link is taking answers — and they were in two
 places: a section for the date, a row in the toolbar's More menu for the close.
-They are together now, and the difference between them stays visible: the date is
-a soft shutter that writes nothing and undoes itself when you move it forward,
-closing is gate 1 and puts a name on the record. Reopening came with the close,
+They are together now and named as the same act at two times: **Closes on**, a
+date, and **Close now**, a button. The difference between them stays visible in
+what each one does — the date writes nothing and undoes itself when you move it
+forward, and it does *not* write the analysis; **Close now** is gate 1, puts a
+name on the record and produces the insights. Reopening came with the close,
 being its inverse.
 
 The More menu keeps only what *finishes* with a project: archive and delete.

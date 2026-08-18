@@ -2629,6 +2629,13 @@ textarea {
   color: var(--ink-3);
   margin-bottom: var(--sp-sm);
 }
+/* naming a control inside a sentence — weight, not colour, and not the accent:
+   it is a signpost, not something to press here */
+.pd-insights .ireads b,
+.pd-due .hintline b {
+  font-weight: 600;
+  color: var(--ink-2);
+}
 /* When the prompt is reckoned from — the date that passed, the day it closed. */
 /* When the prompt is reckoned from — the date that passed, the day it closed.
    Tucked under the sentence rather than spaced from it: it is that sentence's
