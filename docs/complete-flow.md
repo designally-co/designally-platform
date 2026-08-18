@@ -34,6 +34,21 @@ Both packages — Brand and Design — follow the same ten steps; only the quest
 2. **Are these insights true?** The AI can mistake two wordings of the same idea for a disagreement, especially across Thai and English.
 3. **Is this project finished?** Archiving is manual. There is no automatic rule. Nothing is deleted; archived projects stay searchable.
 
+   **Archiving a project whose survey is still open closes collection too, and
+   signs it** (18 August 2026). The link already stopped working the moment the
+   project was archived — `/s/<token>` tells anyone opening it that the work is
+   finished — but `closed_at` stayed empty, so the record said collection had
+   never been closed and nobody had ever closed it. That is rule 2 losing a gate.
+   The person archiving is the person who decided to stop taking answers, so they
+   sign both, at the same moment. It does **not** run the analysis: archiving is
+   filing, and a paid API call fired by a menu item nobody associates with one is
+   a surprise in the wrong direction. The due date is left alone — it is what the
+   client was told (rule 1), and archiving before it is the ordinary case.
+
+   Deleting does not close anything first. The cascade takes the survey with the
+   project, so there is no row left to stamp; the link 404s rather than
+   explaining itself, because the project it belonged to is gone.
+
 **Including the date.** A survey carries a date the team told the client to answer by, two weeks
 out by default and editable. When it passes, the app raises a prompt and nothing else — it does
 not close the survey, and a client who answers late is still recorded. Rule 1 holds.

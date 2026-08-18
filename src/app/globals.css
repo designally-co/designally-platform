@@ -5413,30 +5413,33 @@ dialog::backdrop {
   padding: 16px;
 }
 /**
- * The link's state, then what that means.
+ * One sentence: the state and what it means for the link.
  *
- * Two lines and two inks, which DESIGN.md §2 allows across lines and forbids
- * within one: the state at `--ink`, the consequence at `--ink-3`. The state
- * takes the label form the system already has — uppercase and tracked, the
- * treatment `.qsec` gives a section heading — because it is a label on the line
- * beneath it, which is exactly what that form is for.
+ * It was a label over a consequence — "OPEN" in caps above "Forward it to
+ * anyone who should answer" — which is the right shape for a heading on a
+ * screen and a lot of apparatus for eight words in a popover. It also asked the
+ * reader to join the two: the caps said the state in this product's vocabulary,
+ * and the line under it said what that meant, and neither was a sentence.
  *
- * No dot. §2 again: "a status is the word for it, never a star or a dot beside
- * a name. A bare glyph needs a legend; words don't."
+ * "Open — anyone with this link can answer" is both, and needs no vocabulary.
+ *
+ * **One colour, and that is what forces the weight.** DESIGN.md §2: no line of
+ * text carries two colours, and emphasis inside a sentence comes from weight
+ * only. Across two lines the state could be `--ink` over `--ink-3`; in one it
+ * cannot, so the state is 600 in the same ink and the caps go — small caps at
+ * 10.5px inside a running sentence is a third thing, not an emphasis.
+ *
+ * Still no dot. §2 again: "a status is the word for it, never a star or a dot
+ * beside a name."
  */
 .sharestate {
   margin: 0 0 12px;
   font-size: 13px;
   line-height: 1.6;
-  color: var(--ink-3);
+  color: var(--ink-2);
 }
 .sharestate b {
-  display: block;
-  font-size: 10.5px;
-  font-weight: 400;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--ink);
+  font-weight: 600;
 }
 
 .sharerow {
@@ -5546,38 +5549,36 @@ dialog::backdrop {
  * accent and one decoration.
  */
 .sharesave {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 44px;
-  height: 44px;
+  /* the row the menu uses, so it reads as available rather than urged */
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 7px;
-  /* 44, matching `.iconbtn` and `.btn`. It was 40 on the argument that this
-     sheet is used at a desk and the touch floor is a phone's rule — true, and
-     beside the point: what decides the number here is the controls it stands
-     next to, and every one of those is 44. */
-  padding: 0;
-  /* the halo — clears the modules away from the disc */
-  border: 5px solid var(--canvas);
-  /* the edge — `outline` rather than a second border, because a circle can only
-     have one and these have to be concentric */
-  outline: 2px solid var(--ink);
-  outline-offset: -7px;
-  border-radius: var(--r-pill);
-  background: var(--canvas);
-  color: var(--ink);
+  gap: 10px;
+  width: 100%;
+  min-height: 40px;
+  margin-top: 6px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink-3);
+  text-align: left;
   cursor: pointer;
-  transition: background-color 0.18s;
+  transition: background-color 0.16s, color 0.16s;
 }
-.sharecopy svg,
 .sharesave svg {
   width: 17px;
   height: 17px;
   flex: none;
+}
+.sharesave:hover {
+  background: var(--parchment);
+  color: var(--ink);
+}
+.sharesave:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
 }
 @media (hover: hover) {
   /* fills on hover — the edge is already there, so the change is the ground */

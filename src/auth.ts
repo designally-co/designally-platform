@@ -53,8 +53,15 @@ function emailIsAllowed(email: string | null | undefined) {
   return typeof email === 'string' && email.toLowerCase().endsWith(`@${ALLOWED_DOMAIN}`);
 }
 
-/** The team member behind a *_by column. Created on first sign-in. */
-async function upsertUser(email: string, name: string) {
+/**
+ * The team member behind a *_by column. Created on first sign-in.
+ *
+ * Exported because sign-in is not the only place that needs it: a JWT outlives
+ * the row it names, and `actingUser` rebuilds the row rather than letting a
+ * gate fail on a foreign key. Keyed on the email, so calling it again returns
+ * the same person instead of a second one.
+ */
+export async function upsertUser(email: string, name: string) {
   const db = await getDb();
   const address = email.toLowerCase();
 

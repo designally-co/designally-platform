@@ -137,7 +137,9 @@ export default function ShareLink({ token, url, closed }: { token: string; url: 
            */}
           <p className="sharestate">
             <b>{closed ? 'Closed' : 'Open'}</b>
-            {closed ? 'Anyone opening it now is told so.' : 'Forward it to anyone who should answer.'}
+            {closed
+              ? ' — anyone who opens it now is told so.'
+              : ' — anyone with this link can answer.'}
           </p>
 
           {/**
@@ -180,24 +182,31 @@ export default function ShareLink({ token, url, closed }: { token: string; url: 
                     Field, and what stops a printed code coming out orange. */}
                 <div className="qrframe" dangerouslySetInnerHTML={{ __html: qr }} />
                 {/**
-                 * Save sits on the code rather than under it.
+                 * Save is under the code, after two goes at putting it on one.
                  *
-                 * The panel is ordered around copying a link; a full-width
-                 * button for the rarer job was the second loudest thing in it.
-                 * On the code it is where the thing it saves is, and it costs
-                 * the panel a row.
+                 * On the code it was centred — the one place that is safe,
+                 * since a QR's three corner squares are *finder* patterns a
+                 * decoder needs before any error correction runs, and covering
+                 * one breaks the symbol outright however much redundancy it
+                 * carries. That part was right and is not why it came off.
                  *
-                 * Centred, which is the one place it is safe. A QR's three
-                 * corner squares are *finder* patterns — a decoder locates the
-                 * symbol with them before any error correction runs, so
-                 * covering one breaks the code outright no matter how much
-                 * redundancy it carries. The centre is data, and at 44px on a
-                 * 256px code the disc hides 2.3% of the area against the ~15%
-                 * level M recovers. Printing it much smaller than this would
-                 * be the reason to raise the level, not the button.
+                 * It came off because a QR is the one surface in this system
+                 * with no mid-tones: pure black modules on pure white, at full
+                 * contrast, everywhere. Nothing sits *on* that. A flat disc
+                 * disappears into the black; a white one with a halo and a ring
+                 * reads as a patch punched out of the code, which is exactly
+                 * what it is. There is no third try — the surface has no
+                 * tonal room, and two attempts is the evidence.
+                 *
+                 * Under it, it is a quiet action row and not a second CTA. Copy
+                 * is what this panel is opened for and keeps the accent; this
+                 * takes the shape of a menu row — mark leading, 13px, `--ink-3`
+                 * — which is the form the system already uses for an action
+                 * that is available rather than urged.
                  */}
-                <button className="sharesave" aria-label="Save the code" title="Save the code" onClick={save}>
+                <button className="sharesave" onClick={save}>
                   <SaveMark />
+                  <span>Save the code</span>
                 </button>
               </>
             ) : error ? null : (

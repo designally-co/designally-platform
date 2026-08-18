@@ -172,6 +172,17 @@ These are product decisions, not preferences. If a request conflicts with one, s
    after it are accepted. Asked for 14 August 2026; built this way rather than as an
    auto-close, which would have left `closed_by` empty.
 2. **Three human gates, each recording who acted:** close collection · confirm the insights · archive the project. Store `*_by` and `*_at` on every one. There was a fourth — recording the kick-off decisions — retired 17 August 2026 with the kick-off itself; it was never built.
+   Archiving a project whose survey is still open **closes collection on the way
+   and signs both** (18 August 2026) — the link had already stopped working, but
+   `closed_at` stayed empty and the record lost a gate. It does not run the
+   analysis. Deleting closes nothing: the cascade takes the survey with it, so
+   there is no row left to stamp.
+   The id behind a `*_by` is **checked against `users` before it is written**, not
+   taken on the session's word. A JWT is minted once and believed for thirty
+   days, so it names a row that existed at sign-in; point the app at a restored
+   backup or a reseeded database and every gate fails as a raw `23503`, while
+   everything that writes no `*_by` carries on. `actingUser` looks the row up and
+   rebuilds it from the session email if it has gone.
 3. **No expected respondent count.** Collection is open-ended. Never show a fraction like "2 of 4". Show "3 answers so far · last one 2 days ago".
 4. **No estimated content volume.** Do not calculate or display a predicted piece count anywhere, client-facing or internal. The earlier figure came from one project and is not reliable.
 5. **Questions are versioned.** A sent survey keeps the question version it was sent with. Editing a template affects future surveys only.

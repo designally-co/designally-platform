@@ -58,7 +58,7 @@ export default function ProjectSheet({
    * either now closes the other because there is only one value to hold, rather
    * than because two handlers each remember to reset the other's flag.
    */
-  const [confirming, setConfirming] = useState<'archive' | 'delete' | null>(null);
+  const [confirming, setConfirming] = useState<'close' | 'archive' | 'delete' | null>(null);
   const [typed, setTyped] = useState('');
   /**
    * The typed name, back on 18 August 2026 after a few hours without it.
@@ -132,7 +132,21 @@ export default function ProjectSheet({
   const [only, setOnly] = useState<string[] | null>(null);
   const [picking, setPicking] = useState(false);
 
-  const run = (fn: () => Promise<{ ok: boolean; error?: string }>, message: string) =>
+  /**
+   * The caller's sentence, unless the server has a better one.
+   *
+   * `message` is written here, before the action runs, so it can only say the
+   * thing that is always true — "Archived." An action that did more than the
+   * button named returns a `warning` saying what, and that is the sentence
+   * worth reading: archiving a project whose survey was still open also closes
+   * collection, and a toast reading "Archived." leaves the person to discover
+   * the link is now dead by hearing about it from the client.
+   *
+   * It is `warning` and not a second success field because that is the shape
+   * `ActionResult` already has and what gate 1 already uses for "closed, but
+   * the insights were not written" — succeeded, with something you need to know.
+   */
+  const run = (fn: () => Promise<{ ok: boolean; error?: string; warning?: string }>, message: string) =>
     start(async () => {
       setError(null);
       const result = await fn();
@@ -140,7 +154,7 @@ export default function ProjectSheet({
         setError(result.error ?? 'That did not work.');
         return;
       }
-      onActed(message);
+      onActed(result.warning ?? message);
     });
 
   const link = p.token ? `${origin}/s/${p.token}` : null;
@@ -229,18 +243,43 @@ export default function ProjectSheet({
       >
         {(close) => (
           <>
-            {!p.closedOn && p.surveyId && p.answers > 0 && (
-              <button
-                disabled={pending}
-                onClick={() => {
-                  close();
-                  run(() => closeCollection(p.surveyId!), 'Collection closed.');
-                }}
-              >
-                <LockMark />
-                <span>Close collection</span>
-              </button>
-            )}
+            {/**
+             * Gate 1 asks first, like the two under it.
+             *
+             * It was the one gate that fired on the press. Reopening exists, so
+             * it was never unrecoverable — but it is not free either: closing
+             * runs the analysis, which is a paid call and a minute of waiting,
+             * and it changes what the client sees on the link. A menu row that
+             * does all that between two rows that both ask twice is the one an
+             * elbow finds.
+             *
+             * The line under it is what a person needs to know before pressing
+             * and cannot see from the row: that the analysis starts here, and
+             * that this is reversible.
+             */}
+            {!p.closedOn &&
+              p.surveyId &&
+              p.answers > 0 &&
+              (confirming === 'close' ? (
+                <div className="delconfirm">
+                  <p>The analysis is written now. You can reopen it afterwards.</p>
+                  <button
+                    disabled={pending}
+                    onClick={() => {
+                      close();
+                      run(() => closeCollection(p.surveyId!), 'Collection closed.');
+                    }}
+                  >
+                    {pending ? 'Closing…' : 'Close collection'}
+                  </button>
+                  <button onClick={() => setConfirming(null)}>Cancel</button>
+                </div>
+              ) : (
+                <button onClick={() => setConfirming('close')}>
+                  <LockMark />
+                  <span>Close collection</span>
+                </button>
+              ))}
             {p.closedOn && (
               <button
                 disabled={pending}

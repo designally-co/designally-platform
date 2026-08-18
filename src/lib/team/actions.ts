@@ -3,7 +3,7 @@
 import { and, count, desc, eq, inArray, isNotNull, isNull } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 
-import { auth } from '@/auth';
+import { auth, upsertUser } from '@/auth';
 import { getDb } from '@/lib/db';
 import {
   PACKAGES,
@@ -15,6 +15,7 @@ import {
   questions,
   responses,
   surveys,
+  users,
   type Package,
 } from '@/lib/db/schema';
 import { surveyOrigin } from '@/lib/survey/origin';
@@ -26,11 +27,38 @@ import { dayIn, defaultDueDay, endOfDay } from '@/lib/team/due';
 /**
  * Every gate records who acted. That is rule 2, and it is enforced here rather
  * than in the form: an action with no signed-in user does not run.
+ *
+ * **The id is checked against the table, not taken on the session's word.** It
+ * arrives from a JWT, which is minted once at sign-in and then believed for
+ * thirty days — so it is a claim about a row that existed when somebody signed
+ * in, and nothing keeps that row alive. Point the app at a restored backup, at
+ * a different Neon branch, or at a reseeded local database, and every id in
+ * every live session names a user that is gone.
+ *
+ * That is not hypothetical and it is not cosmetic. `closed_by`, `archived_by`
+ * and `confirmed_by` are foreign keys, so the three human gates are exactly the
+ * actions that fail — and they fail as `23503` out of the driver, which reaches
+ * the team as an unexplained crash on the button rather than as anything they
+ * could act on. Everything that writes no `*_by` carries on working, which is
+ * what makes it look like a bug in the gates.
+ *
+ * So the row is looked up, and rebuilt from the session's own email if it has
+ * gone. The email is the identity Google vouched for and `upsertUser` is
+ * idempotent, so this restores the same person rather than inventing one. One
+ * indexed lookup per gate, against three gates a person presses a handful of
+ * times a week.
  */
 async function actingUser() {
   const session = await auth();
-  if (!session?.user?.id) throw new Error('Not signed in.');
-  return session.user.id;
+  const id = session?.user?.id;
+  const email = session?.user?.email;
+  if (!id || !email) throw new Error('Not signed in.');
+
+  const db = await getDb();
+  const [row] = await db.select({ id: users.id }).from(users).where(eq(users.id, id)).limit(1);
+  if (row) return row.id;
+
+  return upsertUser(email, session.user?.name ?? '');
 }
 
 export type ActionResult =
@@ -314,21 +342,55 @@ export async function confirmInsights(projectId: string): Promise<ActionResult> 
 /**
  * Gate 4 — archive. Manual, always available, never automatic. Nothing is
  * deleted; an archived project stays searchable.
+ *
+ * **An open survey is closed on the way, and the close is signed.** Archiving
+ * already stopped the client answering — `/s/<token>` refuses an archived
+ * project's link and says the work is finished, which `load.ts` has done all
+ * along. What it did not do was write it down: the survey kept `closed_at`
+ * null, so the project's own record said collection was never closed and
+ * nobody ever closed it, which is rule 2 losing a gate rather than recording
+ * one. The person archiving is the person who decided to stop taking answers,
+ * so they sign both.
+ *
+ * The date is untouched, and deliberately. `due_at` is what the client was told
+ * (rule 1) and archiving before it is the ordinary case — a team that has what
+ * it needs does not wait out a date it chose. Moving the date to make the close
+ * look punctual would falsify what the client was asked.
+ *
+ * **It closes and does not analyse.** Closing through gate 1 runs the insights;
+ * this does not. Archiving is filing, the answers have already been read by
+ * then, and a paid API call fired by a menu item nobody associates with one is
+ * a surprise in the wrong direction. `reanalyse` is there if it is wanted.
  */
 export async function archiveProject(projectId: string): Promise<ActionResult> {
   const userId = await actingUser();
   const db = await getDb();
+  const now = new Date();
 
   const [row] = await db
     .update(projects)
-    .set({ archived: true, archivedAt: new Date(), archivedBy: userId })
+    .set({ archived: true, archivedAt: now, archivedBy: userId })
     .where(and(eq(projects.id, projectId), eq(projects.archived, false)))
     .returning();
 
   if (!row) return { ok: false, error: 'That project is already archived.' };
 
+  /* After the archive, not before: if the archive is the one that loses the
+     race and returns nothing, the survey must be left as it was. Same guard as
+     gate 1 — `closed_at is null` — so a survey closed properly last week keeps
+     the name of whoever closed it. */
+  const closedNow = await db
+    .update(surveys)
+    .set({ closedAt: now, closedBy: userId })
+    .where(and(eq(surveys.projectId, projectId), isNull(surveys.closedAt)))
+    /* bare, not a projection: `getDb` returns a union of the PGlite and
+       postgres-js builders and a union's overloads do not compose */
+    .returning();
+
   revalidatePath('/');
-  return { ok: true };
+  return closedNow.length
+    ? { ok: true, warning: 'Archived, and collection is closed. The link now tells anyone opening it that the work is finished.' }
+    : { ok: true };
 }
 
 /** Archiving is reversible — it is a filing decision, not a deletion. */
@@ -612,6 +674,20 @@ export async function deleteProject(projectId: string, typedName: string): Promi
     return { ok: false, error: `That does not match. Type ${row.client} exactly to delete it.` };
   }
 
+  /**
+   * No close first, and that is not the omission it looks like beside archive.
+   *
+   * Archiving closes the survey because the survey survives it and would
+   * otherwise carry an unsigned gate 1 for good. Here every `on delete cascade`
+   * in the schema fires — surveys, responses, answers, insights — so there is no
+   * row left to stamp and nothing left to read a stamp from. Writing `closed_by`
+   * a millisecond before deleting the row it sits on records nothing.
+   *
+   * The link stops working either way, and harder: `/s/<token>` finds no survey
+   * at all, so it is a 404 rather than the "this work is finished" page an
+   * archived project shows. That is the honest answer — the project it belonged
+   * to is gone, and there is nothing to tell the client about.
+   */
   await db.delete(projects).where(eq(projects.id, projectId));
 
   revalidatePath('/');
