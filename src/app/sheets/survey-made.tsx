@@ -20,29 +20,31 @@ import LinkAndCode from './link-code';
  * here is the only copy of anything.
  */
 export default function SurveyMadeSheet({
-  clientName,
-  packageLabel,
   token,
   url,
   onClose,
 }: {
-  clientName: string;
-  packageLabel: string;
   token: string;
   url: string;
   onClose: () => void;
 }) {
   return (
     <Sheet
-      /* The client's name, not "Survey created" — the sheet's own body says
-         what happened, and by the time somebody is copying a link the useful
-         thing in the bar is whose link it is. */
-      title={
-        <>
-          <b>{clientName}</b>
-          <i>{packageLabel}</i>
-        </>
-      }
+      /**
+       * Nothing in the bar but the way out.
+       *
+       * It held the client's name over the package, which is the project
+       * sheet's title doing a job this sheet does not have: there is one thing
+       * on this screen and the body names it in two lines, at a size somebody
+       * reads. The bar was repeating the answer above the answer, and the name
+       * is on the toast that just went past and on the project underneath.
+       *
+       * The bar cannot carry those two lines either — its height is a fixed sum
+       * (see `.sheet-top`), which holds because the title is one clipped line
+       * over one short string. "Send it to the client's main contact. They can
+       * forward it on." is neither.
+       */
+      title={null}
       narrow
       dismiss
       backLabel="Done"
@@ -54,10 +56,11 @@ export default function SurveyMadeSheet({
 
         <LinkAndCode token={token} url={url} />
 
-        <p className="hintline">
-          Opens without a login, and anyone who has it can answer. You close collection when
-          there are enough answers — the date on it closes nothing.
-        </p>
+        {/* One fact, and the one somebody needs before sending it. What went:
+            that collection is closed by a person and not by the date — true,
+            and rule 1's business on the project, not on a line under a QR code
+            somebody is about to photograph. */}
+        <p className="hintline">Opens without a login. Anyone who has it can answer.</p>
       </div>
     </Sheet>
   );

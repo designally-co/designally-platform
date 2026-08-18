@@ -267,8 +267,6 @@ export default function Today({
       )}
       {made && (
         <SurveyMadeSheet
-          clientName={made.clientName}
-          packageLabel={made.packageLabel}
           token={made.token}
           url={`${origin}${made.link}`}
           onClose={() => setMade(null)}

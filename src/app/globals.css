@@ -2917,6 +2917,18 @@ textarea {
  * panel uses. It is a screen with one job, so it says what it is at the top
  * rather than making somebody infer it from a URL in a box.
  */
+/**
+ * One column, the width of the thing it is about.
+ *
+ * The heading, the line under it, the link, the code and the note beneath all
+ * measure 288 — the code's own width, which is the widest thing here and the
+ * only one with a reason for its size. A note running the full width of a 412px
+ * sheet under a 288px column is a different object on the same screen.
+ */
+.made {
+  max-width: 288px;
+  margin-inline: auto;
+}
 .made h1 {
   font-family: var(--font-display);
   font-size: 25px;
@@ -2935,6 +2947,7 @@ textarea {
 }
 .made .hintline {
   margin-top: var(--sp-md);
+  text-wrap: pretty;
 }
 
 /**
