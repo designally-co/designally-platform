@@ -165,7 +165,19 @@ function buildAction(v: {
         : `It found ${plural(v.conflicts, 'conflict')}.`;
     return {
       kind: 'review-insights',
-      say: `The survey is closed and the analysis is written.`,
+      /**
+       * "Closed" only when it is closed.
+       *
+       * This said "The survey is closed and the analysis is written" whenever
+       * insights existed and were unconfirmed, which is not the same condition.
+       * Reopening clears `closedAt` and deliberately leaves the insights alone —
+       * that is what `reopenCollection` is for — so a reopened project sat here
+       * announcing it was closed while its link was live and taking answers.
+       * The `when` line below already knew, and fell back to the answer count.
+       */
+      say: v.closedOn
+        ? 'The survey is closed and the analysis is written.'
+        : 'The analysis is written, and the survey is open again.',
       emphasis: found,
       when: v.closedOn
         ? `Closed ${v.closedOn} with ${plural(v.answers, 'answer')}`
