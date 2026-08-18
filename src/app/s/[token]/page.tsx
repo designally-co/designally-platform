@@ -21,9 +21,14 @@ export default async function SurveyPage(props: PageProps<'/s/[token]'>) {
   const survey = await loadSurvey(token);
 
   if (!survey) notFound();
-  if (survey.closed || survey.archived) {
+  /* Archived first, then closed, then the date: the most final reason wins, so
+     a finished project never tells somebody to ask for a new date. */
+  if (survey.closed || survey.archived || survey.overdue) {
     return (
-      <Closed clientName={survey.clientName} reason={survey.archived ? 'finished' : 'closed'} />
+      <Closed
+        clientName={survey.clientName}
+        reason={survey.archived ? 'finished' : survey.closed ? 'closed' : 'due'}
+      />
     );
   }
 

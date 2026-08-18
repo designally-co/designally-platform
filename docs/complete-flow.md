@@ -67,9 +67,17 @@ Both packages — Brand and Design — follow the same ten steps; only the quest
    project, so there is no row left to stamp; the link 404s rather than
    explaining itself, because the project it belonged to is gone.
 
-**Including the date.** A survey carries a date the team told the client to answer by, two weeks
-out by default and editable. When it passes, the app raises a prompt and nothing else — it does
-not close the survey, and a client who answers late is still recorded. Rule 1 holds.
+**Including the date, from 18 August 2026.** A survey carries a date the team told the client to
+answer by, two weeks out by default and editable. When it passes, two things happen: the project
+appears in *Needs you*, and the link stops serving — a client arriving after it is told the date
+has passed and asked to contact their project lead, who moves the date forward to let them back in.
+
+It was a prompt and nothing else until that day, with late answers accepted; the team asked for a
+real deadline, on the reasoning that a client who finds the door shut writes to them, and one who
+finds it open answers whenever they feel like it.
+
+**It stops the link, not the survey.** `closed_at` stays null and nothing is signed on the team's
+behalf, so rule 2 holds and moving the date undoes it completely. Gate 1 is still a person's.
 
 ## No volume estimates
 Rule 4 stands even though the content survey that prompted it is gone: the platform never

@@ -211,8 +211,13 @@ function buildAction(v: {
         v.answers > 0
           ? `${plural(v.answers, 'answer')} in, and the date you asked for has passed.`
           : 'The date you asked for has passed, and nobody has answered.',
+      /* Not "give it longer" as in wait — nobody can answer while it is past
+         due. Moving the date is what lets them back in, and it is the thing the
+         client will be asking for. */
       emphasis:
-        v.answers > 0 ? 'Close it, or give it longer?' : 'Chase it, or give it longer?',
+        v.answers > 0
+          ? 'The link has stopped taking answers. Close it, or move the date?'
+          : 'The link has stopped taking answers. Chase it, or move the date?',
       when: `Was due ${v.dueOn} · ${agoText(v.overdueDays)}`,
       label: 'Close collection',
     };

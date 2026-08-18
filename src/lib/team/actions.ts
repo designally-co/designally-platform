@@ -419,7 +419,7 @@ export async function readAnswers(projectId: string) {
 /**
  * Change the date the team asked for answers by.
  *
- * It closes nothing (rule 1) — it is what the client is shown and what puts the
+ * It stops the link from 18 August 2026 — it is what the client is shown and what puts the
  * project into Needs you once it passes. Clearing it is allowed and means "no
  * date", which is how every survey sent before this existed behaves.
  *

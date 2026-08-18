@@ -42,7 +42,9 @@ A project runs from a signed deal to a written summary.
 4. The team reads and confirms the insights. **This is where the platform's job ends.**
 5. The project is archived by hand, whenever the team judges it finished.
 
-**Two human gates, each recording who acted and when:** close collection · archive the project. None of them can happen on a timer, including the date in step 1 — it raises a prompt and closes nothing.
+**Two human gates, each recording who acted and when:** close collection · archive the project. Neither can happen on a timer.
+
+The date in step 1 is not one of them. From 18 August 2026 it stops the link serving once it passes — the client is told to contact their project lead, who moves the date — but it writes nothing and signs nothing, so both gates still belong to people.
 
 Confirming the insights was a third, retired 18 August 2026. The platform's job is to collect the answers and write the insights; it ends there. Somebody still has to read the analysis before working from it — it mistakes two wordings of one idea for a disagreement often enough that this matters — but that is how the team works, not a state the software holds.
 

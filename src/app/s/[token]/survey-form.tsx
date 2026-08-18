@@ -938,7 +938,9 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                 {/* The date the team asked for. It is the one thing on this
                     screen that makes somebody answer this week rather than
                     next, so it sits with the count rather than in the small
-                    print — and it closes nothing: a late answer still lands. */}
+                    print — and from 18 August 2026 it is a deadline: past it
+                    the link stops taking answers and says who to contact. The
+                    wording already read as one, which is why it is unchanged. */}
                 {survey.dueOn && (
                   <p className="qdue">
                     Please answer by {survey.dueOn.en}

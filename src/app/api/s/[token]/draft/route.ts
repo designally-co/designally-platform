@@ -68,9 +68,16 @@ export async function PUT(req: NextRequest, ctx: RouteContext<'/api/s/[token]/dr
   const { db, survey, archived } = await openSurvey(token);
   if (!survey) return NextResponse.json({ error: 'no such survey' }, { status: 404 });
 
-  // Rule 1 — both of these happened because a person did them. Stop saving.
+  // Two of these happened because a person did them; the third is the date the
+  // team set. Either way, stop saving.
   if (survey.closedAt) return NextResponse.json({ error: 'survey closed' }, { status: 409 });
   if (archived) return NextResponse.json({ error: 'project finished' }, { status: 409 });
+  /* Checked here and not only on the page: a tab opened before the date passed
+     is still open after it, and a draft saving into a survey the link no longer
+     serves is work nobody will ever see. */
+  if (survey.dueAt && survey.dueAt.getTime() < Date.now()) {
+    return NextResponse.json({ error: 'past the date' }, { status: 409 });
+  }
 
   await db
     .insert(surveyDrafts)

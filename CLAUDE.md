@@ -164,13 +164,21 @@ it predates the split, and what it draws is this surface, not the brief.
 
 These are product decisions, not preferences. If a request conflicts with one, say so before building it.
 
-1. **Nothing happens on a timer.** The app never closes a survey, confirms a brief, or archives a project by itself. It may surface a prompt; a person acts.
-   A survey carries a **due date** — chosen on the New survey sheet, prefilled at 14
-   days and editable afterwards on the project — and
-   that is a date, not a deadline the software enforces. The client is shown it, and once
-   it passes the project appears in Needs you asking whether to close. Answers arriving
-   after it are accepted. Asked for 14 August 2026; built this way rather than as an
-   auto-close, which would have left `closed_by` empty.
+1. **The gates are never on a timer.** The app never closes collection or archives a project
+   by itself. It may surface a prompt; a person acts, and their name goes on it.
+   **The due date is the exception, and it is not a gate.** Asked for 18 August 2026,
+   reversing the 14 August decision. A survey carries a date — chosen on the New survey
+   sheet, prefilled at 14 days, editable on the project — and past it the link stops
+   taking answers: the client is shown the closed screen and asked to contact the team,
+   who move the date to let them back in. It was a prompt and nothing else until then,
+   with late answers accepted.
+   **It stops the link, it does not close the survey.** `closed_at` stays null and no
+   `closed_by` is invented — the route declines to serve, which is a different thing from
+   the app closing a survey and signing it as though somebody had. That distinction is
+   what keeps rule 2 true: moving the date forward opens the link again with nothing to
+   undo, and gate 1 still belongs to a person.
+   Enforced in three places, because a phone left open overnight crosses the date without
+   reloading: the page, the draft endpoint and the submit endpoint.
 2. **Two human gates, each recording who acted:** close collection · archive the project. Store `*_by` and `*_at` on both.
    There were four. Recording the kick-off decisions went 17 August 2026 with the
    kick-off itself and was never built. **Confirming the insights went 18 August
@@ -224,8 +232,9 @@ questions        block_id, order, text_en, text_th, type, config, version
 surveys          project_id, kind (discovery), token,
                  opened_at, due_at, closed_at, closed_by
                  due_at — the date the team told the client to answer by. It
-                 shows on the survey and raises a prompt on the landing page
-                 when it passes. It closes nothing (rule 1).
+                 shows on the survey, raises a prompt on the landing page when
+                 it passes, and from 18 August 2026 stops the link serving —
+                 see rule 1. It writes nothing: `closed_at` stays null.
 responses        survey_id, respondent_name, role, email, submitted_at
                  role and email — retired at versions 3 and 4, both live again at
                  question version 5: the team asked for who is speaking and how to

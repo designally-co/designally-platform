@@ -63,11 +63,26 @@ export type SurveyPayload = {
   /**
    * The date the team asked for answers by, already formatted for reading.
    *
-   * Shown on the welcome and nowhere else. It is the thing that actually makes
-   * somebody answer this week rather than next, and it closes nothing — a late
-   * answer still lands (rule 1). Null on surveys sent before the field existed.
+   * Shown on the welcome and nowhere else. Null on surveys sent before the
+   * field existed.
    */
   dueOn: { en: string; th: string } | null;
+  /**
+   * The date has passed, and the link has stopped taking answers.
+   *
+   * **Changed 18 August 2026, asked for.** The date used to close nothing: a
+   * late answer landed and the project only appeared in *Needs you* asking
+   * whether to close. It is a deadline now — a client arriving after it is told
+   * the questionnaire is closed and asked to contact the team, who move the date
+   * to let them back in.
+   *
+   * **The data is untouched.** `closed_at` stays null and no `closed_by` is
+   * invented; this is the route declining to serve, not the app closing a survey
+   * on a timer and signing it as though somebody had. The team's two gates still
+   * belong to people. Clearing the date, or moving it forward, opens the link
+   * again with nothing to undo.
+   */
+  overdue: boolean;
   steps: SurveyStep[];
   questionCount: number;
 };
@@ -213,6 +228,9 @@ export async function loadSurvey(rawToken: string): Promise<SurveyPayload | null
         }
       : null,
     archived: row.project.archived,
+    /* End of the chosen day in Bangkok — `endOfDay` anchors it at +07:00 — so a
+       client answering at 11pm on the date still gets in. */
+    overdue: !!row.survey.dueAt && row.survey.dueAt.getTime() < Date.now(),
     steps,
     /* Numbered questions only, so the welcome screen's promise and the last
        number the respondent reaches are the same figure. Name and email are

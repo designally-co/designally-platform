@@ -71,6 +71,11 @@ export async function POST(req: NextRequest, ctx: RouteContext<'/api/s/[token]/s
      design, so the page guard is not the only door. */
   if (payload.archived) return NextResponse.json({ error: 'project finished' }, { status: 409 });
 
+  /* And the date, for the same reason — a phone left open overnight crosses it
+     without ever reloading the page. `overdue` is computed once in `loadSurvey`
+     so the page and this agree on where the boundary is. */
+  if (payload.overdue) return NextResponse.json({ error: 'past the date' }, { status: 409 });
+
   const questions = payload.steps.flatMap((s) => s.questions);
   const { name, role, email } = identityOf(questions, values);
 

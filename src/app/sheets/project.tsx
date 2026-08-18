@@ -641,7 +641,8 @@ export default function ProjectSheet({
                 }}
               />
               <span className="hintline">
-                The client sees this. It does not close the survey — you do.
+                The client sees this, and the link stops taking answers after it. Move it forward
+                to let somebody back in.
               </span>
             </div>
           )}
