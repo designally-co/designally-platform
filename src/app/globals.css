@@ -6765,13 +6765,36 @@ dialog::backdrop {
  * the menu's first child there is no such row, and the 4px becomes padding the
  * menu did not ask for: the block sat 11px from the top while the last row sat
  * 7px from the bottom, so a two-item menu was visibly heavier at one end.
- *
- * `:first-child` rather than `:only-child`, which is what this was — it covered
- * the response toolbar, where the confirmation is the whole popover, and missed
- * the archive confirmation, which is first of two.
  */
 .barmenu > .delconfirm:first-child {
   margin-top: 0;
+}
+
+/**
+ * When the confirmation *is* the popover, it stops being a block inside one.
+ *
+ * The archive and delete-project confirmations open among menu rows, and a
+ * recessed block sitting in a menu is exactly right there — the menu is the
+ * container, the block is one thing in it. Deleting a response has no rows: the
+ * menu holds the confirmation and nothing else, so the menu's own white ground,
+ * its border and its 6px of padding became a second container drawn around the
+ * first. A white frame with a pink block floating in it, on a popover 232px
+ * wide.
+ *
+ * So the wrapper stands down and the confirmation takes the popover's shape:
+ * the card radius, the Edge, and room to breathe. One panel.
+ */
+.barmenu:has(> .delconfirm:only-child) {
+  min-width: 268px;
+  padding: 0;
+  background: none;
+  border: 0;
+}
+.barmenu > .delconfirm:only-child {
+  margin-top: 0;
+  padding: var(--sp-sm);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-card);
 }
 /**
  * A confirmation's two answers, everywhere one is asked.
