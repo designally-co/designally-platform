@@ -5526,10 +5526,19 @@ dialog::backdrop {
  * than a control. A hairline cannot separate white from a surface that is
  * already half white.
  *
- * Inverted, it has nothing to be confused with: `--ink` at 16.1:1 under its
- * white mark, and a 5px ring of `--canvas` doing the separating. Black is the
- * code's own colour, so this introduces no hue to a two-colour object — the
- * ring is what makes it an object rather than a blot.
+ * White, with two rings doing what a shadow would be asked to do.
+ *
+ * A drop shadow was the obvious answer and DESIGN.md rules it out — borders,
+ * not shadows, the focus ring being the system's only one. It would also have
+ * worked badly here: a soft grey shadow has no tonal room against pure black
+ * modules, so it would show on the white ones and vanish on the black, which is
+ * a halo that comes and goes around the edge of a circle.
+ *
+ * Two rings instead, and each does a different half. The outer 5px of
+ * `--canvas` clears the modules away from the disc; the 2px of `--ink` inside
+ * it draws the edge, and it holds against both colours the code is made of
+ * because it is darker than one and the white ring separates it from the other.
+ * The mark is `--ink` on white at 16.85:1.
  *
  * Not the accent, though it would certainly be visible. DESIGN.md §1 gives the
  * accent one meaning — a person is needed here — and the panel already spends
@@ -5552,11 +5561,15 @@ dialog::backdrop {
      beside the point: what decides the number here is the controls it stands
      next to, and every one of those is 44. */
   padding: 0;
-  /* the halo, and the only thing separating the disc from the modules */
+  /* the halo — clears the modules away from the disc */
   border: 5px solid var(--canvas);
+  /* the edge — `outline` rather than a second border, because a circle can only
+     have one and these have to be concentric */
+  outline: 2px solid var(--ink);
+  outline-offset: -7px;
   border-radius: var(--r-pill);
-  background: var(--ink);
-  color: var(--canvas);
+  background: var(--canvas);
+  color: var(--ink);
   cursor: pointer;
   transition: background-color 0.18s;
 }
@@ -5567,8 +5580,10 @@ dialog::backdrop {
   flex: none;
 }
 @media (hover: hover) {
+  /* fills on hover — the edge is already there, so the change is the ground */
   .sharesave:hover {
-    background: var(--ink-2);
+    background: var(--ink);
+    color: var(--canvas);
   }
 }
 
