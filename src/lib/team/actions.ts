@@ -547,3 +547,53 @@ export async function surveyQr(token: string): Promise<{ svg: string } | { error
   });
   return { svg };
 }
+
+/**
+ * Delete a project and everything under it. There is no undo.
+ *
+ * Archiving is the filing decision and stays the ordinary one — it is
+ * reversible and it keeps the answers, which is why it is what the sheet
+ * offers first. This is for the other case: a test project, a duplicate, a
+ * client that never signed. Those accumulate in a list the team is supposed to
+ * be able to read at a glance, and archiving them only moves them somewhere
+ * they still are.
+ *
+ * **The confirmation is the client's name, typed.** Every other destructive
+ * thing here uses a two-press guard, and a two-press guard is right for
+ * deleting one response — a mistake costs one person's twenty minutes and the
+ * button says whose. This costs every response on the project and the insights
+ * written from them, and a guard you can clear by pressing twice in the same
+ * second is not proportional to that. Typing the name cannot be done by
+ * accident and cannot be done on the wrong row.
+ *
+ * The cascade is the database's, declared on the foreign keys: surveys and
+ * insights reference the project, responses reference the survey, answers
+ * reference the response. Deleting the project row takes all of it. The client
+ * is left — one client can have several projects, and deleting the last of them
+ * is not a decision to remove the client.
+ */
+export async function deleteProject(projectId: string, typedName: string): Promise<ActionResult> {
+  await actingUser();
+  const db = await getDb();
+
+  const [row] = await db
+    .select({ id: projects.id, client: clients.name })
+    .from(projects)
+    .innerJoin(clients, eq(clients.id, projects.clientId))
+    .where(eq(projects.id, projectId))
+    .limit(1);
+
+  if (!row) return { ok: false, error: 'That project no longer exists.' };
+
+  /* Trimmed and case-insensitive: this is a guard against acting without
+     meaning to, not a spelling test, and the names are often Thai where a
+     trailing space is invisible. */
+  if (typedName.trim().toLocaleLowerCase() !== row.client.trim().toLocaleLowerCase()) {
+    return { ok: false, error: `That does not match. Type ${row.client} exactly to delete it.` };
+  }
+
+  await db.delete(projects).where(eq(projects.id, projectId));
+
+  revalidatePath('/');
+  return { ok: true };
+}

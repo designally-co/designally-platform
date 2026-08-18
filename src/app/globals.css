@@ -1559,6 +1559,23 @@ label.f span {
  * measured 6.02:1 on parchment — twice the 3:1 a graphical object has to clear.
  * It carries the whole meaning here, so it is not asked to be subtle.
  */
+/**
+ * The disc, matching the back control at the other end of the bar.
+ *
+ * It was bare — mark, no container — on the HIG's advice that "borders aren't
+ * necessary because the section provides a visible container", and the one disc
+ * in the header was the back control, navigation set apart from actions.
+ *
+ * Asked for as three discs on 18 August 2026, and the reason holds up: the
+ * separation the HIG describes is real on a bar that is *full*, and this one
+ * carries three controls with a title between them. Two shapes across three
+ * buttons read as one styled and two unfinished rather than as a grouping. A
+ * consistent target is also the more honest thing on a bare glyph — the disc is
+ * what says where to press when nothing is labelled.
+ *
+ * The same 44px, the same `--fill` at 1.32:1 against parchment (a surface, not
+ * a boundary, so no contrast floor applies) and the same `--glyph` at 8.9:1.
+ */
 .iconbtn {
   display: grid;
   place-items: center;
@@ -1566,9 +1583,9 @@ label.f span {
   height: 44px;
   flex: 0 0 auto;
   border: 0;
-  background: none;
+  background: var(--fill);
   border-radius: var(--r-pill);
-  color: var(--ink-3);
+  color: var(--glyph);
   cursor: pointer;
   transition:
     color 0.18s,
@@ -1576,14 +1593,17 @@ label.f span {
     transform 0.12s var(--ease);
 }
 .iconbtn:active {
+  background: var(--fill-press);
+  color: var(--ink);
   transform: scale(0.94);
 }
 @media (hover: hover) {
-  /* the same hover every quiet control has — the mark darkens to ink. The
+  /* the disc deepens, exactly as the back control's does — see
+     `.sheet-top .back:hover`. The
      parchment wash is what gives a borderless button an edge to aim at. */
   .iconbtn:hover {
     color: var(--ink);
-    background: var(--canvas);
+    background: var(--fill-deep);
   }
 }
 /* the menu is open: the button stays lit, so it is clear what the panel
@@ -4944,4 +4964,47 @@ dialog::backdrop {
    panel does not jump when it does */
 .qrframe.loading {
   background: var(--parchment);
+}
+
+/**
+ * The delete confirmation, inside the More menu.
+ *
+ * It is a form in a menu, which is unusual and deliberate: the alternative is a
+ * second dialog over the sheet, and a confirmation that arrives as a new window
+ * is one a person dismisses to get back to what they were reading. Here the
+ * project's name is still on the screen behind it, which is the thing being
+ * typed.
+ */
+.delconfirm {
+  display: grid;
+  gap: 8px;
+  padding: 10px 11px 11px;
+  border-top: 1px solid var(--hairline);
+  margin-top: 4px;
+}
+.delconfirm p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+.delconfirm label {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink-3);
+}
+/* the name is the thing to be copied, so it is the one bit of emphasis */
+.delconfirm label b {
+  font-weight: 600;
+  color: var(--ink);
+}
+.delconfirm .input {
+  width: 100%;
+}
+/* Disabled until the name matches. Deliberately quiet rather than red while it
+   is unavailable: an accent on a control nobody can use yet is the accent
+   saying a person is needed at a place they cannot act — DESIGN.md section 1. */
+.delconfirm .danger:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }

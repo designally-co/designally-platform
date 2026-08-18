@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react';
 
 import {
   archiveProject,
+  deleteProject,
   closeCollection,
   reanalyse,
   reopenCollection,
@@ -46,6 +47,12 @@ export default function ProjectSheet({
   onActed: (message: string) => void;
 }) {
   const [confirmArchive, setConfirmArchive] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [typed, setTyped] = useState('');
+  /* trimmed and case-insensitive, matching the action — a guard against acting
+     without meaning to, not a spelling test, and the names are often Thai where
+     a trailing space is invisible */
+  const matches = typed.trim().toLocaleLowerCase() === p.clientName.trim().toLocaleLowerCase();
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
   /**
@@ -144,6 +151,73 @@ export default function ProjectSheet({
               <button onClick={() => setConfirmArchive(true)}>
                 Archive project
                 <small>Nothing is deleted — it stays searchable. · ข้อมูลไม่ถูกลบ ค้นหาได้เสมอ</small>
+              </button>
+            )}
+
+            {/**
+             * Delete, under archive and looking like it.
+             *
+             * Archive is the filing decision and stays the ordinary one — it is
+             * reversible and it keeps the answers. This is for the other case,
+             * the test project and the client that never signed, which archiving
+             * only moves somewhere they still are.
+             *
+             * The confirmation is the client's name, typed. Everything else
+             * destructive here uses a two-press guard, which is proportional to
+             * deleting one response — one person's twenty minutes, on a button
+             * that says whose. This takes every response on the project and the
+             * insights written from them, and a guard you can clear by pressing
+             * twice in the same second is not proportional to that.
+             */}
+            {confirmDelete ? (
+              <div className="delconfirm">
+                <p>
+                  This deletes {p.answers} {p.answers === 1 ? 'answer' : 'answers'}
+                  {p.insights ? ' and the insights written from them' : ''}. It cannot be undone.
+                </p>
+                <label htmlFor={`del-${p.id}`}>
+                  Type <b>{p.clientName}</b> to confirm
+                </label>
+                <input
+                  id={`del-${p.id}`}
+                  className="input"
+                  value={typed}
+                  autoComplete="off"
+                  disabled={pending}
+                  onChange={(e) => setTyped(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && matches) {
+                      close();
+                      run(() => deleteProject(p.id, typed), `${p.clientName} deleted.`);
+                    }
+                  }}
+                />
+                <button
+                  className="danger"
+                  /* the name has to be right before this does anything, so the
+                     button says so by being unavailable rather than by failing
+                     after the press */
+                  disabled={pending || !matches}
+                  onClick={() => {
+                    close();
+                    run(() => deleteProject(p.id, typed), `${p.clientName} deleted.`);
+                  }}
+                >
+                  {pending ? 'Deleting…' : 'Delete permanently'}
+                </button>
+                <button
+                  onClick={() => {
+                    setConfirmDelete(false);
+                    setTyped('');
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <button onClick={() => setConfirmDelete(true)}>
+                Delete project
+                <small>Removes the answers too. There is no undo.</small>
               </button>
             )}
           </>
