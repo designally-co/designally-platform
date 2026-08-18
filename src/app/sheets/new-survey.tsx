@@ -1,14 +1,14 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 
 import type { Package } from '@/lib/db/schema';
 import { countQuestions, type LibraryBlock } from '@/lib/team/library-types';
 import { PACKAGE_BLOCKS } from '@/lib/survey/packages';
-import { createSurvey, surveyQr, type NewSurveyField } from '@/lib/team/actions';
+import { createSurvey, type NewSurveyField } from '@/lib/team/actions';
 import { DEFAULT_DUE_DAYS, dayIn, defaultDueDay } from '@/lib/team/due';
-import { forDisplay } from '@/lib/survey/link';
 import DateField from '../date-field';
+import LinkAndCode from './link-code';
 import Sheet from './sheet';
 
 const OPTIONS: { key: Package; label: string }[] = [
@@ -52,29 +52,7 @@ export default function NewSurveySheet({
   const [error, setError] = useState<{ text: string; field?: NewSurveyField } | null>(null);
   const [link, setLink] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
-  const [qr, setQr] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
   const [pending, start] = useTransition();
-
-  /**
-   * The code, drawn once the survey exists.
-   *
-   * Fetched rather than bundled: the encoder is a server action so it stays out
-   * of a bundle that is loaded to *create* a survey, and most of the time nobody
-   * gets as far as a code. Failing is silent — the link above it is the thing
-   * this sheet promised, and a red line under a working URL saying the picture
-   * did not draw would be alarming about nothing.
-   */
-  useEffect(() => {
-    if (!token) return;
-    let live = true;
-    surveyQr(token).then((r) => {
-      if (live && 'svg' in r) setQr(r.svg);
-    });
-    return () => {
-      live = false;
-    };
-  }, [token]);
 
   const submit = () => {
     setError(null);
@@ -101,16 +79,6 @@ export default function NewSurveySheet({
 
   // the copyable link must be the one that actually resolves
   const full = link ? `${origin}${link}` : '';
-
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(full);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      setCopied(false);
-    }
-  };
 
   return (
     <Sheet title="New survey" narrow onClose={onClose}>
@@ -212,40 +180,20 @@ export default function NewSurveySheet({
           session. Rare, and it has nowhere better to go. */}
       {error && !error.field && <p className="formerror">{error.text}</p>}
 
-      {link ? (
+      {link && token ? (
         <div className="field">
           {/* a caption, not a label — it names no control */}
           <p className="f">Send this link to the client&apos;s main contact</p>
-          <div className="linkbox">
-            <span>{forDisplay(full)}</span>
-            <button className="btn btn-quiet" onClick={copy}>
-              {copied ? 'Copied' : 'Copy'}
-            </button>
-          </div>
+          {/**
+           * The same control the project's Share panel uses, because it is the
+           * same job — see link-code.tsx. It had grown its own: a text button
+           * reading *Copy* that reported nothing when pressed, a smaller code,
+           * and a caption where the Save was.
+           */}
+          <LinkAndCode token={token} url={full} />
           <p className="hintline">
             Opens without a login. Anyone the client forwards it to can answer.
           </p>
-
-          {/**
-           * The same link, for a camera.
-           *
-           * How this reaches a client is often a person in a room holding a
-           * laptop and a client holding a phone, and a twelve-character token
-           * read aloud is a token typed wrong. The share panel on the project
-           * has carried a code for that reason since it was built; this sheet
-           * is where the link is newest and most likely to be handed over on
-           * the spot, and it was the one place you could not.
-           */}
-          <div className="newqr">
-            {qr ? (
-              /* the encoder's SVG carries no colour of its own, so
-                 `currentColor` on the frame paints it */
-              <div className="qrframe" dangerouslySetInnerHTML={{ __html: qr }} />
-            ) : (
-              <div className="qrframe loading" aria-hidden="true" />
-            )}
-            <p className="hintline">Or let them point a camera at this.</p>
-          </div>
         </div>
       ) : (
         <button className="btn btn-primary" onClick={submit} disabled={pending}>

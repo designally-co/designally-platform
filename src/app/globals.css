@@ -2679,23 +2679,7 @@ textarea {
  * phone across a table, and here it sits in a form still being read, so it is
  * capped and centred rather than stretched to the sheet's width.
  */
-.newqr {
-  margin-top: var(--sp-md);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--sp-sm);
-}
-.newqr .qrframe {
-  width: 100%;
-  max-width: 232px;
-}
-/* Reserves the square before the code arrives, so the button under it does not
-   jump the moment the server answers. */
-.newqr .qrframe.loading {
-  background: var(--parchment);
-  border-color: transparent;
-}
+
 
 /**
  * A split button — run it, or say what it runs on.
@@ -6416,7 +6400,9 @@ dialog::backdrop {
   justify-content: center;
   gap: var(--sp-xs);
   width: 100%;
-  margin-top: var(--sp-sm);
+  /* with the code above it, in both places */
+  max-width: 288px;
+  margin: var(--sp-sm) auto 0;
 }
 .sharesave svg {
   width: 17px;
@@ -6451,8 +6437,12 @@ dialog::backdrop {
   /* The full width of the panel. It was 172px in a 300px box, which is a code
      sized for the screen it is drawn on rather than for the camera across the
      table — and the camera is the entire reason it is here. At the panel's
-     width a module is about 9px, which a phone locks onto at arm's length. */
+     width a module is about 9px, which a phone locks onto at arm's length.
+     Capped at that width and centred, so the same code in the wider New survey
+     sheet is the same object rather than a 400px wall of squares. */
   width: 100%;
+  max-width: 288px;
+  margin-inline: auto;
   aspect-ratio: 1;
   height: auto;
   padding: 14px;

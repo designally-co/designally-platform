@@ -2,9 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-import { forDisplay } from '@/lib/survey/link';
-import { surveyQr } from '@/lib/team/actions';
-import { CheckMark, LinkMark, SaveMark, ShareMark } from '../icons';
+import { ShareMark } from '../icons';
+import LinkAndCode from './link-code';
 
 /**
  * Everything to do with sending the link, in one place you open.
@@ -27,25 +26,7 @@ import { CheckMark, LinkMark, SaveMark, ShareMark } from '../icons';
  */
 export default function ShareLink({ token, url, closed }: { token: string; url: string; closed: boolean }) {
   const [open, setOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const [qr, setQr] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
-
-  /* Drawn once per open, and kept: the link cannot change while the panel is
-     up, so a second open of the same project redraws nothing. */
-  useEffect(() => {
-    if (!open || qr) return;
-    let live = true;
-    surveyQr(token).then((r) => {
-      if (!live) return;
-      if ('svg' in r) setQr(r.svg);
-      else setError(r.error);
-    });
-    return () => {
-      live = false;
-    };
-  }, [open, qr, token]);
 
   /* The same dismissal `MoreMenu` uses, and the same reason for capturing
      Escape: this sits inside a native <dialog>, which closes on Escape too, and
@@ -68,38 +49,6 @@ export default function ShareLink({ token, url, closed }: { token: string; url: 
       document.removeEventListener('keydown', esc, true);
     };
   }, [open]);
-
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(url);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      /* The URL is on screen in a box, so the recovery is to select it — which
-         is what the box is for and why it is not a read-only input the browser
-         might style as unavailable. */
-      setError('Could not reach the clipboard. The link is above — select and copy it.');
-    }
-  };
-
-  /**
-   * The code as a file.
-   *
-   * A blob and an object URL rather than a data: URI, because a QR SVG is a few
-   * kilobytes of path and a data URI that long is a filename the browser
-   * sometimes declines to honour. Revoked on the next frame; kept alive it
-   * holds the blob for the life of the document.
-   */
-  const save = () => {
-    if (!qr) return;
-    const blob = new Blob([qr], { type: 'image/svg+xml' });
-    const href = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = href;
-    a.download = `${token}-survey-qr.svg`;
-    a.click();
-    requestAnimationFrame(() => URL.revokeObjectURL(href));
-  };
 
   return (
     <div className="shareslot" ref={ref}>
@@ -142,79 +91,7 @@ export default function ShareLink({ token, url, closed }: { token: string; url: 
               : ' — anyone with this link can answer.'}
           </p>
 
-          {/**
-           * The link and its Copy, on one line.
-           *
-           * Copy is filled rather than outlined: it is the action this panel is
-           * opened for, and the accent is what the system uses to say so. A
-           * white disc beside a grey box read as two pieces of furniture, with
-           * nothing marking which one does something.
-           *
-           * A disc rather than a labelled button, because the row is the link —
-           * a full-width `Copy link` under it pushed the code down a line and
-           * spent the panel's loudest element on a verb the mark already says.
-           */}
-          <div className="sharerow">
-            <span className="sharelink" title={url}>
-              {forDisplay(url)}
-            </span>
-            <button
-              className="sharecopy"
-              aria-label={copied ? 'Link copied' : 'Copy link'}
-              title={copied ? 'Copied' : 'Copy link'}
-              onClick={copy}
-            >
-              {copied ? <CheckMark /> : <LinkMark />}
-            </button>
-          </div>
-
-          {/* a swapped glyph is silent to a screen reader */}
-          <span className="visually-hidden" role="status">
-            {copied ? 'Link copied' : ''}
-          </span>
-
-          <div className="shareqr">
-            {qr ? (
-              <>
-                {/* The encoder's own SVG, inlined. It carries no colour of its
-                    own, so `currentColor` on the wrapper paints it — which is
-                    what keeps it correct if this sheet is ever on the dark
-                    Field, and what stops a printed code coming out orange. */}
-                <div className="qrframe" dangerouslySetInnerHTML={{ __html: qr }} />
-                {/**
-                 * Save is under the code, after two goes at putting it on one.
-                 *
-                 * On the code it was centred — the one place that is safe,
-                 * since a QR's three corner squares are *finder* patterns a
-                 * decoder needs before any error correction runs, and covering
-                 * one breaks the symbol outright however much redundancy it
-                 * carries. That part was right and is not why it came off.
-                 *
-                 * It came off because a QR is the one surface in this system
-                 * with no mid-tones: pure black modules on pure white, at full
-                 * contrast, everywhere. Nothing sits *on* that. A flat disc
-                 * disappears into the black; a white one with a halo and a ring
-                 * reads as a patch punched out of the code, which is exactly
-                 * what it is. There is no third try — the surface has no
-                 * tonal room, and two attempts is the evidence.
-                 *
-                 * Under it, it is a quiet action row and not a second CTA. Copy
-                 * is what this panel is opened for and keeps the accent; this
-                 * takes the shape of a menu row — mark leading, 13px, `--ink-3`
-                 * — which is the form the system already uses for an action
-                 * that is available rather than urged.
-                 */}
-                <button className="btn btn-outline sharesave" onClick={save}>
-                  <SaveMark />
-                  <span>Save QR code</span>
-                </button>
-              </>
-            ) : error ? null : (
-              <div className="qrframe loading" aria-hidden="true" />
-            )}
-          </div>
-
-          {error && <p className="formerror">{error}</p>}
+          <LinkAndCode token={token} url={url} />
         </div>
       )}
     </div>
