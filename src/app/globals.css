@@ -1808,54 +1808,12 @@ label.f span {
 }
 
 /* ============================================================
-   What the client said — the full answers, one respondent at a
-   time. DESIGN.md: borders not shadows, canvas on parchment.
+   What one person said — the full answers for a single response.
+   The tab strip that switched between respondents went on
+   18 August 2026; every route into this sheet is a click on a
+   named person, so it opens on them and stays there.
+   DESIGN.md: borders not shadows, canvas on parchment.
    ============================================================ */
-
-.anspeople {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: var(--sp-lg);
-}
-.anspeople button {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  text-align: left;
-  padding: 10px 16px;
-  border: 1px solid var(--hairline);
-  border-radius: var(--r-pill);
-  background: var(--canvas);
-  color: var(--ink);
-  font-family: inherit;
-  cursor: pointer;
-  transition: border-color 0.18s;
-}
-.anspeople button b {
-  font-size: 15px;
-  font-weight: 600;
-}
-.anspeople button span {
-  font-size: 12px;
-  color: var(--ink-3);
-  line-height: 1.7;
-}
-/* the position sits under the name and above the count — who is speaking,
-   before how much they said */
-.anspeople button .ansrole {
-  color: var(--ink-2);
-}
-@media (hover: hover) {
-  .anspeople button:hover {
-    border-color: var(--ink-3);
-  }
-}
-/* the accent marks the selection, never the hover — DESIGN.md section 5 */
-.anspeople button.on {
-  border: 2px solid var(--primary-focus);
-  padding: 9px 15px;
-}
 
 .anssum {
   margin-bottom: var(--sp-lg);
@@ -4824,10 +4782,31 @@ dialog::backdrop {
   margin-left: 0;
 }
 
-/* On screen the tabs say whose answers these are; the heading exists for the
-   printed page, which has no tabs. */
+/**
+ * Whose answers these are.
+ *
+ * It was hidden while the tabs said it, and the tabs went on 18 August 2026 —
+ * the sheet opens on one person now. The sheet's own title names the client, so
+ * without this the page carried a person's twenty-one answers and their name
+ * nowhere on it.
+ */
 .ansname {
-  display: none;
+  margin: 0 0 4px;
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  /* any name here can be Thai, and most are */
+  line-height: 1.6;
+}
+/* the position and the email, on the line under it — the same ink and size the
+   summary beneath takes, because they are the same kind of fact about a person
+   rather than part of their name */
+.ansname span {
+  display: block;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--ink-3);
 }
 
 /* The printed page is not this page. `printableHtml` in lib/team/export.ts

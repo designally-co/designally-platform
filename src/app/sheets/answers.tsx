@@ -182,11 +182,22 @@ export default function AnswersSheet({
   onDeleted: (message: string) => void;
   onClose: () => void;
 }) {
-  const [open, setOpen] = useState(() => {
-    const i = data.respondents.findIndex((p) => p.id === focus);
-    return i === -1 ? 0 : i;
-  });
-  const person = data.respondents[open];
+  /**
+   * One person, and only ever the one that was opened.
+   *
+   * The sheet carried a tab per respondent until 18 August 2026, and the tabs
+   * went because of where it is reached from: every route in is a click on a
+   * named person, on the project. Arriving on somebody you chose, with four
+   * other names above their answers, offers a switch nobody asked for and makes
+   * the page about the list rather than about them.
+   *
+   * `data` still holds everybody, which is what lets Export offer the whole set
+   * from here without a second read.
+   *
+   * The fallback survives a stale `focus` — a response deleted in another tab
+   * would otherwise index past the end and take the sheet down with it.
+   */
+  const person = data.respondents.find((p) => p.id === focus) ?? data.respondents[0];
   /**
    * Delete sits here, on the answers themselves, and not on the project's list
    * of names — moved 17 August 2026. Deleting somebody's twenty minutes from a
@@ -315,55 +326,31 @@ export default function AnswersSheet({
         <p className="quiet">Nobody has answered yet.</p>
       ) : (
         <>
-          {/* one tab per person; with three to twenty respondents this never
-              needs to become a select */}
-          <div className="anspeople" role="tablist">
-            {data.respondents.map((p, i) => (
-              <button
-                key={p.id}
-                role="tab"
-                aria-selected={i === open}
-                className={i === open ? 'on' : undefined}
-                onClick={() => setOpen(i)}
-              >
-                <b>{p.name}</b>
-                {/* the position, live again at question version 5. Whose view
-                    this is changes what a disagreement means — a founder and a
-                    new hire dissenting is not the same finding twice. Absent on
-                    anything sent at versions 3 or 4, which never asked. */}
-                {p.role && <span className="ansrole">{p.role}</span>}
-                <span>
-                  {p.answered} answered
-                  {p.blank > 0 && ` · ${p.blank} blank`}
-                </span>
-              </button>
-            ))}
-          </div>
-
-          {/**
-           * One person on screen, everybody when the print is for everybody.
-           *
-           * Printing all respondents needs them all in the document, and the
-           * tabs only ever mounted one. Rendering all of them permanently would
-           * put up to twenty times twenty-one answers in the DOM to serve a
-           * button most people press never, so they arrive for the moment the
-           * dialog is open and leave with it.
-           *
-           * The name is a heading here rather than only a tab, because a
-           * printed page has no tabs — see the print rules, which is also where
-           * it is hidden on screen.
-           */}
           {[person].map((p) => (
             <section className="ansperson" key={p.id}>
+              {/**
+               * Whose answers these are, which the tabs used to say.
+               *
+               * The sheet's own title names the *client* — "What ARUN+ said" —
+               * so without this the page had five people's worth of answers on
+               * it and no name anywhere. The position is here for the reason it
+               * was on the tab: a founder and a new hire dissenting is not the
+               * same finding twice.
+               */}
               <h3 className="ansname">
                 {p.name}
                 {p.role && <span>{p.role}</span>}
                 {p.email && <span>{p.email}</span>}
               </h3>
+              {/* No name in it any more: it named the person because the only
+                  other place they appeared was a tab across the top. The
+                  heading is the line directly above this one now, and a Thai
+                  name is long enough that repeating it here reads as a stutter
+                  rather than as a subject. */}
               <p className="quiet anssum">
                 {p.blank > 0
-                  ? `${p.name} left ${p.blank} of ${p.answered + p.blank} blank. A question nobody could answer is a finding, not a gap in the data.`
-                  : `${p.name} answered every question.`}
+                  ? `Left ${p.blank} of ${p.answered + p.blank} blank. A question nobody could answer is a finding, not a gap in the data.`
+                  : 'Answered every question.'}
               </p>
 
               <ul className="anslist">
