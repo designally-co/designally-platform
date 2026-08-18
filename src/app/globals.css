@@ -2774,8 +2774,25 @@ textarea {
 .vermenu .delconfirm {
   margin-top: 0;
 }
+/**
+ * The two answers stay on one line.
+ *
+ * They wrapped, because "Delete permanently" plus "Cancel" is wider than a
+ * 300px menu less its padding — and a stacked pair reads as a list of options
+ * rather than as a question's two answers. The verb lost its adverb instead:
+ * the sentence above already says which run and the block is already red, so
+ * "permanently" was the third thing saying the same thing.
+ *
+ * `nowrap` on the row and no wrapping inside either label, so a longer
+ * translation shrinks the padding rather than breaking the line.
+ */
 .vermenu .delconfirm .iacts {
   margin-top: var(--sp-xxs);
+  flex-wrap: nowrap;
+}
+.vermenu .delconfirm .iacts .btn {
+  padding-left: var(--sp-md);
+  padding-right: var(--sp-md);
 }
 /**
  * Cancel goes neutral inside a danger confirm.

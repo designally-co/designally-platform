@@ -301,7 +301,7 @@ export default function InsightsSheet({
                                 act(() => deleteInsights(v.id), 'Version deleted.');
                               }}
                             >
-                              {busy ? 'Deleting…' : 'Delete permanently'}
+                              {busy ? 'Deleting…' : 'Delete'}
                             </button>
                             <button className="btn btn-quiet" onClick={() => setDropping(null)}>
                               Cancel
