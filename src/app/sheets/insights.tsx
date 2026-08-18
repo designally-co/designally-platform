@@ -140,7 +140,21 @@ export default function InsightsSheet({
   const openId = shown?.id ?? current?.id;
   const openVersion = versions.find((v) => v.id === openId) ?? current;
   const insights = (shown?.insights ?? project.insights) as Insights;
-  const people = project.answers;
+  /**
+   * The denominator in "2 of 5" — how many answers *this version* read.
+   *
+   * It was `project.answers`, the number the project has now, and that is a
+   * different number the moment a version reads a subset or somebody answers
+   * after it was written. A run over two respondents reported "2 of 5", which
+   * reads as three people declining to agree when in fact three were never
+   * asked. Rule 7 is that "2 of 3" is honest; a fraction whose denominator is
+   * not the set it was counted from is not.
+   *
+   * `sources` is that set, stored per run. Versions written before it was kept
+   * fall back to the project's count, which is what they were counted from
+   * then — every run read everybody until the picker existed.
+   */
+  const people = openVersion?.sources?.length ?? project.answers;
 
   /**
    * Whose answers the next run should read. Null is everyone, which is the

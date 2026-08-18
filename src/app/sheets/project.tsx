@@ -125,12 +125,25 @@ export default function ProjectSheet({
   const [pending, start] = useTransition();
   /**
    * Whose answers the analysis should read. Null is everyone, which is the
-   * default and nearly always what happens — the subset exists to see the insights
-   * without an outlier or a duplicate, not as a routine step, so it stays out
-   * of the way until somebody opens it.
+   * default and nearly always what happens.
+   *
+   * **One value for the whole sheet.** It used to sit inside the *right now*
+   * card, which meant the card and the insights section would each have held
+   * their own — two lists of the same checkboxes, disagreeing, with the button
+   * you happened to press deciding which one counted. The Insights section owns
+   * the picker now and the card's own actions read the same value.
    */
   const [only, setOnly] = useState<string[] | null>(null);
-  const [picking, setPicking] = useState(false);
+
+  /**
+   * The banner's own confirmation, separate from the More menu's.
+   *
+   * Closing collection from here is gate 1 exactly as it is from the menu — it
+   * stamps `closed_by`, it stops the link, and it starts a paid analysis — so it
+   * asks first for the same reasons. It cannot share `confirming`: that value
+   * drives the menu, and one field would open both panels at once.
+   */
+  const [confirmGenerate, setConfirmGenerate] = useState(false);
 
   /**
    * The caller's sentence, unless the server has a better one.
@@ -155,6 +168,40 @@ export default function ProjectSheet({
         return;
       }
       onActed(result.warning ?? message);
+    });
+
+  /**
+   * Write the insights, then show them.
+   *
+   * `run` closes the sheet and toasts, which is right for archiving and wrong
+   * for this: the team asked to press generate and *see* what came back, so
+   * this ends on the insights sheet instead of on a sentence about it.
+   *
+   * Two actions behind one button, because there are two ways to arrive here
+   * and only one of them is a second run. An open survey has no settled set of
+   * answers to read — `reanalyse` refuses one — so closing is what produces the
+   * first analysis, and it is gate 1 while it does. The label says which is
+   * about to happen.
+   */
+  const generate = () =>
+    start(async () => {
+      setError(null);
+      setConfirmGenerate(false);
+      const result = p.closedOn
+        ? await reanalyse(p.id, only ?? undefined)
+        : await closeCollection(p.surveyId!, only ?? undefined);
+      if (!result.ok) {
+        setError(result.error ?? 'That did not work.');
+        return;
+      }
+      /* A close with nobody to read comes back ok with a warning and no
+         analysis — there is nothing to open, so say it rather than opening an
+         empty sheet. */
+      if (result.warning) {
+        onActed(result.warning);
+        return;
+      }
+      onOpenInsights();
     });
 
   const link = p.token ? `${origin}/s/${p.token}` : null;
@@ -485,78 +532,21 @@ export default function ProjectSheet({
               <b>{p.action.say}</b> {p.action.emphasis}
             </p>
             <p className="when">{p.action.when}</p>
-            {/* which answers this reads. Hidden until asked for, because the
-                answer is "all of them" almost every time. Only for the two
-                actions that read answers — reviewing what is already written
-                reads nothing. */}
-            {p.action.kind !== 'review-insights' && p.people.length > 1 && (
-              <div className="whoreads">
-                {picking ? (
-                  <>
-                    <p className="hintline">Read the answers of:</p>
-                    {p.people.map((person) => {
-                      const on = only === null || only.includes(person.id);
-                      return (
-                        <label key={person.id} className="pickwho">
-                          <input
-                            type="checkbox"
-                            checked={on}
-                            onChange={() => {
-                              const base = only ?? p.people.map((x) => x.id);
-                              const next = on
-                                ? base.filter((id) => id !== person.id)
-                                : [...base, person.id];
-                              /* everyone selected is the same as no selection —
-                                 keep it null so the insights records it that way */
-                              setOnly(next.length === p.people.length ? null : next);
-                            }}
-                          />
-                          <span>{person.name}</span>
-                        </label>
-                      );
-                    })}
-                  </>
-                ) : (
-                  <button className="linky" onClick={() => setPicking(true)}>
-                    {only
-                      ? `Reading ${only.length} of ${p.people.length} answers — change`
-                      : 'Choose whose answers to read'}
-                  </button>
-                )}
-              </div>
-            )}
             {/**
-             * Three actions reach this card and they are not the same act.
-             * Closing collection is the gate; writing the insights is the
-             * retry after the analysis failed on a survey already closed;
-             * reviewing opens the sheet and touches nothing.
+             * This card says what is going on. It no longer does anything about
+             * it, as of 18 August 2026.
              *
-             * All three used to call `closeCollection`, so two of them came
-             * back "That survey is already closed." — the label said one thing
-             * and the button did another. Branch on the kind.
+             * It carried a primary button branching three ways — close, write
+             * the insights, review them — and every one of those is what the
+             * Insights section below now does, with the picker attached. Two
+             * buttons a thumb apart running the same analysis is how you get a
+             * team choosing four respondents in one place and generating from
+             * all five in the other.
+             *
+             * What is left is the half the section cannot say: *why now*. The
+             * date has passed, or it has been quiet five days — a reason, and
+             * the date it is reckoned from.
              */}
-            <button
-              className="btn btn-primary"
-              disabled={pending || only?.length === 0}
-              onClick={() => {
-                if (p.action!.kind === 'review-insights') return onOpenInsights();
-                if (p.action!.kind === 'write-insights') {
-                  return run(() => reanalyse(p.id, only ?? undefined), 'The insights are written.');
-                }
-                run(
-                  () => closeCollection(p.surveyId!, only ?? undefined),
-                  'Collection closed.',
-                );
-              }}
-            >
-              {pending ? 'Working…' : p.action.label}
-            </button>
-            {p.action.kind === 'close-collection' && (
-              <p className="hintline">
-                This records that you closed it, and when. Closing stops new answers and starts the
-                analysis.
-              </p>
-            )}
           </>
         ) : (
           <>
@@ -591,7 +581,11 @@ export default function ProjectSheet({
        * to send it belong to one control, and this section is about *when* the
        * answers are wanted rather than where they go.
        */}
-      {p.token && (
+      {/* Closed, and no date ever set, leaves nothing to put under the heading —
+          and a heading with nothing under it is a section that failed to load.
+          The editor is only for a survey still taking answers; a closed one
+          keeps the date as the record of what the client was told. */}
+      {p.token && (!p.closedOn || p.dueOn) && (
         <div className="pd-sec">
           <h2>The date</h2>
 
@@ -626,6 +620,9 @@ export default function ProjectSheet({
               </span>
             </div>
           )}
+          {p.closedOn && p.dueOn && (
+            <p className="quiet">You asked for answers by {p.dueOn}. Collection is closed.</p>
+          )}
           {/* Reopening is in the toolbar's More menu. A stakeholder replying the
               day after collection closed is not an edge case, and reopening
               leaves the insights alone: what they say was true of the answers
@@ -633,25 +630,137 @@ export default function ProjectSheet({
         </div>
       )}
 
-      {/* documents */}
-      <div className="pd-sec">
-        <h2>Documents</h2>
-        {p.insights ? (
-          <div className="pd-docs">
-            <button className="doc" onClick={onOpenInsights}>
-              Survey analysis
-              <small>
-                {p.answers} {p.answers === 1 ? 'answer' : 'answers'}
-                {p.insightsWrittenOn ? ` · ${p.insightsWrittenOn}` : ''}
-              </small>
-            </button>
-          </div>
-        ) : (
+      {/**
+       * The insights, and the one place they are made.
+       *
+       * This was a section called *Documents* holding a single button, and it
+       * was a plural because there used to be two things in it — the insights
+       * and the brief the designer was handed after the kick-off. The brief went
+       * with the kick-off on 17 August 2026, so it had been a shelf built for a
+       * library that was cancelled.
+       *
+       * The team asked for this shape on 18 August 2026: the answers, then a
+       * banner where you choose which of them to read, press once, and see what
+       * came back. That is three things that were in three places — the picker
+       * inside the *right now* card, the button that ran the analysis, and a
+       * document row that opened the result.
+       *
+       * **The picker is open, not behind a link.** It was hidden until asked for
+       * on the argument that the answer is "everyone" almost every time, which
+       * is true and is why everyone stays ticked. But choosing is the first half
+       * of what the team described doing here, and a control you have to go
+       * looking for is not offered.
+       */}
+      <div className="pd-sec pd-insights">
+        <h2>Insights</h2>
+
+        {!p.people.length ? (
           <p className="quiet">
-            {p.closedOn
-              ? 'Collection is closed but no insights were written. Needs you has a button to write it.'
-              : 'Nothing produced yet — documents appear here as the project moves.'}
+            Nobody has answered yet. The analysis reads the answers, so it has nothing to read.
           </p>
+        ) : (
+          <>
+            {/* What exists, before what can be done about it. */}
+            {p.insights ? (
+              <p className="isay">
+                <b>Written {p.insightsWrittenOn}</b>
+                {p.insightsVersions.length > 1
+                  ? ` · ${p.insightsVersions.length} versions kept`
+                  : ''}
+              </p>
+            ) : (
+              <p className="isay">
+                <b>Not written yet</b>
+                {p.closedOn ? ' · collection is closed' : ''}
+              </p>
+            )}
+
+            {/**
+             * Whose answers to read. One row each, everyone ticked.
+             *
+             * A single respondent gets no picker: a checkbox whose only legal
+             * state is ticked is furniture.
+             */}
+            {p.people.length > 1 && (
+              <div className="whoreads">
+                <p className="hintline">Read the answers of:</p>
+                {p.people.map((person) => {
+                  const on = only === null || only.includes(person.id);
+                  return (
+                    <label key={person.id} className="pickwho">
+                      <input
+                        type="checkbox"
+                        checked={on}
+                        disabled={pending}
+                        onChange={() => {
+                          const base = only ?? p.people.map((x) => x.id);
+                          const next = on
+                            ? base.filter((id) => id !== person.id)
+                            : [...base, person.id];
+                          /* everyone selected is the same as no selection — keep
+                             it null so the run records it that way */
+                          setOnly(next.length === p.people.length ? null : next);
+                        }}
+                      />
+                      <span>{person.name}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            )}
+
+            <div className="iacts">
+              {/**
+               * Generating while the survey is open closes it on the way, and
+               * that is gate 1 — so it asks first, the way every other gate on
+               * this sheet does. Once closed it is a re-run and asks nothing:
+               * every version is kept and nothing is overwritten.
+               */}
+              {confirmGenerate ? (
+                <div className="delconfirm">
+                  <p>
+                    This closes collection first — the link stops taking answers, and your name
+                    goes on it.
+                  </p>
+                  {/* Wrapped, so `.delconfirm > button` does not reach them:
+                      that rule compacts a menu row, and these two are buttons on
+                      a sheet standing next to other buttons on the same sheet. */}
+                  <div className="iacts">
+                    <button className="btn btn-primary" disabled={pending} onClick={generate}>
+                      {pending ? 'Working…' : 'Close and generate'}
+                    </button>
+                    <button className="btn btn-quiet" onClick={() => setConfirmGenerate(false)}>
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  className="btn btn-primary"
+                  disabled={pending || only?.length === 0}
+                  onClick={() => (p.closedOn ? generate() : setConfirmGenerate(true))}
+                >
+                  {pending
+                    ? 'Working…'
+                    : p.closedOn
+                      ? p.insights
+                        ? 'Generate again'
+                        : 'Generate insights'
+                      : 'Close collection and generate'}
+                </button>
+              )}
+
+              {p.insights && (
+                <button className="btn btn-quiet" disabled={pending} onClick={onOpenInsights}>
+                  Open the insights
+                </button>
+              )}
+            </div>
+
+            {only?.length === 0 && (
+              <p className="hintline">Tick at least one person for the analysis to read.</p>
+            )}
+          </>
         )}
       </div>
 

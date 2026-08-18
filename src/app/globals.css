@@ -2374,6 +2374,42 @@ label.f span {
   border: 0;
 }
 
+/**
+ * The Insights section on a project — what exists, who it should read, and the
+ * one button that makes it.
+ *
+ * No card, no fill, no tint. It is a section like the others on this sheet and
+ * the only thing that raises it is the primary button, which is the system
+ * saying a person is needed here (DESIGN.md section 1). A banner drawn as a
+ * coloured panel would have claimed that twice.
+ */
+.pd-insights .isay {
+  font-size: 14px;
+  /* Thai never below 1.6 on a line that can carry a date and a name */
+  line-height: 1.6;
+  color: var(--ink-3);
+  margin-bottom: var(--sp-md);
+}
+.pd-insights .isay b {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* The two buttons wrap rather than shrink: "Close collection and generate" is a
+   long label by design, and at 390px it takes the line to itself. */
+.iacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-sm);
+  align-items: center;
+}
+.pd-insights .delconfirm {
+  width: 100%;
+}
+.pd-insights .hintline {
+  margin-top: var(--sp-sm);
+}
+
 /* ---- All projects ---- */
 .ptable {
   width: 100%;

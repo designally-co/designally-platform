@@ -6,6 +6,25 @@ _Designally Platform_
 
 **1 · Nothing.** Answers accumulate. No expected count, no fraction. The team is not asked to watch.
 
+**The project sheet is where the insights are made** (18 August 2026, asked for by
+the team). Three sections in the order the work happens: *Who answered*, where each
+person opens their own answers; *Insights*, where you tick whose answers to read,
+press once, and land on what came back; and *The date*. The picker sits open rather
+than behind a link — everyone stays ticked, because that is the answer almost every
+time, but choosing is half of what the team described doing here and a control you
+have to go looking for is not offered.
+
+While the survey is still open the button reads **Close collection and generate**,
+and it asks first: that press is gate 1, it stops the link, and it puts a name on
+the close. Once closed it reads *Generate insights* or *Generate again* and asks
+nothing — every run is kept and none is overwritten.
+
+The *right now* card above it no longer has a button. It had one that branched
+three ways, and all three are what the Insights section does now; two controls a
+thumb apart running the same analysis is how a team ticks four respondents in one
+place and generates from five in the other. The card keeps the half the section
+cannot say — *why now*: the date has passed, or it has been quiet five days.
+
 **Answers can arrive after a version is written, and a new one can be asked for at
 any time** (18 August 2026). The ordinary shape is: close, read, reopen because
 somebody was missed, take their answer, close again. The insights sheet has a
