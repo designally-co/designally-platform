@@ -303,8 +303,26 @@ export default function ProjectSheet({
     </>
   );
 
+  /**
+   * The bar says which project, not that this is one.
+   *
+   * Its title read "Project", which is true of the sheet and useless about it.
+   * The bar is `position: sticky` and the client's name is an `<h1>` in the body
+   * that scrolls out from under it — the HIG's large-title pattern, where the
+   * small title exists precisely for the moment the large one has gone. Left as
+   * a category it told somebody reading answers halfway down the sheet that
+   * they were looking at a project, which they knew, and not at whose.
+   *
+   * Both stay, and that is the pattern working rather than a repetition: the
+   * two are never legible at the same moment for long.
+   */
   return (
-    <Sheet title="Project" actions={actions} backLabel="Back to all projects" onClose={onClose}>
+    <Sheet
+      title={p.clientName}
+      actions={actions}
+      backLabel="Back to all projects"
+      onClose={onClose}
+    >
       <div className="pd-head">
         <h1>{p.clientName}</h1>
         <div className="pkg">
