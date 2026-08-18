@@ -54,6 +54,8 @@ export type Person = {
   id: string;
   name: string;
   email: string | null;
+  /** raw, not formatted — the browser turns it into a local time, see `when.ts` */
+  submittedAt: Date;
 };
 
 export type ProjectAction = {
@@ -287,7 +289,7 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
   const peopleBySurvey = new Map<string, Person[]>();
   for (const r of everyone) {
     const list = peopleBySurvey.get(r.surveyId) ?? [];
-    list.push({ id: r.id, name: r.name, email: r.email });
+    list.push({ id: r.id, name: r.name, email: r.email, submittedAt: r.submittedAt });
     peopleBySurvey.set(r.surveyId, list);
   }
 

@@ -14,6 +14,7 @@ import {
 import type { ProjectView } from '@/lib/team/projects';
 import { answersToMarkdown, exportFilename, printableHtml } from '@/lib/team/export';
 import { ArchiveMark, DocMark, LockMark, PrintMark, SaveMark, TrashMark, UndoMark } from '../icons';
+import { submitted } from '@/lib/team/when';
 import ShareLink from './share';
 import MoreMenu from '../menu';
 import Sheet from './sheet';
@@ -513,7 +514,13 @@ export default function ProjectSheet({
               {p.people.map((person) => (
                 <button className="person" key={person.id} onClick={() => onReadAnswers(person.id)}>
                   <b>{person.name}</b>
-                  <span className="role">{person.email || 'no email given'}</span>
+                  {/* When, not the address. The email said nothing about the
+                      answer underneath it and read as a second name; the time
+                      is what orders five responses to one survey and what tells
+                      you whether the person you chased last week has replied.
+                      It is still on their own sheet and in both exports, which
+                      is where somebody actually writing to them would be. */}
+                  <span className="at">{submitted(person.submittedAt)}</span>
                 </button>
               ))}
             </div>

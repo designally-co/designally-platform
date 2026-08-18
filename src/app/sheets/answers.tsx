@@ -13,6 +13,7 @@ import {
 } from '@/lib/team/export';
 import { DocMark, PrintMark, SaveMark, TrashMark } from '../icons';
 import MoreMenu from '../menu';
+import { submitted } from '@/lib/team/when';
 import Sheet from './sheet';
 
 /**
@@ -144,24 +145,6 @@ function Value({ value, pairs }: { value: AnswerValue; pairs?: ReadableAnswer['p
     case 'scale':
       return <Scale value={value} pairs={pairs} />;
   }
-}
-
-/**
- * When a response was submitted, for the sheet's bar.
- *
- * Date and time, not a relative "2 days ago": five responses to one survey
- * arrive within a week of each other and "3 days ago" against "4 days ago" is
- * harder to order at a glance than two dates. Local formatting, because the
- * team reads these in Bangkok.
- */
-function submitted(at: Date) {
-  return new Date(at).toLocaleString('en-GB', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
 }
 
 /**

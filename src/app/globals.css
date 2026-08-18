@@ -3067,7 +3067,9 @@ dialog::backdrop {
   display: block;
   font-size: 14.5px;
 }
-.person .role {
+/* `.role` until 18 August 2026, when it stopped holding a role — it had been
+   showing the email, and shows the time the answer arrived now. */
+.person .at {
   display: block;
   color: var(--ink-3);
 }
