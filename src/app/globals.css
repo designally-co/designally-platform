@@ -5570,15 +5570,18 @@ dialog::backdrop {
   font-weight: 600;
   color: var(--ink);
 }
-/* 38, not the 44 a form field takes. This one is typed into once, under a
-   sentence, in a panel — the touch floor is about controls somebody hunts for
-   on a phone, and this is neither. White on the wash, so the field reads as the
-   thing in front the way a hovered row does. */
+/**
+ * The app's own field, not a smaller copy of it.
+ *
+ * It was overridden to 38px at 15px type on the argument that a panel wants
+ * something more compact than a form. That made it look like `.input` and
+ * measure like something else — a second field with no name, which is how a
+ * system grows two of everything. It takes `.input` whole: 44px, 17px type,
+ * `--r-lg`, and `--canvas` white, which on the red wash reads as the thing in
+ * front the way a hovered row does.
+ */
 .delconfirm .input {
   width: 100%;
-  height: 38px;
-  padding: 0 12px;
-  font-size: 15px;
 }
 /* Quiet rather than red while unavailable — an accent on a control nobody can
    use yet is the accent saying a person is needed at a place they cannot act,

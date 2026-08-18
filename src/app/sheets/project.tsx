@@ -298,12 +298,21 @@ export default function ProjectSheet({
                * second is not proportional to that.
                */
               <div className="delconfirm danger">
-                <p>
-                  {p.answers} {p.answers === 1 ? 'answer' : 'answers'}
-                  {p.insights ? ' and the insights' : ''} go. No undo.
-                </p>
+                {/**
+                 * One line: what to type, and what typing it does.
+                 *
+                 * It counted the answers, and a count is a partial inventory —
+                 * a project holds the insights written from those answers too,
+                 * and it will hold whatever else is added to it. Naming some of
+                 * what goes is worse than naming none, because it reads as the
+                 * complete list. "The project" is the complete list.
+                 *
+                 * No "no undo" either: the button below says permanently, and a
+                 * warning given twice in four inches reads as a template rather
+                 * than a warning.
+                 */}
                 <label htmlFor={`del-${p.id}`}>
-                  Type <b>{p.clientName}</b> to confirm
+                  Type <b>{p.clientName}</b> to delete the project.
                 </label>
                 <input
                   id={`del-${p.id}`}
