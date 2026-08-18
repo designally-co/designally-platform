@@ -16,12 +16,20 @@ Every step belongs to the client, the team, or the app.
 | 6 | App | After the date passes, or after 5 quiet days: "enough to work with, or wait a little longer?" | — |
 | 7 | **Team** | **Close and analyse** ← human decision | 5 sec |
 | 8 | App | Writes the insights: agreements, conflicts, gaps, flags | ~30 sec |
-| 9 | **Team** | **Read and confirm** ← human decision | 15–20 min |
+| 9 | Team | Read the insights — and re-run them on whichever answers they choose | 15–20 min |
 | 10 | **Team** | **Archive the project** ← human decision, whenever they judge it finished | 5 sec |
 
-**After 9.** The team has the confirmed insights and the full answers, and the design work
+**Step 9 was a gate until 18 August 2026** — *Read and confirm*, with a name recorded
+against it. It is not one now. The platform collects the answers and writes the
+insights, and it stops there; asking a person to countersign the last thing it
+produces was the app holding a door it does not own. Reading it still matters for
+the reason `docs/insight-engine-spec.md` gives — the analysis mistakes two wordings
+of one idea for a disagreement, especially across Thai and English — but that is
+how the team works rather than a state the software enforces.
+
+**After 8.** The team has the insights and the full answers, and the design work
 begins. How they run the first meeting, what they build the deck in, and what they write down
-afterwards are theirs; the platform's job ended at step 9.
+afterwards are theirs; the platform's job ends when the insights are written.
 
 **Retired 17 August 2026:** steps 10–12 of the older flow — the deck handoff, the kick-off
 meeting, and recording what the room decided. The platform now stops at the summary. The

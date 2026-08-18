@@ -2338,7 +2338,9 @@ label.f span {
   }
 }
 
-/* a confirmed set of insights the answers have moved past */
+/* A run the answers have moved past — somebody answered after it was written.
+   Caution, not accent: it is worth knowing before you read the numbers, and
+   nobody has to act on it. */
 .stale {
   border-left: 2px solid var(--caution);
   padding-left: var(--sp-md);
@@ -2346,7 +2348,7 @@ label.f span {
   margin-bottom: var(--sp-md);
 }
 
-/* un-confirm sits inside a sentence, so it reads as a word, not a control */
+/* a control that reads as a word inside a sentence, not as a button */
 .linky {
   border: 0;
   background: none;
@@ -2356,27 +2358,6 @@ label.f span {
   cursor: pointer;
   text-decoration: underline;
   text-underline-offset: 2px;
-}
-
-/**
- * Gate 2 — the confirm step.
- *
- * The accent means a person is needed here (DESIGN.md section 1), which is
- * exactly what unconfirmed insights are: work that stops until somebody reads it
- * and puts their name to it.
- */
-.isec.gate {
-  border-top: 1px solid var(--hairline);
-  padding-top: var(--sp-lg);
-}
-.isec.gate p {
-  max-width: 62ch;
-  color: var(--ink-2);
-  margin-bottom: var(--sp-md);
-}
-.isec.gate .confirmed {
-  color: var(--ink-3);
-  margin-bottom: 0;
 }
 
 /* Present to a screen reader, absent to everything else. Not `display: none`,

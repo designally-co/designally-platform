@@ -2,13 +2,7 @@
 
 import { useState, useTransition } from 'react';
 
-import {
-  confirmInsights,
-  deleteInsights,
-  reanalyse,
-  readInsightsVersion,
-  unconfirmInsights,
-} from '@/lib/team/actions';
+import { deleteInsights, reanalyse, readInsightsVersion } from '@/lib/team/actions';
 
 import type { Insights } from '@/lib/analysis/schema';
 import type { ProjectView } from '@/lib/team/projects';
@@ -311,15 +305,16 @@ export default function InsightsSheet({
                   >
                     <b>{v.writtenOn}</b>
                     <span>
-                      {v.isNewest && 'newest'}
-                      {v.isNewest && v.confirmedOn && ' · '}
-                      {v.confirmedOn
-                        ? `confirmed ${v.confirmedOn}${v.confirmedBy ? ` by ${v.confirmedBy}` : ''}`
-                        : !v.isNewest && 'not confirmed'}
+                      {v.isNewest
+                        ? 'newest'
+                        : v.sources
+                          ? `${v.sources.length === 1 ? '1 answer' : `${v.sources.length} answers`}`
+                          : ''}
                     </span>
                   </button>
-                  {/* deleting takes two deliberate steps once somebody has signed it */}
-                  {!v.confirmedOn && versions.length > 1 && (
+                  {/* not the last one — a project with insights needs a version
+                      to show them in */}
+                  {versions.length > 1 && (
                     <button
                       className="drop"
                       disabled={busy}
@@ -343,13 +338,12 @@ export default function InsightsSheet({
          * ordinary case — closed, read, reopened, somebody else answered,
          * closed again — could produce a second version only by closing
          * collection a second time, which reads everyone and gives no say in
-         * it. The stale line directly below has been telling people to
-         * regenerate since it was written, at a screen with no way to.
+         * it.
          *
-         * Every run is kept. A confirmed version is not touched or demoted by a
-         * new one — it keeps its signature and its place in the list, and the
-         * new run arrives above it unconfirmed. That is what makes this safe to
-         * offer beside a signed analysis rather than only instead of one.
+         * Every run is kept, and a new one neither replaces nor demotes an
+         * older one: it arrives at the top of the list and the rest stay
+         * openable. This is the last thing the platform does — gate 2 was
+         * retired on 18 August 2026 and the job now ends at the insights.
          *
          * The picker answers the three questions actually asked of it: everyone
          * (the default), the same people this version read, or only those it
@@ -362,7 +356,7 @@ export default function InsightsSheet({
               <>
                 <p>
                   A new version, from the answers you choose. This one stays exactly as it is —
-                  every run is kept, and a confirmed one keeps its signature.
+                  every run is kept, and you can open any of them again.
                 </p>
 
                 {sinceThis.length > 0 && (
@@ -412,11 +406,13 @@ export default function InsightsSheet({
                     </div>
                   ))}
 
-                {/* quiet, not primary: confirming is what this sheet is for,
-                    and a second filled button beside it would put the redo and
-                    the sign-off at the same weight */}
+                {/* Primary from 18 August 2026. It was quiet because Confirm
+                    the insights sat below it and a second filled button would
+                    have put the redo and the sign-off at the same weight. Gate 2
+                    is gone, so this is the only thing on the sheet that does
+                    anything, and a quiet lone button reads as unavailable. */}
                 <button
-                  className="btn btn-quiet"
+                  className="btn btn-primary"
                   disabled={busy || only?.length === 0}
                   onClick={() =>
                     act(() => reanalyse(project.id, only ?? undefined), 'A new version is written.')
@@ -437,47 +433,6 @@ export default function InsightsSheet({
           </section>
         )}
 
-        {/* gate 2 — rule 2 records who acted, rule 1 never does it on a timer */}
-        <section className="isec gate">
-          {/* The instruction moved to *Write it again* above, which is the
-              thing it was asking for and did not exist when this was written. */}
-          {project.insightsStale && (
-            <p className="stale">
-              Answers arrived after this was confirmed. What it says was true of the answers it was
-              written from, and still is.
-            </p>
-          )}
-          {openVersion?.confirmedOn ? (
-            <p className="confirmed">
-              Confirmed {openVersion.confirmedOn}
-              {openVersion.confirmedBy && <> by {openVersion.confirmedBy}</>}. The deck outline can
-              be copied.{' '}
-              <button
-                className="linky"
-                disabled={busy}
-                onClick={() => act(() => unconfirmInsights(openVersion.id), 'Confirmation removed.')}
-              >
-                Un-confirm
-              </button>
-            </p>
-          ) : (
-            <>
-              <h2>Is this right?</h2>
-              <p>
-                Nothing here has reached the client. Confirming says a person has read it and stands
-                behind it — the analysis mistakes two wordings of one idea for a disagreement often
-                enough that this step cannot be skipped. Your name is recorded against it.
-              </p>
-              <button
-                className="btn btn-primary"
-                disabled={busy}
-                onClick={() => act(() => confirmInsights(project.id), 'Insights confirmed.')}
-              >
-                {busy ? 'Confirming' : 'Confirm the insights'}
-              </button>
-            </>
-          )}
-        </section>
       </div>
     </Sheet>
   );

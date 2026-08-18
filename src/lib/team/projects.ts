@@ -94,7 +94,6 @@ export type ProjectView = {
   /** the most recent insights, if the analysis has run */
   insights: import('@/lib/analysis/schema').Insights | null;
   insightsWrittenOn: string | null;
-  insightsConfirmedOn: string | null;
   /**
    * Every run, newest first — the content of the newest only.
    *
@@ -106,22 +105,10 @@ export type ProjectView = {
   insightsVersions: {
     id: string;
     writtenOn: string;
-    confirmedOn: string | null;
-    confirmedBy: string | null;
     isNewest: boolean;
     /** whose answers it read — null on insights written before that was stored */
     sources: { id: string; name: string }[] | null;
   }[];
-  /**
-   * Insights were confirmed, and answers arrived afterwards.
-   *
-   * Reopening collection leaves a confirmed insights alone — its signature stays
-   * valid for the answers it was written from. What it cannot do is stay the
-   * whole truth, and somebody working from it would never know.
-   */
-  insightsStale: boolean;
-  /** gate 2 records who acted, and a gate whose actor is not shown records nothing useful */
-  insightsConfirmedBy: string | null;
 
   action: ProjectAction | null;
   /** the two lines of the Latest column */
@@ -138,9 +125,12 @@ function buildAction(v: {
   /** days past the date the team asked for; null if no date or not yet due */
   overdueDays: number | null;
   hasInsights: boolean;
-  insightsConfirmedOn: string | null;
+  /** an archived project is finished and asks for nothing */
+  archived: boolean;
   conflicts: number;
 }): ProjectAction | null {
+  if (v.archived) return null;
+
   /* Collection was closed but no insights came back — the analysis failed, the
      key was missing, or the request ran past the function's time limit. The
      work is recoverable and the team needs a way to ask for it again. Without
@@ -155,10 +145,21 @@ function buildAction(v: {
     };
   }
 
-  /* Insights exist and nobody has read it. This is the only step in the flow
-     that cannot be skipped — the AI mistakes two wordings of one idea for a
-     disagreement, especially across Thai and English. */
-  if (v.hasInsights && !v.insightsConfirmedOn) {
+  /**
+   * The analysis is written, and the project is waiting to be filed.
+   *
+   * This used to run while the insights were *unconfirmed*, and confirming is
+   * what cleared it. Gate 2 went on 18 August 2026 — the platform's job is to
+   * collect the answers and write the insights, and it stops there — so there
+   * is no signature to wait for and the condition is simply that an analysis
+   * exists.
+   *
+   * What clears it now is archiving, which is why `archived` returns null at
+   * the top of this function. Without that this would be a card nothing could
+   * ever answer, which is the one thing a "Needs you" list must not contain:
+   * a row that cannot be cleared teaches people to stop reading the list.
+   */
+  if (v.hasInsights) {
     const found =
       v.conflicts === 0
         ? 'It found no conflicts.'
@@ -178,7 +179,12 @@ function buildAction(v: {
       say: v.closedOn
         ? 'The survey is closed and the analysis is written.'
         : 'The analysis is written, and the survey is open again.',
-      emphasis: found,
+      /* `say` is the bold statement of fact and `emphasis` is what follows from
+         it — the same slot the other two cards put their question in. Archiving
+         is what clears this row, so it has to be said somewhere a person reads
+         before pressing, and putting it in `say` split the sentence from its
+         own conflict count. */
+      emphasis: `${found} Archive the project once your team has what it needs.`,
       when: v.closedOn
         ? `Closed ${v.closedOn} with ${plural(v.answers, 'answer')}`
         : plural(v.answers, 'answer'),
@@ -312,7 +318,6 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
         .flatMap((r) => [
           r.project.archivedBy,
           r.survey?.closedBy,
-          ...(versionsByProject.get(r.project.id) ?? []).map((b) => b.confirmedBy),
         ])
         .filter((id): id is string => Boolean(id)),
     ),
@@ -379,22 +384,12 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
 
       insights,
       insightsWrittenOn: formatDay(insightRow?.generatedAt ?? null),
-      insightsConfirmedOn: formatDay(insightRow?.confirmedAt ?? null),
-      insightsConfirmedBy: insightRow?.confirmedBy ? (actorName.get(insightRow.confirmedBy) ?? null) : null,
       insightsVersions: (versionsByProject.get(project.id) ?? []).map((b, i) => ({
         id: b.id,
         writtenOn: formatDay(b.generatedAt) ?? '',
-        confirmedOn: formatDay(b.confirmedAt ?? null),
-        confirmedBy: b.confirmedBy ? (actorName.get(b.confirmedBy) ?? null) : null,
         isNewest: i === 0,
         sources: b.sources ?? null,
       })),
-      /* the confirmed version, not the newest — a newer unconfirmed run does not
-         make the signed one stale, more answers do */
-      insightsStale: (() => {
-        const signed = (versionsByProject.get(project.id) ?? []).find((b) => b.confirmedAt);
-        return !!(signed?.confirmedAt && lastAnswer && lastAnswer > signed.confirmedAt);
-      })(),
 
       action: buildAction({
         closedOn,
@@ -404,7 +399,7 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
         dueOn,
         overdueDays,
         hasInsights: Boolean(insights),
-        insightsConfirmedOn: formatDay(insightRow?.confirmedAt ?? null),
+        archived: project.archived,
         conflicts: insights?.unsettled.length ?? 0,
       }),
       latest: buildLatest({ sentOn, closedOn, answers, quietDays }),

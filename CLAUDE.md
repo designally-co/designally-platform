@@ -2,7 +2,7 @@
 
 ## Project
 
-Internal platform replacing the manual work between a signed deal and the start of the work. Clients answer branded bilingual questionnaires; the platform collects responses, finds where stakeholders disagree, and produces one confirmed summary. That summary is the end of the job — what the team does with it afterwards is not the platform's business.
+Internal platform replacing the manual work between a signed deal and the start of the work. Clients answer branded bilingual questionnaires; the platform collects responses, finds where stakeholders disagree, and produces one summary. That summary is the end of the job — what the team does with it afterwards is not the platform's business.
 
 Read `PRODUCT.md` for users, purpose and design principles. Read `DESIGN.md` for the visual system. Both take precedence over anything inferred from existing code.
 
@@ -171,7 +171,18 @@ These are product decisions, not preferences. If a request conflicts with one, s
    it passes the project appears in Needs you asking whether to close. Answers arriving
    after it are accepted. Asked for 14 August 2026; built this way rather than as an
    auto-close, which would have left `closed_by` empty.
-2. **Three human gates, each recording who acted:** close collection · confirm the insights · archive the project. Store `*_by` and `*_at` on every one. There was a fourth — recording the kick-off decisions — retired 17 August 2026 with the kick-off itself; it was never built.
+2. **Two human gates, each recording who acted:** close collection · archive the project. Store `*_by` and `*_at` on both.
+   There were four. Recording the kick-off decisions went 17 August 2026 with the
+   kick-off itself and was never built. **Confirming the insights went 18 August
+   2026**: the platform collects the answers and writes the insights, and it stops
+   there — asking a person to countersign the last thing it produces was the app
+   holding a door it does not own. Reading the analysis is still the job, and
+   `docs/insight-engine-spec.md`'s reason for it stands — the analysis mistakes
+   two wordings of one idea for a disagreement — but that is the team's practice
+   now, not a state the software enforces. `insights.confirmed_at` and
+   `confirmed_by` are **retired in place**: real signatures were written there,
+   and dropping them would delete who stood behind an analysis on a shipped
+   project.
    Archiving a project whose survey is still open **closes collection on the way
    and signs both** (18 August 2026) — the link had already stopped working, but
    `closed_at` stayed empty and the record lost a gate. It does not run the
@@ -271,7 +282,11 @@ Each one ends with something usable. Do not start the next before the previous h
 1. **One survey link that works** — public bilingual form, saves to Postgres. No auth, no team app.
 2. **The team can see it** — auth, Projects list, create survey, view responses. Already replaces Google Forms.
 3. **The team can prepare in ten minutes** — close and analyse, Anthropic API, structured output. The engine reports what they might miss or must be careful about; it does not read the answers for them. The team sees the full answers and that summary. Narrowed 13 August 2026 after the first real brief returned fifty items, and again on 17 August when the deck outline and the room notes went with the kick-off — see `docs/insight-engine-spec.md`.
-4. **The human gate** — review and confirm the insights. That is where the platform stops.
+4. ~~The human gate~~ — review and confirm the insights. **Retired 18 August 2026.** The
+   platform stops at the insights themselves: milestone 3 produces them, and reading
+   them is the team's job rather than a gate the app holds open. What survived is the
+   insights sheet — every run kept as a version, and *Write it again* to re-run on
+   whichever answers you choose.
 5. ~~The website track~~ — retired 11 August 2026 with the website package.
 6. ~~The template editor~~ — retired 17 August 2026 with the *Question templates* panel. The
    questionnaire is fixed at version 6, the branding team owns its wording, and the questions

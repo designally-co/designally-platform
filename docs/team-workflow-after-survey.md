@@ -10,9 +10,9 @@ _Designally Platform_
 any time** (18 August 2026). The ordinary shape is: close, read, reopen because
 somebody was missed, take their answer, close again. The insights sheet has a
 *Write it again* section for exactly this — it runs the analysis on whichever
-respondents you tick, and keeps every run as a version. A confirmed version is
-never touched or demoted by a later run: it keeps its signature and its place in
-the list, and the new one arrives above it unconfirmed. The picker marks who
+respondents you tick, and keeps every run as a version. A later run neither
+replaces nor demotes an earlier one: it arrives at the top of the list and the
+rest stay openable. The picker marks who
 answered *after* the version on screen, which is read from that run's stored
 `sources` rather than from a date.
 
@@ -31,9 +31,13 @@ as it stands; *Write it again* is the one that lets you choose.
 - Is anything in the internal notes unfair or too blunt to survive being seen?
 - Would the "read this first" line survive being said out loud to the client?
 
-Then **Confirm**. Nothing reaches a client before a person has confirmed.
+There is no Confirm button, and there has not been one since 18 August 2026. Every
+question above is still worth asking — the analysis is weakest exactly where Thai
+and English say one thing two ways — but the answer is a conversation in your team,
+not a state the app holds. If the reading changes what the analysis should have
+read, *Write it again* is right there.
 
-**5 · The work begins**, from the confirmed insights and the full answers.
+**5 · The work begins**, from the insights and the full answers.
 
 ## Where this used to go on
 

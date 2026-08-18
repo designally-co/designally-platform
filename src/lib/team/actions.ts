@@ -298,48 +298,6 @@ export async function reanalyse(projectId: string, only?: string[]): Promise<Act
 }
 
 /**
- * Gate 2 — confirm the insights.
- *
- * Rule 6: nothing reaches a client before a human confirms it. Rule 2: the gate
- * records who acted. Rule 1: it is never on a timer — insights sits unconfirmed
- * for as long as it takes, and the Needs You list keeps saying so.
- *
- * **The newest insights, not any insights.** Re-analysing inserts a new row and keeps
- * the earlier runs, so confirming by project id alone could sign off insights
- * that was superseded before anyone read it.
- *
- * The `isNull` in the update is not decoration: two people opening the same
- * insights and pressing at the same moment would otherwise both write, and the
- * second would overwrite the first person's name on a gate whose entire purpose
- * is recording who acted.
- */
-export async function confirmInsights(projectId: string): Promise<ActionResult> {
-  const userId = await actingUser();
-  const db = await getDb();
-
-  const [latest] = await db
-    .select()
-    .from(insights)
-    .where(eq(insights.projectId, projectId))
-    .orderBy(desc(insights.generatedAt))
-    .limit(1);
-
-  if (!latest) return { ok: false, error: 'There is no insights to confirm.' };
-  if (latest.confirmedAt) return { ok: false, error: 'Those insights are already confirmed.' };
-
-  const [row] = await db
-    .update(insights)
-    .set({ confirmedAt: new Date(), confirmedBy: userId })
-    .where(and(eq(insights.id, latest.id), isNull(insights.confirmedAt)))
-    .returning();
-
-  if (!row) return { ok: false, error: 'Somebody else confirmed it a moment ago.' };
-
-  revalidatePath('/');
-  return { ok: true };
-}
-
-/**
  * Gate 4 — archive. Manual, always available, never automatic. Nothing is
  * deleted; an archived project stays searchable.
  *
@@ -486,42 +444,25 @@ export async function reopenCollection(projectId: string): Promise<ActionResult>
 }
 
 /**
- * Undo gate 2.
+ * Drop one run.
  *
- * Deleting insights somebody signed takes two deliberate steps, and this is the
- * first: a signature should not disappear because a delete button was next to
- * the wrong row. It is also what makes a wrong insights fixable — permanence and
- * correctability pull against each other and this is where the line landed.
+ * It used to refuse a confirmed version and send you to un-confirm it first —
+ * two deliberate steps, so a signature could not vanish because a delete button
+ * sat next to the wrong row. There are no signatures now (gate 2 was retired on
+ * 18 August 2026), so there is nothing for the two steps to protect and the
+ * guard would only ever have been a guard against nothing.
+ *
+ * The sheet still hides the control when there is one version left. That is a
+ * different rule — a project with insights and no version to show them in — and
+ * it did not come from confirmation.
  */
-export async function unconfirmInsights(insightsId: string): Promise<ActionResult> {
-  await actingUser();
-  const db = await getDb();
-
-  const [row] = await db
-    .update(insights)
-    .set({ confirmedAt: null, confirmedBy: null })
-    .where(eq(insights.id, insightsId))
-    .returning();
-
-  if (!row) return { ok: false, error: 'No such insights.' };
-
-  revalidatePath('/');
-  return { ok: true };
-}
-
-/** A version nobody has signed. Confirmed ones must be un-confirmed first. */
 export async function deleteInsights(insightsId: string): Promise<ActionResult> {
   await actingUser();
   const db = await getDb();
 
-  const [row] = await db
-    .delete(insights)
-    .where(and(eq(insights.id, insightsId), isNull(insights.confirmedAt)))
-    .returning();
+  const [row] = await db.delete(insights).where(eq(insights.id, insightsId)).returning();
 
-  if (!row) {
-    return { ok: false, error: 'That version is confirmed. Un-confirm it first, then delete it.' };
-  }
+  if (!row) return { ok: false, error: 'No such version.' };
 
   revalidatePath('/');
   return { ok: true };
@@ -562,16 +503,22 @@ export async function deleteResponse(
   if (!survey) return { ok: false, error: 'No such survey.' };
 
   if (!confirm) {
-    const signed = (
+    /* Any version that read them, not only a signed one. The guard keyed on
+       `confirmedAt` until gate 2 was retired on 18 August 2026; keeping the
+       condition would have quietly turned a warning into nothing, because no
+       row is ever confirmed now. What makes the deletion worth a second press
+       is that an analysis cites this person — which is true of every run that
+       read them, signed or not. */
+    const cited = (
       await db.select().from(insights).where(eq(insights.projectId, survey.projectId))
-    ).filter((b) => b.confirmedAt && b.sources?.some((x) => x.id === responseId));
+    ).filter((b) => b.sources?.some((x) => x.id === responseId));
 
-    if (signed.length) {
+    if (cited.length) {
       return {
         ok: false,
         error:
-          `${row.respondentName}'s answers were read by a confirmed insights. ` +
-          `Deleting them leaves that insights citing somebody whose answers are gone. Press again to delete.`,
+          `${row.respondentName}'s answers were read by ${cited.length === 1 ? 'an analysis' : `${cited.length} analyses`}. ` +
+          `Deleting them leaves it citing somebody whose answers are gone. Press again to delete.`,
       };
     }
   }

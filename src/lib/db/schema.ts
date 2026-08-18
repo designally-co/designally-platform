@@ -336,6 +336,20 @@ export const insights = pgTable('insights', {
   sources: jsonb('sources').$type<{ id: string; name: string }[]>(),
 
   /* gate 2 — confirm the insights. Rule 6: nothing reaches a client before this. */
+  /**
+   * Gate 2, retired in place 18 August 2026 — never written, never read.
+   *
+   * Confirming the insights was the third human gate: a person read the
+   * analysis and put their name to it before the team worked from it. It went
+   * when the platform's job was narrowed to collecting the answers and writing
+   * the insights, which is where it now stops.
+   *
+   * The columns stay, and stay for the same reason `projects.stage` and the
+   * `decisions` table do: real signatures were written here, and dropping them
+   * would delete a record of who stood behind an analysis on a project that has
+   * already shipped. Nothing reads them, so they cost a migration nobody needs
+   * and two nullable columns nobody sets.
+   */
   confirmedAt: timestamp('confirmed_at', { withTimezone: true }),
   confirmedBy: uuid('confirmed_by').references(() => users.id),
 });

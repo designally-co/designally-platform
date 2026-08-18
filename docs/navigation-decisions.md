@@ -66,7 +66,7 @@ carry the whole team app — the back **chevron**, the **chain link** for Copy l
 **ellipsis** for More — each with a tooltip and an accessible name. Copy link turns into a tick
 for two seconds, and says "Link copied" into a live region, because a swapped glyph is silent.
 
-The primary action keeps its words: `New survey`, `Review insights`, `Confirm the insights`. The
+The primary action keeps its words: `New survey`, `Review insights`, `Write the insights again`. The
 HIG's own exception is actions a symbol does not represent, and a prominent action with a label
 is what it shows everywhere.
 

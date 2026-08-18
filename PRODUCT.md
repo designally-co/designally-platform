@@ -34,7 +34,7 @@ An internal tool that turns scattered stakeholder answers into one confirmed pag
 
 ## Operating Context
 
-A project runs from a signed deal to a confirmed summary.
+A project runs from a signed deal to a written summary.
 
 1. The team creates a survey and copies the link. **Sending it is manual** — there is no email from the platform, ever. The survey carries a date to answer by, chosen when it is created and prefilled at two weeks.
 2. The client answers, on a phone, usually in Thai, often a week or two after the link was sent.
@@ -42,7 +42,9 @@ A project runs from a signed deal to a confirmed summary.
 4. The team reads and confirms the insights. **This is where the platform's job ends.**
 5. The project is archived by hand, whenever the team judges it finished.
 
-**Three human gates, each recording who acted and when:** close collection · confirm the insights · archive the project. None of them can happen on a timer, including the date in step 1 — it raises a prompt and closes nothing.
+**Two human gates, each recording who acted and when:** close collection · archive the project. None of them can happen on a timer, including the date in step 1 — it raises a prompt and closes nothing.
+
+Confirming the insights was a third, retired 18 August 2026. The platform's job is to collect the answers and write the insights; it ends there. Somebody still has to read the analysis before working from it — it mistakes two wordings of one idea for a disagreement often enough that this matters — but that is how the team works, not a state the software holds.
 
 **Narrowed 17 August 2026.** There were two more steps and a fourth gate: copy the confirmed
 text into Claude to build a kick-off deck, run the kick-off, and record what was decided. The
