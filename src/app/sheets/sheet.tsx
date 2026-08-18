@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, type ReactNode } from 'react';
 
-import { BackMark } from '../icons';
+import { BackMark, CloseMark } from '../icons';
 
 /**
  * A full-screen dialog on the parchment page, entering with an 18px rise.
@@ -36,6 +36,7 @@ import { BackMark } from '../icons';
 export default function Sheet({
   title,
   narrow = false,
+  dismiss = false,
   actions,
   backLabel = 'Back',
   onClose,
@@ -43,6 +44,24 @@ export default function Sheet({
 }: {
   title: ReactNode;
   narrow?: boolean;
+  /**
+   * A close disc on the trailing edge instead of a back chevron on the leading
+   * one — for a sheet that *dismisses* rather than goes back.
+   *
+   * The distinction is what the way out actually does. The project, answers and
+   * insights sheets retrace a step: the answers sheet returns to the project it
+   * was opened from, not to the page behind it, and a chevron is the symbol for
+   * that. The New survey form and the sheet that hands over its link go nowhere
+   * — there is only the page underneath, and closing is the end of the task
+   * rather than a step back through it.
+   *
+   * **This reverses part of a decision from 17 August 2026**, which took a text
+   * `Close` pill off the trailing edge because it sat in the same group as the
+   * things you can *do* here. That reasoning holds and is why this is a disc set
+   * apart from `.bartrail` rather than a pill inside it: it reads as furniture
+   * belonging to the sheet, not as one of its actions.
+   */
+  dismiss?: boolean;
   /**
    * The sheet's toolbar actions, on the trailing edge before Close.
    *
@@ -79,12 +98,19 @@ export default function Sheet({
             corners — see the note in globals.css. The bar is inside it too,
             which is what keeps content passing under a sticky header. */}
         <div className="sheetscroll">
-          <div className="sheet-top">
-            <button className="back" onClick={onClose} aria-label={backLabel}>
-              <BackMark />
-            </button>
+          <div className={`sheet-top${dismiss ? ' dismissing' : ''}`}>
+            {!dismiss && (
+              <button className="back" onClick={onClose} aria-label={backLabel}>
+                <BackMark />
+              </button>
+            )}
             <span className="t">{title}</span>
             <div className="bartrail">{actions}</div>
+            {dismiss && (
+              <button className="sheetclose" onClick={onClose} aria-label={backLabel}>
+                <CloseMark />
+              </button>
+            )}
           </div>
           <div className="sheet-body">{children}</div>
         </div>

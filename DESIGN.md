@@ -1174,6 +1174,16 @@ button     solid orange, white label          — this is the action
 
 Three rungs in one hue, separated by how much orange each spends. Use it for package pickers, question types, word chips and the day cells in a calendar.
 
+### The way out of a sheet — chevron or close
+
+Two sheets, two exits, and which one depends on what the exit *does*.
+
+**A chevron disc on the leading edge** when the sheet retraces a step. The answers sheet returns to the project it was opened from, not to the page behind it; the insights sheet does the same. That is navigation, and the chevron is the symbol every phone and window on the machine has taught.
+
+**A close disc on the trailing edge** when the sheet dismisses. The New survey form and the sheet handing over its link go nowhere — there is only the page underneath, and closing is the end of the task rather than a step back through it. `dismiss` on `Sheet`.
+
+**This is a partial reversal of 17 August 2026**, which took a text `Close` pill off the trailing edge because it sat in the same group as the things you can *do* here. That reasoning stands, and is why the close is a disc set outside `.bartrail` with its own gap rather than a pill inside it: furniture belonging to the sheet, not one of its actions. What changed is only that a sheet with nothing behind it was being given a symbol for going back.
+
 ### Split button — run it, or say what it runs on
 
 One control, two halves: a filled primary and a 42px chevron sharing a pill, seamed by a line of the label's own colour at 24%. The chevron opens a dropdown that changes what the primary will read; the primary's label reports the answer — *Generate insights* when everything is ticked, *Generate from 3 answers* when it is not.

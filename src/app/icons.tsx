@@ -47,6 +47,7 @@ import {
   RotateCcw,
   Share,
   Trash2,
+  X,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -127,6 +128,9 @@ export function PrevMark() {
 export function NextMark() {
   return <ChevronRight size={26} strokeWidth={1.46} aria-hidden="true" />;
 }
+
+/** The way out of a sheet that dismisses rather than goes back. */
+export const CloseMark = mark(X);
 
 /** The half of a split button that opens the other half's options. */
 export function DownMark() {

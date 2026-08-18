@@ -44,6 +44,7 @@ export default function SurveyMadeSheet({
         </>
       }
       narrow
+      dismiss
       backLabel="Done"
       onClose={onClose}
     >

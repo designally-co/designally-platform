@@ -85,7 +85,7 @@ export default function NewSurveySheet({
     error?.field === field ? <p className="fielderror">{error.text}</p> : null;
 
   return (
-    <Sheet title="New survey" narrow onClose={onClose}>
+    <Sheet title="New survey" narrow dismiss backLabel="Close" onClose={onClose}>
       <div className="field">
         <label className="f" htmlFor="nClient">
           Project

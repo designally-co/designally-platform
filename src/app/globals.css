@@ -2937,6 +2937,68 @@ textarea {
   margin-top: var(--sp-md);
 }
 
+/**
+ * The link, its code and its Save, in one column of one width.
+ *
+ * Each part used to carry its own: the row took whatever held it, the code and
+ * the pill were capped at 288. In the 320px share panel that is invisible —
+ * everything is 288 there — and on the sheet that hands over a new link it was a
+ * full-width row above a centred square. They are three parts of one object.
+ *
+ * 288 because that is what the panel already measured, so the panel does not
+ * move: 320 less its 16px padding either side. Centred, so the wider sheet puts
+ * the column under its own heading rather than ragged against one edge.
+ */
+.linkcode {
+  max-width: 288px;
+  margin-inline: auto;
+}
+
+/**
+ * The way out of a sheet that dismisses rather than goes back.
+ *
+ * On the trailing edge, after the actions and set apart from them — `.bartrail`
+ * has its own gap, and this sits outside it with more air, because the decision
+ * of 17 August 2026 still holds: the way out does not belong in the same group
+ * as the things you can *do* here. What changed is only which sheets get a
+ * chevron. See `sheet.tsx`.
+ *
+ * The same disc as `.iconbtn`, because it is the same object: canvas inside the
+ * Edge, ink glyph, 44.
+ */
+.sheetclose {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-left: var(--sp-xs);
+  padding: 0;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-pill);
+  background: var(--canvas);
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    border-color 0.16s,
+    background-color 0.16s;
+}
+@media (hover: hover) {
+  .sheetclose:hover {
+    border-color: var(--ink-3);
+  }
+}
+.sheetclose:focus-visible {
+  outline: 2px solid var(--primary-focus);
+  outline-offset: 2px;
+}
+/* With no chevron on the leading edge the title starts the row, and it needs the
+   padding the disc used to stand in. */
+.sheet-top.dismissing .t {
+  margin-left: 2px;
+}
+
 /* ---- The date field ----------------------------------------------------
    A date, as three boxes and a month you can point at. It replaces
    `<input type="date">`, which drew its own segment highlight, its own glyph
@@ -6427,9 +6489,7 @@ dialog::backdrop {
   justify-content: center;
   gap: var(--sp-xs);
   width: 100%;
-  /* with the code above it, in both places */
-  max-width: 288px;
-  margin: var(--sp-sm) auto 0;
+  margin-top: var(--sp-sm);
 }
 .sharesave svg {
   width: 17px;
@@ -6468,8 +6528,6 @@ dialog::backdrop {
      Capped at that width and centred, so the same code in the wider New survey
      sheet is the same object rather than a 400px wall of squares. */
   width: 100%;
-  max-width: 288px;
-  margin-inline: auto;
   aspect-ratio: 1;
   height: auto;
   padding: 14px;

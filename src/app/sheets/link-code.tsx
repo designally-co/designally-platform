@@ -80,7 +80,16 @@ export default function LinkAndCode({ token, url }: { token: string; url: string
   };
 
   return (
-    <>
+    /**
+     * One column, one width.
+     *
+     * The link row used to take the width of whatever held it while the code
+     * and its Save pill were capped at 288 — which is invisible in a 320px
+     * panel, where everything is 288 anyway, and obvious on the sheet that
+     * hands over a new link: a full-width row above a centred code. They are
+     * three parts of one object and they line up.
+     */
+    <div className="linkcode">
       {/**
        * The link and its Copy, on one line.
        *
@@ -130,6 +139,6 @@ export default function LinkAndCode({ token, url }: { token: string; url: string
       </div>
 
       {error && <p className="formerror">{error}</p>}
-    </>
+    </div>
   );
 }
