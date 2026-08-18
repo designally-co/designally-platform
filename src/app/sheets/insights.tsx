@@ -1,11 +1,14 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useCallback, useRef, useState, useTransition } from 'react';
 
 import { deleteInsights, reanalyse, readInsightsVersion } from '@/lib/team/actions';
 
 import type { Insights } from '@/lib/analysis/schema';
 import type { ProjectView } from '@/lib/team/projects';
+import { useAnchored, useDismiss } from '../anchored';
+import { TrashMark, VersionsMark } from '../icons';
+import { submitted } from '@/lib/team/when';
 import Sheet from './sheet';
 
 /**
@@ -44,13 +47,13 @@ function outOf(some: number, all: number) {
 function Sources({
   version,
   onProject,
-  writtenOn,
 }: {
   version: ProjectView['insightsVersions'][number] | undefined;
   onProject: { id: string }[];
-  writtenOn: string | null;
 }) {
-  const when = writtenOn ? ` · ${writtenOn}` : '';
+  /* No date here since 18 August 2026 — the bar carries it, to the minute, and
+     says so while this scrolls away. This line is about *whose* answers. */
+  const when = '';
 
   /* insights written before sources were stored. Saying so is more use than a
      guess that happens to be right most of the time. */
@@ -177,6 +180,21 @@ export default function InsightsSheet({
     ? project.people.filter((p) => !readAlready.has(p.id))
     : [];
 
+  /**
+   * The version list, in the bar.
+   *
+   * It was a *Versions* section near the foot of the sheet, which is the wrong
+   * end of a long document to answer "which of these am I reading?" — a person
+   * scrolls a screen of findings, forms an opinion, and only then meets the
+   * list telling them it was the run from three days ago over two respondents.
+   * The bar says which version this is at all times, and the list that changes
+   * it hangs off the bar beside the answer.
+   */
+  const [listing, setListing] = useState(false);
+  const versionsWrap = useRef<HTMLDivElement>(null);
+  const at = useAnchored(listing, versionsWrap, 300, 240);
+  useDismiss(listing, versionsWrap, useCallback(() => setListing(false), []));
+
   function act(run: () => Promise<{ ok: boolean; error?: string }>, done: string) {
     start(async () => {
       const res = await run();
@@ -185,15 +203,100 @@ export default function InsightsSheet({
   }
 
   return (
-    <Sheet title={`${project.clientName} — insights`} backLabel={backLabel} onClose={onClose}>
+    <Sheet
+      /**
+       * The bar names the version, not just the project.
+       *
+       * "Soyo — insights" was true of the sheet and useless about it once a
+       * project has four runs over different sets of respondents. The second
+       * line is the run you are reading, to the minute: two versions written the
+       * same afternoon are common — close, read, reopen, close again — and a
+       * date alone cannot tell them apart.
+       *
+       * Local time, formatted in the browser. See `when.ts`: the server is UTC
+       * and Bangkok is seven hours ahead, so a run at 9am would be filed at 2am.
+       */
+      title={
+        <>
+          <b>{project.clientName}</b>
+          <i>
+            {openVersion ? submitted(openVersion.writtenAt) : 'insights'}
+            {openVersion && !openVersion.isNewest ? ' · older run' : ''}
+          </i>
+        </>
+      }
+      actions={
+        versions.length > 1 ? (
+          <div className="shareslot" ref={versionsWrap}>
+            <button
+              className="iconbtn"
+              aria-label="Earlier runs"
+              title="Earlier runs"
+              aria-expanded={listing}
+              aria-haspopup="dialog"
+              onClick={() => setListing((o) => !o)}
+            >
+              <VersionsMark />
+            </button>
+
+            {listing && at && (
+              <div
+                className="vermenu"
+                role="dialog"
+                aria-label="Every run of this analysis"
+                style={{ top: at.top, left: at.left, width: at.width }}
+              >
+                <p className="hintline">Every run, newest first:</p>
+                <ul className="iversions">
+                  {versions.map((v) => (
+                    <li key={v.id} className={v.id === openId ? 'on' : undefined}>
+                      <button
+                        className="pick"
+                        onClick={() => {
+                          setListing(false);
+                          if (v.isNewest) return setShown(null);
+                          start(async () => {
+                            const b = await readInsightsVersion(v.id);
+                            if (b) setShown({ id: v.id, insights: b });
+                          });
+                        }}
+                      >
+                        <b>{submitted(v.writtenAt)}</b>
+                        <span>
+                          {v.isNewest ? 'newest' : ''}
+                          {v.isNewest && v.sources ? ' · ' : ''}
+                          {v.sources
+                            ? `${v.sources.length === 1 ? '1 answer' : `${v.sources.length} answers`}`
+                            : 'answers not recorded'}
+                        </span>
+                      </button>
+                      {/* not the last one — a project with insights needs a
+                          version to show them in */}
+                      {versions.length > 1 && (
+                        <button
+                          className="drop"
+                          aria-label={`Delete the run of ${submitted(v.writtenAt)}`}
+                          disabled={busy}
+                          onClick={() => act(() => deleteInsights(v.id), 'Version deleted.')}
+                        >
+                          <TrashMark />
+                        </button>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        ) : undefined
+      }
+      backLabel={backLabel}
+      onClose={onClose}
+    >
       <div className="insights">
         {/* 1 · read this first */}
         <h1>{insights.headline}</h1>
-        <Sources
-          version={openVersion}
-          onProject={project.people}
-          writtenOn={openVersion?.writtenOn ?? project.insightsWrittenOn}
-        />
+        <Sources version={openVersion} onProject={project.people} />
         <p className="firstpara">{insights.headlineBody}</p>
 
         {/* 2 · settled */}
@@ -297,51 +400,6 @@ export default function InsightsSheet({
             </div>
           ))}
         </section>
-
-        {/* every run this project has had. Re-analysing has always kept them;
-            nothing ever showed them. */}
-        {versions.length > 1 && (
-          <section className="isec">
-            <h2>Versions</h2>
-            <ul className="iversions">
-              {versions.map((v) => (
-                <li key={v.id} className={v.id === openId ? 'on' : undefined}>
-                  <button
-                    className="pick"
-                    onClick={() =>
-                      v.isNewest
-                        ? setShown(null)
-                        : start(async () => {
-                            const b = await readInsightsVersion(v.id);
-                            if (b) setShown({ id: v.id, insights: b });
-                          })
-                    }
-                  >
-                    <b>{v.writtenOn}</b>
-                    <span>
-                      {v.isNewest
-                        ? 'newest'
-                        : v.sources
-                          ? `${v.sources.length === 1 ? '1 answer' : `${v.sources.length} answers`}`
-                          : ''}
-                    </span>
-                  </button>
-                  {/* not the last one — a project with insights needs a version
-                      to show them in */}
-                  {versions.length > 1 && (
-                    <button
-                      className="drop"
-                      disabled={busy}
-                      onClick={() => act(() => deleteInsights(v.id), 'Version deleted.')}
-                    >
-                      Delete
-                    </button>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
 
         {/**
          * Running it again, on whichever answers you choose.

@@ -107,6 +107,8 @@ export type ProjectView = {
   insightsVersions: {
     id: string;
     writtenOn: string;
+    /** raw, for the bar's date *and time* — formatted in the browser, see `when.ts` */
+    writtenAt: Date;
     isNewest: boolean;
     /** whose answers it read — null on insights written before that was stored */
     sources: { id: string; name: string }[] | null;
@@ -389,6 +391,7 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
       insightsVersions: (versionsByProject.get(project.id) ?? []).map((b, i) => ({
         id: b.id,
         writtenOn: formatDay(b.generatedAt) ?? '',
+        writtenAt: b.generatedAt,
         isNewest: i === 0,
         sources: b.sources ?? null,
       })),

@@ -39,6 +39,7 @@ import {
   ChevronRight,
   Download,
   FileText,
+  History,
   Link as LinkIcon,
   Lock,
   MoreHorizontal,
@@ -106,6 +107,9 @@ export const PrintMark = mark(Printer);
 
 /** The date field's own calendar, replacing the one the browser drew. */
 export const CalendarMark = mark(Calendar);
+
+/** Earlier runs of the analysis — the clock turning back, not a stack of files. */
+export const VersionsMark = mark(History);
 
 /**
  * A month back and a month forward.

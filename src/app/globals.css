@@ -2392,8 +2392,17 @@ textarea {
   line-height: 1.7;
 }
 /* the accent marks what is chosen, never what is hovered */
+/**
+ * The run on screen, marked by its ground and not by its ink.
+ *
+ * This coloured the timestamp with the accent, which was defensible when the
+ * list was a plain section with nothing else to distinguish a row. In the bar's
+ * menu the row already sits on the tint, so the accent would be saying the same
+ * thing twice — and saying it with the colour DESIGN.md §1 reserves for "a
+ * person is needed here", which a row you are already reading is not.
+ */
 .iversions li.on .pick b {
-  color: var(--primary-mark);
+  color: var(--ink);
 }
 .iversions .drop {
   border: 0;
@@ -2670,6 +2679,73 @@ textarea {
   margin-top: var(--sp-xs);
   margin-bottom: 0;
   color: var(--critical);
+}
+
+/**
+ * Every run of the analysis, hung off the bar.
+ *
+ * It was a section near the foot of the sheet, which is the wrong end of a long
+ * document to answer "which of these am I reading?" — a person scrolls a screen
+ * of findings, forms a view, and only then meets the list telling them it was
+ * the run from Tuesday over two respondents. The bar names the version at all
+ * times now, and the list that changes it hangs off the bar beside the answer.
+ *
+ * Fixed and placed by `useAnchored`, like every other popover opened from
+ * inside a sheet. This one hangs from the bar rather than the body, but the bar
+ * is `position: absolute` *inside* the sheet — which clips to its own corners
+ * either way.
+ */
+.vermenu {
+  position: fixed;
+  z-index: 90;
+  max-height: min(60dvh, 420px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--sp-xs) var(--sp-sm) var(--sp-sm);
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-card);
+}
+.vermenu .hintline {
+  margin-bottom: 0;
+}
+/* No rule above the first row: the caption above it is already the boundary,
+   and a line under a caption makes it a table header. */
+.vermenu .iversions li:first-child {
+  border-top: 0;
+}
+/* The run on screen. A left rule would be a coloured border on a list item,
+   which this project's floor bans outright — so it is the ground that changes,
+   which is what the system does everywhere else something is selected. */
+.vermenu .iversions li.on {
+  background: var(--primary-tint);
+  border-radius: var(--r-sm);
+  margin: 2px 0;
+  padding: 0 var(--sp-xs);
+  border-top-color: transparent;
+}
+.vermenu .iversions .drop {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: var(--r-pill);
+  color: var(--ink-3);
+  transition:
+    background-color 0.16s,
+    color 0.16s;
+}
+@media (hover: hover) {
+  .vermenu .iversions .drop:hover {
+    background: var(--critical-wash);
+    color: var(--critical);
+  }
+}
+.vermenu .iversions .drop:focus-visible {
+  outline: 2px solid var(--primary-focus);
+  outline-offset: 2px;
 }
 
 /* ---- The date field ----------------------------------------------------
