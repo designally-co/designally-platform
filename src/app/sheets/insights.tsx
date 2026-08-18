@@ -276,10 +276,12 @@ export default function InsightsSheet({
                     dropping === v.id ? (
                       <li key={v.id} className="asking">
                         <div className="delconfirm danger">
-                          <p>
-                            The run of {submitted(v.writtenAt)} goes for good. Every other run
-                            stays.
-                          </p>
+                          {/* The run's own name, which is its timestamp — the same
+                              shape as "Type {client} to delete the project": the
+                              question names the thing and the button answers it.
+                              Nothing about what survives, because a list of what
+                              survives is on screen around it. */}
+                          <p>Delete {submitted(v.writtenAt)}?</p>
                           <div className="iacts">
                             <button
                               className="btn btn-danger"
