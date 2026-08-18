@@ -5483,12 +5483,7 @@ dialog::backdrop {
  * lockup ends up crowding the right rim. Half of it is where the two edges
  * look equal, checked side by side at 300px against the disc's own centre.
  */
-.qdisc.markdisc img {
-  width: 54%;
-  height: auto;
-  display: block;
-  transform: translate(2.9%, -0.9%);
-}
+
 .qdisc {
   display: flex;
   align-items: center;

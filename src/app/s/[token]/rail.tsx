@@ -33,37 +33,27 @@ export default function Rail({ n, total }: { n: number | null; total: number }) 
 }
 
 /**
- * The disc itself — a count, or the mark when there is nothing to count yet.
+ * The disc itself — a count, or nothing at all before there is anything to
+ * count.
  *
- * Before the questions start, the disc read `0/9`. Zero of nine is honest and
- * it is also the least interesting thing the brand's own object could be doing
- * on the two screens a client sees first. So on the welcome and the identity
- * screen it carries the Designally mark instead, and it becomes a counter at
- * the first question and stays one to the end.
+ * The welcome and the identity screen come before question one, so the disc has
+ * no number to hold. It read `0/9` at first, which is honest and dull; then it
+ * carried the Designally mark, knocked out white; it is empty now, asked for on
+ * 18 August 2026.
  *
- * The mark is knocked out white and sits on the same `--primary` disc, so the
- * object does not change shape or colour between screens — only what is inside
- * it. It is the *inverse* of the mark as drawn: the D reads white, the counter
- * and the Point read as the disc showing through, which is what puts the CI's
- * own orange inside its own mark at 54px without asking a 2.92:1 orange to
- * hold an edge.
+ * Empty is not a gap. The disc *is* the Point — one of the CI's five pieces,
+ * and DESIGN.md gives it "the head of the Cut" as its first job. On these two
+ * screens that is exactly what it is doing: the head of a line that has not
+ * started measuring. It fills with a number at question one and stays a counter
+ * to the end, and the object never changes shape or colour on the way — only
+ * what is inside it.
  *
- * It is `aria-hidden` all the way up at `.qrail`, so no alt text is owed: a
+ * `aria-hidden` all the way up at `.qrail`, so nothing is owed a label: a
  * screen reader is told where it is by the questions, not by a graphic.
  */
 export function Disc({ n, total, className }: { n: number; total: number; className?: string }) {
   const cls = className ? `qdisc ${className}` : 'qdisc';
-  if (n === 0) {
-    return (
-      <b className={`${cls} markdisc`} aria-hidden="true">
-        {/* plain <img>: 274px of 1.5KB PNG, no layout shift to optimise away,
-            and next/image would put a fetch in front of a mark that is on the
-            first paint of the first screen */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/designally-mark.png" alt="" width={274} height={284} />
-      </b>
-    );
-  }
+  if (n === 0) return <b className={cls} aria-hidden="true" />;
   return (
     <b className={cls} aria-hidden="true">
       {n}

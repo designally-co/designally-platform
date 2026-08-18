@@ -67,7 +67,10 @@ changes; only `DATABASE_URL`.
   question per screen before. Group by what somebody answers in one breath, never by
   count, and the heading over a screen has to be true of everything under it. The
   masthead counts screens and does not count the name/position/email screen — the
-  count starts at the first question and its Cut is at rest there. Each question
+  count starts at the first question and its Cut is at rest there, the disc empty
+  until there is something to count. It carried the Designally mark for a few
+  days and does not from 18 August 2026; empty, it is the Point at the head of
+  the Cut, which is the job DESIGN.md gives it first. Each question
   keeps its own 1–21 number in the data — the send screen's grid, the team's
   reading and the analysis all use it — but it is not printed on the card.
 - **Private** (everything else) — the team app. Behind auth. Designally staff only.
