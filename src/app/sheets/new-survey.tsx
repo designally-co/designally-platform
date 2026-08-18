@@ -5,7 +5,7 @@ import { useEffect, useState, useTransition } from 'react';
 import type { Package } from '@/lib/db/schema';
 import { countQuestions, type LibraryBlock } from '@/lib/team/library-types';
 import { PACKAGE_BLOCKS } from '@/lib/survey/packages';
-import { createSurvey, surveyQr } from '@/lib/team/actions';
+import { createSurvey, surveyQr, type NewSurveyField } from '@/lib/team/actions';
 import { DEFAULT_DUE_DAYS, defaultDueDay } from '@/lib/team/due';
 import { forDisplay } from '@/lib/survey/link';
 import Sheet from './sheet';
@@ -38,7 +38,14 @@ export default function NewSurveySheet({
    * whenever this bundle was built.
    */
   const [due, setDue] = useState(() => defaultDueDay());
-  const [error, setError] = useState<string | null>(null);
+  /**
+   * The one thing that went wrong, and which control it is about.
+   *
+   * One at a time, because the server checks in order and stops — reporting a
+   * date problem the user has not reached yet would be noise about a field they
+   * have not touched.
+   */
+  const [error, setError] = useState<{ text: string; field?: NewSurveyField } | null>(null);
   const [link, setLink] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [qr, setQr] = useState<string | null>(null);
@@ -74,14 +81,19 @@ export default function NewSurveySheet({
     start(async () => {
       const result = await createSurvey(form);
       if (!result.ok) {
-        setError(result.error);
+        setError({ text: result.error, field: result.field });
         return;
       }
-      setLink(result.link!);
-      setToken(result.token ?? null);
+      setLink(result.link);
+      setToken(result.token);
       onCreated(`${OPTIONS.find((o) => o.key === pkg)?.label} questionnaire attached.`);
     });
   };
+
+  /* The message for one field, or nothing. Clearing on edit is deliberate: an
+     error that survives the fix it asked for teaches people to ignore it. */
+  const errFor = (field: NewSurveyField) =>
+    error?.field === field ? <p className="fielderror">{error.text}</p> : null;
 
   // the copyable link must be the one that actually resolves
   const full = link ? `${origin}${link}` : '';
@@ -100,17 +112,22 @@ export default function NewSurveySheet({
     <Sheet title="New survey" narrow onClose={onClose}>
       <div className="field">
         <label className="f" htmlFor="nClient">
-          Client
+          Project
         </label>
         <input
           id="nClient"
           type="text"
           className="input"
           value={client}
-          onChange={(e) => setClient(e.target.value)}
+          onChange={(e) => {
+            setClient(e.target.value);
+            if (error?.field === 'client') setError(null);
+          }}
           placeholder="ACME Coffee"
+          aria-invalid={error?.field === 'client' || undefined}
           disabled={Boolean(link)}
         />
+        {errFor('client')}
       </div>
 
       <div className="field">
@@ -119,7 +136,7 @@ export default function NewSurveySheet({
             chosen, on the screen that decides which questionnaire a client
             gets. It is a group with a name now. */}
         <span className="f" id="pkg-label">
-          Package <span>· this chooses the questionnaire</span>
+          Package
         </span>
         <div className="opts" role="group" aria-labelledby="pkg-label">
           {OPTIONS.map((o) => (
@@ -128,7 +145,10 @@ export default function NewSurveySheet({
               type="button"
               className="opt"
               aria-pressed={pkg === o.key}
-              onClick={() => setPkg(o.key)}
+              onClick={() => {
+                setPkg(o.key);
+                if (error?.field === 'package') setError(null);
+              }}
               disabled={Boolean(link)}
             >
               {o.label}
@@ -136,38 +156,53 @@ export default function NewSurveySheet({
             </button>
           ))}
         </div>
+        {errFor('package')}
       </div>
 
       <div className="field">
+        {/* "Asking for answers by" beside "Client" and "Package" — one label
+            arguing its own case next to two nouns. "Answers by" fits the pair
+            and keeps rule 1 intact, which "Deadline" would not: the app asks for
+            this date and enforces nothing. */}
         <label className="f" htmlFor="nDue">
-          Asking for answers by <span>· {DEFAULT_DUE_DAYS} days, change it if you need to</span>
+          Answers by
         </label>
         <input
           id="nDue"
           type="date"
           className="input"
           value={due}
-          onChange={(e) => setDue(e.target.value)}
+          onChange={(e) => {
+            setDue(e.target.value);
+            if (error?.field === 'due') setError(null);
+          }}
+          aria-invalid={error?.field === 'due' || undefined}
           disabled={Boolean(link)}
         />
-        {/* Rule 1 — it is a date, not a timer. Say so here, where somebody is
-            choosing it, rather than leaving them to find out. */}
-        <p className="hintline">
-          The client sees this on the welcome screen. It does not close the survey — you do, and
-          late answers still count. Leave it empty for no date.
-        </p>
+        {errFor('due')}
+        {/**
+         * What the box is already filled with, and nothing else.
+         *
+         * This field carried three sentences, with a four-line note under it
+         * about nobody needing to know who will answer — two paragraphs of
+         * standing policy on a form with three fields, read once and scrolled
+         * past ever after. Rule 1 and rule 3 have not changed; a form is simply
+         * not where a product explains itself, and both are said properly on the
+         * project this creates.
+         *
+         * Every label on this sheet is a bare noun now. The qualifiers each
+         * label carried — "· this chooses the questionnaire", "· 14 days,
+         * change it if you need to" — were doing two jobs from one line, and a
+         * label that argues with you is a label you stop reading. What survives
+         * is the one fact this control cannot show by itself: the date in the
+         * box was chosen for you.
+         */}
+        <p className="hintline">{DEFAULT_DUE_DAYS} days by default</p>
       </div>
 
-      {/* Rule 3 — collection is open-ended. There is nothing here to fill in
-          about who will answer, and there never will be. */}
-      <div className="field">
-        <p className="note">
-          <b>No need to know who will answer.</b> One link, shared as widely as the client likes.
-          Answers arrive as people find time, and you close collection when there&apos;s enough.
-        </p>
-      </div>
-
-      {error && <p className="formerror">{error}</p>}
+      {/* Anything with no field of its own — a dead database, an expired
+          session. Rare, and it has nowhere better to go. */}
+      {error && !error.field && <p className="formerror">{error.text}</p>}
 
       {link ? (
         <div className="field">
@@ -206,7 +241,7 @@ export default function NewSurveySheet({
         </div>
       ) : (
         <button className="btn btn-primary" onClick={submit} disabled={pending}>
-          {pending ? 'Creating…' : 'Create and get link'}
+          {pending ? 'Creating…' : 'Create'}
         </button>
       )}
     </Sheet>

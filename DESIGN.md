@@ -60,6 +60,8 @@ no decorative colour.
 --ink              var(--charcoal-900)
 --ink-muted-80     #262a30
 --ink-muted-48     #53575e   /* was #6e6e73; the CI ramp is darker here */
+--ink-muted-36     #797d85   /* `--ink-4`, 18 Aug: placeholders only. 4.61:1 —
+                                over the floor, and plainly not an answer */
 --on-dark          #ffffff
 --body-muted       #b9bcc2
 
@@ -887,9 +889,14 @@ none 0 · sm 8 · md 11 · lg 18 · card 26 · sheet 34 · pill 9999
 - `pill` — buttons, chips, tags. **The pill is the action signal.**
 - **Inputs came off this list on 18 August 2026**, and the rule above is why: a
   box you type into is not an action, and a pill field reads as a button that
-  happens to hold text. Fields take `lg` on both surfaces — the survey because a
-  field there is a card on a page of cards, the team app because everything
-  around it still wearing a pill is something you press.
+  happens to hold text.
+- **The two surfaces then split, later the same day.** The survey keeps `lg`: a
+  field there *is* a card on a page of cards, sized to be answered on a phone. The
+  team app went to `md` — 18px on a 44px box curves through most of its own
+  height, and beside a 34px sheet and 26px cards it read as a third rounded thing
+  rather than as the plainest control on screen. 11px on 44 is a corner, not an
+  arc. `.opt` and `.linkbox` moved with it; one radius on every control in a team
+  form.
 - **So did the team app's package selector, later the same day.** The New survey
   sheet had three radii down one short form — an 18px text field, two fully-round
   package options, an 18px date field — and the options were the odd one. A pill

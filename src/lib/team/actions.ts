@@ -62,22 +62,39 @@ async function actingUser() {
 }
 
 export type ActionResult =
-  /* `token` rides along with `link` for the one caller that needs both: the New
-     survey sheet shows the URL to copy *and* draws its code, and `surveyQr`
-     takes the token rather than the URL — it checks the survey exists before it
-     draws anything. Splitting `/s/<token>` back apart at the call site would
-     tie that sheet to the shape of a route it does not own. */
-  | { ok: true; link?: string; token?: string; warning?: string }
+  | { ok: true; link?: string; warning?: string }
   | { ok: false; error: string };
 
-export async function createSurvey(formData: FormData): Promise<ActionResult> {
+/**
+ * Creating a survey answers with more than the other actions, and differently.
+ *
+ * `token` rides along with `link` because the sheet shows the URL to copy *and*
+ * draws its code, and `surveyQr` takes a token rather than a URL — it checks the
+ * survey exists before drawing anything. Splitting `/s/<token>` back apart at the
+ * call site would tie that sheet to the shape of a route it does not own.
+ *
+ * `field` is what lets "Enter a client name" appear under the client name box
+ * instead of in a line at the foot of the form. A refusal that names the control
+ * it is about is the difference between an error you fix and an error you hunt
+ * for — and this is the only action with more than one thing a person can get
+ * wrong, which is why it is here and not on `ActionResult`.
+ */
+export type NewSurveyField = 'client' | 'package' | 'due';
+
+export type CreateSurveyResult =
+  | { ok: true; link: string; token: string }
+  | { ok: false; error: string; field?: NewSurveyField };
+
+export async function createSurvey(formData: FormData): Promise<CreateSurveyResult> {
   await actingUser();
 
   const raw = String(formData.get('client') ?? '').trim();
   const pkg = String(formData.get('package') ?? '') as Package;
 
-  if (!raw) return { ok: false, error: 'Enter a client name.' };
-  if (!PACKAGES.includes(pkg)) return { ok: false, error: 'Choose a package' };
+  if (!raw) return { ok: false, error: 'Enter a client name.', field: 'client' };
+  if (!PACKAGES.includes(pkg)) {
+    return { ok: false, error: 'Choose which questionnaire this client gets.', field: 'package' };
+  }
 
   /**
    * The date the team is telling the client to answer by. The sheet prefills
@@ -95,11 +112,13 @@ export async function createSurvey(formData: FormData): Promise<ActionResult> {
   let dueAt: Date | null = null;
   if (dueDay) {
     dueAt = endOfDay(dueDay);
-    if (Number.isNaN(dueAt.getTime())) return { ok: false, error: 'That is not a date.' };
+    if (Number.isNaN(dueAt.getTime())) {
+      return { ok: false, error: 'That is not a date.', field: 'due' };
+    }
     /* A date already gone is a slip, not an intention — it would put the
        project into Needs you the moment the link was copied. */
     if (dueDay < dayIn(new Date())) {
-      return { ok: false, error: 'That date has already passed. Pick a later one.' };
+      return { ok: false, error: 'That date has already passed. Pick a later one.', field: 'due' };
     }
   }
 

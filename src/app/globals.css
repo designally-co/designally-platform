@@ -65,6 +65,9 @@
   --ink: var(--charcoal-900);
   --ink-2: #262a30;
   --ink-3: #53575e;
+  /* the rung under `--ink-3`, for placeholder text — present but plainly not an
+     answer. 4.61:1 on `--canvas`, clearing the 4.5 floor. */
+  --ink-4: #797d85;
   --on-dark: #ffffff;
   --body-muted: #b9bcc2;
 
@@ -282,6 +285,7 @@
   --ink: var(--warm-white); /* 17.51:1 */
   --ink-2: #e0e2e5; /* 14.97:1 */
   --ink-3: #919399; /* 6.33:1  */
+  --ink-4: #75777d; /* 4.53:1 on the dark Field */
   --body-muted: var(--stone-500); /* 8.37:1  */
 
   --hairline: #2b2f35;
@@ -475,7 +479,19 @@ textarea {
   color: var(--ink);
   background: var(--canvas);
   border: 1px solid var(--hairline);
-  border-radius: var(--r-lg);
+  /**
+   * `md`, not `lg`.
+   *
+   * Both are a step down from the pill and both make the point that a field is
+   * not a button — but 18px on a 44px box curves through most of its own height,
+   * and next to a 34px sheet and 26px cards it read as a third rounded thing
+   * rather than as the plainest control on the screen. 11px on 44 is a corner,
+   * not an arc.
+   *
+   * The survey keeps `lg`, below: a field there *is* a card on a page of cards,
+   * which is the reason it was given that radius and is still true.
+   */
+  border-radius: var(--r-md);
   padding: 12px 14px;
   height: 44px;
   /* the caret is the one place the accent is unarguable: it marks exactly where
@@ -493,7 +509,7 @@ textarea {
   color: var(--ink);
   background: var(--canvas);
   border: 1px solid var(--hairline);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-md);
   padding: 14px 18px;
   min-height: 96px;
   resize: vertical;
@@ -534,20 +550,76 @@ textarea {
   background: var(--primary-tint);
   color: var(--ink);
 }
+/**
+ * A placeholder is an example, not an answer.
+ *
+ * `--ink-3` is the colour of text meant to be read — the hint under a field, a
+ * timestamp beside a name — and at the field's own 17px it made an empty box
+ * look like a filled one. `--ink-4` is a rung below it, added for this: light
+ * enough to read as absent, and measured at 4.61:1 on the canvas, which is over
+ * the 4.5 floor placeholders have to clear like any other text.
+ */
 .input::placeholder,
 .textarea::placeholder {
-  color: var(--ink-3);
+  color: var(--ink-4);
 }
 
-label.f {
+/**
+ * A field's label, whatever element carries it.
+ *
+ * This was `label.f`, and the qualifier was a bug with a stylesheet's alibi: a
+ * group of buttons has no single control to point a `<label>` at, so the package
+ * chooser names itself with a `<span class="f">` — which matched nothing and
+ * came out as body copy. One form, two label sizes, and the largest text on the
+ * sheet sitting over the smallest decision on it.
+ *
+ * The class is the contract. Any element wearing it is a field label.
+ */
+.f {
   display: block;
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0;
   margin-bottom: 7px;
 }
-label.f span {
+.f span {
   font-weight: 400;
+}
+
+/**
+ * On a team sheet, a label loses to its own value.
+ *
+ * 14px at 600 over a 17px value at 400 made the label the heaviest text in the
+ * field and the answer the lightest, so a form scanned as a column of headings
+ * with grey underneath. 13.5 / 500 / `--ink-2` steps down in all three, which is
+ * what makes it read as subordinate rather than merely smaller. 13:1, so it is
+ * quieter without being faint.
+ *
+ * **Scoped to `.sheet`, and that is the point of the scope.** The survey uses
+ * `.f` too, and there the label *is* the question — the whole screen is one
+ * bilingual sentence and a box under it. Quietening that would be shrinking the
+ * thing the client came to read. Same class, two jobs, and only one of them is
+ * a field name.
+ */
+.sheet .f {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+
+/**
+ * What is wrong, under the thing that is wrong.
+ *
+ * Errors used to collect in one line above the button, so "Enter a client name"
+ * appeared four fields away from the client name. Naming the control is most of
+ * the fix; sitting under it is the rest.
+ */
+.fielderror {
+  display: block;
+  margin-top: 7px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--critical);
 }
 
 /* ============================================================
@@ -2627,7 +2699,21 @@ dialog::backdrop {
 .sheetscroll {
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
+  /**
+   * Down only. `overflow-y: auto` on its own is not that.
+   *
+   * The spec resolves `visible` to `auto` whenever the other axis is not
+   * visible, so declaring only the vertical axis silently made the horizontal
+   * one scrollable too — every sheet in the app could be dragged sideways off
+   * its own content, on a trackpad by accident, and the further right you went
+   * the more parchment you got. Nothing here is wider than the sheet; the axis
+   * was never asked for, it was inherited from a rule about the other one.
+   *
+   * `hidden` rather than `clip` because it keeps the box a scroll container for
+   * the vertical axis, which is the whole job. Anything genuinely wide — a table,
+   * a code block — carries its own scroller and is unaffected.
+   */
+  overflow: hidden auto;
   overscroll-behavior: contain;
   /* clears the bar laid over it *and* the ramp beneath it — the bar's own three
      numbers plus `--bar-ramp`, so none of the three can drift apart. Without
@@ -2970,8 +3056,19 @@ dialog::backdrop {
  * No top padding. Clearing the bar and its ramp is the scroller's job, and
  * doing it in two places is how the two drift.
  */
+/**
+ * The foot of a sheet, sized for a sheet that ends.
+ *
+ * 72px, which was a scrolling sheet's runway — room under the last control so
+ * it clears the bottom edge on the way up. On a sheet that hugs its content it
+ * is just empty parchment: the New survey form ended at its Create button with
+ * seventy pixels of nothing under it and a border after that.
+ *
+ * `--sp-lg` matches the sides, and the sheet's own 34px corner is the reason it
+ * cannot go lower — content any closer would run into the curve.
+ */
 .sheet-body {
-  padding: 0 var(--sp-lg) 72px;
+  padding: 0 var(--sp-lg) var(--sp-lg);
 }
 /**
  * The right padding gives back what the scrollbar took.
@@ -3216,7 +3313,7 @@ dialog::backdrop {
  */
 .opt {
   border: 1px solid var(--hairline);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-md);
   background: var(--canvas);
   padding: 12px 18px;
   min-height: 44px;
@@ -3234,8 +3331,27 @@ dialog::backdrop {
   font-weight: 400;
   margin-top: 1px;
 }
+/**
+ * Chosen, in the rung the survey already uses for it.
+ *
+ * It was a 2px `--primary-focus` line on a white field — a blue-grey borrowed
+ * from the focus ring, which means *the keyboard is here*, not *you picked
+ * this*. Two states in one colour, and neither the survey's language nor this
+ * one's.
+ *
+ * `.chip[aria-pressed="true"]` settled this ladder and it holds here unchanged:
+ *
+ *   hover      white field, 1px orange line       — you are pointing at this
+ *   selected   pale orange field, 2px orange line — you chose this
+ *   button     solid orange, white label          — this is the action
+ *
+ * The label stays ink on the tint rather than turning orange; the field and the
+ * border already say chosen. Padding drops by the extra pixel of border so
+ * nothing shifts on selection (DESIGN.md §5).
+ */
 .opt[aria-pressed='true'] {
-  border: 2px solid var(--primary-focus);
+  background: var(--primary-tint);
+  border: 2px solid var(--primary);
   padding: 11px 17px;
 }
 .opt[disabled] {
@@ -3248,9 +3364,8 @@ dialog::backdrop {
   align-items: center;
   background: var(--canvas);
   border: 1px solid var(--hairline);
-  /* `--r-lg`, with the inputs it sits under — it was `--r-sm`, a fourth radius
-     on a sheet that now has one */
-  border-radius: var(--r-lg);
+  /* with the inputs it sits under */
+  border-radius: var(--r-md);
   padding: 11px 14px;
   font-size: 13.5px;
   font-family: ui-monospace, Menlo, monospace;
@@ -4702,8 +4817,9 @@ dialog::backdrop {
  * nothing to tell where one answer's ground ended and the next question began
  * except the empty space between them.
  *
- * Canvas inside the Edge, `--r-md` — the same object every input in the team
- * app is, which is the point: the survey stops inventing a control.
+ * Canvas inside the Edge — the same *kind* of object every input in the team app
+ * is, which is the point: the survey stops inventing a control. It keeps its own
+ * radius, and the rule below says why.
  */
 .slide .input,
 .slide .textarea {
