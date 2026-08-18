@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { answerPreview, isAnswered, type DraftValues } from '@/lib/survey/answers';
 import type { SurveyPayload, SurveyQuestion, SurveyStep } from '@/lib/survey/load';
@@ -475,7 +475,6 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
    * something on it.
    */
   const numberedBlanks = blanks.filter(({ question }) => question.number !== null);
-  const detailBlanks = blanks.filter(({ question }) => question.number === null);
 
   /* numbered questions only — name and email are not numbered anywhere else */
   const answered = survey.questionCount - numberedBlanks.length;

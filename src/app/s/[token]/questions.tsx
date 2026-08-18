@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useId, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 
 import type { QuestionConfig } from '@/lib/db/schema';
 import type { RawValue } from '@/lib/survey/answers';
