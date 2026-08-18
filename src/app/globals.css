@@ -1929,29 +1929,98 @@ label.f span {
   background: var(--canvas);
   font-size: 14px;
 }
+/**
+ * Ten scales, read down rather than wrapped across.
+ *
+ * They were a flowing row of "4 of 5 · pair 1" chips, which was the right shape
+ * for ten anonymous numbers and the wrong one for ten named oppositions: the
+ * words are the content now, they are of unequal length, and wrapped inline
+ * they gave no column to compare positions down. One per line, and the position
+ * marks land on a shared track.
+ */
 .ansscale {
   margin: 0 0 0 34px;
   padding: 0;
   list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 18px;
-}
-.ansscale li {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
+  display: grid;
+  /* left word · track · right word · count */
+  grid-template-columns: auto 1fr auto auto;
+  gap: 9px 14px;
+  max-width: 52ch;
   font-size: 14px;
+}
+/**
+ * Every row on the list's own columns, through `subgrid`.
+ *
+ * Each row sized itself first, and the words are of very unequal length —
+ * Calm against Cosmopolitan, Fun against Sophisticated — so every track began
+ * and ended somewhere different and the ten marks fell on ten unrelated scales.
+ * The point of one row per line is that the column of marks can be read down as
+ * the shape of a personality; misaligned it is ten separate readings again.
+ *
+ * `subgrid` rather than `display: contents`, which would do the same to the
+ * columns and take the `li` out of the accessibility tree with it. This is a
+ * list of ten readings and it should still be announced as one.
+ */
+.ansscale li {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  align-items: center;
 }
 .ansscale .pos {
   font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 .ansscale .pos i {
   font-style: normal;
   font-weight: 400;
   color: var(--ink-3);
 }
+/**
+ * The opposition, with the answer's place on it.
+ *
+ * Both words at full strength: neither pole is the default and setting the
+ * unchosen one back would be the view deciding which end the client meant. What
+ * carries the answer is the mark between them, and DESIGN.md's rule holds —
+ * `--primary-mark` at 4.54:1, a graphical object above the 3:1 floor, and it is
+ * a position rather than a status so it is not doing the accent's job.
+ */
 .ansscale .pair {
+  display: grid;
+  grid-column: 1 / 4;
+  grid-template-columns: subgrid;
+  align-items: center;
+}
+.ansscale .pair b {
+  font-weight: 400;
+}
+/* the track, and the point on it — the CI's line and point, at the size a table
+   cell can carry */
+.ansscale .pair i {
+  position: relative;
+  height: 1px;
+  background: var(--hairline);
+  min-width: 34px;
+}
+.ansscale .pair i::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  /* `--at` is 0 at the left word and 1 at the right one. Inset by the dot's own
+     width so neither end can hang off the track it is measured against. */
+  left: calc(var(--at) * (100% - 7px) + 3.5px);
+  width: 7px;
+  height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  border-radius: var(--r-pill);
+  background: var(--primary-mark);
+}
+/* a pair this question version no longer has — the number without a name is
+   still worth more than nothing */
+.ansscale .pair.unlabelled {
+  display: block;
+  grid-column: 1 / 4;
   color: var(--ink-3);
   font-size: 12px;
 }

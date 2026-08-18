@@ -39,6 +39,19 @@ export type ReadableAnswer = {
   textTh: string | null;
   blockKey: string;
   value: AnswerValue | null;
+  /**
+   * The poles of each scale, in the order the client saw them.
+   *
+   * Only on `linear_scale`, and carried rather than looked up because a scale
+   * answer stores nothing but the pair's index — `{ "0": 4, "1": 2, … }`. On
+   * its own that renders as "4 of 5, pair 1", which is a number about a thing
+   * the reader cannot see. `transcript.ts` has resolved these for the analysis
+   * since it was written; the team was the one reading the raw indices.
+   *
+   * From the question's own frozen version, like everything else here — a
+   * survey sent at version 4 gets version 4's pairs (rule 5).
+   */
+  pairs?: { left_en: string; left_th: string; right_en: string; right_th: string }[];
 };
 
 export type RespondentAnswers = {
@@ -146,6 +159,7 @@ export async function loadProjectAnswers(projectId: string): Promise<ProjectAnsw
         textTh: q.textTh,
         blockKey: blockById.get(q.blockId) ?? '',
         value: mine.get(q.id) ?? null,
+        ...(q.config?.pairs?.length ? { pairs: q.config.pairs } : {}),
       }));
       return {
         id: p.id,

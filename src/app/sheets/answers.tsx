@@ -26,23 +26,61 @@ import Sheet from './sheet';
  * in would hide it perfectly.
  */
 
-function Scale({ value }: { value: Extract<AnswerValue, { kind: 'scale' }> }) {
+/**
+ * A scale answer, with the words the client was actually looking at.
+ *
+ * It read "4 of 5 · pair 1" through to "3 of 5 · pair 10" — ten numbers about
+ * ten things the reader could not see. The answer stores only the pair's index,
+ * so the labels have to be carried from the question; see `ReadableAnswer.pairs`.
+ *
+ * The poles are named in the order they were on screen, and the position is
+ * stated against them: `1` was the left word and `points` was the right one, so
+ * "2 of 5" between Serious and Fun means nearer Serious. Reading it any other
+ * way is a mistake nothing on the old row could prevent.
+ *
+ * English only. The client chose their language, the team reads in one.
+ *
+ * A pair the question no longer has still renders — a survey answered at an
+ * earlier version can carry an index this version dropped, and losing the
+ * number would be worse than showing it bare.
+ */
+function Scale({
+  value,
+  pairs,
+}: {
+  value: Extract<AnswerValue, { kind: 'scale' }>;
+  pairs?: ReadableAnswer['pairs'];
+}) {
   const entries = Object.entries(value.values).sort((a, b) => Number(a[0]) - Number(b[0]));
   return (
     <ul className="ansscale">
-      {entries.map(([index, point]) => (
-        <li key={index}>
-          <span className="pos">
-            {point} <i>of {value.points}</i>
-          </span>
-          <span className="pair">pair {Number(index) + 1}</span>
-        </li>
-      ))}
+      {entries.map(([index, point]) => {
+        const pair = pairs?.[Number(index)];
+        /* how far along, so the eye can rank ten rows without doing the
+           arithmetic ten times. 1 sits at the left word, `points` at the right. */
+        const along = value.points > 1 ? (point - 1) / (value.points - 1) : 0.5;
+        return (
+          <li key={index}>
+            {pair ? (
+              <span className="pair">
+                <b>{pair.left_en}</b>
+                <i style={{ '--at': along } as React.CSSProperties} aria-hidden="true" />
+                <b>{pair.right_en}</b>
+              </span>
+            ) : (
+              <span className="pair unlabelled">pair {Number(index) + 1}</span>
+            )}
+            <span className="pos">
+              {point} <i>of {value.points}</i>
+            </span>
+          </li>
+        );
+      })}
     </ul>
   );
 }
 
-function Value({ value }: { value: AnswerValue }) {
+function Value({ value, pairs }: { value: AnswerValue; pairs?: ReadableAnswer['pairs'] }) {
   switch (value.kind) {
     case 'text':
       /* the client's own words, wrapped as they wrote them — never trimmed to a
@@ -67,7 +105,7 @@ function Value({ value }: { value: AnswerValue }) {
         </>
       );
     case 'scale':
-      return <Scale value={value} />;
+      return <Scale value={value} pairs={pairs} />;
   }
 }
 
@@ -81,7 +119,7 @@ function Answer({ a }: { a: ReadableAnswer }) {
           {a.textTh && <i className="th">{a.textTh}</i>}
         </span>
       </div>
-      {a.value ? <Value value={a.value} /> : <p className="noanswer">Left blank</p>}
+      {a.value ? <Value value={a.value} pairs={a.pairs} /> : <p className="noanswer">Left blank</p>}
     </li>
   );
 }
