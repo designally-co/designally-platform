@@ -6,7 +6,7 @@ import { deleteInsights, reanalyse, readInsightsVersion } from '@/lib/team/actio
 
 import type { Insights } from '@/lib/analysis/schema';
 import type { ProjectView } from '@/lib/team/projects';
-import { useAnchored, useDismiss } from '../anchored';
+import { useDismiss } from '../anchored';
 import { TrashMark, VersionsMark } from '../icons';
 import { submitted } from '@/lib/team/when';
 import Sheet from './sheet';
@@ -191,9 +191,38 @@ export default function InsightsSheet({
    * it hangs off the bar beside the answer.
    */
   const [listing, setListing] = useState(false);
+  /**
+   * Which run is being asked about, if any.
+   *
+   * One field rather than a flag per row, for the reason the project sheet's
+   * `confirming` gives: two of these open at once is a menu asking two
+   * irreversible questions with two red buttons in it and nothing saying which
+   * row you opened.
+   *
+   * No typed guard here, unlike deleting a project. That one takes a client's
+   * name because it takes every answer with it and cannot be undone by anybody.
+   * This takes one run of the analysis, on a project that keeps the rest and can
+   * write another in a minute — the same weight as archiving, and it asks the
+   * same way.
+   */
+  const [dropping, setDropping] = useState<string | null>(null);
   const versionsWrap = useRef<HTMLDivElement>(null);
-  const at = useAnchored(listing, versionsWrap, 300, 240);
-  useDismiss(listing, versionsWrap, useCallback(() => setListing(false), []));
+  /* No `useAnchored` here, unlike the calendar and the split button. Those hang
+     off controls in a sheet's *body*, inside the scroller, where an absolutely
+     positioned panel grows the scroll height and is clipped by the sheet's
+     corners. This hangs off the bar, which is absolute against the sheet and
+     outside the scroller — so it drops the same 8px on the same trailing edge
+     as `.barmenu` and `.sharepanel`, in CSS, like they do. */
+  useDismiss(
+    listing,
+    versionsWrap,
+    /* Closing forgets which row was being asked about — reopening to a red
+       panel you did not open is the thing the project sheet's `onClose` fixed. */
+    useCallback(() => {
+      setListing(false);
+      setDropping(null);
+    }, []),
+  );
 
   function act(run: () => Promise<{ ok: boolean; error?: string }>, done: string) {
     start(async () => {
@@ -239,16 +268,36 @@ export default function InsightsSheet({
               <VersionsMark />
             </button>
 
-            {listing && at && (
-              <div
-                className="vermenu"
-                role="dialog"
-                aria-label="Every run of this analysis"
-                style={{ top: at.top, left: at.left, width: at.width }}
-              >
+            {listing && (
+              <div className="vermenu" role="dialog" aria-label="Every run of this analysis">
                 <p className="hintline">Every run, newest first:</p>
                 <ul className="iversions">
-                  {versions.map((v) => (
+                  {versions.map((v) =>
+                    dropping === v.id ? (
+                      <li key={v.id} className="asking">
+                        <div className="delconfirm danger">
+                          <p>
+                            The run of {submitted(v.writtenAt)} goes for good. Every other run
+                            stays.
+                          </p>
+                          <div className="iacts">
+                            <button
+                              className="btn btn-danger"
+                              disabled={busy}
+                              onClick={() => {
+                                setDropping(null);
+                                act(() => deleteInsights(v.id), 'Version deleted.');
+                              }}
+                            >
+                              {busy ? 'Deleting…' : 'Delete permanently'}
+                            </button>
+                            <button className="btn btn-quiet" onClick={() => setDropping(null)}>
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      </li>
+                    ) : (
                     <li key={v.id} className={v.id === openId ? 'on' : undefined}>
                       <button
                         className="pick"
@@ -277,13 +326,14 @@ export default function InsightsSheet({
                           className="drop"
                           aria-label={`Delete the run of ${submitted(v.writtenAt)}`}
                           disabled={busy}
-                          onClick={() => act(() => deleteInsights(v.id), 'Version deleted.')}
+                          onClick={() => setDropping(v.id)}
                         >
                           <TrashMark />
                         </button>
                       )}
                     </li>
-                  ))}
+                    ),
+                  )}
                 </ul>
               </div>
             )}
