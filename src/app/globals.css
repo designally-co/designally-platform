@@ -2790,9 +2790,27 @@ textarea {
   margin-top: var(--sp-xxs);
   flex-wrap: nowrap;
 }
+/**
+ * Smaller than a CTA, because they are answers inside a menu.
+ *
+ * `.btn` is 44px and 17px type — the size of the thing you press on a sheet,
+ * standing next to 44px discs. In a 300px popover it is the size of the popover
+ * itself, and two of them turn a question into a landing page.
+ *
+ * 36 and 14.5. **Below the 44px touch floor deliberately**, and the menu had
+ * already made that call: its own delete bins are 32px and its rows are 53. A
+ * confirmation reached by pressing a 32px bin cannot then insist on 44px
+ * answers — the target that got you here was smaller than both.
+ */
 .vermenu .delconfirm .iacts .btn {
-  padding-left: var(--sp-md);
-  padding-right: var(--sp-md);
+  /* Half the block each. Two pills floating left in a box they do not fill
+     leaves a ragged edge down the right of the only red thing in the menu; at
+     full width the block reads as one object with two answers in it, and each
+     target grows by half again. */
+  flex: 1;
+  min-height: 36px;
+  padding: 6px 12px;
+  font-size: 14.5px;
 }
 /**
  * Cancel goes neutral inside a danger confirm.
