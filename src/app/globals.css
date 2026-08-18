@@ -2319,9 +2319,40 @@ dialog::backdrop {
   gap: 14px;
   padding: 15px 28px;
 }
+/**
+ * The sticky title, one line or two.
+ *
+ * Most sheets pass a string and it stays a single line; the project sheet
+ * passes a name and a package. A column rather than two spans with a middot,
+ * because a client name can be long and Thai, and a wrapped middot pair reads
+ * as two unrelated facts on the second line.
+ */
 .sheet-top .t {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
   font-size: 15.5px;
   font-weight: 600;
+  /* the name can be Thai, and Thai stacks four levels — DESIGN.md §2 */
+  line-height: 1.5;
+}
+.sheet-top .t b {
+  font-weight: 600;
+  /* one line in the bar: the whole point of it is that it survives scrolling,
+     and a title that grows to three lines takes the screen with it */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* the package, under the name — a step down in size and ink, not a second
+   heading. `--ink-3` at 6.02:1. */
+.sheet-top .t i {
+  font-style: normal;
+  font-size: 12.5px;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--ink-3);
 }
 /* the actions take the trailing edge; back has the leading edge to itself */
 .sheet-top .bartrail {
@@ -2386,20 +2417,10 @@ dialog::backdrop {
   }
 }
 
-/* ---- project detail ---- */
-.pd-head {
-  margin-bottom: 26px;
-}
-.pd-head h1 {
-  font-size: clamp(1.5rem, 3.6vw, 2rem);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  margin-bottom: 3px;
-}
-.pd-head .pkg {
-  font-size: 14px;
-  color: var(--ink-3);
-}
+/* ---- project detail ----
+   `.pd-head` was the client's name as an <h1> with the package and code under
+   it, at the top of the body. The sticky bar carries all three now, so the
+   block was the same three facts a second time, 26px above themselves. */
 .pd-now {
   background: var(--canvas);
   border: 1px solid var(--hairline);

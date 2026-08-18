@@ -315,21 +315,33 @@ export default function ProjectSheet({
    *
    * Both stay, and that is the pattern working rather than a repetition: the
    * two are never legible at the same moment for long.
+   *
+   * Two lines, because the name alone is not always enough to place a project:
+   * a client can hold a Brand and a Design at once, and those are different
+   * questionnaires with different answers. The package under the name is what
+   * the body's own head says under its `<h1>`, so the bar keeps saying it after
+   * that has scrolled away.
+   *
+   * The code rides with the package on that second line. It was in the body's
+   * head, and when that came out on 18 August 2026 this was the only place it
+   * appeared anywhere in the app — dropping the block without moving it would
+   * have made a project's own reference unreachable from the project.
    */
   return (
     <Sheet
-      title={p.clientName}
+      title={
+        <>
+          <b>{p.clientName}</b>
+          <i>
+            {p.packageLabel}
+            {p.projectCode ? ` · ${p.projectCode}` : ''}
+          </i>
+        </>
+      }
       actions={actions}
       backLabel="Back to all projects"
       onClose={onClose}
     >
-      <div className="pd-head">
-        <h1>{p.clientName}</h1>
-        <div className="pkg">
-          {p.packageLabel}
-          {p.projectCode ? ` · ${p.projectCode}` : ''}
-        </div>
-      </div>
 
       {/* who answered */}
       <div className="pd-sec">
