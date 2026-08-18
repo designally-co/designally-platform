@@ -4823,3 +4823,14 @@ dialog::backdrop {
   display: block;
   margin-left: 0;
 }
+
+/* On screen the tabs say whose answers these are; the heading exists for the
+   printed page, which has no tabs. */
+.ansname {
+  display: none;
+}
+
+/* The printed page is not this page. `printableHtml` in lib/team/export.ts
+   builds its own document and prints that — see the note there for why a
+   de-chromed copy of this sheet was the wrong shape, and why the <dialog>
+   being nested rather than portalled made it a blank one. */

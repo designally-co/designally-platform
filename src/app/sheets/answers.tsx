@@ -4,7 +4,14 @@ import { useState, useTransition } from 'react';
 
 import { deleteResponse } from '@/lib/team/actions';
 import type { AnswerValue } from '@/lib/db/schema';
-import type { ProjectAnswers, ReadableAnswer } from '@/lib/team/answers';
+import type { ProjectAnswers, ReadableAnswer, RespondentAnswers } from '@/lib/team/answers';
+import {
+  answersToMarkdown,
+  exportFilename,
+  printableHtml,
+  scaleReading,
+} from '@/lib/team/export';
+import MoreMenu from '../menu';
 import Sheet from './sheet';
 
 /**
@@ -46,6 +53,10 @@ import Sheet from './sheet';
  * made on — so the reading sits after them, in `--ink-3`, doing the one job the
  * number cannot do alone: saying which end of the pair it is counting from.
  *
+ * `scaleReading` lives in `export.ts` and is imported, so the file a person
+ * downloads and the row they are looking at cannot say different things about
+ * the same answer.
+ *
  * The three readings are the only ones the data supports. An endpoint is `at`,
  * because the client chose the last available point and there is nothing beyond
  * it; the exact middle is `balanced`; everything else is `toward`. No degree
@@ -60,13 +71,6 @@ import Sheet from './sheet';
  *
  * English only. The client chose their language; the team reads in one.
  */
-function reading(point: number, points: number, leftEn: string, rightEn: string) {
-  if (point <= 1) return `at ${leftEn}`;
-  if (point >= points) return `at ${rightEn}`;
-  /* exact middle only — 3 of 5 is balanced, nothing in 4 points is */
-  if (points % 2 === 1 && point === (points + 1) / 2) return 'balanced';
-  return point < (points + 1) / 2 ? `toward ${leftEn}` : `toward ${rightEn}`;
-}
 
 /**
  * A pair the question no longer carries still renders as its number: a survey
@@ -95,7 +99,7 @@ function Scale({
                 <span className="pos">
                   <b>{point}</b> <i>of {value.points}</i>
                 </span>
-                <span className="lean">{reading(point, value.points, pair.left_en, pair.right_en)}</span>
+                <span className="lean">{scaleReading(point, value.points, pair.left_en, pair.right_en)}</span>
               </>
             ) : (
               <>
@@ -194,6 +198,59 @@ export default function AnswersSheet({
   const [warned, setWarned] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  /**
+   * The file, handed over by the browser rather than fetched from anywhere.
+   *
+   * `ProjectAnswers` is already loaded for the sheet, so the export is built
+   * from exactly what is on screen — no request, no second read of the
+   * database, and no way for the file to disagree with the view. The object URL
+   * is revoked on the next frame; keeping it alive holds the blob in memory for
+   * the life of the document.
+   */
+  const download = (person?: RespondentAnswers) => {
+    const blob = new Blob([answersToMarkdown(data, clientName, person)], {
+      type: 'text/markdown;charset=utf-8',
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = exportFilename(clientName, person);
+    a.click();
+    requestAnimationFrame(() => URL.revokeObjectURL(url));
+  };
+
+  /**
+   * The document opens in its own window and prints itself.
+   *
+   * `printableHtml` builds a complete page — see the note there for why it is
+   * not this sheet with its chrome hidden, which produced a blank page because
+   * the `<dialog>` is nested rather than portalled, and would have been a poor
+   * document even when it worked.
+   *
+   * A pop-up blocker can refuse the window; that is the one failure worth
+   * saying out loud, because nothing else on screen would change and the team
+   * would conclude the button is broken.
+   */
+  const [printError, setPrintError] = useState<string | null>(null);
+  const print = (person?: RespondentAnswers) => {
+    const w = window.open('', '_blank');
+    if (!w) {
+      setPrintError('Your browser blocked the print window. Allow pop-ups for this site and try again.');
+      return;
+    }
+    setPrintError(null);
+    w.document.write(printableHtml(data, clientName, person));
+    w.document.close();
+    /* the fonts have to be resolved before the dialog freezes the page, or a
+       Thai line can measure against a fallback and re-flow behind the preview */
+    const go = () => {
+      w.focus();
+      w.print();
+    };
+    if (w.document.fonts?.ready) w.document.fonts.ready.then(go);
+    else w.addEventListener('load', go);
+  };
+
   const remove = () =>
     start(async () => {
       setError(null);
@@ -207,7 +264,53 @@ export default function AnswersSheet({
     });
 
   return (
-    <Sheet title={`What ${clientName} said`} backLabel={backLabel} onClose={onClose}>
+    <Sheet
+      title={`What ${clientName} said`}
+      backLabel={backLabel}
+      onClose={onClose}
+      actions={
+        data.respondents.length ? (
+          <MoreMenu label="Export">
+            {(close) => (
+              <>
+                <button
+                  onClick={() => {
+                    download(person);
+                    close();
+                  }}
+                >
+                  Download {person.name}&rsquo;s answers · Markdown
+                </button>
+                <button
+                  onClick={() => {
+                    download();
+                    close();
+                  }}
+                >
+                  Download all {data.respondents.length} · Markdown
+                </button>
+                <button
+                  onClick={() => {
+                    close();
+                    print(person);
+                  }}
+                >
+                  Print {person.name}&rsquo;s answers · PDF
+                </button>
+                <button
+                  onClick={() => {
+                    close();
+                    print();
+                  }}
+                >
+                  Print all {data.respondents.length} · PDF
+                </button>
+              </>
+            )}
+          </MoreMenu>
+        ) : null
+      }
+    >
       {!data.respondents.length ? (
         <p className="quiet">Nobody has answered yet.</p>
       ) : (
@@ -237,21 +340,44 @@ export default function AnswersSheet({
             ))}
           </div>
 
-          <p className="quiet anssum">
-            {person.blank > 0
-              ? `${person.name} left ${person.blank} of ${person.answered + person.blank} blank. A question nobody could answer is a finding, not a gap in the data.`
-              : `${person.name} answered every question.`}
-          </p>
+          {/**
+           * One person on screen, everybody when the print is for everybody.
+           *
+           * Printing all respondents needs them all in the document, and the
+           * tabs only ever mounted one. Rendering all of them permanently would
+           * put up to twenty times twenty-one answers in the DOM to serve a
+           * button most people press never, so they arrive for the moment the
+           * dialog is open and leave with it.
+           *
+           * The name is a heading here rather than only a tab, because a
+           * printed page has no tabs — see the print rules, which is also where
+           * it is hidden on screen.
+           */}
+          {[person].map((p) => (
+            <section className="ansperson" key={p.id}>
+              <h3 className="ansname">
+                {p.name}
+                {p.role && <span>{p.role}</span>}
+                {p.email && <span>{p.email}</span>}
+              </h3>
+              <p className="quiet anssum">
+                {p.blank > 0
+                  ? `${p.name} left ${p.blank} of ${p.answered + p.blank} blank. A question nobody could answer is a finding, not a gap in the data.`
+                  : `${p.name} answered every question.`}
+              </p>
 
-          <ul className="anslist">
-            {person.answers.map((a, i) => (
-              <Answer a={a} key={i} />
-            ))}
-          </ul>
+              <ul className="anslist">
+                {p.answers.map((a, i) => (
+                  <Answer a={a} key={i} />
+                ))}
+              </ul>
+            </section>
+          ))}
 
           {/* under the answers, not above them: the reason to delete a response
               is in the response, and a Delete placed before it is pressed on a
               name alone — which is what it was on the project sheet. */}
+          {printError && <p className="formerror">{printError}</p>}
           {error && <p className="formerror">{error}</p>}
           <button className="ansdrop" disabled={pending} onClick={remove}>
             {warned ? 'Delete anyway' : `Delete ${person.name}'s answers`}
