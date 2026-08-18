@@ -2805,6 +2805,29 @@ textarea {
   margin: 2px 0;
   padding: 0 var(--sp-xs);
 }
+/**
+ * One coloured row at a time.
+ *
+ * `--primary-tint` and `--critical-wash` are both a hue at 7% over white, and
+ * the two hues are neighbours — #fff0ec against #fcf0f0. Side by side in a
+ * short menu they are the same pale warm block, so a list showing the run you
+ * are *reading* on one and the run you are *deleting* on the next asks somebody
+ * to tell them apart by hue at 7% strength. Nobody can, and the price of being
+ * wrong is a deleted analysis.
+ *
+ * So the reading mark stands down while the question is open. It is the less
+ * urgent of the two by a distance, and the run being asked about names itself
+ * in the block anyway.
+ *
+ * That is the whole fix. A `--critical` border on the block was tried alongside
+ * it and taken off again: with only one row coloured there is nothing left to
+ * confuse it with, and a full-strength line around a confirmation that has
+ * already been opened deliberately is shouting at somebody who is standing
+ * still.
+ */
+.vermenu[data-asking] .iversions li.on {
+  background: transparent;
+}
 .vermenu .iversions .drop {
   display: inline-flex;
   align-items: center;

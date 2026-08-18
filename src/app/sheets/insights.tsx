@@ -269,7 +269,14 @@ export default function InsightsSheet({
             </button>
 
             {listing && (
-              <div className="vermenu" role="dialog" aria-label="Every run of this analysis">
+              <div
+                className="vermenu"
+                role="dialog"
+                aria-label="Every run of this analysis"
+                /* While a row is being asked about, the tint on the row you are
+                   *reading* comes off — see the rule in globals.css. */
+                data-asking={dropping ? 'true' : undefined}
+              >
                 {/* No caption. The bar's own second line names the run on
                     screen, and a menu of four timestamps under a *Earlier runs*
                     button does not need telling what it is or which way it
