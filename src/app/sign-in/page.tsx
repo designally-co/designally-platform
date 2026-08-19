@@ -13,7 +13,10 @@ export default async function SignIn(props: PageProps<'/sign-in'>) {
   if (session?.user) redirect(target);
 
   return (
-    <main className="signin">
+    /* `deck paper` — the door stands on the same ground as the room. Without it
+       this page kept the old grammar, a white card on a grey page, while the app
+       behind it and every sheet in it had inverted. See `.deck.paper`. */
+    <main className="signin deck paper">
       <div className="card">
         <Mark size={44} />
         <h1>Sign in</h1>

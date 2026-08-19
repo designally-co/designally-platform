@@ -5490,9 +5490,10 @@ body:has(.deck.paper) {
   place-items: center;
   padding: var(--sp-lg);
 }
+/* A tone, so not also a line — the rule every card on this surface follows. */
 .signin .card {
   background: var(--canvas);
-  border: 1px solid var(--hairline);
+  border: 1px solid transparent;
   border-radius: var(--r-card);
   padding: var(--sp-xl);
   width: min(440px, 100%);
