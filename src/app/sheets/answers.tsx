@@ -340,6 +340,10 @@ export default function AnswersSheet({
         </>
       }
       backLabel={backLabel}
+      /* The third sheet on the paper ground, 19 August 2026. It opens from the
+         project sheet — a respondent's chip is the way in — so it is the same
+         stack, and a stack cannot be two colours. See `.sheet.paper`. */
+      surface="paper"
       onClose={onClose}
       /**
        * Two controls, and they are the two things you do to a response: take a

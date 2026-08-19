@@ -4226,7 +4226,12 @@ dialog::backdrop {
    ground on 19 August 2026 and takes the same rule: the tone is the boundary.
    `.signal`'s top rule and the blockquote's left rule stay, because neither is
    a container — they are lines between things, which is a different job. */
-.sheet.paper .conflict {
+.sheet.paper .conflict,
+/* the answers sheet's chips — what somebody ticked, one word each. The same
+   object `.pd-people button` is on the project sheet, so it loses its line for
+   the same reason. The hairlines *between* answers are not containers and
+   stay. */
+.sheet.paper .anschips li {
   border-color: transparent;
 }
 /**
