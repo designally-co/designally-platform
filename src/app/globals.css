@@ -796,7 +796,19 @@ textarea {
      viewport edge on a phone — at 26px it hung a pixel off it */
   --rail-x: clamp(38px, 4.4vw, 76px);
   --disc: clamp(54px, 6.5vw, 84px);
-  --rail-gutter: calc(var(--rail-x) + var(--disc) / 2 + 24px);
+  /**
+   * The air between the graphic and the words — 19 August 2026.
+   *
+   * It was a bare `24px` inside the gutter's arithmetic here and nothing at all
+   * on a wide screen, where `--rail-lead: 58px` measured *centre to column* and
+   * left whatever half a disc did not eat: at the 84px the disc clamps to, that
+   * was **16px**. The mark and the sentence beside it were touching.
+   *
+   * Named, so both breakpoints ask for the same thing and the disc's size is
+   * subtracted from it rather than being remembered by hand.
+   */
+  --rail-air: 40px;
+  --rail-gutter: calc(var(--rail-x) + var(--disc) / 2 + var(--rail-air));
 }
 
 /**
@@ -5547,7 +5559,10 @@ dialog::backdrop {
    */
   :root {
     --rail-gutter: 0px;
-    --rail-lead: 58px;
+    /* Centre to column, so half a disc of it is spent before the air begins —
+       see `--rail-air`. It was a flat 58, which left 16px beside an 84px disc
+       and less as the disc grew. */
+    --rail-lead: calc(var(--disc) / 2 + var(--rail-air));
     --col: min(880px, 100vw - 340px);
     --rail-x: calc(50vw - var(--col) / 2 - var(--rail-lead) / 2);
   }

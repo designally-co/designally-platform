@@ -207,22 +207,40 @@ export async function loadSurvey(rawToken: string): Promise<SurveyPayload | null
      *
      * A Thai sentence ending in "31 August" is the same defect as an English
      * one ending in a Thai month: the line is bilingual, so the date inside it
-     * has to be too.
+     * has to be too. The welcome screen is English from 19 August 2026 but the
+     * closed screen is not, and both read this.
      *
      * Bangkok in both, because the client reads it there and a date is not a
      * moment — the 31st must not become the 30th because a server sits in
      * Virginia.
+     *
+     * **`en-US` and the year, from 19 August 2026** — "September 2, 2026"
+     * rather than "2 September". Asked for.
+     *
+     * It is deliberately not what the team app does, and the difference is the
+     * reader. Everything the team sees is en-GB — `13 Aug 2026` on a response,
+     * `Sent 13 Aug` in the list, `dd/mm/yyyy` in the date field — and mixing
+     * orders *there* is how a date gets typed wrong once a year with nobody
+     * able to say when. A client reads this one date, on one screen, with the
+     * month spelled out in full, so there is nothing to confuse it with and no
+     * field to mistype: `September 2` cannot be read as the 9th.
+     *
+     * The year comes with the format and is worth having. A questionnaire sent
+     * in December for a January deadline says so, instead of leaving somebody
+     * to guess which side of the new year "2 January" falls on.
      */
     dueOn: row.survey.dueAt
       ? {
-          en: new Intl.DateTimeFormat('en-GB', {
-            day: 'numeric',
+          en: new Intl.DateTimeFormat('en-US', {
             month: 'long',
+            day: 'numeric',
+            year: 'numeric',
             timeZone: 'Asia/Bangkok',
           }).format(row.survey.dueAt),
           th: new Intl.DateTimeFormat('th-TH', {
             day: 'numeric',
             month: 'long',
+            year: 'numeric',
             timeZone: 'Asia/Bangkok',
           }).format(row.survey.dueAt),
         }
