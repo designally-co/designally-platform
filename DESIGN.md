@@ -1021,6 +1021,52 @@ The parchment inversion above is the **team app's** rule and stays exactly as wr
 
 This is not the two-volumes idea in section 7 stretched further. It is a second surface rule, and the reason it is allowed is that each surface earns its own: a worklist has layers, a single question does not.
 
+### Paper — the inversion, inverted
+
+**Experimental, 19 August 2026.** Two sheets run the parchment inversion the other way
+round: the sheet is white, a card is the warm white, and a band inside a card that wants
+to be a different thing returns to white. `.sheet.paper` in `globals.css`, applied by the
+`surface` prop on `Sheet`.
+
+```
+page   #ffffff
+card   #f3f3f3   1.110 down
+hover  #e6e6e6   1.125 down
+press  #dbdbdb   1.110 down
+```
+
+**Why it exists.** The first pass turned the sheet white and kept the cards white, which
+changed almost nothing — and that was the finding. `#fff` on `#f3f3f3` is **1.11:1**: the
+lift was always the hairline doing the work, and the tone was never really carrying it.
+Reversed, the same two values give three levels with no new grey, and the *direction* of
+depth says which surface you are standing on.
+
+**A card here has no border.** A filled silhouette at 1.11 reads where an outlined shape
+at 1.11 plus a line does not, because the eye takes the shape rather than hunting for its
+edge. A tone that can carry the boundary should not also be drawn one — which is what
+"borders, not shadows" is asking for. On the parchment sheets the tone *cannot* carry it,
+so there the line stays and the rule is unchanged.
+
+**Controls keep their edge and step back up to white.** The date field, the inputs, the
+option chips. A thing you press is bounded in this system whatever it stands on, and on a
+grey card a white fill is the direction that has always meant live.
+
+**Hover is the fill, not the line.** §Hover's rule — *a hover darkens the line to
+`--ink-3` and nothing else* — has no line to act on here, so these cards take that
+section's own exception: **a filled control deepens its own fill.** `#dbdbdb` and not
+`--surface-fill` for the press: that ramp is hued 45° to sit beside the orange, and these
+cards are hueless, so pressing one turned it brown against four greys.
+
+**Which sheets take it.** The two that are nearly all cards — the project sheet and the
+insights sheet it opens — because on those the parchment between the cards stopped reading
+as a page. The insights sheet also has the stronger claim of being the reading surface.
+The New survey sheet stays parchment: it is three fields and holds no card, so there is
+nothing for the grey to fail at, and its white inputs are already the lift.
+
+**Two sheets in one stack cannot be two grounds.** That is the constraint this rule has to
+respect, and the reason the insights sheet could not be left behind: going one level deeper
+and getting darker inverts the whole app's meaning of white-on-parchment.
+
 ### Materials — blur and scrim
 
 The system's vocabulary is ink, line and surface. Two materials are admitted beyond it, and only for the jobs named here.

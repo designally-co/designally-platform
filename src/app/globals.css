@@ -4171,6 +4171,50 @@ dialog::backdrop {
 .sheet.paper .conflict {
   border-color: transparent;
 }
+/**
+ * The disc buttons lose their ring — 19 August 2026, asked for: the outline
+ * read hard.
+ *
+ * It was a 1px `--hairline` around a `--canvas` fill. On the parchment sheets
+ * that fill is white and lifts off the grey, so the ring is a second, softer
+ * device on a shape the tone already carries. Inverted, the fill *is* the page's
+ * near-neighbour — 1.11:1 — so the ring became the only edge, and the only edge
+ * on a 44px circle is a hard one: a dark hoop drawn around almost nothing.
+ *
+ * So the disc takes the surface's own rule, the one the cards took: a tone
+ * carries the boundary, and a thing with a tone is not also drawn a line. The
+ * fill steps down to where the shape reads on its own and the ring goes.
+ *
+ * **What identifies the control is the glyph, and it always was.** `--glyph` on
+ * this fill measures 10.41:1, its hover 9.40 and its press 11.14. The disc is a
+ * ground for it, not a boundary
+ * around it — which is why softening this one does not cost what softening an
+ * input's border would, and why the date field and the text inputs below keep
+ * theirs to the pixel.
+ *
+ * Hover and press are the fill, not the line, for the same reason `.person` and
+ * `.doc` are on this surface: `--ink-3` on a ring that is no longer there does
+ * nothing at all. They continue the ramp the cards run on.
+ */
+.sheet.paper .iconbtn,
+.sheet.paper .sheet-top .back {
+  border-color: transparent;
+  background: #e9e9e9;
+}
+@media (hover: hover) {
+  .sheet.paper .iconbtn:hover,
+  .sheet.paper .sheet-top .back:hover {
+    border-color: transparent;
+    background: #dedede;
+    color: var(--ink);
+  }
+}
+.sheet.paper .iconbtn:active,
+.sheet.paper .sheet-top .back:active {
+  background: #d2d2d2;
+  color: var(--ink);
+}
+
 /* Back up to the page's own white: a control on a card, not part of it. */
 .sheet.paper .dpfield,
 .sheet.paper .input,
