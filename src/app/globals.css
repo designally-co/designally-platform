@@ -7721,10 +7721,44 @@ dialog::backdrop {
   font-weight: 600;
 }
 
+/**
+ * One pill, with the copy disc sitting inside its right end.
+ *
+ * It was a rounded box and a disc beside it with 8px between, which is two
+ * controls doing one job — read this link, take this link — and the eye had to
+ * put them together. The row is the control now: the field is its inside, and
+ * the button is a thing held within it.
+ *
+ * **The right cap and the disc are concentric, which is the whole geometry.**
+ * A pill's cap radius is half its height, so for the gap between them to hold
+ * the same width all the way round that curve, the disc's radius has to be the
+ * cap's radius minus how far it is inset. 54 ÷ 2 = 27; the disc is 44, so 22;
+ * and 27 − 22 = 5, which is the padding. Both centres land 27px in from the
+ * right edge and 27px down, measured — not near it. Move any one of the three
+ * and the other two follow.
+ *
+ * **No outline.** The fill is the boundary, which is the rule this surface's
+ * cards already follow: a tone that can carry the edge should not also be drawn
+ * one. It was a hairline for a few minutes and it cost a pixel of the geometry
+ * as well — box-sizing is border-box, so the border ate into the cap and the
+ * two centres came out 1px apart, which shows on two arcs meant to read as one
+ * gap.
+ *
+ * **54 rather than the 44 DESIGN.md gives an input, and the 44 is still there.**
+ * This is a field *containing* a control, so its height is the control plus the
+ * inset twice over. Shrinking the pill to 44 would put the disc at 36 and take
+ * it under the touch floor, which is the number that actually protects
+ * somebody; the input height is a consistency rule and this is not a plain
+ * input.
+ */
 .sharerow {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  height: 54px;
+  padding: 5px 5px 5px 16px;
+  border-radius: var(--r-pill);
+  background: var(--recess);
 }
 /**
  * The URL on one line, truncated, with the button beside it.
@@ -7741,15 +7775,10 @@ dialog::backdrop {
 .sharelink {
   flex: 1;
   min-width: 0;
-  /* the same 44 as the disc beside it, so the row has one height rather than a
-     box and a control that nearly line up */
-  min-height: 44px;
+  /* Bare now. The border, the fill and the height moved out to `.sharerow`,
+     which is the control — this is only the text inside it. */
   display: flex;
   align-items: center;
-  padding: 0 12px;
-  border: 1px solid var(--hairline);
-  border-radius: var(--r-sm);
-  background: var(--parchment);
   font-size: 13px;
   line-height: 1.55;
   color: var(--ink);
