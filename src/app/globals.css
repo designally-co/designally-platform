@@ -6224,6 +6224,12 @@ dialog::backdrop {
   font-size: inherit;
   color: inherit;
   line-height: 1.6;
+  /* The two languages are one paragraph without this. At display size the
+     English already runs two or three lines, so a block boundary alone is not
+     visible — the Thai starts on a new line and reads as the sentence
+     continuing. Half a line of air is the smallest thing that separates them
+     without making the Thai look like a different, lesser note. */
+  margin-top: 0.5em;
 }
 
 /**

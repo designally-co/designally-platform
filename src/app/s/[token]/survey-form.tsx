@@ -623,8 +623,9 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
             questions does not need the page to announce that they finished.
             The Cut and the Wordmark still sign both screens. */}
         <div className="survey-shell client-surface">
-          {/* the disc at the end of the run: every screen behind you */}
-          <Rail n={counts.total} total={counts.total} />
+          {/* The Point, empty — the same as the send screen. It read `9/9`, a
+              full count on a screen where there is nothing left to count. */}
+          <Rail n={0} total={counts.total} />
           {/**
            * The Cut arrives full, and that is the whole ending.
            *
@@ -645,22 +646,13 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
            * is saying the name to somebody who has just spent twenty minutes
            * with it.
            */}
-          <Masthead
-            counted={false}
-            count={{ n: counts.total, total: counts.total }}
-            lead={
-              /* The questions, not the screens. The disc counts screens, as
-                 it has on all nine of them — but the client was told twenty-one
-                 questions on the welcome, so "9/9" beside a bare "Answered"
-                 reads as nine of the twenty-one they were promised. The Thai is
-                 the string this screen already carried; it says answered in
-                 full and needs no number to do it. */
-              <span className="qwhen">
-                All {survey.questionCount} answered
-                <span className="th">ตอบครบแล้ว</span>
-              </span>
-            }
-          />
+          {/* Nothing in it but the Cut and its Point — 19 August 2026, asked
+              for. It carried "All 21 answered" over a `9/9` disc: two counts of
+              the same finished thing, on the one screen where the number is
+              behind the reader rather than in front of them. The Cut arriving
+              full is the ending, and the line under this says thank you by
+              name. */}
+          <Masthead counted={false} count={{ n: 0, total: counts.total }} />
           {/* the floor controls are revealed by data-active, and there is only
               ever one screen — without it the only action here was invisible */}
           <div className="slide" data-screen="done" data-active="" data-dir="next">
@@ -676,17 +668,30 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                  * — so the line was a client-facing promise about something
                  * that had stopped existing, in two languages.
                  *
-                 * Nothing replaces it. The masthead says the questionnaire is
-                 * complete, this says thank you, and the only thing left to
-                 * offer somebody is the link for the next stakeholder. What
-                 * happens after the summary is not this surface's to promise.
+                 * What replaced it, 19 August 2026, is warmth rather than a
+                 * promise. "Thank you, X." on its own was the whole screen and
+                 * read as a receipt — the client had just spent twenty minutes
+                 * on twenty-one questions and the last thing the survey said to
+                 * them was four words. This line says the two things that are
+                 * both true and worth hearing: the answers arrived, and a
+                 * person reads them. It promises no meeting and no date.
                  */}
                 <h1>
                   Thank you, <em>{submitted}</em>.
                 </h1>
+                <p className="intro">
+                  Your answers are with us. We&rsquo;ll read every one before we
+                  start designing.
+                  <span className="th">คำตอบของคุณส่งถึงเราแล้ว เราจะอ่านทุกข้อก่อนเริ่มออกแบบ</span>
+                </p>
               </div>
               <button className="btn btn-quiet start" onClick={answerAsSomeoneElse}>
-                Answer as another stakeholder
+                {/* "Answer as another stakeholder" until 19 August 2026. It was
+                    the team's word for the person, not the person's own — and
+                    the client reading it has just finished answering and is
+                    being asked whether somebody else at their company should
+                    too. This says the thing that happens. */}
+                Submit another answer
               </button>
             </div>
           </div>
