@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Mark from './mark';
 
 import MoreMenu from './menu';
 
@@ -101,9 +102,7 @@ export default function Toolbar({
     <header className={past ? 'topbar past' : 'topbar'} ref={barRef}>
       <div className="inner">
         {/* leading — identity, then the title slot beside it */}
-        <span className="wordmark">
-          Design<em>ally</em>
-        </span>
+        <Mark size={30} />
         <span className="barttl" aria-live="polite">
           <span className={past ? 'ttl on' : 'ttl'}>{title}</span>
           <span className={past ? 'ttl' : 'ttl on'}>{today}</span>

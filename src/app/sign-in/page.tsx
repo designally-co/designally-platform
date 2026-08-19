@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import Mark from '../mark';
 
 import { auth, signIn, ALLOWED_DOMAIN, devSignInEnabled, hasGoogleCredentials } from '@/auth';
 
@@ -14,9 +15,7 @@ export default async function SignIn(props: PageProps<'/sign-in'>) {
   return (
     <main className="signin">
       <div className="card">
-        <span className="wordmark">
-          Design<em>ally</em>
-        </span>
+        <Mark size={44} />
         <h1>Sign in</h1>
         <p>
           The team app is for {ALLOWED_DOMAIN} accounts. Client questionnaires need no sign-in —

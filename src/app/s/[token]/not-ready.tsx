@@ -1,3 +1,5 @@
+import Mark from '../../mark';
+
 /**
  * Shown when a survey resolves to no questions — the questionnaire it was sent
  * with is not in the database. The client cannot fix this and should not be
@@ -8,9 +10,7 @@ export default function NotReady({ clientName }: { clientName: string }) {
     <div className="survey-shell client-surface">
       <div className="sform">
         <div className="head">
-          <span className="wordmark">
-            Design<em>ally</em>
-          </span>
+          <Mark size={44} />
           <span className="proj">{clientName}</span>
         </div>
         <div className="step">

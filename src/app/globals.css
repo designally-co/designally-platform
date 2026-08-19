@@ -1001,28 +1001,39 @@ textarea {
  * The <em> stays in the markup and stops carrying weight, so five call sites
  * did not have to change to fix one lockup.
  */
-.wordmark {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 15px;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  white-space: nowrap;
+/**
+ * The mark, in its disc — what `.wordmark` used to be.
+ *
+ * `DESIGNALLY.` set in caps with an orange full stop was the identity in four
+ * places and is not an approved lockup; it went on 19 August 2026. The three
+ * numbers here are the survey disc's own, so this is the same object rather
+ * than a second drawing of it — see `.qdisc.markdisc img`, where 56% and
+ * `translate(5%, -1%)` were measured.
+ *
+ * The diameter is a custom property the component sets, because the callers
+ * want different sizes of one thing: 30px inline in the toolbar, 44px standing
+ * alone on the sign-in card and on the survey's dead ends.
+ */
+.brandmark {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: var(--brandmark-size, 30px);
+  height: var(--brandmark-size, 30px);
+  border-radius: var(--r-pill);
+  background: var(--primary);
 }
-.wordmark em {
-  font-style: normal;
-  font-weight: inherit;
-  color: inherit;
-}
-.wordmark::after {
-  content: ".";
-  color: var(--primary-mark);
-}
-/* on the survey's two signed screens the wordmark is a block above the
-   headline, not an inline lockup in a header bar */
-.slidemain .wordmark {
+.brandmark img {
+  width: 56%;
+  height: auto;
   display: block;
-  color: var(--ink-3);
+  transform: translate(5%, -1%);
+}
+/* On the survey's two dead ends it is a block above the headline rather than
+   an inline lockup in a bar — the same job `.slidemain .wordmark` did. */
+.sform .head .brandmark,
+.slidemain .brandmark {
+  display: grid;
   margin-bottom: 26px;
 }
 .sform .head .proj {
@@ -1992,12 +2003,6 @@ textarea {
 .client-surface .step h2 {
   letter-spacing: -0.02em;
 }
-/* The wordmark is Latin-only and set in caps, where the tracking is the
-   lockup rather than an optical correction — so it keeps it here. */
-.client-surface .wordmark {
-  letter-spacing: 0.07em;
-}
-
 /* ============================================================
    TEAM APP — ported from reference/designally-app.html.
    Store-and-configurator volume: utility cards, 24px padding,
@@ -5522,18 +5527,25 @@ body:has(.deck.paper) {
     gap: 10px;
   }
   /**
-   * One row on a phone, and the wordmark is what goes.
+   * The mark stays on a phone, where the wordmark could not.
    *
-   * It used to wrap to two rows — 105px of a 844px screen, permanently, on a
-   * sticky bar. The HIG's iOS section is the argument for which item loses:
-   * "Prioritize only the most important items for inclusion in the main toolbar
-   * area. Because space is so limited, carefully consider which actions are
-   * essential." The title says where you are and the two controls do the work;
-   * the mark says the name of the app whose tab you are already looking at, and
-   * the same page says it in 40px type a moment later.
+   * `DESIGNALLY.` was hidden here because it wrapped the bar to two rows —
+   * 105px of an 844px screen, permanently, on a sticky bar. That was an
+   * argument about width, and it stopped applying on 19 August 2026 when the
+   * identity became a 30px disc: less than a third of what the words cost, on a
+   * row that also holds a title and two controls.
+   *
+   * So there is nothing to hide. A phone gets the mark the desktop gets, which
+   * is what an identity is for.
+   *
+   * It is not free, though: 30px and its gap came out of a row that was already
+   * tight, and *New survey* broke over two lines and made the sticky bar
+   * taller. The label holds itself on one line now and the title gives up the
+   * width instead — it is already truncating with an ellipsis, so it loses
+   * characters nobody was reading rather than the bar gaining a row.
    */
-  .topbar .wordmark {
-    display: none;
+  .topbar .btn {
+    white-space: nowrap;
   }
   .page {
     padding: 32px 20px 40px;
