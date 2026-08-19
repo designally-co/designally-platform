@@ -1418,9 +1418,6 @@ textarea {
    carries the name and the email with every other answer, and each row there is
    a button back to its own field, so the `<dl>` restated two of them in a form
    nobody could act on. */
-@media (hover: hover) {
-}
-
 .blankcount {
   margin-top: 26px;
   font-size: 13.5px;
@@ -1466,9 +1463,22 @@ textarea {
  * was doing the shouting. Still `--ink-3` at 6.02:1, so nothing is traded for
  * it: DESIGN.md's ladder has no 500, and this is the step below 600.
  */
+/**
+ * It scales with the line under it — 19 August 2026.
+ *
+ * It was a flat `10.5px` at every width while `.qtopic` runs
+ * `clamp(17px, 1.7vw, 22px)`. On a phone that is 10.5 against 17, which reads
+ * as a label; on a 1280 window it is 10.5 against 21.5, and the eyebrow shrinks
+ * away from the heading it belongs to — measured at 0.62 of it on mobile and
+ * 0.49 on desktop.
+ *
+ * The same clamp shape, at the ratio the phone already had: 0.62 of 17 is 10.5,
+ * 0.62 of 22 is 13.6. So the pair holds its proportion at every width instead of
+ * one half growing and the other standing still.
+ */
 .qsec {
   display: block;
-  font-size: 10.5px;
+  font-size: clamp(10.5px, 1.06vw, 13.6px);
   font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.1em;
