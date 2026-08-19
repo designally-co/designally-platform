@@ -205,30 +205,20 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
    * fields is not a question, wherever it lands.
    */
   /**
-   * The count is **questions, not screens** — 19 August 2026.
+   * The count is **screens**, and the welcome says the same number.
    *
-   * The welcome promises "21 questions" and the disc ran 1/9 to 9/9, so a
-   * client was told one number and then watched a different one for twenty
-   * minutes. Nine of what was never said anywhere.
+   * It counted questions for an hour on 19 August 2026, to settle a real
+   * contradiction — the welcome promised twenty-one and the disc ran to nine —
+   * and the fix was made on the wrong side. A screen holds two or three
+   * questions and a screen is what a client moves through: one heading, one
+   * Continue, one thing to think about. That is the unit the disc measures, so
+   * it is the unit the welcome names.
    *
-   * Each screen advances the count by the questions it holds, so the figure is
-   * the last question number on the screen in front of you: 2, 5, 7, 10, 11,
-   * 14, 16, 18, 21 on the Brand run. It reads as *how far into the twenty-one
-   * you are*, and it lands exactly on 21/21 on the final screen, which a screen
-   * count could never do.
-   *
-   * `total` is the sum rather than `survey.questionCount`, and the two agree by
-   * construction: the identity card returns null here and its three fields are
-   * unnumbered and uncounted there (see `load.ts`). Deriving it from the cards
-   * keeps the disc honest if a package is ever re-sliced.
+   * The identity card returns null: it is outside the count entirely.
    */
   const counts = useMemo(() => {
     let n = 0;
-    const position = cards.map((c) => {
-      if (c.kind === 'fields') return null;
-      n += c.questions.length;
-      return n;
-    });
+    const position = cards.map((c) => (c.kind === 'fields' ? null : ++n));
     return { position, total: n };
   }, [cards]);
 
@@ -607,13 +597,12 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   const grouped = card && card.kind === 'group' && card.questions.length > 1 ? card : null;
 
   /**
-   * What the disc counts: **questions**, and the welcome's promise is why.
+   * What the disc counts: **screens, not questions**.
    *
-   * It counted screens until 19 August 2026. The objection that put it there
-   * was real — "15 of 21" over a screen holding 15, 16 and 17 is the *first*
-   * question's position dressed as a position in the questionnaire — and the
-   * answer to it is the last question rather than the first. "17 of 21" over
-   * that screen is true: seventeen is as far as you have got.
+   * Two to four are open at once, so "15 of 21" over a screen holding 15, 16
+   * and 17 is the position of the screen's *first* question wearing the look of
+   * a position in the questionnaire. A screen is what a client moves through,
+   * each one has a heading naming what it covers, and the disc counts those.
    *
    * Null on the identity card, which is outside the count entirely.
    */
@@ -624,8 +613,6 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
    * line, no disc. The mark belongs on every screen, so it reads `0/9` there
    * and on the welcome: honest about where you are, and the brand's object is
    * on the page from the first screen rather than arriving at the second.
-   *
-   * `0/21` now rather than `0/9` — the total changed with what is counted.
    */
   const railAt = card ? (counts.position[step - 1] ?? 0) : 0;
 
@@ -957,7 +944,27 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                  its own phrase, which is the same defect that put the Thai on
                  its own line under `.intro`. */
               <span className="qwhen">
-                <b>{survey.questionCount} questions</b> · <b>about 20 minutes</b>
+                {/* Steps, not questions — 19 August 2026. This said
+                    "21 questions" while the disc beside it counted screens and
+                    ran to nine, so a client was given one number and then
+                    watched a different one for twenty minutes.
+
+                    The disc measures screens, because a screen is what somebody
+                    moves through: one heading, one Continue, one thing to think
+                    about. So the promise is in the same unit, and `counts.total`
+                    is the same figure the disc's denominator uses rather than a
+                    second count that could drift from it.
+
+                    What it costs: the client is no longer told how many
+                    questions there are. "About 20 minutes" is what they were
+                    weighing anyway, and the twenty-one are still counted where
+                    it matters — the send screen's `0/21 answered`, which is
+                    attached to the button that is blocked until they are all
+                    done. */}
+                <b>
+                  {counts.total} step{counts.total === 1 ? '' : 's'}
+                </b>{' '}
+                · <b>about 20 minutes</b>
                 {/* Its own line, not a third fact after a middot: how long it
                     takes and when it is wanted by are two different questions,
                     and run together they wrapped wherever the column ended. */}

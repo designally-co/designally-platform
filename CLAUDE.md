@@ -66,14 +66,15 @@ changes; only `DATABASE_URL`.
   it. Enter goes to the next question and only leaves the screen when none is left. Asked for by the branding team 17 August 2026; it was one
   question per screen before. Group by what somebody answers in one breath, never by
   count, and the heading over a screen has to be true of everything under it. The
-  masthead **counts questions, not screens** — corrected 19 August 2026, because
-  the welcome promises twenty-one and the disc was running to nine, so a client
-  was told one number and then watched a different one for twenty minutes. Each
-  screen advances the count by the questions it holds, so it reads 2, 5, 7, 10,
-  11, 14, 16, 18, 21 on the Brand run and lands exactly on 21/21 on the last
-  screen, which a screen count could never do. It does not count the
-  name/position/email screen — the count starts at the first question and its
-  Cut is at rest there, the disc empty until there is something to count. It carried the Designally mark for a few
+  masthead counts screens and does not count the name/position/email screen — the
+  count starts at the first question and its Cut is at rest there, the disc empty
+  until there is something to count. **The welcome names the same unit** from
+  19 August 2026: it said "21 questions" beside a disc running to nine, so a
+  client was given one number and then watched another for twenty minutes. A
+  screen is the group somebody moves through — one heading, one Continue — so
+  the disc measures groups and the welcome counts them. The twenty-one are still
+  counted on the send screen, where `0/21 answered` is attached to the button
+  that stays blocked until they are done. It carried the Designally mark for a few
   days and does not from 18 August 2026; empty, it is the Point at the head of
   the Cut, which is the job DESIGN.md gives it first. Each question
   keeps its own 1–21 number in the data — the send screen's grid, the team's

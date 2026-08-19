@@ -26,13 +26,14 @@
  * button label. Charcoal on it is **5.19:1**, which is the other of the two
  * places §1 calls the pure orange legal: *with charcoal on top of it*.
  *
- * It counts questions, not screens — the number the welcome screen promised.
+ * It counts **screens** — the group of two to four questions in front of you,
+ * out of the nine the run is made of.
  *
- * That was written when a screen opened one question at a time and stayed true
- * by accident for a day after grouping made it false; the disc was counting
- * screens and reading `8/9` while the welcome said twenty-one. It is a question
- * count again from 19 August 2026, and deliberately: each screen advances it by
- * the questions it holds, so the figure is how far into the twenty-one you are.
+ * This comment claimed questions for a long time, which was true only while a
+ * screen opened one at a time. Grouping made it false and nothing noticed: the
+ * disc read `8/9` while the welcome promised twenty-one. Settled on 19 August
+ * 2026 — the disc measures groups, and the welcome counts the same groups
+ * rather than the questions inside them.
  */
 export default function Rail({
   n,
