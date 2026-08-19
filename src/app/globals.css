@@ -4172,6 +4172,62 @@ dialog::backdrop {
 .sheet.pd textarea {
   background: var(--white);
 }
+
+/**
+ * The hover, on a card that no longer has a line to darken.
+ *
+ * DESIGN.md §Hover gives one rule — *a hover darkens the line to `--ink-3` and
+ * nothing else* — and one exception: **a filled control deepens its own fill.**
+ * A borderless tone-card is the filled case, so it takes the exception. On the
+ * parchment sheet these cards keep their border and keep the rule; this is the
+ * same instruction expressed on a surface that has no line to give.
+ *
+ * `#e6e6e6` is one more step of the size the surface is already built from:
+ * the page-to-card step is **1.11:1** and this is **1.125:1**, so pointing at
+ * a card moves it by as much as being a card is worth. Ink on it measures
+ * 13.50:1 and `--ink-3` 5.82:1, so nothing on the card gets quieter for being
+ * pointed at.
+ *
+ * Scoped to `.sheet.pd`, wrapped in `@media (hover: hover)` like every hover in
+ * this codebase — a touch device has no way to end one, and a tapped card that
+ * stays darkened reads as selected.
+ */
+@media (hover: hover) {
+  .sheet.pd .person:hover,
+  .sheet.pd .doc:hover {
+    background: #e6e6e6;
+    /* the line stays gone — one device, and it is the fill */
+    border-color: transparent;
+    /* `.doc` underlines its name on hover on the parchment sheet, which was a
+       second device even there — `.person` had the same thing removed on the
+       argument that link decoration on a name is wrong. With a fill carrying
+       the state it is plainly one too many. */
+    text-decoration: none;
+  }
+}
+.sheet.pd .person,
+.sheet.pd .doc {
+  transition: background-color 0.16s var(--ease);
+}
+/**
+ * Pressed: one more step, so the card answers the finger before the sheet
+ * opens.
+ *
+ * `--surface-fill` was the obvious pick — it is the system's own press ground
+ * for a neutral control — and it is wrong here. That ramp is deliberately warm,
+ * hued 45° to sit beside the orange, and these cards are hueless: pressing one
+ * turned it brown against four greys. The whole point of this surface is a
+ * single neutral run.
+ *
+ * `#dbdbdb` continues it at the interval the other two steps use — 1.110 from
+ * the hover, against 1.110 page-to-card and 1.125 card-to-hover. Three moves of
+ * the same size, so depth on this sheet is one unit counted out. Ink on it is
+ * 12.17:1.
+ */
+.sheet.pd .person:active,
+.sheet.pd .doc:active {
+  background: #dbdbdb;
+}
 /**
  * The scroller sits inside the sheet, and the sheet clips it.
  *
