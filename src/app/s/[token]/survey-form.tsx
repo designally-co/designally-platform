@@ -762,6 +762,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
            * line. The disc is empty because there is nothing left to count.
            */}
           <Masthead
+            headingFirst
             counted
             count={{ n: 0, total: counts.total }}
             section={{ en: `${answered}/${survey.questionCount} answered` }}

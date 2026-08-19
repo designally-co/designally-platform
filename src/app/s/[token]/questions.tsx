@@ -53,6 +53,7 @@ export function Masthead({
   counted,
   count,
   section,
+  headingFirst = false,
   heading,
   action,
   lead,
@@ -83,6 +84,15 @@ export function Masthead({
   count?: { n: number; total: number };
   /** which of the questionnaire's two parts this screen belongs to */
   section?: { en?: string; th?: string };
+  /**
+   * Draw `heading` above `section` rather than under it.
+   *
+   * The send screen alone. Its `section` slot holds a count rather than a part
+   * of the questionnaire — "21/21 answered" — and a count is a fact *about* the
+   * screen named above it, not a place the screen sits inside. Both lines keep
+   * the weight they have everywhere else; only the order moves.
+   */
+  headingFirst?: boolean;
   /**
    * What this screen is about, bilingual, beside the count.
    *
@@ -181,8 +191,15 @@ export function Masthead({
              * pass: a Thai-only reader now meets these two lines in English.
              */}
             {lead}
+            {/* Order, not styling. `headingFirst` swaps which of the two lines
+                is read and drawn first while each keeps its own weight — the
+                send screen wants "Ready to send" above its count, and every
+                question screen wants its section above its subject. Done in the
+                markup rather than with `order` or `column-reverse`, so what a
+                screen reader hears is what the page shows. */}
+            {headingFirst && heading && <span className="qtopic">{heading.en}</span>}
             {section?.en && <span className="qsec">{section.en}</span>}
-            {heading && <span className="qtopic">{heading.en}</span>}
+            {!headingFirst && heading && <span className="qtopic">{heading.en}</span>}
             {/**
              * The disc lives with the words, so it can be centred on them.
              *
