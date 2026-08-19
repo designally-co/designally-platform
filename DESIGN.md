@@ -421,9 +421,23 @@ adoption and describes a colour this product no longer uses.
 Field, which it reserves for a moment of drama. They read better as one surface: the drama
 cost a change of ground twice in a sitting, and a client who has just answered twenty-one
 questions does not need the page to announce that they finished. The `[data-field="dark"]`
-token set stays in `globals.css`, applied nowhere — it is one of the CI's three named
-Fields, and it carries corrections (the focus ring the system leaves at 1.39:1 on that
+token set stayed in `globals.css` afterwards, applied nowhere — it is one of the CI's three
+named Fields, and it carries corrections (the focus ring the system leaves at 1.39:1 on that
 ground) that would be re-derived wrongly from the CI alone.
+
+**It is in service from 19 August 2026, on the Collection bar** — the survey is still one
+Field throughout, and this is the team app. Nothing in the token block changed to be used,
+which is the argument for having kept it: one attribute on one wrapper re-colours the bar,
+the date field inside it and the calendar it opens, because no component reads a Field
+colour directly. Two of its corrections came into service with it — the focus ring at
+10.87:1, and the icon disc warmed to the light Field's temperature so a control that
+appears on both does not change hue between them.
+
+One correction it did *not* carry is recorded at the rule: `--primary-tint` is the pale
+orange the light Field fills a focused date segment with, and on this ground it is
+`#34211d` at 1.11:1 — the field's border says the control has focus and nothing says which
+of the three cells the arrow keys move. The bar uses `#8e5d4c`, same hue and chroma, at the
+lightness that measures 3.06:1 as a fill with the digit at 4.95:1 on top.
 
 ### The Cut is the bookends
 
@@ -672,6 +686,7 @@ Hue and chroma are the CI's in every case; only lightness moved.
 | `--status-warn` | `#e39f2c` | **2.04:1** | `#a06000` — 4.54 |
 | `--status-danger` | `#d72d34` | 4.39:1 | `#d32830` — 4.60 |
 | `--edge-focus` on `[data-field="dark"]` | `#112d4a` | **1.39:1** | `#a9c4e8` — 10.87 |
+| `--primary-tint` as a focused date cell on `[data-field="dark"]` | `#34211d` | **1.11:1** | `#8e5d4c` — 3.06 |
 
 The last one is the one that matters most: the CI's dark Field remaps its links and its
 edges but not its focus ring, so the ring is invisible on the one Field the system's own

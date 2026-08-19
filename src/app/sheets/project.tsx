@@ -14,7 +14,17 @@ import {
 import { dayIn } from '@/lib/team/due';
 import type { ProjectView } from '@/lib/team/projects';
 import { answersToMarkdown, exportFilename, printableHtml } from '@/lib/team/export';
-import { ArchiveMark, DocMark, DownMark, LockMark, PrintMark, SaveMark, TrashMark, UndoMark } from '../icons';
+import {
+  ArchiveMark,
+  CalendarMark,
+  DocMark,
+  DownMark,
+  LockMark,
+  PrintMark,
+  SaveMark,
+  TrashMark,
+  UndoMark,
+} from '../icons';
 import { submitted } from '@/lib/team/when';
 import { useAnchored, useDismiss } from '../anchored';
 import DateField from '../date-field';
@@ -171,6 +181,18 @@ export default function ProjectSheet({
    */
   const dueChanged = due !== (p.dueDay ?? '');
   const today = dayIn(new Date());
+  /**
+   * The date the client was told has gone by, and the link is refusing them.
+   *
+   * `p.dueDay` and not `due` — the saved date, not the one somebody is halfway
+   * through typing. Typing tomorrow's date into an overdue survey should not
+   * announce that it is open again before anybody has pressed Save.
+   *
+   * It changes what the banner says and nothing else. Rule 1: no gate has been
+   * crossed, `closed_at` is still null, and moving the date forward is the
+   * whole of the way back.
+   */
+  const overdue = !!p.dueDay && p.dueDay < today;
 
   /**
    * The caller's sentence, unless the server has a better one.
@@ -597,17 +619,42 @@ export default function ProjectSheet({
            * to start drawing them another way.
            */}
           {!p.closedOn && (
-            <div className="collbox">
-              {/* One row: the date it closes on, and the button that closes it
-                  now. They were two rows with a label each, which spent a line
-                  on "Or stop now" — a label for a button that already says what
-                  it does — and made a panel twice the height of the one control
-                  anybody came here to find. */}
-              <div className="collrow">
-                {/* A span, not a `<label for>`: the control is a group of three
-                    boxes and `for` binds only to a form control. */}
-                <span className="f" id={`due-${p.id}`}>
-                  Closes on
+            <div className="collbox" data-field="dark">
+              {/**
+               * One bar: what state it is in, when it closes, and the way to
+               * close it now.
+               *
+               * Built from a banner the team brought in as the reference — a
+               * disc, a title over a line of explanation, a segmented counter,
+               * a filled action. The counter is what makes it the right
+               * reference rather than a borrowed look: `09h 44m 49s` is three
+               * joined boxes holding a time, and this control is already three
+               * joined boxes holding a date. The mapping is exact.
+               *
+               * Its dismiss `×` is not here. A promotional bar is something you
+               * make go away; a section of a project is not.
+               */}
+              <div className="collbanner">
+                <span className="collmark" aria-hidden="true">
+                  <CalendarMark />
+                </span>
+
+                <span className="colltext">
+                  <b>{overdue ? 'The date has passed' : 'Open for answers'}</b>
+                  <span>
+                    {overdue
+                      ? 'The link is refusing answers. Move the date to let the client back in.'
+                      : 'The client sees this date. After it, the link stops taking answers.'}
+                  </span>
+                </span>
+
+                {/* The bold line is the state, not a field label, so the date
+                    group's name is said and not drawn — the reference does not
+                    label its counter either. A span and not a `<label for>`:
+                    the control is three boxes and `for` binds only to a form
+                    control. */}
+                <span className="visually-hidden" id={`due-${p.id}`}>
+                  Answers close on
                 </span>
                 {/* No `min`, unlike the New survey sheet — a project's date can
                     legitimately be moved to one already past, and `setDueDate`
@@ -621,14 +668,23 @@ export default function ProjectSheet({
                   onChange={setDue}
                 />
 
+                {/* Filled, where the panel this replaces had it outlined.
+                    Closing is still available rather than urged — the app asks
+                    through *Needs you* when it has a reason to — but on a
+                    near-black bar the outline pill is the quiet form and the
+                    filled one is simply the action. `.btn-ink` inverts by
+                    itself here: `--ink` is the warm white and `--canvas` the
+                    charcoal, so it lands as the reference's white pill without
+                    a rule of its own. The lock glyph went with the reference's
+                    own bare label — the row is tight and "Close now" is not
+                    ambiguous. */}
                 {p.answers > 0 && p.surveyId && (
                   <button
-                    className="btn btn-outline collnow"
+                    className="btn btn-ink collnow"
                     disabled={pending}
                     onClick={() => setConfirming('close')}
                   >
-                    <LockMark />
-                    <span>Close now</span>
+                    Close now
                   </button>
                 )}
               </div>
@@ -636,7 +692,7 @@ export default function ProjectSheet({
               {dueChanged && (
                 /* A row of its own, spanning the panel — the question is about
                    the row above it and belongs inside the same object. */
-                <div className="collrow collask">
+                <div className="collask">
                   <p>
                     <b>{due ? `Change to ${niceDay(due)}?` : 'Remove the date?'}</b>{' '}
                     <span className="why">
@@ -672,7 +728,7 @@ export default function ProjectSheet({
               )}
 
               {confirming === 'close' && (
-                <div className="collrow collask">
+                <div className="collask">
                   <p>
                     <b>Close it now?</b>{' '}
                     <span className="why">
@@ -700,39 +756,60 @@ export default function ProjectSheet({
             </div>
           )}
 
-          {/* One line, under the panel rather than inside it. The panel says
-              what the two controls do; this says the one thing neither can show
-              — that only the second of them writes the analysis. */}
-          {!p.closedOn && (
-            <p className="hintline">
-              The client sees the date. Closing writes the analysis; the date only shuts the link.
-            </p>
+          {/**
+           * Closed, on the same bar.
+           *
+           * It was a line of prose and a pill under it, which left the section
+           * as a banner in one state and loose markup in the other — the same
+           * two facts, laid out two ways depending on whether somebody had
+           * pressed a button. One shape, both states: the disc says which, the
+           * bold line is the state, the line under it is the record, and the
+           * pill on the right is the only thing to do.
+           *
+           * Nothing is lost in the move. Who closed it and the date the team
+           * had asked for both still print, and the date control is gone
+           * because there is no longer a link for it to govern.
+           *
+           * The hint that used to sit under the panel went with it. It said
+           * that closing writes the analysis, which the Insights section says
+           * where the analysis is, and that the date only shuts the link, which
+           * the open bar's own second line now says.
+           */}
+          {p.closedOn && (
+            <div className="collbox" data-field="dark">
+              <div className="collbanner">
+                <span className="collmark" aria-hidden="true">
+                  <LockMark />
+                </span>
+
+                <span className="colltext">
+                  <b>Closed {p.closedOn}</b>
+                  <span>
+                    {p.closedByName ? `by ${p.closedByName}` : 'No longer taking answers.'}
+                    {p.dueOn ? ` · you asked for answers by ${p.dueOn}` : ''}
+                  </span>
+                </span>
+
+                {/* Outlined, not filled: reopening is a way back, not the thing
+                    the section is for. It also asks nothing before it runs — it
+                    takes no answers away, writes no gate, and leaves the
+                    insights it was closed for exactly as they are. The one
+                    control here somebody can press by accident and lose nothing
+                    by.
+
+                    It sits on the bar rather than in a menu. A stakeholder
+                    replying the day after collection closed is not an edge
+                    case. */}
+                <button
+                  className="btn btn-outline collnow"
+                  disabled={pending}
+                  onClick={() => runStay(() => reopenCollection(p.id), 'Collection reopened.')}
+                >
+                  {pending ? 'Reopening…' : 'Reopen'}
+                </button>
+              </div>
+            </div>
           )}
-          {p.closedOn ? (
-            <>
-              <p className="isay">
-                <b>Closed {p.closedOn}</b>
-                {p.closedByName ? ` by ${p.closedByName}` : ''}
-                {p.dueOn ? ` · you asked for answers by ${p.dueOn}` : ''}
-              </p>
-              {/* Reopening asks nothing. It takes no answers away, writes no
-                  gate, and the insights it was closed for stay exactly as they
-                  are — the one control here somebody can press by accident and
-                  lose nothing by. */}
-              <button
-                className="btn btn-outline"
-                disabled={pending}
-                onClick={() => runStay(() => reopenCollection(p.id), 'Collection reopened.')}
-              >
-                {pending ? 'Reopening…' : 'Reopen for answers'}
-              </button>
-            </>
-          ) : null}
-          {/* Reopening sits with the closed line above, not in a menu. A
-              stakeholder replying the day after collection closed is not an
-              edge case, and reopening leaves the insights alone: what they say
-              was true of the answers they were written from, and they keep
-              saying so. */}
         </div>
       )}
 
