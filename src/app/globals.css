@@ -7084,12 +7084,13 @@ dialog::backdrop {
   }
   /* Start, Send answers and the thank-you's action get the same floor, and the
      line that belongs to each sits above it rather than under the fold. */
-  .btn.start {
-    /* the desktop rule sizes it to its label; anchored left and right on the
-       phone's floor it has to take the width instead */
-    width: auto;
-  }
-  /* the button is out of flow now, so this has to clear the space it occupies */
+  /* `.btn.start { width: auto }` was here, stretching it across the phone —
+     written when the controls were fixed to the floor of the viewport and
+     anchored to both edges. That went on 17 August 2026 and this outlived it,
+     so the one full-width element on the welcome was a centred label under two
+     left-aligned lines. It hugs its own label now and sits on the column's
+     edge, which is what the base rule already says and what desktop already
+     did. */
   .savednote {
     display: none;
   }
