@@ -204,9 +204,31 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
    * because that is the actual property: a screen of unnumbered short-text
    * fields is not a question, wherever it lands.
    */
+  /**
+   * The count is **questions, not screens** — 19 August 2026.
+   *
+   * The welcome promises "21 questions" and the disc ran 1/9 to 9/9, so a
+   * client was told one number and then watched a different one for twenty
+   * minutes. Nine of what was never said anywhere.
+   *
+   * Each screen advances the count by the questions it holds, so the figure is
+   * the last question number on the screen in front of you: 2, 5, 7, 10, 11,
+   * 14, 16, 18, 21 on the Brand run. It reads as *how far into the twenty-one
+   * you are*, and it lands exactly on 21/21 on the final screen, which a screen
+   * count could never do.
+   *
+   * `total` is the sum rather than `survey.questionCount`, and the two agree by
+   * construction: the identity card returns null here and its three fields are
+   * unnumbered and uncounted there (see `load.ts`). Deriving it from the cards
+   * keeps the disc honest if a package is ever re-sliced.
+   */
   const counts = useMemo(() => {
     let n = 0;
-    const position = cards.map((c) => (c.kind === 'fields' ? null : ++n));
+    const position = cards.map((c) => {
+      if (c.kind === 'fields') return null;
+      n += c.questions.length;
+      return n;
+    });
     return { position, total: n };
   }, [cards]);
 
@@ -585,17 +607,15 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   const grouped = card && card.kind === 'group' && card.questions.length > 1 ? card : null;
 
   /**
-   * What the disc counts: **screens, not questions**.
+   * What the disc counts: **questions**, and the welcome's promise is why.
    *
-   * It counted questions for a few hours, and that was right only while a
-   * screen opened one question at a time — you really were on question 8. All
-   * two to four are open again, so "15 of 21" over a screen holding 15, 16 and
-   * 17 is the position of the screen's *first* question wearing the look of a
-   * position in the questionnaire.
+   * It counted screens until 19 August 2026. The objection that put it there
+   * was real — "15 of 21" over a screen holding 15, 16 and 17 is the *first*
+   * question's position dressed as a position in the questionnaire — and the
+   * answer to it is the last question rather than the first. "17 of 21" over
+   * that screen is true: seventeen is as far as you have got.
    *
-   * A screen is what a client moves through, each one has a heading naming what
-   * it covers, and the disc counts those. Null on the identity card, which is
-   * outside the count entirely.
+   * Null on the identity card, which is outside the count entirely.
    */
   /**
    * Zero, not nothing, before the questions start.
@@ -604,6 +624,8 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
    * line, no disc. The mark belongs on every screen, so it reads `0/9` there
    * and on the welcome: honest about where you are, and the brand's object is
    * on the page from the first screen rather than arriving at the second.
+   *
+   * `0/21` now rather than `0/9` — the total changed with what is counted.
    */
   const railAt = card ? (counts.position[step - 1] ?? 0) : 0;
 
