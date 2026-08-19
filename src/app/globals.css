@@ -1102,15 +1102,6 @@ textarea {
   font-size: 13.5px;
   margin-bottom: 9px;
 }
-/* the same note beneath a compact identity field, which is not inside .sq */
-.fhelp {
-  display: block;
-  color: var(--ink-3);
-  font-size: 13.5px;
-  /* Thai never below 1.6 — DESIGN.md §2 */
-  line-height: 1.6;
-  margin-top: 6px;
-}
 /**
  * A required field left blank, after the respondent tried to move on.
  *

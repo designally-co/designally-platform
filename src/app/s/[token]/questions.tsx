@@ -373,7 +373,6 @@ export function IdentityField({ question, value, onChange, onEnter }: Props) {
   /* An email field typed on a phone deserves the @ keyboard and no
      autocapitalise — the first character is otherwise a capital every time. */
   const email = question.config.maps_to === 'email';
-  const help = t(question.helpEn, question.helpTh);
 
   return (
     <div>
@@ -398,7 +397,13 @@ export function IdentityField({ question, value, onChange, onEnter }: Props) {
           onEnter?.();
         }}
       />
-      {email && help && <span className="fhelp">{help}</span>}
+      {/* The email's help line — "So we can reach you if something in your
+          answers needs a follow-up." — was here and went on 19 August 2026,
+          asked for. It explained why the box exists to somebody already typing
+          in it, and it is the third line of the row after the label and its
+          Thai. The box now has something better to say in that space: the
+          validation message, which appears only when it is needed. The help
+          text is still on the question in the seed file if it is ever wanted. */}
     </div>
   );
 }
