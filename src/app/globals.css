@@ -517,6 +517,53 @@ textarea {
 }
 
 /**
+ * The client survey's actions wear the CI orange itself — 19 August 2026.
+ *
+ * **This is a deliberate departure from §1 and it is confined to this
+ * surface.** `--primary` is `#c73f29` because a white label on the CI's
+ * `#ef6148` measures 3.24:1, and that is still true. What changed is the
+ * question being asked: the survey is the one screen a client ever sees of
+ * Designally, the Cut and the disc already run at `#ef6148` across it, and an
+ * action in a second, deeper orange beside them read as a mistake rather than
+ * as a system. Asked for directly, twice.
+ *
+ * **The label is white, and the type size is what pays for it.** White on
+ * `#ef6148` is 3.24:1. At the CTA's old 17px/600 the floor is 4.5:1 and that
+ * fails — which is the whole reason `--primary` exists. WCAG's floor drops to
+ * **3:1 for large text**, which begins at 18.66px *bold*, so the label goes to
+ * 19px/700 and 3.24 clears it with the size doing the work instead of the hue.
+ *
+ * That is not a loophole, it is the rule the guideline is built on: bigger,
+ * heavier letterforms carry less contrast legibly. A 19px bold CTA on a phone
+ * is also simply a better button than a 17px one.
+ *
+ * Charcoal was here first, at 5.19:1 — the other pairing §1 calls legal, and
+ * the one the disc's numerals use. It went because white was asked for
+ * directly. The disc keeps charcoal: its numerals are 12px and no size change
+ * would rescue them.
+ *
+ * The team app keeps `--primary` unchanged. It has no Cut, no disc and no brand
+ * mark on screen; there the deeper orange is the only orange and a white label
+ * on it is 5.03:1 at any size.
+ */
+.client-surface .btn-primary {
+  background: var(--cut);
+  color: var(--on-primary);
+  /* 19/700 is the large-text threshold, and the reason the white label above is
+     legal on this fill. Do not lower either without changing the fill. */
+  font-size: 19px;
+  font-weight: 700;
+}
+@media (hover: hover) {
+  .client-surface .btn-primary:hover {
+    /* darkens, never lightens — the one direction a hover moves in this
+       system. `--primary` is the same hue one step down, so the ramp stays the
+       CI's own and the white label goes from 3.24:1 to 5.03. */
+    background: var(--primary);
+  }
+}
+
+/**
  * The ghost pill in ink — an available action, not a wanted one.
  *
  * `.btn-quiet` is the same shape in the accent, and the accent means *a person
@@ -5793,18 +5840,50 @@ dialog::backdrop {
   height: var(--disc);
   border-radius: var(--r-pill);
   background: var(--cut);
-  color: var(--ink);
-  font-size: calc(var(--disc) * 0.23);
-  font-weight: 600;
+  /**
+   * White, and the number is the size that makes it legal.
+   *
+   * White on `#ef6148` is 3.24:1 — under the 4.5:1 a normal numeral takes, over
+   * the **3:1 WCAG gives large text**, which begins at 18.66px *bold*. At the
+   * old `0.23 × 54px` it was 12.4px and failed; at `0.44` it is 23.8px at
+   * weight 700 and clears it. The count is also simply better big: it is the
+   * one number on the screen and it was set at the size of a caption.
+   */
+  color: var(--on-primary);
+  font-size: calc(var(--disc) * 0.44);
+  font-weight: 700;
   line-height: 1;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 /* "21" and "/21" are one line and one weight — a fraction, not a headline with
    a subscript. The slash is the only thing between them. */
+/**
+ * The total, tucked under the number's shoulder.
+ *
+ * Half the size and a step lighter, raised off the baseline so the two read as
+ * one lockup rather than as a fraction set in two sizes — the big numeral is
+ * what the client is looking for and the denominator is the context it sits in.
+ *
+ * **It is 10.5px white on the orange: 3.24:1, which fails.** Nothing about the
+ * size can rescue it — a denominator large enough to clear the large-text floor
+ * would be the same size as the number it qualifies. It is legible in practice
+ * and it is below the standard, and the honest fixes are to drop it (the total
+ * is on the welcome) or to let the disc go back to charcoal. Flagged rather
+ * than quietly shipped.
+ */
 .qdisc span {
-  font-weight: 400;
+  font-size: 0.44em;
+  font-weight: 500;
+  letter-spacing: 0;
+  /* `relative`, not `align-self: flex-start` — flex-start puts it against the
+     disc's own top edge, and at this size that hung it over the rim. A
+     relative offset takes it off the baseline without leaving the flow, so the
+     pair stays centred in the disc as one lockup. */
+  position: relative;
+  top: -0.34em;
+  opacity: 0.9;
 }
 
 /**
@@ -6246,10 +6325,23 @@ dialog::backdrop {
  * Only the fill varies, and it varies by variant class: accent for the way
  * forward, ghost for the way sideways.
  */
+/**
+ * The survey's two actions, at the size the white label needs.
+ *
+ * `19px/700` is not a taste choice, it is the contrast floor: white on the CI
+ * orange this button now wears is 3.24:1, which fails the 4.5:1 a normal label
+ * takes and passes the **3:1 WCAG gives large text** — 18.66px *and* bold.
+ * See `.client-surface .btn-primary`. Lower either number and the label stops
+ * being legal on that fill.
+ *
+ * It was 17/600, which is `.btn`'s own size, from when this button was
+ * `--primary` and white on it measured 5.03 at any size.
+ */
 .btn.ok,
 .btn.start {
   padding: 10px 28px;
-  font-weight: 600;
+  font-size: 19px;
+  font-weight: 700;
 }
 .okhint {
   font-size: 12.5px;
@@ -6846,7 +6938,11 @@ dialog::backdrop {
   .btn.ok,
   .btn.start {
     min-height: 52px;
-    font-size: 17px;
+    /* 19, not the 17 this held. It is the contrast floor and not a size
+       preference — see `.client-surface .btn-primary` — and the phone is the
+       one place it was still being overridden, which is the screen every one
+       of these buttons is actually pressed on. */
+    font-size: 19px;
   }
   .btn.ok {
     flex: 1;

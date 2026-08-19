@@ -109,11 +109,28 @@ as a mistake rather than as a system, so the disc takes `--cut` and the count mo
 charcoal to pay for it: white on `#ef6148` is the 3.24:1 measured above, and charcoal on it
 is **5.19:1** — the second of the two places this section calls the pure orange legal.
 
-The disc itself is 2.92:1 against the page, under the 3:1 a graphical object takes, and it
-is not one: it is `aria-hidden`, it identifies no control and no state, and the position it
-decorates is read from the questions. **The Start button stays `--primary`** and is the one
-remaining second orange on that screen — a white label on `#ef6148` is 3.24:1 and there is
-no version of that which passes.
+**And the survey's actions, from the same day, with white labels at 19px/700.** Asked for
+directly. White on `#ef6148` is the 3.24:1 measured above, which fails the 4.5:1 a normal
+label takes — and clears the **3:1 WCAG gives large text**, which begins at 18.66px *bold*.
+So the size carries it rather than the hue, which is the trade the guideline is built on:
+bigger, heavier letterforms stay legible at less contrast. The disc's count went the same
+way — 23.76px at 700, white, 3.24:1 against a 3:1 floor.
+
+**These two numbers are a contrast floor, not a type preference.** `19px/700` on
+`.btn.ok`/`.btn.start` and `0.44em/700` on `.qdisc`. Lower either and the white stops being
+legal on that fill; the fill has to go back to `--primary` in the same edit.
+
+Two things on that surface are still short of the standard and are recorded rather than
+hidden. The **disc itself** is 2.92:1 against the page, under the 3:1 for a graphical
+object — and it is not one: `aria-hidden`, identifying no control and no state, with the
+position it decorates read from the questions. The **denominator** in the disc is 10.5px
+white at 3.24:1 and simply fails; no size rescues it, because a denominator big enough to
+clear the large-text floor is the size of the number it qualifies. The honest fixes are to
+drop it — the total is on the welcome — or to return the disc to charcoal.
+
+**The team app keeps `--primary` throughout.** It has no Cut, no disc and no brand mark on
+screen; there the deeper orange is the only orange and a white label on it is 5.03:1 at any
+size.
 
 **The icon disc is a warm neutral, not the CI's cool one.** The CI hues its whole neutral
 ramp 265° "so light surfaces echo the steel grey-blue Field". That reasoning does not
