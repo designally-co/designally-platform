@@ -777,8 +777,13 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                   {review.map((r) => (
                     <li key={r.ref} className={r.answered ? undefined : 'blank'}>
                       <button type="button" onClick={() => leaveSend(r.step)}>
+                        {/* Three items, not two: the number is its own column
+                            so a wrapped question keeps its indent instead of
+                            running back under the numeral, and the answer lines
+                            up with the question rather than with the number.
+                            See `.qanda button`. */}
+                        {r.number !== null && <span className="qa-n">{r.number}</span>}
                         <span className="qa-q">
-                          {r.number !== null && <i>{r.number}</i>}
                           {LEAD === 'th' ? r.textTh || r.textEn : r.textEn}
                         </span>
                         <span className="qa-a">

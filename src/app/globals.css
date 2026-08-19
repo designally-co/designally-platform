@@ -5813,8 +5813,25 @@ dialog::backdrop {
 .qanda li {
   border-bottom: 1px solid var(--hairline);
 }
+/**
+ * Two columns: the number, then the question over its answer.
+ *
+ * The number used to be an `inline-block` of fixed width inside the question's
+ * own line, which hangs the *first* line only — a question that wrapped put its
+ * second line back under the numeral, and the answer was pushed across by a
+ * matching `margin-left` that had to be kept in step by hand. Two rules holding
+ * one measurement between them.
+ *
+ * As a grid the column *is* the measurement. The question and the answer both
+ * sit in column 2, so every line of both shares one left edge whatever the
+ * number is, and `align-items: start` keeps the numeral on the question's first
+ * line rather than centring it against a block that can be four lines tall.
+ */
 .qanda button {
-  display: block;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 12px;
+  align-items: start;
   width: 100%;
   text-align: left;
   background: none;
@@ -5824,23 +5841,26 @@ dialog::backdrop {
   color: inherit;
   cursor: pointer;
 }
+/* Wide enough for two digits and no wider — tabular figures so 1 and 11 occupy
+   the same column and the questions never shift against each other. */
+.qa-n {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 1.2em;
+  font-size: 14px;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-3);
+}
 .qa-q {
-  display: block;
+  grid-column: 2;
   font-size: 14px;
   line-height: 1.5;
   color: var(--ink-3);
 }
-/* the number hangs, so every question and every answer share one left edge */
-.qa-q i {
-  display: inline-block;
-  width: 26px;
-  font-style: normal;
-  font-variant-numeric: tabular-nums;
-}
 .qa-a {
-  display: block;
+  grid-column: 2;
   margin-top: 3px;
-  margin-left: 26px;
   font-size: 15.5px;
   line-height: 1.6;
   color: var(--ink);
@@ -5851,7 +5871,8 @@ dialog::backdrop {
   color: var(--caution);
 }
 @media (hover: hover) {
-  .qanda button:hover .qa-q {
+  .qanda button:hover .qa-q,
+  .qanda button:hover .qa-n {
     color: var(--ink);
   }
 }
