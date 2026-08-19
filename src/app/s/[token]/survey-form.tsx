@@ -2,7 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { answerPreview, isAnswered, looksLikeEmail, type DraftValues } from '@/lib/survey/answers';
+import {
+  answerPreview,
+  isAnswered,
+  looksLikeEmail,
+  suggestEmailFix,
+  type DraftValues,
+} from '@/lib/survey/answers';
 import type { SurveyPayload, SurveyQuestion, SurveyStep } from '@/lib/survey/load';
 import Chevron from '../../chevron';
 import Rail from './rail';
@@ -417,7 +423,11 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   const identityOk = (q: SurveyQuestion, v: DraftValues) => {
     if (!isAnswered(q.type, v[q.ref])) return false;
     if (q.config.maps_to !== 'email') return true;
-    return looksLikeEmail(String(v[q.ref] ?? ''));
+    const raw = String(v[q.ref] ?? '');
+    /* Shaped like an address, and not at one of the domains where an address
+       cannot exist. `gmail.co` is well formed and still nobody's mailbox, so
+       the format rule alone let it past — see `TYPO_DOMAINS`. */
+    return looksLikeEmail(raw) && !suggestEmailFix(raw);
   };
 
   const advance = (n: number) => {
@@ -1018,11 +1028,20 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                             typed that is not an address. "Please fill in your
                             email" under a box holding `abcd` reads as a bug —
                             it is filled in. */}
+                        {/* Three things can be wrong with this row and each
+                            gets its own sentence. Nothing typed; something
+                            typed that is not an address; or an address at a
+                            domain nobody has a mailbox at — that last one is
+                            not "invalid", it is a letter out, and the fix is
+                            already on screen as the button underneath, so this
+                            says look rather than repeating it. */}
                         {identityMissing && !identityOk(q, values) && (
                           <span className="qwarn">
-                            {isAnswered(q.type, values[q.ref])
-                              ? 'Please enter a valid email address. · กรุณากรอกอีเมลให้ถูกต้อง'
-                              : `Please fill in ${q.textEn.toLowerCase()}. · กรุณากรอก${q.textTh}`}
+                            {!isAnswered(q.type, values[q.ref])
+                              ? `Please fill in ${q.textEn.toLowerCase()}. · กรุณากรอก${q.textTh}`
+                              : suggestEmailFix(String(values[q.ref] ?? ''))
+                                ? 'Please check the email address. · กรุณาตรวจสอบอีเมลอีกครั้ง'
+                                : 'Please enter a valid email address. · กรุณากรอกอีเมลให้ถูกต้อง'}
                           </span>
                         )}
                       </div>

@@ -117,6 +117,13 @@ export function looksLikeEmail(raw: string): boolean {
 /**
  * Misspellings of the handful of mail hosts a client actually uses.
  *
+ * **Every one of these is a domain where a mailbox cannot exist**, which is
+ * what lets the identity step refuse them rather than merely suggest. `gmial
+ * .com` is nobody\'s mail host; `gmail.co` is a defensive registration Google
+ * does not serve mail on. Being in this map is a statement, not a guess, so
+ * anything uncertain stays out of it — the cost of a wrong entry is now a
+ * client locked out of their own address.
+ *
  * **Exact domains only, never a pattern.** The tempting rule is "`.co` at the
  * end of a mail host probably wanted `.com`" and it would be a disaster here:
  * `.co` is a real TLD, this product's own survey lives at `s.designally.co`,
@@ -153,7 +160,11 @@ const TYPO_DOMAINS: Record<string, string> = {
   'iclod.com': 'icloud.com',
   'icoud.com': 'icloud.com',
   'icloud.co': 'icloud.com',
-  'hotmail.co.th': 'hotmail.com',
+  /* `hotmail.co.th` was in this list and is out again: Microsoft ran
+     country-coded Hotmail domains for years and I cannot say from here whether
+     Thailand was one of them. A wrong entry was merely annoying while this only
+     suggested; now that it refuses, a wrong entry is a client locked out of
+     their own address. Nothing goes in here that is not certain. */
 };
 
 /**
