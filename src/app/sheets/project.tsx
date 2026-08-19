@@ -11,15 +11,13 @@ import {
   reopenCollection,
   setDueDate,
 } from '@/lib/team/actions';
-import { dayIn } from '@/lib/team/due';
+import { dayIn, defaultDueDay } from '@/lib/team/due';
 import type { ProjectView } from '@/lib/team/projects';
 import { answersToMarkdown, exportFilename, printableHtml } from '@/lib/team/export';
 import {
   ArchiveMark,
-  CalendarMark,
   DocMark,
   DownMark,
-  LockMark,
   PrintMark,
   SaveMark,
   TrashMark,
@@ -185,14 +183,39 @@ export default function ProjectSheet({
    * The date the client was told has gone by, and the link is refusing them.
    *
    * `p.dueDay` and not `due` — the saved date, not the one somebody is halfway
-   * through typing. Typing tomorrow's date into an overdue survey should not
+   * through typing. Typing tomorrow's date into a shut survey should not
    * announce that it is open again before anybody has pressed Save.
-   *
-   * It changes what the banner says and nothing else. Rule 1: no gate has been
-   * crossed, `closed_at` is still null, and moving the date forward is the
-   * whole of the way back.
    */
   const overdue = !!p.dueDay && p.dueDay < today;
+
+  /**
+   * **Closed means no answer is accepted, and there are two ways in.**
+   * Confirmed by the team 19 August 2026.
+   *
+   * A person presses Close now, or the date arrives. The client meets the same
+   * screen either way, so the app says the same word either way — it used to
+   * call one of them closed and describe the other, which left a survey that
+   * had been refusing people for a week reading as open, with the analysis
+   * telling the team to close it first.
+   *
+   * **`closed_at` still means only the first of them, and that is the point.**
+   * It is the record that a person acted and which person, and a date cannot
+   * write it — see rule 2. So this is derived and never stored: one boolean for
+   * *can anybody still answer*, and the columns underneath left saying exactly
+   * what they always said.
+   */
+  const shut = !!p.closedOn || overdue;
+
+  /**
+   * Reopening, once somebody has asked to.
+   *
+   * It needs a date — closing moves `due_at` to the moment it closed, so every
+   * shut survey is past its date and clearing the gate alone would produce one
+   * that says open and refuses everybody. So the bar's date goes from a fact
+   * you are reading to a field you are filling, and the confirmation asks with
+   * the date in it.
+   */
+  const [reopening, setReopening] = useState(false);
 
   /**
    * The caller's sentence, unless the server has a better one.
@@ -263,7 +286,14 @@ export default function ProjectSheet({
    * project, and closing the sheet under somebody who has just moved a date is
    * the app deciding they are done when they are not.
    */
-  const runStay = (fn: () => Promise<{ ok: boolean; error?: string }>, message: string) =>
+  const runStay = (
+    fn: () => Promise<{ ok: boolean; error?: string }>,
+    message: string,
+    /* Only on success. Reopening leaves the field showing the date somebody
+       chose, and a failure that reset it would take their answer away along
+       with the error explaining it. */
+    after?: () => void,
+  ) =>
     start(async () => {
       setError(null);
       const result = await fn();
@@ -271,6 +301,7 @@ export default function ProjectSheet({
         setError(result.error ?? 'That did not work.');
         return;
       }
+      after?.();
       onToast(message);
     });
 
@@ -302,9 +333,11 @@ export default function ProjectSheet({
    */
   const actions = (
     <>
-      {link && p.token && (
-        <ShareLink token={p.token} url={link} closed={!!p.closedOn} />
-      )}
+      {/* `shut`, not `closed_at`: the panel says whether the link takes
+          answers, and a survey past its date does not. It was reporting Open on
+          a link that had been turning clients away for a week — on the one
+          control the team uses to send it again. */}
+      {link && p.token && <ShareLink token={p.token} url={link} closed={shut} />}
       {/**
        * Download has its own disc, the way it does on a response.
        *
@@ -593,223 +626,261 @@ export default function ProjectSheet({
           <h2>Collection</h2>
 
           {/**
-           * The date the team asked for. Two weeks at creation, changed here.
+           * One bar, both states — the reference the team brought in, and the
+           * meaning they confirmed on 19 August 2026.
            *
-           * It is deliberately not a switch that closes anything: the client
-           * sees this date on the welcome screen, and once it passes the
-           * project appears in Needs you asking whether to close. A person
-           * still decides — rule 1, and the gate records who acted. Clearing
-           * it means no date, which is how every survey sent before this
-           * existed already behaves.
+           * **Closed means no answer is accepted, and there are two ways in:**
+           * somebody presses Close now, or the date arrives. The client meets
+           * the same screen either way, so the bar says the same word either
+           * way. It used to call one of them closed and merely describe the
+           * other, which left a survey that had been refusing people for a week
+           * reading as *open* — with the analysis, a few inches below, telling
+           * the team to close it first.
+           *
+           * So there is one object with two faces rather than two blocks with a
+           * ternary between them:
+           *
+           * - **Open** — the calendar disc, the date as the reference's counter,
+           *   and Close now filled. The date is the soft shutter and the button
+           *   the hard one, and both land in the same place.
+           * - **Closed** — the lock disc, the date it stopped shown and not
+           *   editable, and Reopen filled. Pressing Reopen hands the field back
+           *   and asks for a date, because there is no reopening without one.
+           *
+           * The date is on the bar in both, which is the point of it: *when did
+           * this stop, or when will it*, is the same question either side of the
+           * moment it stops.
            */}
-          {/**
-           * The two ways a survey stops, as one object with two rows.
-           *
-           * They were five stacked things — a label, a field, a paragraph, a
-           * rule and a button — which said nothing about being related. They
-           * are the same act at two times, so they are two rows of one panel
-           * divided by a hairline: *what closes it later*, and *what closes it
-           * now*. The relationship is the layout rather than a sentence
-           * explaining it, which is what let the paragraph come down to a line.
-           *
-           * Canvas inside the Edge at `--r-lg`, rows split by `--divider` — the
-           * same construction `.linkbox` and the version menu already use. No
-           * shadow, no glass, no second bezel: this system draws containers
-           * with a line, and a panel of two rows in a 615px sheet is not a place
-           * to start drawing them another way.
-           */}
-          {!p.closedOn && (
-            <div className="collbox" data-field="dark">
+          <div className="collbox">
+            <div className="collbanner">
+              <span className="colltext">
+                <b>{shut ? `Closed ${p.closedOn ?? p.dueOn}` : 'Open for answers'}</b>
+                <span>
+                  {/* Which of the two closed it, and it is worth a line. A
+                      person leaves a name in `closed_by` and a date leaves
+                      nothing — rule 2's whole distinction, said in the one
+                      place somebody reads it. */}
+                  {!shut
+                    ? 'The client sees this date. After it, the link stops taking answers.'
+                    : p.closedOn
+                      ? `${p.closedByName ? `by ${p.closedByName}. ` : ''}Nobody can answer until you reopen it.`
+                      : 'The date arrived. Nobody can answer until you reopen it.'}
+                </span>
+              </span>
+
+              {/* The bold line is the state, not a field label, so the date
+                  group's name is said and not drawn — the reference does not
+                  label its counter either. A span and not a `<label for>`:
+                  the control is three boxes and `for` binds only to a form
+                  control. */}
+              <span className="visually-hidden" id={`due-${p.id}`}>
+                {shut ? 'Answers closed on' : 'Answers close on'}
+              </span>
+              {/* Disabled while shut, and a fact rather than a field: the date
+                  is the day it stopped, and typing over it would be editing
+                  history. Reopen is what makes it a field again.
+
+                  No `min` when it is one — a live project's date can
+                  legitimately be moved to one already past, and `setDueDate`
+                  accepts it. Typing moves the field and nothing else: the date
+                  shuts a client's link, and a three-box control passes through
+                  several legal dates on the way to the one somebody means. */}
+              <DateField
+                labelledBy={`due-${p.id}`}
+                value={due}
+                disabled={pending || (shut && !reopening)}
+                onChange={setDue}
+              />
+
               {/**
-               * One bar: what state it is in, when it closes, and the way to
-               * close it now.
+               * Reopen, which is one control over both ways of being shut.
                *
-               * Built from a banner the team brought in as the reference — a
-               * disc, a title over a line of explanation, a segmented counter,
-               * a filled action. The counter is what makes it the right
-               * reference rather than a borrowed look: `09h 44m 49s` is three
-               * joined boxes holding a time, and this control is already three
-               * joined boxes holding a date. The mapping is exact.
+               * It used to be two: a Reopen on the closed bar that cleared the
+               * gate, and nothing at all past the date but a sentence telling
+               * somebody to move it. Neither worked alone once closing began
+               * moving `due_at` to the moment it closed — clearing the gate on
+               * a survey whose date has passed produces one that says open and
+               * refuses every client who opens the link.
                *
-               * Its dismiss `×` is not here. A promotional bar is something you
-               * make go away; a section of a project is not.
+               * So it asks for a date, both times. This press only fills the
+               * field with the fourteen days the New survey sheet prefills and
+               * opens the question below; nothing is written until somebody
+               * reads the date and presses Reopen again.
+               *
+               * No answer-count guard, unlike closing: a survey nobody answered
+               * is the one most likely to have run past its date, and exactly
+               * the one somebody needs to reopen.
                */}
-              <div className="collbanner">
-                <span className="collmark" aria-hidden="true">
-                  <CalendarMark />
-                </span>
-
-                <span className="colltext">
-                  <b>{overdue ? 'The date has passed' : 'Open for answers'}</b>
-                  <span>
-                    {overdue
-                      ? 'The link is refusing answers. Move the date to let the client back in.'
-                      : 'The client sees this date. After it, the link stops taking answers.'}
-                  </span>
-                </span>
-
-                {/* The bold line is the state, not a field label, so the date
-                    group's name is said and not drawn — the reference does not
-                    label its counter either. A span and not a `<label for>`:
-                    the control is three boxes and `for` binds only to a form
-                    control. */}
-                <span className="visually-hidden" id={`due-${p.id}`}>
-                  Answers close on
-                </span>
-                {/* No `min`, unlike the New survey sheet — a project's date can
-                    legitimately be moved to one already past, and `setDueDate`
-                    accepts it. Typing moves the field and nothing else: the date
-                    shuts a client's link, and a three-box control passes through
-                    several legal dates on the way to the one somebody means. */}
-                <DateField
-                  labelledBy={`due-${p.id}`}
-                  value={due}
-                  disabled={pending}
-                  onChange={setDue}
-                />
-
-                {/* Filled, where the panel this replaces had it outlined.
-                    Closing is still available rather than urged — the app asks
-                    through *Needs you* when it has a reason to — but on a
-                    near-black bar the outline pill is the quiet form and the
-                    filled one is simply the action. `.btn-ink` inverts by
-                    itself here: `--ink` is the warm white and `--canvas` the
-                    charcoal, so it lands as the reference's white pill without
-                    a rule of its own. The lock glyph went with the reference's
-                    own bare label — the row is tight and "Close now" is not
-                    ambiguous. */}
-                {p.answers > 0 && p.surveyId && (
-                  <button
-                    className="btn btn-ink collnow"
-                    disabled={pending}
-                    onClick={() => setConfirming('close')}
-                  >
-                    Close now
-                  </button>
-                )}
-              </div>
-
-              {dueChanged && (
-                /* A row of its own, spanning the panel — the question is about
-                   the row above it and belongs inside the same object. */
-                <div className="collask">
-                  <p>
-                    <b>{due ? `Change to ${niceDay(due)}?` : 'Remove the date?'}</b>{' '}
-                    <span className="why">
-                      {!due
-                        ? 'The link stays open until somebody closes it.'
-                        : due < today
-                          ? 'It has already passed, so the link stops serving straight away.'
-                          : 'The client sees it, and the link stops serving after it.'}
-                    </span>
-                  </p>
-                  <div className="iacts">
-                    <button
-                      className="btn btn-ink"
-                      disabled={pending}
-                      onClick={() =>
-                        runStay(
-                          () => setDueDate(p.id, due || null),
-                          due ? `Date changed to ${niceDay(due)}.` : 'Date removed.',
-                        )
-                      }
-                    >
-                      {pending ? 'Saving…' : 'Save'}
-                    </button>
-                    <button
-                      className="btn btn-quiet"
-                      disabled={pending}
-                      onClick={() => setDue(p.dueDay ?? '')}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {confirming === 'close' && (
-                <div className="collask">
-                  <p>
-                    <b>Close it now?</b>{' '}
-                    <span className="why">
-                      The analysis is written and the link stops serving. You can reopen it
-                      afterwards.
-                    </span>
-                  </p>
-                  <div className="iacts">
-                    <button
-                      className="btn btn-ink"
-                      disabled={pending}
-                      onClick={() => {
-                        setConfirming(null);
-                        run(() => closeCollection(p.surveyId!), 'Collection closed.');
-                      }}
-                    >
-                      {pending ? 'Closing…' : 'Close'}
-                    </button>
-                    <button className="btn btn-quiet" onClick={() => setConfirming(null)}>
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/**
-           * Closed, on the same bar.
-           *
-           * It was a line of prose and a pill under it, which left the section
-           * as a banner in one state and loose markup in the other — the same
-           * two facts, laid out two ways depending on whether somebody had
-           * pressed a button. One shape, both states: the disc says which, the
-           * bold line is the state, the line under it is the record, and the
-           * pill on the right is the only thing to do.
-           *
-           * Nothing is lost in the move. Who closed it and the date the team
-           * had asked for both still print, and the date control is gone
-           * because there is no longer a link for it to govern.
-           *
-           * The hint that used to sit under the panel went with it. It said
-           * that closing writes the analysis, which the Insights section says
-           * where the analysis is, and that the date only shuts the link, which
-           * the open bar's own second line now says.
-           */}
-          {p.closedOn && (
-            <div className="collbox" data-field="dark">
-              <div className="collbanner">
-                <span className="collmark" aria-hidden="true">
-                  <LockMark />
-                </span>
-
-                <span className="colltext">
-                  <b>Closed {p.closedOn}</b>
-                  <span>
-                    {p.closedByName ? `by ${p.closedByName}` : 'No longer taking answers.'}
-                    {p.dueOn ? ` · you asked for answers by ${p.dueOn}` : ''}
-                  </span>
-                </span>
-
-                {/* Outlined, not filled: reopening is a way back, not the thing
-                    the section is for. It also asks nothing before it runs — it
-                    takes no answers away, writes no gate, and leaves the
-                    insights it was closed for exactly as they are. The one
-                    control here somebody can press by accident and lose nothing
-                    by.
-
-                    It sits on the bar rather than in a menu. A stakeholder
-                    replying the day after collection closed is not an edge
-                    case. */}
+              {shut && !reopening && p.surveyId && (
                 <button
                   className="btn btn-outline collnow"
                   disabled={pending}
-                  onClick={() => runStay(() => reopenCollection(p.id), 'Collection reopened.')}
+                  onClick={() => {
+                    setReopening(true);
+                    setDue(defaultDueDay());
+                  }}
                 >
-                  {pending ? 'Reopening…' : 'Reopen'}
+                  Reopen
                 </button>
-              </div>
+              )}
+
+              {/**
+               * Filled, where the panel this replaces had it outlined.
+               *
+               * Closing is still available rather than urged — the app asks
+               * through *Needs you* when it has a reason to — but on a
+               * near-black bar the outline pill is the quiet form and the
+               * filled one is simply the action. `.btn-ink` inverts by itself
+               * here: `--ink` is the warm white and `--canvas` the charcoal, so
+               * it lands as the reference's white pill without a rule of its
+               * own. The lock glyph went with the reference's own bare label —
+               * the row is tight and "Close now" is not ambiguous.
+               *
+               * It is not here once the survey is shut, and does not need to
+               * be: the date closed it as firmly as the button would have, and
+               * the analysis reads it either way.
+               *
+               * **It is here for every open survey, answered or not** — the
+               * answer-count guard went on 19 August 2026. It was written when
+               * closing was the only thing that produced an analysis, so a
+               * survey with nothing to read had nothing to close *for*. The
+               * date closes those too, and closing one by hand is the same act:
+               * this is over, nobody is going to answer. Keeping the guard
+               * meant a survey reopened for a straggler who never came could
+               * not be shut again by the person who reopened it.
+               */}
+              {!shut && p.surveyId && (
+                <button
+                  className="btn btn-outline collnow"
+                  disabled={pending}
+                  onClick={() => setConfirming('close')}
+                >
+                  Close now
+                </button>
+              )}
             </div>
-          )}
+
+            {/**
+             * Reopening, asked with the date in it.
+             *
+             * Its own row rather than the date-change one below, because it is
+             * a different act with a different server call: that one moves a
+             * live survey's date, this one clears the gate as well when there
+             * is a gate to clear. One action does both — see
+             * `reopenCollection`.
+             */}
+            {reopening && (
+              <div className="collask">
+                <p>
+                  <b>{due ? `Reopen until ${niceDay(due)}?` : 'Reopen until when?'}</b>{' '}
+                  <span className="why">
+                    {!due
+                      ? 'A reopened survey needs a date, or the link has nothing telling it to serve.'
+                      : due < today
+                        ? 'That date has passed, so the link would stop again straight away.'
+                        : 'The link takes answers again, and stops after this date.'}
+                  </span>
+                </p>
+                <div className="iacts">
+                  <button
+                    className="btn btn-ink"
+                    disabled={pending || !due || due < today}
+                    onClick={() =>
+                      runStay(
+                        () => reopenCollection(p.id, due),
+                        `Reopened until ${niceDay(due)}.`,
+                        () => setReopening(false),
+                      )
+                    }
+                  >
+                    {pending ? 'Reopening…' : 'Reopen'}
+                  </button>
+                  <button
+                    className="btn btn-quiet"
+                    disabled={pending}
+                    onClick={() => {
+                      setReopening(false);
+                      setDue(p.dueDay ?? '');
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {dueChanged && !reopening && (
+              /* A row of its own, spanning the panel — the question is about
+                 the row above it and belongs inside the same object. */
+              <div className="collask">
+                {/* There is no "Remove the date?" any more. Every survey has one
+                    — 19 August 2026 — because a survey without a date takes
+                    answers until somebody remembers to close it. An empty field
+                    is somebody halfway through typing, so it says what is
+                    missing and Save waits. */}
+                <p>
+                  <b>{due ? `Change to ${niceDay(due)}?` : 'Finish the date.'}</b>{' '}
+                  <span className="why">
+                    {!due
+                      ? 'A survey needs a date to close on — it cannot be left empty.'
+                      : due < today
+                        ? 'It has already passed, so the link stops serving straight away.'
+                        : 'The client sees it, and the link stops serving after it.'}
+                  </span>
+                </p>
+                <div className="iacts">
+                  <button
+                    className="btn btn-ink"
+                    disabled={pending || !due}
+                    onClick={() =>
+                      runStay(() => setDueDate(p.id, due), `Date changed to ${niceDay(due)}.`)
+                    }
+                  >
+                    {pending ? 'Saving…' : 'Save'}
+                  </button>
+                  <button
+                    className="btn btn-quiet"
+                    disabled={pending}
+                    onClick={() => setDue(p.dueDay ?? '')}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {confirming === 'close' && (
+              <div className="collask">
+                {/* What actually happens, which is not the same sentence when
+                    there is nothing to read: `closeCollection` returns with a
+                    warning and writes no analysis. Promising one and delivering
+                    a warning is how a person learns to distrust the line. */}
+                <p>
+                  <b>Close it now?</b>{' '}
+                  <span className="why">
+                    {p.answers > 0
+                      ? 'The analysis is written and the link stops serving. You can reopen it afterwards.'
+                      : 'The link stops serving. Nobody has answered, so there is nothing to analyse — you can reopen it afterwards.'}
+                  </span>
+                </p>
+                <div className="iacts">
+                  <button
+                    className="btn btn-ink"
+                    disabled={pending}
+                    onClick={() => {
+                      setConfirming(null);
+                      run(() => closeCollection(p.surveyId!), 'Collection closed.');
+                    }}
+                  >
+                    {pending ? 'Closing…' : 'Close'}
+                  </button>
+                  <button className="btn btn-quiet" onClick={() => setConfirming(null)}>
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -881,8 +952,8 @@ export default function ProjectSheet({
         ) : (
           <p className="isay">
             <b>Not written yet</b>
-            {p.closedOn
-              ? ` · collection closed ${p.closedOn}${p.closedByName ? ` by ${p.closedByName}` : ''}`
+            {shut
+              ? ` · collection closed ${p.closedOn ?? p.dueOn}${p.closedByName ? ` by ${p.closedByName}` : ''}`
               : p.answers
                 ? ' · collection is open'
                 : ''}
@@ -915,10 +986,14 @@ export default function ProjectSheet({
              * A single respondent gets no chevron: choosing between one person
              * and nobody is not a choice.
              */}
-            {!p.closedOn ? (
+            {!shut ? (
               /**
                * Generating needs a closed survey, and closing is the Collection
                * section's job now.
+               *
+               * `shut`, not `closed_at` — a survey past its date is closed by
+               * the team's own definition, and it had been telling them to go
+               * and close a link that had been refusing clients for a week.
                *
                * This button used to read *Close collection and generate* and do
                * both — which was one press instead of two, and put a second

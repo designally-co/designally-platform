@@ -135,16 +135,35 @@ function buildAction(v: {
 }): ProjectAction | null {
   if (v.archived) return null;
 
-  /* Collection was closed but no insights came back — the analysis failed, the
-     key was missing, or the request ran past the function's time limit. The
-     work is recoverable and the team needs a way to ask for it again. Without
-     this the project falls out of Needs you entirely and looks finished. */
-  if (v.closedOn && !v.hasInsights && v.answers > 0) {
+  /**
+   * **Closed means no answer is accepted** — confirmed by the team 19 August
+   * 2026 — and there are two ways in: somebody pressed Close now, or the date
+   * arrived. Every rule below that used to read `closedOn` reads this instead.
+   *
+   * What it fixed: a survey a week past its date sat in *Needs you* asking to
+   * be closed, while its link had been turning clients away the whole time and
+   * its answers were sitting unread. `closedOn` goes on meaning only the first
+   * of the two, which is the record of who acted — see rule 2.
+   */
+  const shut = !!v.closedOn || (v.overdueDays !== null && v.overdueDays > 0);
+
+  /* Shut, with answers nobody has analysed. Two ways to arrive and they are not
+     the same news: closing runs the analysis on the way, so a closed survey
+     with no insights is one where it *failed* — the key was missing, or the
+     request ran past the function's time limit. A survey the date closed never
+     started one. Both are recoverable and both need a way to ask; only the
+     sentence differs. Without this the project falls out of Needs you entirely
+     and looks finished. */
+  if (shut && !v.hasInsights && v.answers > 0) {
     return {
       kind: 'write-insights',
-      say: `Collection is closed with ${plural(v.answers, 'answer')}, but no insights were written.`,
-      emphasis: 'The analysis did not finish.',
-      when: `Closed ${v.closedOn}`,
+      say: v.closedOn
+        ? `Collection is closed with ${plural(v.answers, 'answer')}, but no insights were written.`
+        : `The date has passed with ${plural(v.answers, 'answer')} in.`,
+      emphasis: v.closedOn
+        ? 'The analysis did not finish.'
+        : 'Nobody can answer now. The analysis has not been run.',
+      when: v.closedOn ? `Closed ${v.closedOn}` : `Closed ${v.dueOn} · on its date`,
       label: 'Write the insights',
     };
   }
@@ -180,7 +199,7 @@ function buildAction(v: {
        * announcing it was closed while its link was live and taking answers.
        * The `when` line below already knew, and fell back to the answer count.
        */
-      say: v.closedOn
+      say: shut
         ? 'The survey is closed and the analysis is written.'
         : 'The analysis is written, and the survey is open again.',
       /* `say` is the bold statement of fact and `emphasis` is what follows from
@@ -189,41 +208,38 @@ function buildAction(v: {
          before pressing, and putting it in `say` split the sentence from its
          own conflict count. */
       emphasis: `${found} Archive the project once your team has what it needs.`,
-      when: v.closedOn
-        ? `Closed ${v.closedOn} with ${plural(v.answers, 'answer')}`
+      when: shut
+        ? `Closed ${v.closedOn ?? v.dueOn} with ${plural(v.answers, 'answer')}`
         : plural(v.answers, 'answer'),
       label: 'Review insights',
     };
   }
 
   /**
-   * The date the team asked for answers by has passed.
+   * Shut, and nobody answered.
    *
-   * Ranked above the quiet check because it is the stronger signal: silence
-   * might mean people are busy, but a passed date is a commitment the team made
-   * to itself. It still only asks — rule 1, and the gate records who closed it.
-   * Answers arriving after this are accepted and welcome.
+   * There is nothing to analyse and nothing to archive with — the only two
+   * moves are to reopen it for a while longer or to let the project go. Both
+   * are in the sheet, so this asks rather than naming one.
+   *
+   * It replaces a card that fired only past the date and asked to *close* a
+   * survey the date had already closed. A survey a person closed with nobody
+   * having answered used to match nothing at all and dropped silently out of
+   * the list, which is the same defect from the other side.
    */
-  if (!v.closedOn && v.overdueDays !== null && v.overdueDays > 0) {
+  if (shut && v.answers === 0) {
     return {
       kind: 'close-collection',
-      say:
-        v.answers > 0
-          ? `${plural(v.answers, 'answer')} in, and the date you asked for has passed.`
-          : 'The date you asked for has passed, and nobody has answered.',
-      /* Not "give it longer" as in wait — nobody can answer while it is past
-         due. Moving the date is what lets them back in, and it is the thing the
-         client will be asking for. */
-      emphasis:
-        v.answers > 0
-          ? 'The link has stopped taking answers. Close it, or move the date?'
-          : 'The link has stopped taking answers. Chase it, or move the date?',
-      when: `Was due ${v.dueOn} · ${agoText(v.overdueDays)}`,
-      label: 'Close collection',
+      say: 'Collection is closed and nobody answered.',
+      emphasis: 'Reopen it for longer, or let the project go?',
+      when: v.closedOn
+        ? `Closed ${v.closedOn}`
+        : `Closed ${v.dueOn} · ${agoText(v.overdueDays ?? 0)}`,
+      label: 'Open the project',
     };
   }
 
-  if (!v.closedOn && v.answers > 0 && v.quietDays !== null && v.quietDays >= QUIET_LIMIT) {
+  if (!shut && v.answers > 0 && v.quietDays !== null && v.quietDays >= QUIET_LIMIT) {
     return {
       kind: 'close-collection',
       say: `${plural(v.answers, 'answer')} in, and it has been quiet for ${plural(v.quietDays, 'day')}.`,

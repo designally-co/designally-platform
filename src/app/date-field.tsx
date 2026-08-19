@@ -295,21 +295,17 @@ export default function DateField({
           {segment('y', 4, 'yyyy', 'year')}
         </span>
 
-        {/* Clearing is a real answer here — no date means the client is shown
-            none and the prompt never fires — so it needs a control and not just
-            an empty box somebody has to backspace their way to. */}
-        {toValue(parts) && !disabled && (
-          <button
-            type="button"
-            className="dpclear"
-            aria-label="Clear the date"
-            title="Clear the date"
-            onClick={() => commit(EMPTY)}
-          >
-            ×
-          </button>
-        )}
+        {/* There was a `×` here that emptied all three boxes. Clearing was a
+            real answer while no date meant no date — the client saw none and
+            nothing ever fired — and it stopped being one on 19 August 2026,
+            when the date became what closes the link. A survey with no date
+            takes answers until somebody remembers to close it, so both callers
+            now require one and the control that offered the opposite is gone.
 
+            Backspace still empties a box, because typing has to pass through
+            empty on the way to a new number. What that produces is a field
+            reporting `''` and a Save the caller has disabled — not a date
+            quietly removed. */}
         <button
           type="button"
           className="dpopen"

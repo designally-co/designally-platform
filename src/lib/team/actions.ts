@@ -1,6 +1,6 @@
 'use server';
 
-import { and, count, desc, eq, inArray, isNotNull, isNull } from 'drizzle-orm';
+import { and, count, desc, eq, inArray, isNotNull, isNull, lt, or } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 
 import { auth, upsertUser } from '@/auth';
@@ -103,23 +103,26 @@ export async function createSurvey(formData: FormData): Promise<CreateSurveyResu
    * same date as one sent in a quiet month, and editing it afterwards on the
    * project meant the link was already copied and sent by then.
    *
-   * Clearing the field is allowed and means no date: the client is shown none
-   * and the prompt never fires, which is how every survey sent before the
-   * field existed already behaves.
+   * **Every survey has one** — 19 August 2026, asked for. Clearing the field
+   * used to be allowed and to mean no date, which was true of every survey sent
+   * before the field existed. It stopped being a sensible answer the day the
+   * date began closing the link: a survey with no date is one that takes
+   * answers until somebody remembers to close it, which is the state this whole
+   * section was built to end.
    */
   const dueRaw = formData.get('due');
   const dueDay = dueRaw === null ? defaultDueDay() : String(dueRaw).trim();
-  let dueAt: Date | null = null;
-  if (dueDay) {
-    dueAt = endOfDay(dueDay);
-    if (Number.isNaN(dueAt.getTime())) {
-      return { ok: false, error: 'That is not a date.', field: 'due' };
-    }
-    /* A date already gone is a slip, not an intention — it would put the
-       project into Needs you the moment the link was copied. */
-    if (dueDay < dayIn(new Date())) {
-      return { ok: false, error: 'That date has already passed. Pick a later one.', field: 'due' };
-    }
+  if (!dueDay) {
+    return { ok: false, error: 'Every survey needs a date to close on.', field: 'due' };
+  }
+  const dueAt = endOfDay(dueDay);
+  if (Number.isNaN(dueAt.getTime())) {
+    return { ok: false, error: 'That is not a date.', field: 'due' };
+  }
+  /* A date already gone is a slip, not an intention — the link would refuse
+     the first client to open it. */
+  if (dueDay < dayIn(new Date())) {
+    return { ok: false, error: 'That date has already passed. Pick a later one.', field: 'due' };
   }
 
   /**
@@ -215,9 +218,25 @@ export async function closeCollection(surveyId: string, only?: string[]): Promis
   const userId = await actingUser();
   const db = await getDb();
 
+  /**
+   * The date follows the close — 19 August 2026.
+   *
+   * A survey stops taking answers on its date or when somebody presses Close
+   * now, and those were two separate records of the same fact: a survey closed
+   * a week early still advertised the date the team had originally asked for,
+   * so the project read "closed 19 August · you asked for answers by 26
+   * August" and the client's link had two different reasons to refuse them.
+   *
+   * One date, one meaning: **`due_at` is the day the survey stops**, and
+   * closing early moves it to now. `closed_at` and `closed_by` go on being
+   * what they always were — the record that a person did it, and which person
+   * — which is the half rule 2 is about and the half a date can never write.
+   */
+  const closedAt = new Date();
+
   const [survey] = await db
     .update(surveys)
-    .set({ closedAt: new Date(), closedBy: userId })
+    .set({ closedAt, closedBy: userId, dueAt: closedAt })
     // already-closed surveys are left alone, so closedBy always names the
     // person who actually made the call
     .where(and(eq(surveys.id, surveyId), isNull(surveys.closedAt)))
@@ -292,7 +311,13 @@ export async function reanalyse(projectId: string, only?: string[]): Promise<Act
     .limit(1);
 
   if (!row) return { ok: false, error: 'No survey on this project.' };
-  if (!row.survey.closedAt) {
+  /* Closed by either route. The analysis wants a survey nobody can still add
+     to, and the date shuts it as firmly as the button does — insisting on
+     `closed_at` meant a survey a week past its date, refusing every client who
+     opened the link, had to be reopened and closed again to be read. */
+  const takingAnswers =
+    !row.survey.closedAt && !(row.survey.dueAt && row.survey.dueAt.getTime() < Date.now());
+  if (takingAnswers) {
     return { ok: false, error: 'Close collection first — the analysis reads a closed survey.' };
   }
 
@@ -363,7 +388,9 @@ export async function archiveProject(projectId: string): Promise<ActionResult> {
      the name of whoever closed it. */
   const closedNow = await db
     .update(surveys)
-    .set({ closedAt: now, closedBy: userId })
+    /* `due_at` follows the close here for the same reason it does in
+       `closeCollection`: one date, and it is the day the survey stopped. */
+    .set({ closedAt: now, closedBy: userId, dueAt: now })
     .where(and(eq(surveys.projectId, projectId), isNull(surveys.closedAt)))
     /* bare, not a projection: `getDb` returns a union of the PGlite and
        postgres-js builders and a union's overloads do not compose */
@@ -427,15 +454,22 @@ export async function readAnswers(projectId: string) {
  * a client answering on the afternoon of the 31st in Thailand has met a date
  * that says the 31st, and would not have under a UTC midnight.
  */
-export async function setDueDate(projectId: string, day: string | null): Promise<ActionResult> {
+/**
+ * Move the date. It cannot be taken away — 19 August 2026, asked for.
+ *
+ * `day` was `string | null` and null meant no date, which is how surveys sent
+ * before the field existed behave. Removing it stopped being a sensible answer
+ * the day the date began closing the link: a survey with no date takes answers
+ * until somebody remembers to close it, and remembering is the thing this
+ * section exists to stop being anybody's job.
+ */
+export async function setDueDate(projectId: string, day: string): Promise<ActionResult> {
   await actingUser();
   const db = await getDb();
 
-  let dueAt: Date | null = null;
-  if (day) {
-    dueAt = endOfDay(day);
-    if (Number.isNaN(dueAt.getTime())) return { ok: false, error: 'That is not a date.' };
-  }
+  if (!day) return { ok: false, error: 'A survey needs a date to close on.' };
+  const dueAt = endOfDay(day);
+  if (Number.isNaN(dueAt.getTime())) return { ok: false, error: 'That is not a date.' };
 
   const [row] = await db
     .update(surveys)
@@ -449,19 +483,51 @@ export async function setDueDate(projectId: string, day: string | null): Promise
   return { ok: true };
 }
 
-export async function reopenCollection(projectId: string): Promise<ActionResult> {
+/**
+ * Reopening takes a date, and cannot be done without one.
+ *
+ * **A survey is shut for one of two reasons and reopening has to answer both.**
+ * Either a person pressed Close now, which set `closed_at`, or the date arrived
+ * and the route stopped serving. Clearing the gate alone used to be the whole
+ * of this function, and since 19 August that leaves a survey which says it is
+ * open and refuses every client who opens the link — because closing now moves
+ * `due_at` to the moment it closed, so a reopened survey is always past its
+ * date. It was already true of any survey closed after its date passed.
+ *
+ * So there is no reopening without saying until when, and the date is required
+ * rather than defaulted here: fourteen days is the *sheet's* suggestion, filled
+ * into a field somebody can see and change before pressing anything. A server
+ * that quietly picked its own would be the app choosing what the client is told.
+ *
+ * It refuses a date already gone for the same reason — the link would stop
+ * again on the next request, and the team would have reopened nothing.
+ */
+export async function reopenCollection(projectId: string, day: string): Promise<ActionResult> {
   await actingUser();
   const db = await getDb();
 
+  const dueAt = endOfDay(day);
+  if (Number.isNaN(dueAt.getTime())) return { ok: false, error: 'That is not a date.' };
+  if (dueAt.getTime() < Date.now()) {
+    return { ok: false, error: 'Choose a date still to come — that one has already passed.' };
+  }
+
   const [row] = await db
     .update(surveys)
-    .set({ closedAt: null, closedBy: null })
-    /* only a closed survey can be reopened, and the returning row proves it —
-       two people pressing at once must not both report success */
-    .where(and(eq(surveys.projectId, projectId), isNotNull(surveys.closedAt)))
+    .set({ closedAt: null, closedBy: null, dueAt })
+    /* Only a survey that is actually shut can be reopened, by either route, and
+       the returning row proves it — two people pressing at once must not both
+       report success. A survey with no date at all matches neither arm, which
+       is right: nothing is refusing anybody. */
+    .where(
+      and(
+        eq(surveys.projectId, projectId),
+        or(isNotNull(surveys.closedAt), lt(surveys.dueAt, new Date())),
+      ),
+    )
     .returning();
 
-  if (!row) return { ok: false, error: 'That survey is already open.' };
+  if (!row) return { ok: false, error: 'That survey is already taking answers.' };
 
   revalidatePath('/');
   return { ok: true };

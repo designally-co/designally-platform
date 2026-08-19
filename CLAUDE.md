@@ -167,21 +167,27 @@ it predates the split, and what it draws is this surface, not the brief.
 
 These are product decisions, not preferences. If a request conflicts with one, say so before building it.
 
-1. **The gates are never on a timer.** The app never closes collection or archives a project
-   by itself. It may surface a prompt; a person acts, and their name goes on it.
-   **The due date is the exception, and it is not a gate.** Asked for 18 August 2026,
-   reversing the 14 August decision. A survey carries a date — chosen on the New survey
-   sheet, prefilled at 14 days, editable on the project — and past it the link stops
-   taking answers: the client is shown the closed screen and asked to contact the team,
-   who move the date to let them back in. It was a prompt and nothing else until then,
-   with late answers accepted.
-   **It stops the link, it does not close the survey.** `closed_at` stays null and no
-   `closed_by` is invented — the route declines to serve, which is a different thing from
-   the app closing a survey and signing it as though somebody had. That distinction is
-   what keeps rule 2 true: moving the date forward opens the link again with nothing to
-   undo, and gate 1 still belongs to a person.
+1. **Closed means no answer is accepted, and there are two ways in.** Settled 19 August
+   2026. Somebody presses *Close now*, or the date arrives. The client meets the same
+   screen either way, so the app says the same word either way — before this it called one
+   of them closed and merely described the other, which left a survey a week past its date
+   reading as *open* while its link turned every client away and its answers sat unread.
+   **Every survey has a date and it cannot be removed** — chosen on the New survey sheet,
+   prefilled at 14 days, editable on the project. A survey with no date is one that takes
+   answers until somebody remembers to close it, and remembering is what this stops being
+   anybody's job. Surveys sent before the field existed have none; nothing backfills them.
+   **One date, one meaning: `due_at` is the day the survey stops.** Closing early moves it
+   to that moment, so a closed survey does not go on advertising a date the team no longer
+   means. Reopening therefore cannot just clear the gate — every shut survey is past its
+   date — so it **requires a new date**, and refuses one already gone.
    Enforced in three places, because a phone left open overnight crosses the date without
    reloading: the page, the draft endpoint and the submit endpoint.
+   **The gates are still never on a timer.** The app never archives a project by itself,
+   and `closed_at`/`closed_by` still record only what a person did. A date writes neither
+   — the route declines to serve, which is a different thing from the app signing a gate as
+   though somebody had. That is what keeps rule 2 true and what makes reopening safe:
+   there is nothing to undo. Everything that asks *can anybody still answer* derives it
+   from the two together; everything that asks *who did this* reads `closed_by` alone.
 2. **Two human gates, each recording who acted:** close collection · archive the project. Store `*_by` and `*_at` on both.
    There were four. Recording the kick-off decisions went 17 August 2026 with the
    kick-off itself and was never built. **Confirming the insights went 18 August
@@ -234,10 +240,12 @@ question_blocks  key (identity | strategy | project | visual
 questions        block_id, order, text_en, text_th, type, config, version
 surveys          project_id, kind (discovery), token,
                  opened_at, due_at, closed_at, closed_by
-                 due_at — the date the team told the client to answer by. It
-                 shows on the survey, raises a prompt on the landing page when
-                 it passes, and from 18 August 2026 stops the link serving —
-                 see rule 1. It writes nothing: `closed_at` stays null.
+                 due_at — the day the survey stops taking answers. Required
+                 from 19 August 2026 and not removable; closing early moves it
+                 to the moment it closed, so it is always the day the survey
+                 stopped. It shows on the survey and stops the link serving —
+                 see rule 1. It writes nothing else: `closed_at` stays null
+                 unless a person pressed the button.
 responses        survey_id, respondent_name, role, email, submitted_at
                  role and email — retired at versions 3 and 4, both live again at
                  question version 5: the team asked for who is speaking and how to

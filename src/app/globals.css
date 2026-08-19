@@ -245,26 +245,36 @@
 }
 
 /* ============================================================
-   The dark Field. **In service on the Collection bar since
-   19 August 2026** — see `.collbox`.
+   The dark Field. **Currently applied nowhere.**
 
    The welcome and completion screens ran on it until 14 August;
-   the questionnaire is one surface now, warm white throughout,
-   and that has not changed. This is the team app.
+   the questionnaire is one surface now, warm white throughout.
 
-   It was kept rather than deleted through those five days, and
-   the reason was not sentiment. It is the CI's own [data-field]
-   mechanism — a named piece of the brand system, the same
-   standing as the unused steps in the spacing and radius scales
-   — and it carries measurements that would be re-derived wrongly
-   from the CI alone: the focus ring the system leaves at 1.39:1
-   on this ground, and the disc warmed to match the light
-   Field's. Deleting it would have thrown away the correction and
-   kept the defect, and both went into service unchanged.
+   The Collection bar was built on it for an afternoon on 19
+   August and taken off the same day. It is worth recording why,
+   because the reasoning is about this Field and not about that
+   bar: near-black inside a warm-white sheet is the loudest thing
+   on the page, and the bar is not the page's action — the
+   analysis is, two sections below it, wearing the accent. The
+   Field is for a surface that has earned being the only thing
+   somebody is looking at. A section of a sheet has not.
 
-   Nothing below reads a Field colour directly, which is what
-   made one attribute on one wrapper enough to re-colour the bar,
-   the date field inside it and the calendar it opens.
+   Kept rather than deleted, and the reason is not sentiment. It
+   is the CI's own [data-field] mechanism — a named piece of the
+   brand system, the same standing as the unused steps in the
+   spacing and radius scales — and it carries measurements that
+   would be re-derived wrongly from the CI alone: the focus ring
+   the system leaves at 1.39:1 on this ground, and the disc
+   warmed to match the light Field's. Deleting it would throw
+   away the correction and keep the defect.
+
+   The afternoon was not wasted on it: nothing here had to change
+   for the bar to stand on it, which is the proof that one
+   attribute on one wrapper is enough. What it did surface is
+   below — `--primary-tint` cannot mark a focused date segment on
+   this ground.
+
+   If a dark surface is ruled out for good, this goes.
 
    The CI names three Fields — near-black, warm off-white, steel
    grey-blue — and scopes them with [data-field], so this uses the
@@ -305,6 +315,14 @@
 
   /* orange lightens on a dark ground rather than darkening */
   --primary-mark: var(--primary-on-dark); /* 8.76:1 */
+  /* CI-DIVERGENCE, found 19 August 2026 and left uncorrected because nothing
+     stands here yet — recorded so the next surface does not rediscover it.
+     On the light Field this tint is what fills a *selected* thing: a focused
+     date segment, a chosen option. Here it is 1.11:1 against --canvas, which
+     is no mark at all. A control that has three cells and moves between them
+     with arrow keys needs its own to read; the value that measures is #8e5d4c,
+     the same hue and chroma at 3.06:1 with a --ink digit at 4.95 on top. As a
+     3px focus glow around a whole field, which is its other job, it is fine. */
   --primary-tint: #34211d;
   --primary-focus: #a9c4e8; /* 10.87:1, was 1.39:1 */
 
@@ -3075,48 +3093,36 @@ textarea {
 }
 
 /* ---- The Collection bar ------------------------------------------------
-   What closes the survey later, and what closes it now — as one bar on the
-   dark Field.
+   Whether the survey is taking answers, when it stops or stopped, and the one
+   thing to do about it — as a single bar.
 
-   **This is the first thing in the app to stand on `[data-field="dark"]`.**
-   The block at the top of this file has been carrying it since 14 August with
-   a note saying "currently applied nowhere" and "if a dark surface is ruled
-   out for good, this goes". It is not ruled out; it was waiting for a surface
-   that had a reason to be one. Nothing in that block changes to be used, which
-   is the point of it: one attribute on one wrapper re-colours the bar, the
-   date field inside it and the calendar it opens, because no component below
-   reads a Field colour directly.
+   The shape came from a promotional banner the team brought in on 19 August
+   2026: an icon disc, a title over a line of explanation, a segmented counter,
+   an action pill, a dismiss. Four of the five are here. The counter is what
+   made it the right reference rather than a borrowed look — it is three joined
+   boxes holding a time, and the date field is already three joined boxes
+   holding a date, so the counter *is* this control and not a drawing of it.
+   The dismiss is not here: a promotional bar is something you make go away,
+   and a section of a project is not.
 
-   Two corrections it carries come into service with it. The focus ring is at
-   10.87:1 here instead of the CI's 1.39, and the icon disc is the warm 45°
-   neutral rather than the CI's steel — so a control that appears on both
-   Fields does not change temperature between them.
+   **It was built on the dark Field first, and that was wrong.** Near-black in
+   a warm-white sheet is the loudest thing on the page, and this is not the
+   page's action — the analysis is, two sections down, and it is the only thing
+   here wearing the accent. A bar that shouts louder than the CTA beneath it is
+   a bar arguing for itself. So it is built the way every other container in
+   this sheet is built: canvas inside the Edge at `--r-lg`, the same
+   construction as `.linkbox`, the response cards and the version menu.
 
-   The shape is a promotional banner the team brought in as a reference on
-   19 August 2026: a disc, a title over a line of explanation, a segmented
-   counter, a filled action, a dismiss. Four of the five are here. The counter
-   is what made it the right reference and not a borrowed look — `09h 44m 49s`
-   is three joined boxes holding a time, and the date field is already three
-   joined boxes holding a date, so the counter *is* the control rather than
-   something drawn to look like it. The dismiss is not here: a promotional bar
-   is something you make go away, and a section of a project is not.
+   The date field is the stock one, with no variant of its own. It is the
+   control the New survey sheet uses, at the size it uses, so the two screens
+   that set this date set it with the same object.
 
-   What it replaces was a light panel of one row — a label, the field, an
-   outlined pill — with the section's explanation stranded on a line below it.
-   The bar takes that line back inside, which is the whole reason it is two
-   lines tall.
+   `[data-field="dark"]` goes back to being applied nowhere — see the token
+   block at the top of this file, and the note there for what it is kept for.
    ------------------------------------------------------------------------ */
-
-/**
- * No border, where every other container in this system has one.
- *
- * "Borders, not shadows" answers how to bound a raised surface against a
- * ground of nearly the same tone, which is every panel in the team app. Near
- * black on warm white is not that case: the bar is 17:1 against the sheet it
- * sits on, and a line around it would be an edge drawn on an edge.
- */
 .collbox {
-  background: var(--parchment);
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
   border-radius: var(--r-lg);
   /* so a row's own ground stops at the curve rather than squaring it off */
   overflow: hidden;
@@ -3126,27 +3132,15 @@ textarea {
   display: flex;
   align-items: center;
   gap: var(--sp-sm);
-  padding: 14px;
+  padding: var(--sp-sm) var(--sp-sm) var(--sp-sm) var(--sp-md);
 }
 
-/* The disc, at the size the toolbar's are. `--fill` and `--glyph` are the
-   Field's own pair and measure 4.53:1 against the lightest fill in the set,
-   which is the binding case — see the block at the top of this file. */
-.collmark {
-  flex: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: var(--r-pill);
-  background: var(--fill);
-  color: var(--glyph);
-}
-.collmark svg {
-  width: 19px;
-  height: 19px;
-}
+/* No icon disc — 19 August 2026. The reference had one and it was the first
+   thing built; on the light bar it was a warm grey circle carrying a calendar
+   next to a line reading "Open for answers", which is the sentence saying it
+   already. A glyph that repeats the words beside it is decoration, and this
+   system does not decorate a container. What is left is what the bar is for:
+   what state it is in, when it stops, and the one thing to do. */
 
 .colltext {
   flex: 1;
@@ -3174,49 +3168,38 @@ textarea {
   text-wrap: pretty;
 }
 
-/* Sized to the bar rather than to a section: 40 to match the disc and the
-   date field beside it, where a CTA's 44 would make the bar taller than its
-   two lines of text need. */
+/**
+ * The action, outlined.
+ *
+ * Closing is available rather than urged — the app asks for it through the
+ * *Needs you* card when it has a reason to — and reopening is a way back
+ * rather than a thing to be sold. Neither is this sheet's action: that is
+ * *Generate insights* below, and it is the only control here wearing the
+ * accent. Two filled pills competing above it would be the section demanding a
+ * decision every time somebody opens a project to read an answer.
+ *
+ * Sized to the bar and not to a section — shorter than a CTA, matched to the
+ * 44 of the date field beside it.
+ */
 .collbanner .collnow {
   flex: none;
   min-height: 40px;
   padding: 8px 18px;
   font-size: 15px;
 }
-/* `.btn-ink` is `--ink` on `--canvas` and inverts on this Field by itself:
-   warm white on charcoal, 16.5:1 — the reference's white pill, with no rule
-   of its own. */
-@media (hover: hover) {
-  .collbanner .btn-ink:hover {
-    background: var(--ink-2);
-  }
-}
-/* Reopen. `--hairline` is #2b2f35 here and would draw a boundary at 1.4:1
-   against the bar; a control's edge needs 3:1, and `--ink-4` is the Field's
-   own value that clears it at 4.53. */
-.collbanner .btn-outline {
-  border-color: var(--ink-4);
-  color: var(--ink);
-}
-@media (hover: hover) {
-  .collbanner .btn-outline:hover {
-    border-color: var(--ink-2);
-    background: var(--canvas);
-  }
-}
 
 /**
  * A row asking a question.
  *
- * It raises to `--canvas` rather than recessing to parchment, which is the
- * light Field's move inverted: the bar is already standing on the darkest
- * ground the Field has, so the only direction left for the thing that wants
- * attention is up. A divider above it, because it is a drawer opening out of
- * the bar and not a second object.
+ * Parchment, which is this system's recessed ground — the same one
+ * `.delconfirm` stands on — with the Edge's own divider above it. It is a row
+ * rather than a block floating inside the bar: the question is *about* the row
+ * above it, and a card inside a card is the thing that made the response
+ * confirmation look wrong.
  */
 .collask {
   display: block;
-  background: var(--canvas);
+  background: var(--parchment);
   border-top: 1px solid var(--divider);
   padding: var(--sp-sm) var(--sp-md);
 }
@@ -3240,104 +3223,6 @@ textarea {
   padding: 6px 16px;
   font-size: 14.5px;
 }
-/**
- * Cancel, on this Field.
- *
- * `.btn-quiet` is an outline in `--primary-mark`, which is the deep `#c73f29`
- * on the light Field and lightens to `#ff8f7a` here — 8.76:1, and beside a
- * white Save it was the louder of the two. The accent is legal on it by the
- * rule (a person *is* needed in an open confirmation) but it is not the thing
- * they should do, and a confirmation whose brightest control is the way out is
- * asking the wrong question.
- */
-.collask .btn-quiet {
-  border-color: var(--ink-4);
-  color: var(--ink-2);
-}
-@media (hover: hover) {
-  .collask .btn-quiet:hover {
-    border-color: var(--ink-2);
-    color: var(--ink);
-  }
-}
-
-/**
- * The date, as the reference's counter.
- *
- * `09h 44m 49s` is one raised group of joined cells with a hairline between
- * them, and that is the whole change to this control: the field keeps its
- * behaviour, its segments, its clear and its calendar, and the segments stop
- * being loose numbers in a box and become cells that fill the group's height.
- * The `/` separators go, because the dividers are the separators now.
- *
- * Everything else is inherited. `--canvas` is the raised charcoal, `--hairline`
- * the Field's line, `--primary-mark` and `--primary-focus` its corrected
- * orange and ring. The date field does not know it moved.
- */
-.collbanner .dpwrap {
-  flex: none;
-}
-.collbanner .dpfield {
-  height: 40px;
-  gap: 0;
-  padding: 0;
-  background: var(--canvas);
-  border-color: var(--hairline);
-  /* so the end cells stop at the curve rather than squaring it off */
-  overflow: hidden;
-}
-.collbanner .dpsegs {
-  flex: none;
-  font-size: 15px;
-}
-.collbanner .dpseg {
-  padding: 0 9px;
-  /* 38 — the field's 40 less its two borders, so a cell is the group's height
-     and the focused one reads as a filled box rather than a floating tint */
-  line-height: 38px;
-  border-radius: 0;
-}
-/* every cell but the first, which is what a divider between cells is */
-.collbanner .dpseg ~ .dpseg,
-.collbanner .dpclear,
-.collbanner .dpopen {
-  border-left: 1px solid var(--hairline);
-}
-.collbanner .dpsep {
-  display: none;
-}
-.collbanner .dpclear,
-.collbanner .dpopen {
-  width: 32px;
-  height: 38px;
-  border-radius: 0;
-}
-
-/**
- * The focused cell — which of the three the arrow keys will move.
- *
- * `--primary-tint` is the pale orange the light Field fills a focused segment
- * with, and it is the right idea: the field's border takes the loud half of
- * the pair and the segment inside it takes the quiet half. On this Field the
- * token is `#34211d`, which measures **1.25:1** against the group's own
- * charcoal — so the border says the control has focus and nothing says which
- * cell has it. On a three-cell control driven by arrow keys that is the more
- * useful half of the message.
- *
- * Held to the same treatment the Field's other corrections get: hue and chroma
- * kept, lightness moved until it measures. `#8e5d4c` is **3.06:1** as a fill
- * against the group — the floor for a graphical object — with the digit on top
- * at **4.95:1**. Still the quiet half: the border beside it is 7.59.
- */
-.collbanner .dpseg:focus-visible {
-  background: #8e5d4c;
-  color: var(--ink);
-}
-.collbanner .dpclear:focus-visible,
-.collbanner .dpopen:focus-visible {
-  /* inside the group's clip, so an offset ring would be cut in half */
-  outline-offset: -2px;
-}
 
 /**
  * Below 620 the bar stops fitting on one line and wraps into two: the disc and
@@ -3349,24 +3234,14 @@ textarea {
 @media (max-width: 620px) {
   .collbanner {
     flex-wrap: wrap;
+    padding: var(--sp-sm) var(--sp-md);
   }
   .colltext {
-    flex: 1 1 calc(100% - 40px - var(--sp-sm));
+    flex: 1 1 100%;
   }
   .collbanner .dpwrap {
     flex: 1 1 auto;
-  }
-  /* The cells share the width instead of hugging their digits. Left to itself
-     the group kept its typed size and the row's slack opened as one dead gap
-     between the year and the calendar — a control with a hole in it. Thirds
-     are also the reference's own proportion, and a third of a phone is a
-     tap target. */
-  .collbanner .dpsegs {
-    flex: 1;
-  }
-  .collbanner .dpseg {
-    flex: 1;
-    text-align: center;
+    min-width: 0;
   }
   .collbanner .collnow {
     margin-left: auto;
@@ -3441,10 +3316,12 @@ textarea {
   color: var(--ink-4);
 }
 
-/* Both trailing controls are quiet discs. Neither is the action on the sheet —
-   the accent belongs to Create — so they take `--ink-3` and earn ink on hover,
-   which is the one rule DESIGN.md gives for a control with no label. */
-.dpclear,
+/* The trailing disc is quiet. It is not the action on the sheet — the accent
+   belongs to Create — so it takes `--ink-3` and earns ink on hover, which is
+   the one rule DESIGN.md gives for a control with no label.
+
+   It used to have a `×` beside it that emptied the field. Every survey has a
+   date from 19 August 2026, so there is nothing to clear. */
 .dpopen {
   flex: none;
   display: inline-flex;
@@ -3461,18 +3338,12 @@ textarea {
     background-color 0.16s,
     color 0.16s;
 }
-.dpclear {
-  font-size: 19px;
-  line-height: 1;
-}
 @media (hover: hover) {
-  .dpclear:hover,
   .dpopen:hover {
     background: var(--parchment);
     color: var(--ink);
   }
 }
-.dpclear:focus-visible,
 .dpopen:focus-visible {
   /* the system's ring — `var(--ring)` was a token this stylesheet never
      defined, so with `outline: none` above it these controls had no focus
