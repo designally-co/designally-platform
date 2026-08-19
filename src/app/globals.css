@@ -7981,6 +7981,25 @@ dialog::backdrop {
 .barmenu > .delconfirm:first-child {
   margin-top: 0;
 }
+/**
+ * And the same 4px under it, for the row below.
+ *
+ * `.delconfirm` had a top margin and no bottom one, which was invisible while
+ * the row under it was bare. It stops being invisible the moment that row is
+ * hovered: a hover is `--recess`, which is the confirmation's own background to
+ * the byte, so an expanded panel with a hovered row beneath it rendered as one
+ * grey shape with a corner missing out of its middle.
+ *
+ * Zeroed as the last child for the reason the first-child rule exists: the menu
+ * already has 6px of padding there, and 4 more made the panel visibly heavier at
+ * one end.
+ */
+.barmenu > .delconfirm {
+  margin-bottom: 4px;
+}
+.barmenu > .delconfirm:last-child {
+  margin-bottom: 0;
+}
 
 /**
  * When the confirmation *is* the popover, it stops being a block inside one.
