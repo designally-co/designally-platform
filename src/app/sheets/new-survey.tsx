@@ -94,6 +94,12 @@ export default function NewSurveySheet({
       width="onecol-w form-w"
       bare
       backLabel="Close"
+      /* The fourth sheet on the paper ground, 19 August 2026. It was left on
+         parchment on the argument that it holds no card — which was wrong: the
+         two package options are exactly that object, `--canvas` inside a
+         hairline, and they are the thing the sheet is *for*. See
+         `.sheet.paper`. */
+      surface="paper"
       onClose={onClose}
     >
       {/**
