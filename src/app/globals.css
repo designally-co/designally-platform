@@ -2242,7 +2242,9 @@ textarea {
 }
 .sec .hint {
   margin-left: auto;
-  font-size: 12.5px;
+  /* `fine`. It was 12.5px — a size that is on no ramp in DESIGN.md §2, which
+     runs 14 for `caption` and 12 for `fine` and has nothing between them. */
+  font-size: 12px;
   color: var(--ink-3);
 }
 
