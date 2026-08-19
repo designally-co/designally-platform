@@ -1523,7 +1523,8 @@ Recording it because an undocumented borrowing looks like an oversight, and the 
 
 **Don't**
 - Introduce a second accent colour
-- Add a shadow to any card, button, panel or text — there are no shadows in this product
+- Add a shadow to any card, button, panel or text — there are no shadows in this product,
+  with **one exception, added 19 August 2026**: a popover on the paper surface. See below.
 - Use gradients, glassmorphism as decoration, or decorative grid backgrounds
 - Round a full-bleed dark tile
 - Tighten body leading below 1.44 in Latin or 1.6 in Thai
@@ -1533,6 +1534,32 @@ Recording it because an undocumented borrowing looks like an oversight, and the 
 - Put two colours in one line of text
 - Use a coloured glyph as a status marker
 - Stripe, fill or rule the project table
+
+### The shadow exception
+
+**One, added 19 August 2026.** A popover opening over a `.sheet.paper` surface — More,
+Share, the version list, the date picker — carries a soft two-layer shadow:
+
+```css
+box-shadow:
+  0 1px 2px rgba(27, 29, 35, 0.05),
+  0 12px 28px -6px rgba(27, 29, 35, 0.14);
+```
+
+**Why this is not the rule collapsing.** "Borders, not shadows" holds wherever a border can
+carry the separation, and on the parchment sheets it can — a white panel over grey is a
+tone apart before the line is drawn. On paper the panel and the page are the same white, so
+the 1px hairline at **1.56:1** is the whole of it: a 300px menu held above a page by a line
+the eye has to hunt for. The exception is scoped to the case that created it and does not
+extend to cards, buttons, sheets or text, on paper or anywhere else.
+
+Ink-hued rather than black — the neutral ramp is hued 265° toward the steel Field and a
+black shadow on it reads cold. Two layers: the close pair seats the edge, the far pair is
+the lift, wide and weak enough to show no band against white. Both carry a real offset and
+a real blur; a zero-offset halo is decoration, and this is doing a job.
+
+**The hairline stays.** The shadow says how far above the page the panel is; the line says
+where it ends.
 
 ---
 

@@ -4246,6 +4246,30 @@ dialog::backdrop {
 .sheet.paper .sharepanel,
 .sheet.paper .dppop {
   background: var(--white);
+  /**
+   * The one shadow in the product that is not the focus ring — 19 August 2026,
+   * asked for, and recorded as an exception in DESIGN.md §8 rather than left as
+   * a rule quietly broken.
+   *
+   * The reason is this surface and only this surface. "Borders, not shadows"
+   * works when a border can carry the separation, and on the parchment sheets it
+   * can: a white panel over grey is a tone apart before the line is drawn. Here
+   * the panel and the page are the same white, so the 1px hairline at 1.56:1 is
+   * the whole of it — a 300px menu held above a page by a line the eye has to
+   * hunt for.
+   *
+   * Two layers, ink-hued rather than black, because the ramp is hued 265° toward
+   * the steel Field and a neutral black shadow on it reads cold. The close pair
+   * seats the edge; the far pair is the lift and is wide and weak enough that no
+   * band is visible against white. Offset and blur both real — a zero-offset
+   * halo is decoration, and this is doing a job.
+   *
+   * The hairline stays. The shadow says how far above the page the panel is; the
+   * line says where it ends.
+   */
+  box-shadow:
+    0 1px 2px rgba(27, 29, 35, 0.05),
+    0 12px 28px -6px rgba(27, 29, 35, 0.14);
 }
 
 /* Back up to the page's own white: a control on a card, not part of it. */
