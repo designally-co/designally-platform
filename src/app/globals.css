@@ -1998,7 +1998,23 @@ textarea {
   top: calc(100% + 8px);
   right: 0;
   z-index: 20;
-  min-width: 232px;
+  /**
+   * The floor is the widest row this menu can show, so the panel does not
+   * change size when a row opens.
+   *
+   * It was 232px, and the menu is sized by its content — which is fine until
+   * the row that opens is the widest one in it. `Download all responses` sets
+   * the project sheet's menu at 240; opening *that* row replaces it, the width
+   * leaves with it, and the panel snapped 8px narrower while Archive and Delete
+   * opening kept it. A popover that resizes depending on which of its own rows
+   * you pressed reads as a glitch, not as a layout.
+   *
+   * 240 is that label at 14.5/600 plus the row's padding and mark. It is a
+   * measurement, so it has to be retaken if the longest label changes — every
+   * label in here is a fixed English string, so it does not move on its own.
+   * Menus with wider content are unaffected: the toolbar's own runs 378.
+   */
+  min-width: 240px;
   background: var(--canvas);
   border: 1px solid var(--hairline);
   border-radius: var(--r-card);
