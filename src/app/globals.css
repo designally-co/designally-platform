@@ -72,8 +72,32 @@
   --body-muted: #b9bcc2;
 
   /* surface */
-  --canvas: #ffffff;
+  /* the raw white, held one step above `--canvas` so a surface can take it by
+     name — see `.sheet.pd` */
+  --white: #ffffff;
+  --canvas: var(--white);
   --parchment: var(--warm-white);
+  /**
+   * The lower ground *inside* a white box — the same grey, a different job.
+   *
+   * Nine rules read `--parchment` because the value matched, not because they
+   * were the page: the insights panel's foot, the collection box's question
+   * row, a confirmation, and the step a control takes when a cursor is on it or
+   * a thumb is down on it — the menu row, the icon button, the sheet's back
+   * disc, and the date picker's trigger, month arrows and days. All of them sit
+   * on `--canvas` and take their depth from the box around them. The page is
+   * nowhere near any of them.
+   *
+   * One token doing two jobs held until a sheet moved its own ground. The
+   * project sheet is white (`.sheet.pd`), and all nine went white with it —
+   * every recess and every hover in it flattened at once, which is a control
+   * losing its feedback rather than a panel losing a tint.
+   *
+   * They are their own name now, and it resolves to the same `--warm-white`, so
+   * nothing rendered differently the day this was split. A surface can change
+   * what it is made of without reaching inside its own cards.
+   */
+  --recess: var(--warm-white);
   --pearl: #fafaf9;
   /**
    * The neutral control fill — an icon button with no label to carry it.
@@ -582,6 +606,45 @@ textarea {
     /* the one rule for a hover in this system: the line darkens, nothing else */
     border-color: var(--ink-3);
   }
+}
+
+/**
+ * The neutral filled pill — a way out that has a body.
+ *
+ * `.btn-outline` is the same role drawn as a line: transparent inside
+ * `--hairline`. That works on parchment, where transparent means the page shows
+ * through and the page is a tone. On the project sheet, which is white from
+ * 19 August 2026, transparent means white, and a white pill on a white ground is
+ * a hairline with nothing in it — the outline *was* the button, beside an ink
+ * pill that is solid all the way through. Two answers to one question, one of
+ * them a shape and one of them an edge.
+ *
+ * So it takes the ground the icon disc takes: `--fill`, and **no border**, which
+ * is the point — an object needs a body, not a boundary. It is 2.01:1 against
+ * white, well clear of the 1.07 a white pill manages, and its `--ink` label
+ * measures 8.37:1, so the label carries the meaning as it should. Hover and
+ * press step through the same `--fill-deep` / `--fill-press` the disc uses;
+ * there is one neutral control in this product and this is its pill form.
+ *
+ * The transparent 1px border stays. `.btn` counts it in the 44px, and dropping
+ * it would shrink this pill 2px below the ink one beside it.
+ *
+ * Where it is used: Cancel, in all five confirmations on the project sheet. The
+ * ink pill is the answer that acts and this is the answer that does not, which
+ * is exactly the hierarchy a solid black pill and a solid grey one already read
+ * as. `.btn-outline` keeps the sheets that are still parchment.
+ */
+.btn-fill {
+  background: var(--fill);
+  color: var(--ink);
+}
+@media (hover: hover) {
+  .btn-fill:not(:disabled):hover {
+    background: var(--fill-deep);
+  }
+}
+.btn-fill:not(:disabled):active {
+  background: var(--fill-press);
 }
 @media (hover: hover) {
   .btn-quiet:hover {
@@ -2031,7 +2094,7 @@ textarea {
 }
 
 .iconbtn:active {
-  background: var(--parchment);
+  background: var(--recess);
   color: var(--ink);
   transform: scale(0.94);
 }
@@ -2177,7 +2240,7 @@ textarea {
 }
 @media (hover: hover) {
   .barmenu button:not(.btn):not(:disabled):hover {
-    background: var(--parchment);
+    background: var(--recess);
   }
 }
 .linkish {
@@ -2830,7 +2893,7 @@ textarea {
 .insfoot {
   padding: var(--sp-md);
   border-top: 1px solid var(--divider);
-  background: var(--parchment);
+  background: var(--recess);
 }
 /* The way in, under the record of what there is to go in to. `--sp-sm` and not
    the `--sp-md` a section would take: it belongs to the lines above it rather
@@ -3573,7 +3636,7 @@ textarea {
  */
 .collask {
   display: block;
-  background: var(--parchment);
+  background: var(--recess);
   border-top: 1px solid var(--divider);
   padding: var(--sp-sm) var(--sp-md);
   /* Centred, where the bar above it is a row read left to right.
@@ -3731,7 +3794,7 @@ textarea {
 }
 @media (hover: hover) {
   .dpopen:hover {
-    background: var(--parchment);
+    background: var(--recess);
     color: var(--ink);
   }
 }
@@ -3788,7 +3851,7 @@ textarea {
 }
 @media (hover: hover) {
   .dpnav:hover {
-    background: var(--parchment);
+    background: var(--recess);
     color: var(--ink);
   }
 }
@@ -3836,7 +3899,7 @@ textarea {
 }
 @media (hover: hover) {
   .dpday:not(:disabled):hover {
-    background: var(--parchment);
+    background: var(--recess);
   }
 }
 .dpday:focus-visible {
@@ -4028,6 +4091,40 @@ dialog::backdrop {
      against a dimmed page — DESIGN.md: borders, not shadows */
   border: 1px solid var(--hairline);
   animation: slideup 0.42s var(--ease);
+}
+
+/**
+ * The project sheet is white.
+ *
+ * Every other sheet is parchment holding white cards — the page arrangement,
+ * carried inside the dialog. This one is nearly all cards: who answered,
+ * collection, the insights panel, the delete confirmation, each a box stacked
+ * down a long scroll. At that density the grey ground stopped reading as a page
+ * and started reading as gaps between the cards.
+ *
+ * **The ground moves and nothing on it does.** `--canvas` is untouched, so the
+ * cards, the buttons, the menus and the inputs are the same white they are on
+ * every other sheet — asked for 19 August 2026, and it is the right way round:
+ * `--canvas` is what a control is made of throughout this product, and a sheet
+ * changing its own ground has no business changing what stands on it.
+ *
+ * What that costs is the fill as a boundary. White on white is 1.07:1, so the
+ * hairline is now the whole edge — 1.66:1 on white against 1.55:1 on parchment,
+ * so it is very slightly stronger than it was, and it is the same treatment
+ * DESIGN.md §8 already gives the quiet action on the survey's flat page:
+ * `--canvas` inside a 1px `--hairline`, same object, different ground.
+ *
+ * What the sheet's ground must not reach is the grey *inside* its cards — the
+ * insights foot, the collection question row, a confirmation, and every hover
+ * and press that steps a control off white. Those took `--parchment` too, and
+ * moving it under them flattened all of them at once. They read `--recess` now;
+ * see the token.
+ *
+ * `--white` is the raw value held one step above `--canvas`, so this line does
+ * not have to write `#ffffff` in the middle of the stylesheet.
+ */
+.sheet.pd {
+  --parchment: var(--white);
 }
 /**
  * The scroller sits inside the sheet, and the sheet clips it.
@@ -4453,7 +4550,7 @@ dialog::backdrop {
 }
 
 .sheet-top .back:active {
-  background: var(--parchment);
+  background: var(--recess);
   color: var(--ink);
   transform: scale(0.96);
 }
@@ -7587,7 +7684,7 @@ dialog::backdrop {
   gap: 6px;
   padding: 10px 11px;
   margin-top: 4px;
-  background: var(--parchment);
+  background: var(--recess);
   border-radius: var(--r-lg);
 }
 /**

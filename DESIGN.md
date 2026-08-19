@@ -1118,6 +1118,14 @@ Where a primary sits beside a secondary on a phone's floor, the primary takes al
 
 **Ghost pill** — transparent fill, `--primary` text, 1px `--primary` border, same size and radius. The second CTA when two appear together.
 
+**Neutral filled pill** — `--surface-fill`, `--ink` label, **no border**, same size and radius. The answer inside a confirmation that does not act: Cancel, beside the ink pill that does.
+
+**Added 19 August 2026, and the ground is the reason.** This role was the ghost pill in ink — transparent inside `--hairline`. Transparent works where the page is a tone: on parchment it shows a tone through. The project sheet went white the same day, and there transparent means white, so the button became a hairline with nothing in it, standing beside an ink pill solid all the way through. Two answers to one question, one a shape and one an edge.
+
+It takes the icon disc's own ground, which is what a neutral control is made of here: 2.01:1 against white where a white pill manages 1.07, and an `--ink` label at 8.37:1 — the label carries the meaning, as it must, because a fill is not asked to. Hover and press step through `--surface-fill-deep` and `--surface-fill-press`, the disc's states. The transparent 1px border stays: `.btn` counts it in the 44px, and dropping it shrinks the pill 2px below the one beside it.
+
+The ghost pill in ink keeps every sheet that is still parchment.
+
 **Pearl capsule** — quiet secondary actions. `--surface-pearl` fill, `--ink-muted-80` text, `caption` (14px), 3px `--divider-soft` ring, padding `8px 14px`.
 
 **Corrected 13 August 2026, twice over.** Its radius was `md` (11px), which contradicts the rule in section 3 that anything reading as an action is a pill — and a quiet secondary action is still an action. It is `pill`.

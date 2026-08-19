@@ -598,6 +598,10 @@ export default function ProjectSheet({
         </>
       }
       actions={actions}
+      /* The experiment: this sheet carries its own ground. It is nearly all
+         cards, and the parchment between them stopped reading as a page. See
+         `.sheet.pd`. */
+      surface="pd"
       backLabel="Back to all projects"
       onClose={onClose}
     >

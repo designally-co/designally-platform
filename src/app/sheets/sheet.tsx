@@ -37,6 +37,7 @@ export default function Sheet({
   title,
   narrow = false,
   width,
+  surface,
   dismiss = false,
   bare = false,
   actions,
@@ -48,6 +49,16 @@ export default function Sheet({
   narrow?: boolean;
   /** an extra width class, for a sheet cut to the one column it holds */
   width?: string;
+  /**
+   * An extra class on `.sheet`, for a sheet that carries its own ground.
+   *
+   * One sheet does: the project sheet is white where the others are parchment,
+   * because it is nearly all cards and the grey between them stopped reading as
+   * a page. `.sheet.pd` in globals.css swaps the two volumes over in two custom
+   * properties, and everything inside inherits it — which is why this is a
+   * class on the sheet rather than a prop threaded through its children.
+   */
+  surface?: string;
   /**
    * A close disc on the trailing edge instead of a back chevron on the leading
    * one — for a sheet that *dismisses* rather than goes back.
@@ -108,7 +119,11 @@ export default function Sheet({
 
   return (
     <dialog ref={ref} onClose={onClose} onCancel={onClose}>
-      <div className={`sheet${narrow ? ' narrow' : ''}${bare ? ' bare' : ''}${width ? ` ${width}` : ''}`}>
+      <div
+        className={`sheet${narrow ? ' narrow' : ''}${bare ? ' bare' : ''}${width ? ` ${width}` : ''}${
+          surface ? ` ${surface}` : ''
+        }`}
+      >
         {bare && (
           <button className="sheetclose floating" onClick={onClose} aria-label={backLabel}>
             <CloseMark />
