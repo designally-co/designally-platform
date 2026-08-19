@@ -18,7 +18,17 @@ export default function PastSheet({
   const [pending, start] = useTransition();
 
   return (
-    <Sheet title="Past projects" onClose={onClose}>
+    <Sheet
+      title="Past projects"
+      /* The last one, and the only sheet the card rule would have left behind:
+         it is a list of rows separated by hairlines and holds no container at
+         all, so there was never any grey between cards for it to fail at. It
+         takes the ground because one app is one surface — a sheet that opens
+         from the same toolbar as the others cannot be the one that is a
+         different colour. See `.sheet.paper`. */
+      surface="paper"
+      onClose={onClose}
+    >
       <p className="lede">
         Projects arrive here when your team archives them — never automatically. Nothing is deleted;
         every survey, answer, insights and decision stays searchable.
