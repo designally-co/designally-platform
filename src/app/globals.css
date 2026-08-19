@@ -283,7 +283,9 @@
      cannot drift apart. */
   /* 24 — `--sp-lg`, the inset every other sheet stands its content at. It was
      68, which gave the two `onecol` sheets an air nothing else in the app has
-     and made a three-field form sit in a 444px column inside a 580px sheet. */
+     and made a three-field form sit in a 444px column inside a 580px sheet.
+     Survey made overrides it back up to 64 at `.sheet.link-w`: that one is a
+     link and a QR code rather than a form, and air is its content. */
   --onecol-pad: 24px;
 
 
@@ -4727,6 +4729,19 @@ dialog::backdrop {
   }
   .sheet.link-w {
     width: min(460px, 100%);
+    /**
+     * 64, where New survey stands at 24 — asked for, 19 August 2026.
+     *
+     * They share the `onecol` shell and took the same inset until now. They are
+     * not the same kind of screen: New survey is a form, and a form wants its
+     * fields wide and its footer close. This one holds a sentence, a link and a
+     * code somebody is about to photograph, and it is the moment a survey
+     * exists. Air is the content here.
+     *
+     * Set as the variable rather than as padding, so the two rules below stay
+     * the single place the inset is applied.
+     */
+    --onecol-pad: 64px;
   }
 
   /* `.sheet.onecol-w`, not `.onecol-w`: the bare sheet's own `padding-top` is
@@ -8067,6 +8082,15 @@ dialog::backdrop {
      Capped at that width and centred, so the same code in the wider New survey
      sheet is the same object rather than a 400px wall of squares. */
   width: 100%;
+  /**
+   * Capped, which the note above `.sheet.onecol-w` has claimed since it was
+   * written and no rule ever did — the code filled whatever column it stood in.
+   * It changes nothing at today's widths and holds if either sheet is ever
+   * widened: a QR gains nothing past the size a phone locks onto, and a 450px
+   * wall of modules is only a bigger wall.
+   */
+  max-width: 332px;
+  margin-inline: auto;
   aspect-ratio: 1;
   height: auto;
   padding: 14px;
