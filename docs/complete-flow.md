@@ -69,8 +69,16 @@ Both packages — Brand and Design — follow the same ten steps; only the quest
 
 **Including the date, from 18 August 2026.** A survey carries a date the team told the client to
 answer by, two weeks out by default and editable. When it passes, two things happen: the project
-appears in *Needs you*, and the link stops serving — a client arriving after it is told the date
-has passed and asked to contact their project lead, who moves the date forward to let them back in.
+appears in *Needs you*, and the link stops serving — a client arriving after it is told the
+questionnaire is closed and asked to contact their project lead, who moves the date forward to let
+them back in.
+
+**One word for it, from 19 August 2026.** The screen said "The date for this questionnaire has
+passed" on this arm and "This questionnaire is closed" on the other two. Rule 1 had already settled
+that a date arriving and somebody pressing *Close now* are the same event to whoever is holding the
+link, and that the client meets the same screen either way — so the app says the same word either
+way. What still differs is the sentence under it, because the three are not the same situation:
+this one is a door that can be opened again, and it is the only one that names the thing to do.
 
 It was a prompt and nothing else until that day, with late answers accepted; the team asked for a
 real deadline, on the reasoning that a client who finds the door shut writes to them, and one who

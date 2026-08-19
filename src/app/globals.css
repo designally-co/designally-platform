@@ -6561,6 +6561,40 @@ dialog::backdrop {
      thing — closing the gap to 18px made the button read as part of the
      sentence. The shared 20px stands. */
 }
+/**
+ * The closed screen carries its heading in both languages, and the other two
+ * ends of the run do not.
+ *
+ * The welcome and the completion are English headlines by decision — the
+ * welcome holds no question, and the completion holds a name the client typed.
+ * This one holds the single fact the screen exists to deliver, to somebody who
+ * may read no English at all, so it cannot be a Latin-only line. It is the
+ * heading, in the other language — not a caption on it.
+ *
+ * **It is not `.step h1 + .th`'s 16.5–19px.** Those were measured under a 32px
+ * heading and hold a ratio of about 0.55 to it; this heading is 37.6px on a
+ * phone and 56px above 1080, so the same relationship lands at 23 and 28. At
+ * 17px it came out *smaller than the sentence below it* — the translation of
+ * the headline reading as less important than the body it introduces, which is
+ * the hierarchy upside down for the only reader it exists for.
+ *
+ * Weight comes down off the headline's all the same: Thai in a display weight
+ * fills its own counters, and §2's four stacked levels have to stay apart.
+ * 1.55 leading, which clears a full stack at this size without opening the two
+ * lines into separate paragraphs.
+ */
+.slide[data-screen='closed'] h1 {
+  line-height: 1.12;
+}
+.slide[data-screen='closed'] h1 .th {
+  display: block;
+  margin-top: 14px;
+  font-size: clamp(1.45rem, 3vw, 1.8rem);
+  font-weight: 600;
+  line-height: 1.55;
+  letter-spacing: 0;
+  color: var(--ink-2);
+}
 /* `lead`, near enough: 20.8px on a phone and 24.8px above 1080, which is the
    step the headline needs under it.
    The floor is 1.3rem rather than 1.2 because of what is *above* the Cut, not
