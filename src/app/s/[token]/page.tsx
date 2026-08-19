@@ -21,15 +21,12 @@ export default async function SurveyPage(props: PageProps<'/s/[token]'>) {
   const survey = await loadSurvey(token);
 
   if (!survey) notFound();
-  /* Archived first, then closed, then the date: the most final reason wins, so
-     a finished project never tells somebody to ask for a new date. */
+  /* No precedence between them any more, because the screen no longer differs:
+     archived, closed by hand and past its date are one state to whoever is
+     holding the link, and rule 1 says so. The ternary that ranked them was
+     picking between three sentences that had stopped being three things. */
   if (survey.closed || survey.archived || survey.overdue) {
-    return (
-      <Closed
-        clientName={survey.clientName}
-        reason={survey.archived ? 'finished' : survey.closed ? 'closed' : 'due'}
-      />
-    );
+    return <Closed clientName={survey.clientName} />;
   }
 
   /**

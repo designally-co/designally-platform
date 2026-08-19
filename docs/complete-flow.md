@@ -73,12 +73,13 @@ appears in *Needs you*, and the link stops serving — a client arriving after i
 questionnaire is closed and asked to contact their project lead, who moves the date forward to let
 them back in.
 
-**One word for it, from 19 August 2026.** The screen said "The date for this questionnaire has
-passed" on this arm and "This questionnaire is closed" on the other two. Rule 1 had already settled
-that a date arriving and somebody pressing *Close now* are the same event to whoever is holding the
-link, and that the client meets the same screen either way — so the app says the same word either
-way. What still differs is the sentence under it, because the three are not the same situation:
-this one is a door that can be opened again, and it is the only one that names the thing to do.
+**One screen for all three, from 19 August 2026.** The client screen had a branch on why the link
+stopped: "The date for this questionnaire has passed" on this arm, "This questionnaire is closed"
+on the other two, and three different sentences underneath. Rule 1 had already settled that a date
+arriving, somebody pressing *Close now* and a project being archived are the same event to whoever
+is holding the link — and nothing a client can do differs between them, so nothing they are told
+does either. One headline naming their project, one line telling them to contact Designally. The
+`reason` prop is gone with the branch.
 
 It was a prompt and nothing else until that day, with late answers accepted; the team asked for a
 real deadline, on the reasoning that a client who finds the door shut writes to them, and one who

@@ -6584,10 +6584,38 @@ dialog::backdrop {
  * lines into separate paragraphs.
  */
 .slide[data-screen='closed'] h1 {
-  line-height: 1.12;
+  /* A notch under the shared 2.35–3.5rem, and the only screen that needs it.
+     The welcome and the completion set fixed short strings; this one sets a
+     sentence with a client's name inside it, and at 37.6px on a phone there are
+     346px of line to work with — "Dentogenesis" alone takes 247 of them, so
+     "for F.W. Dentogenesis" cannot hold together and the name breaks in half.
+     31.2px fits it. This is a floor, not a fix: a long enough name breaks at
+     any size, and the ones this product sees are Thai as often as not. */
+  font-size: clamp(1.95rem, 6.1vw, 2.9rem);
+  line-height: 1.14;
+  /* The client's name is inside the sentence here, so where the lines fall is
+     not cosmetic — greedy wrapping put "for F.W." on a line of its own and
+     broke the name across the one below it. Balanced, the name survives on one
+     line for anything that fits, and a name too long for that at least breaks
+     somewhere the whole headline chose rather than wherever the last word ran
+     out of room. `nowrap` on the name would be the stronger promise and the
+     wrong one: a long Thai company name would leave the screen. */
+  text-wrap: balance;
+}
+/* Thai has no spaces and the browser breaks it by dictionary, which is right
+   until the dictionary parts a compound the reader holds as one word. Wrap the
+   phrase, do not fight the breaker. */
+.nobr {
+  white-space: nowrap;
 }
 .slide[data-screen='closed'] h1 .th {
   display: block;
+  /* Explicitly *not* the headline's balance, which is inherited. Balancing
+     equalises the two lines by holding line one short, and short here means
+     one pixel short of the client's name: `แบบสอบถาม F.W. Dentogenesis` is
+     337px against 346 of line and fits exactly once nothing is trying to make
+     it pretty. Greedy fills the line and the name survives. */
+  text-wrap: wrap;
   margin-top: 14px;
   font-size: clamp(1.45rem, 3vw, 1.8rem);
   font-weight: 600;
