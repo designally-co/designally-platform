@@ -7763,7 +7763,20 @@ dialog::backdrop {
   height: 54px;
   padding: 5px 5px 5px 16px;
   border-radius: var(--r-pill);
-  background: var(--recess);
+  /**
+   * `--canvas`, not `--recess`, and the difference is a bug.
+   *
+   * This control also stands on the *Survey made* sheet, which is parchment —
+   * and there `--recess` and `--parchment` are the same `--warm-white`, so a
+   * borderless pill filled with it disappeared into the page. It was invisible
+   * only because the hairline had been carrying it, which is the thing removing
+   * the hairline was supposed to prove was unnecessary.
+   *
+   * `--canvas` is the token that means *a step off whatever you are standing
+   * on*, and it is the one that inverts: white on the parchment sheet, warm
+   * white inside the white share popover. Both read; neither needs a line.
+   */
+  background: var(--canvas);
 }
 /**
  * The URL on one line, truncated, with the button beside it.
