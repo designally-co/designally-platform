@@ -4228,6 +4228,26 @@ dialog::backdrop {
   color: var(--ink);
 }
 
+/**
+ * A popover floats, so it takes the page's own white — not the card tone.
+ *
+ * `--canvas` is the raised surface, and on the parchment sheets raised *is*
+ * white. Inverted, `--canvas` became the card tone, and every panel that opens
+ * over this sheet — More, Share, the version list, the date picker — came up
+ * grey. A menu is not a card lying on the page; it is a thing held above it,
+ * and on this surface the value for held-above is white.
+ *
+ * They keep their hairline, and here it is doing the whole job: a white panel
+ * over the white page has nothing else to separate it, and there are no shadows
+ * in this product. Over a card it has the tone as well.
+ */
+.sheet.paper .barmenu,
+.sheet.paper .vermenu,
+.sheet.paper .sharepanel,
+.sheet.paper .dppop {
+  background: var(--white);
+}
+
 /* Back up to the page's own white: a control on a card, not part of it. */
 .sheet.paper .dpfield,
 .sheet.paper .input,
