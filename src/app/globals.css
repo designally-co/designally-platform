@@ -2007,14 +2007,6 @@ textarea {
   flex-direction: column;
   align-items: stretch;
 }
-/* The rule between a menu's groups. One menu has two: what you do to read the
-   project, and what you do to finish with it. */
-.barmenu hr {
-  height: 1px;
-  border: 0;
-  margin: 5px 11px;
-  background: var(--divider-soft);
-}
 .moreslot {
   position: relative;
   display: flex;

@@ -417,6 +417,13 @@ export default function ProjectSheet({
              * a row that unfolds: a line of fact, then the answers to it, with
              * `onClose` already forgetting which row was open. Download is that
              * shape without a decision to back out of.
+             *
+             * **No rule under it.** There was one for a few minutes, grouping
+             * reading above it and deciding below — and it put 11px between
+             * this row and Archive where Archive and Delete sit flush. Four
+             * rows in one menu do not need a divider to be read as two kinds of
+             * thing; an uneven column is a defect in a way a missing grouping
+             * is not.
              */}
             {p.answers > 0 && (
               <>
@@ -459,7 +466,6 @@ export default function ProjectSheet({
                     <span>Download all responses</span>
                   </button>
                 )}
-                <hr />
               </>
             )}
             {/* Closing and reopening left this menu on 18 August 2026 — they
