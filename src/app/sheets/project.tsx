@@ -623,8 +623,11 @@ export default function ProjectSheet({
        */}
       {p.token && (
         <div className="pd-sec">
-          <h2>Collection</h2>
-
+          {/* No heading — 19 August 2026. "Collection" sat over a bar whose own
+              first line is *Open for answers* or *Closed 17 Aug*, which is the
+              same fact in words somebody reads rather than a filing label. The
+              other sections keep theirs because their contents do not introduce
+              themselves. */}
           {/**
            * One bar, both states — the reference the team brought in, and the
            * meaning they confirmed on 19 August 2026.
@@ -713,7 +716,7 @@ export default function ProjectSheet({
                */}
               {shut && !reopening && p.surveyId && (
                 <button
-                  className="btn btn-outline collnow"
+                  className="btn btn-ink collnow"
                   disabled={pending}
                   onClick={() => {
                     setReopening(true);
@@ -757,7 +760,7 @@ export default function ProjectSheet({
                */}
               {!shut && p.surveyId && confirming !== 'close' && (
                 <button
-                  className="btn btn-outline collnow"
+                  className="btn btn-ink collnow"
                   disabled={pending}
                   onClick={() => setConfirming('close')}
                 >

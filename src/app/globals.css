@@ -3176,14 +3176,42 @@ textarea {
  * accent. Two filled pills competing above it would be the section demanding a
  * decision every time somebody opens a project to read an answer.
  *
- * Sized to the bar and not to a section — shorter than a CTA, matched to the
- * 44 of the date field beside it.
+ * Sized to the bar and not to a section — a 15px label rather than a CTA's 17,
+ * on the 44 the date field beside it stands at. It was 40 while the field had
+ * square-ish corners and the difference read as two sizes of control; once both
+ * are pills, two pills of different heights on one line is the only thing you
+ * can see.
  */
 .collbanner .collnow {
   flex: none;
-  min-height: 40px;
-  padding: 8px 18px;
+  min-height: 44px;
+  padding: 8px 20px;
   font-size: 15px;
+}
+
+/**
+ * The date field is a pill here, and nowhere else — 19 August 2026, asked for.
+ *
+ * **This is an exception to the radius rule and it is worth naming as one.**
+ * DESIGN.md took inputs off `pill` on 18 August because a box you type into is
+ * not an action and a pill field reads as a button holding text — and the date
+ * field on the New survey sheet is the example the rule names. That sheet is
+ * untouched: three fields down a column with one Create button under them, and
+ * a pill among them would still be the loudest thing on it pretending to be
+ * pressable.
+ *
+ * This row is not that shape. It is one line with exactly two controls on it,
+ * side by side, and the other one is a pill. The rule protects a field from
+ * looking like the action *on a form of fields*; here the field is half of a
+ * pair, and matching its neighbour is what makes them read as one object rather
+ * than as a control and a button that happened to land next to each other.
+ *
+ * 20px of padding, not the rectangle's 14: DESIGN.md's own note under Inputs —
+ * a pill needs the extra to clear its own curve before the text starts.
+ */
+.collbanner .dpfield {
+  border-radius: var(--r-pill);
+  padding-left: 20px;
 }
 
 /**

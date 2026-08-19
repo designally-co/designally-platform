@@ -909,6 +909,16 @@ none 0 · sm 8 · md 11 · lg 18 · card 26 · sheet 34 · pill 9999
 - **Inputs came off this list on 18 August 2026**, and the rule above is why: a
   box you type into is not an action, and a pill field reads as a button that
   happens to hold text.
+- **One field is a pill anyway: the Collection bar's date, from 19 August 2026.**
+  The rule protects a field from looking like the action *on a form of fields* —
+  three inputs down a column with one Create under them, which is the New survey
+  sheet and is untouched. The bar is not that shape: one line, exactly two
+  controls on it, and the other is a pill. There the field is half of a pair, and
+  matching its neighbour is what makes them read as one object instead of a
+  control and a button that happened to land side by side. Scoped to
+  `.collbanner .dpfield`, with the 20px of padding a pill needs to clear its own
+  curve, and both at 44 — two pills of different heights on one line is the only
+  thing you can see.
 - **The two surfaces then split, later the same day.** The survey keeps `lg`: a
   field there *is* a card on a page of cards, sized to be answered on a phone. The
   team app went to `md` — 18px on a 44px box curves through most of its own
