@@ -1040,6 +1040,21 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                  * shown at zero. Full, it is simply the Cut, and it starts
                  * measuring on the first question.
                  */}
+                {/**
+                 * Whose project this is — 19 August 2026, asked for.
+                 *
+                 * It is the first thing a client checks: somebody forwarded
+                 * them a link and they want to know it was meant for them. It
+                 * went in the masthead first, with the count and the date, and
+                 * came out again the same day — the masthead is the meta block
+                 * and this is not meta, it is who the next twenty minutes are
+                 * about. In the body it is the line the headline speaks from.
+                 *
+                 * Not inside the headline the way the closed screen carries it:
+                 * that one *states* something about the project, and this one
+                 * is an invitation with the project as its context.
+                 */}
+                <p className="qproj">{survey.clientName}</p>
                 <h1>Let&apos;s shape your brand, together.</h1>
                 {/**
                  * The sentence that says what the questionnaire is for.

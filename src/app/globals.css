@@ -6656,6 +6656,21 @@ dialog::backdrop {
    the ink is a step apart as well.
    1.6 leading because the Thai sits on its own line here and DESIGN.md's floor
    is not negotiable below display size. */
+/* The client's name, over the welcome's headline.
+   `.intro`'s size and full ink at 600, which is the one arrangement that reads
+   as a letterhead rather than as a second sentence: same measure as the line
+   below the headline, a weight and a whole ink step above it, and nowhere near
+   the display size it introduces. It is as likely to be Thai as Latin, so the
+   leading is DESIGN.md's standalone-line value rather than a paragraph's. */
+.slide[data-screen='welcome'] .qproj {
+  font-size: clamp(1.3rem, 2.4vw, 1.55rem);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin-bottom: 14px;
+  text-wrap: balance;
+}
 .slide[data-screen] .intro {
   font-size: clamp(1.3rem, 2.4vw, 1.55rem);
   line-height: 1.6;
