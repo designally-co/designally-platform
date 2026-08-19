@@ -162,10 +162,22 @@ export default function ProjectSheet({
   /** Whether the subset dropdown is open. Shut is the ordinary case: read everyone. */
   const [picking, setPicking] = useState(false);
   const split = useRef<HTMLDivElement>(null);
-  /* Roughly the dropdown's own size; it only decides whether to open down or
-     up, and a list of three or four names is short either way. */
-  const at = useAnchored(picking, split, 260, 200);
-  useDismiss(picking, split, useCallback(() => setPicking(false), []));
+  const pickBtn = useRef<HTMLButtonElement>(null);
+  /* 340 is the menu's own `max-height` — it only decides whether to open down
+     or up, and it was 200, which a five-person list already passed. A list that
+     is taller than the estimate opens downward off the bottom of the screen. */
+  const at = useAnchored(picking, split, 260, 340);
+  /* Focus goes back to the control that opened it. Escape used to drop it on
+     the sheet's scroller, which puts a keyboard user at the top of the sheet
+     having pressed one key. */
+  useDismiss(
+    picking,
+    split,
+    useCallback(() => {
+      setPicking(false);
+      pickBtn.current?.focus();
+    }, []),
+  );
 
   /* The date field is controlled now, so the sheet holds it. It was
      `defaultValue` on a native input, which the browser kept for us. */
@@ -218,6 +230,36 @@ export default function ProjectSheet({
   const [reopening, setReopening] = useState(false);
 
   /**
+   * The prompt this panel can actually answer.
+   *
+   * `p.action` is the *project's* outstanding thing, and the insights panel wore
+   * the accent for all of them. On a project whose analysis is written that
+   * produced NEEDS YOUR TEAM over "Archive the project once your team has what
+   * it needs" — with two buttons underneath, neither of which archives anything.
+   * Archiving is in the toolbar menu. Same for `close-collection`, whose control
+   * is the Collection bar above.
+   *
+   * DESIGN.md §1 and PRODUCT.md principle 3 both make the accent mean *a person
+   * is needed **here***. An accent on a container that cannot answer its own
+   * prompt teaches the reader it means "somewhere on this sheet", and then it
+   * stops working where it is used correctly. So the banner appears for the one
+   * kind this panel answers, and the others stay with their own control.
+   */
+  const mine = p.action?.kind === 'write-insights';
+
+  /**
+   * The analysis gets its own pending flag.
+   *
+   * It shared one `useTransition` with every other action on the sheet, so
+   * pressing Generate disabled the lot — the date field, Reopen, Archive,
+   * Delete, even *Download the answers* — for the one to three minutes an
+   * Anthropic call takes. None of those becomes unsafe because an analysis is
+   * running, and a sheet that freezes whole is a sheet somebody assumes has
+   * crashed.
+   */
+  const [genPending, startGen] = useTransition();
+
+  /**
    * The caller's sentence, unless the server has a better one.
    *
    * `message` is written here, before the action runs, so it can only say the
@@ -256,7 +298,7 @@ export default function ProjectSheet({
    * about to happen.
    */
   const generate = () =>
-    start(async () => {
+    startGen(async () => {
       setError(null);
       const result = await reanalyse(p.id, only ?? undefined);
       if (!result.ok) {
@@ -971,7 +1013,7 @@ export default function ProjectSheet({
              * sentence was the only thing naming it, and Collection lost its own
              * heading an hour earlier for the same reason.
              */}
-            {p.action ? (
+            {mine ? (
               <p className="ineed">
                 <span className="pt" aria-hidden="true" />
                 NEEDS YOUR TEAM
@@ -980,30 +1022,46 @@ export default function ProjectSheet({
               <p className="ineed isname">Insights</p>
             )}
 
-            {p.action ? (
-              <>
-                <p className="isay">
-                  <b>{p.action.say}</b> {p.action.emphasis}
-                </p>
-                <p className="iwhen">{p.action.when}</p>
-              </>
-            ) : p.insights ? (
+            {mine ? (
               <p className="isay">
-                <b>Written {p.insightsWrittenOn}</b>
-                {p.insightsVersions.length > 1
-                  ? ` · ${p.insightsVersions.length} versions kept`
-                  : ''}
+                <b>{p.action!.say}</b> {p.action!.emphasis}
               </p>
             ) : (
+              /* The state, not the date — the date is the line below, and this
+                 said "Written 19 Aug" directly over "Written 19 Aug · 3 runs
+                 kept" until the provenance line came out of its ternary. */
               <p className="isay">
-                <b>Not written yet</b>
-                {shut
-                  ? ` · collection closed ${p.closedOn ?? p.dueOn}${p.closedByName ? ` by ${p.closedByName}` : ''}`
-                  : p.answers
-                    ? ' · collection is open'
-                    : ''}
+                <b>{p.insights ? 'The analysis is written.' : 'Not written yet'}</b>
+                {!p.insights &&
+                  (shut
+                    ? ` · collection closed ${p.closedOn ?? p.dueOn}${p.closedByName ? ` by ${p.closedByName}` : ''}`
+                    : p.answers
+                      ? ' · collection is open'
+                      : '')}
               </p>
             )}
+
+            {/**
+             * When it was written, and how many runs are kept — now always,
+             * where it used to be structurally unreachable.
+             *
+             * This was one arm of a ternary against `p.action`, and
+             * `buildAction` returns a `review-insights` action for *every*
+             * unarchived project that has insights. Both came off the same
+             * boolean, so the arm could only render on an archived project: a
+             * live one was never told when its analysis was written or how many
+             * versions existed. That is the fact somebody opens this sheet for,
+             * and its absence made "every run is kept as a version" a promise
+             * the panel gave no way to check.
+             */}
+            {p.insights ? (
+              <p className="iwhen">
+                Written {p.insightsWrittenOn}
+                {p.insightsVersions.length > 1 ? ` · ${p.insightsVersions.length} runs kept` : ''}
+              </p>
+            ) : mine ? (
+              <p className="iwhen">{p.action!.when}</p>
+            ) : null}
           </div>
 
           {/**
@@ -1093,53 +1151,117 @@ export default function ProjectSheet({
                  * proportion of anything.
                  */}
                 <div className="insreads">
-                  <span
-                    className="meter"
-                    data-running={pending || undefined}
-                    aria-hidden="true"
-                  >
-                    {p.people.map((person, i) => (
-                      <i
-                        key={person.id}
-                        data-on={only === null || only.includes(person.id) ? '' : undefined}
-                        style={{ animationDelay: `${i * 0.11}s` }}
-                      />
-                    ))}
-                  </span>
+                  {/**
+                   * One mark per person, and each one knows whose it is.
+                   *
+                   * **It reported only how many, which is the number the
+                   * sentence beside it already reads out** — and withheld the
+                   * one thing only it could carry, which is *whose*. Every mark
+                   * names its person now, so the row answers the question the
+                   * sentence cannot, and a pointer and a screen reader get the
+                   * same answer: `role="img"` with a label naming who is being
+                   * left out, because that is the short list and the surprising
+                   * one.
+                   *
+                   * **Nothing below two respondents.** PRODUCT.md: usually one
+                   * person answers. A single mark beside a sentence is a stray
+                   * pipe character next to the words that already say it, and
+                   * the normal case was the case it read worst in.
+                   */}
+                  {p.people.length > 1 && (
+                    <span
+                      className="meter"
+                      data-running={genPending || undefined}
+                      role="img"
+                      aria-label={
+                        chosen === p.people.length
+                          ? 'Reading everyone who answered.'
+                          : `Not reading ${p.people
+                              .filter((x) => only !== null && !only.includes(x.id))
+                              .map((x) => x.name)
+                              .join(', ')}.`
+                      }
+                    >
+                      {p.people.map((person, i) => {
+                        const on = only === null || only.includes(person.id);
+                        return (
+                          <i
+                            key={person.id}
+                            data-on={on ? '' : undefined}
+                            title={on ? person.name : `${person.name} — not read`}
+                            style={{ animationDelay: `${i * 0.11}s` }}
+                          />
+                        );
+                      })}
+                    </span>
+                  )}
                   <p className="ireads">
-                    {pending
-                      ? `Reading ${chosen} ${chosen === 1 ? 'answer' : 'answers'}…`
+                    {genPending
+                      ? `Reading ${chosen} ${chosen === 1 ? 'answer' : 'answers'}. This usually takes a minute or two.`
                       : chosen === p.people.length
                         ? `Reads all ${p.answers} ${p.answers === 1 ? 'answer' : 'answers'}.`
-                        : `Reads ${chosen} of ${p.people.length} answers.`}{' '}
-                    {!pending && 'Every run is kept as a version, so this replaces nothing.'}
+                        : `Reads ${chosen} of the ${p.people.length} answers.`}{' '}
+                    {/* Kept during the run, where it used to be deleted. It is
+                        the one sentence answering *am I about to lose a good
+                        analysis*, and it was on screen while nobody was anxious
+                        and gone the moment the anxious minute began. */}
+                    Every run is kept as a version, so this replaces nothing.
                   </p>
                 </div>
 
+                {/* Said out loud. The meter is a picture and the sentence above
+                    it does not take focus, so a screen reader got silence for
+                    the length of the call. */}
+                <p className="visually-hidden" role="status">
+                  {genPending ? `Reading ${chosen} answers. This usually takes a minute or two.` : ''}
+                </p>
+
                 <div className="iacts">
+                  {/**
+                   * Filled only when there is nothing to open.
+                   *
+                   * `Generate again` was the accent pill and *Open the insights*
+                   * the outline beside it, which points the scarcest signal in
+                   * the system at the expensive, rare act. For a project that
+                   * already has an analysis the overwhelming intent is to read
+                   * it; re-running costs money and minutes. PRODUCT.md's
+                   * fifteen-second reader presses the biggest orange thing, and
+                   * it was the one thing they should almost never press.
+                   *
+                   * So the accent goes to the first run and to a failed one, and
+                   * steps back to an outline once there is something to open.
+                   * Exactly one primary stays visible either way — the floor's
+                   * item 6 — and it is the one somebody came for.
+                   */}
                   <div className="splitwrap" ref={split}>
                     <div className="split" data-open={picking || undefined}>
                       <button
-                        className="btn btn-primary"
-                        disabled={pending || chosen === 0}
+                        className={`btn ${p.insights && !error ? 'btn-outline' : 'btn-primary'}`}
+                        disabled={genPending || chosen === 0}
                         onClick={generate}
                       >
-                        {pending
-                          ? 'Working…'
-                          : chosen !== p.people.length
-                            ? `Generate from ${chosen} ${chosen === 1 ? 'answer' : 'answers'}`
-                            : p.insights
-                              ? 'Generate again'
-                              : 'Generate insights'}
+                        {genPending
+                          ? 'Reading…'
+                          : error
+                            ? 'Try again'
+                            : chosen !== p.people.length
+                              ? `Generate from ${chosen} ${chosen === 1 ? 'answer' : 'answers'}`
+                              : p.insights
+                                ? 'Generate again'
+                                : 'Generate insights'}
                       </button>
                       {p.people.length > 1 && (
                         <button
+                          ref={pickBtn}
                           className="splitmore"
                           aria-label="Choose whose answers to read"
                           title="Choose whose answers to read"
-                          aria-haspopup="true"
+                          /* Not `aria-haspopup` — that announces a menu, and
+                             what opens is a group of checkboxes. `expanded` and
+                             `controls` describe what is actually there. */
                           aria-expanded={picking}
-                          disabled={pending}
+                          aria-controls={`pick-${p.id}`}
+                          disabled={genPending}
                           onClick={() => setPicking((o) => !o)}
                         >
                           <DownMark />
@@ -1149,12 +1271,32 @@ export default function ProjectSheet({
 
                     {picking && at && (
                       <div
+                        id={`pick-${p.id}`}
                         className="splitmenu"
                         role="group"
                         aria-label="Whose answers to read"
                         style={{ top: at.top, left: at.left, width: at.width }}
                       >
                         <p className="hintline">Read the answers of:</p>
+                        {/* Unticking nineteen of twenty people was nineteen
+                            presses. Everyone is also the default, and a row
+                            saying so is the only place the panel admits it. */}
+                        <div className="pickall">
+                          <button
+                            type="button"
+                            disabled={only === null}
+                            onClick={() => setOnly(null)}
+                          >
+                            Everyone
+                          </button>
+                          <button
+                            type="button"
+                            disabled={chosen === 0}
+                            onClick={() => setOnly([])}
+                          >
+                            Nobody
+                          </button>
+                        </div>
                         {p.people.map((person) => {
                           const on = only === null || only.includes(person.id);
                           return (
@@ -1162,7 +1304,7 @@ export default function ProjectSheet({
                               <input
                                 type="checkbox"
                                 checked={on}
-                                disabled={pending}
+                                disabled={genPending}
                                 onChange={() => {
                                   const base = only ?? p.people.map((x) => x.id);
                                   const next = on
@@ -1185,11 +1327,32 @@ export default function ProjectSheet({
                   </div>
 
                   {p.insights && (
-                    <button className="btn btn-quiet" disabled={pending} onClick={onOpenInsights}>
+                    <button
+                      className="btn btn-primary"
+                      disabled={genPending}
+                      onClick={onOpenInsights}
+                    >
                       Open the insights
                     </button>
                   )}
                 </div>
+
+                {/**
+                 * The run that failed, where the person who ran it is looking.
+                 *
+                 * It rendered as the last child of the whole sheet, below the
+                 * fold, with no role. Somebody who waited ninety seconds
+                 * watching this panel saw the button return to rest and nothing
+                 * else — and the likeliest next move is pressing it again,
+                 * which is a second paid call for a failure the first one had
+                 * already diagnosed. `role="alert"` so it is also said out
+                 * loud, and the button above now reads *Try again*.
+                 */}
+                {error && (
+                  <p className="insfail" role="alert">
+                    <b>That run did not finish.</b> {error}
+                  </p>
+                )}
               </>
             )}
           </>

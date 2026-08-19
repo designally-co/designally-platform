@@ -1262,12 +1262,21 @@ It is an eyebrow above a heading, a pattern that is usually a defect. It earns i
 
 ### The reading meter — what the analysis will read
 
-One 3×15px mark per person who answered, on the insights panel beside the line
-that says the same thing in words. Ink for the answers this run will read,
-`--ink-4` at 45% for the ones the picker has unticked. **This is the only
-animated element in the team app**: while the analysis runs the marks pass a
-wave left to right, each delayed by its own index, so the motion is the shape of
-what is actually happening — it is reading them, one after another.
+One 3×15px pill per person who answered, on the insights panel beside the line
+that says the same thing in words. **Every mark names its person** — `title` for
+a pointer, and a `role="img"` label on the row naming whoever is being left out
+— because *how many* is what the sentence already says and *whose* is the thing
+only the marks can carry. Solid `--ink` for the answers this run will read
+(15.18:1), solid `--ink-4` for the ones the picker has unticked (3.72:1).
+**Nothing renders below two respondents**: PRODUCT.md says one person answering
+is the normal case, and a single mark beside a sentence is a stray pipe
+character next to the words that already say it.
+
+**This is the only animated element in the team app**: while the analysis runs
+the marks pass a wave left to right, each delayed by its own index, so the
+motion is the shape of what is actually happening — it is reading them, one
+after another. The trough is 0.55, which measures 3.71:1; it was 0.28, at which
+the one signal that the machine is working faded to 1.80:1 twice a second.
 
 **It is what "feels like AI" here, and it is a count rather than an effect.**
 Nothing on screen exists in order to say *machine*: the marks are there before,
@@ -1280,9 +1289,17 @@ it read, when, and that the last run is still there — not ornament.
   spoken for on that panel by *Generate*, and §1's ladder says nothing may take
   a rung above its importance. What the analysis reads is a fact about the run;
   the run is the thing being urged.
-- **Opacity only.** A wave built on `width` or `background-color` repaints a row
-  of marks for the length of an API call. `prefers-reduced-motion` drops the
-  animation and leaves every mark at full opacity.
+- **Opacity only, and only while running.** A wave built on `width` or
+  `background-color` repaints a row of marks for the length of an API call.
+  `prefers-reduced-motion` drops the animation and leaves every mark at full
+  opacity. The on/off colour change carries **no transition** — it is a paint
+  property, so it only advances while the page composites, and a tab that is not
+  painting left the mark stuck on the colour it started from.
+- **Never opacity for the off state.** The first build drew it as `--ink-4` at
+  45%, which composites to `#bcbec2` — **1.68:1**, against a 3:1 floor — while
+  the comment beside it quoted the solid colour's 4.61:1. The mark carrying the
+  whole point of the meter could not be seen. Contrast is measured on the
+  composited result or it is not measured.
 - **Rules 3 and 7 hold.** These are the people who actually answered — never a
   fraction of an expected number, never a proportion of anything.
 

@@ -45,3 +45,6 @@ next-env.d.ts
 
 # the example is meant to be committed
 !.env.example
+
+# Impeccable critique snapshots — a local design backlog, not project source
+.impeccable/

@@ -2425,6 +2425,9 @@ textarea {
   display: flex;
   align-items: center;
   gap: 10px;
+  /* 44, not the 39.5 this measured. It is a tap target on a phone and the floor
+     applies to it like any other. */
+  min-height: 44px;
   padding: 7px 0;
   font-size: 15px;
   /* Thai never below 1.6 in a line that can hold a name */
@@ -2638,8 +2641,12 @@ textarea {
  */
 /* The same slot with nothing outstanding: the panel's own name, no dot and no
    accent. It is what replaced the `<h2>` — see the eyebrow in project.tsx. */
+/* `--ink-3`, not `--ink-4`. This is 11.5px at weight 700 — not large text by
+   any definition — so it answers to the 4.5:1 body floor, and `--ink-4` on
+   canvas is 4.13:1. `--ink-3` is 7.26. `--ink-4` is documented as placeholders
+   only; a label is not a placeholder. */
 .pd-insights .ineed.isname {
-  color: var(--ink-4);
+  color: var(--ink-3);
   text-transform: uppercase;
 }
 .pd-insights .ineed .pt {
@@ -2743,6 +2750,31 @@ textarea {
 .insreads .ireads {
   margin-bottom: 0;
 }
+
+/**
+ * A run that failed, in the panel that ran it.
+ *
+ * The message used to render as the last child of the whole sheet, below the
+ * fold, in `--caution` with no role. Somebody who waited ninety seconds looking
+ * at this panel saw the button return to rest and nothing else — and the
+ * likeliest next move is pressing it again, which is a second paid call for a
+ * failure the first one had already diagnosed.
+ *
+ * `--critical` and not `--caution`: this is a thing that did not happen, not a
+ * thing to be careful about. On the recessed ground it measures 4.60:1.
+ */
+.insfail {
+  display: flex;
+  gap: var(--sp-xs);
+  margin-top: var(--sp-sm);
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--critical);
+  text-wrap: pretty;
+}
+.insfail b {
+  font-weight: 600;
+}
 .meter {
   flex: none;
   display: inline-flex;
@@ -2755,13 +2787,30 @@ textarea {
 .meter i {
   width: 3px;
   height: 15px;
-  border-radius: 2px;
-  /* not read on this run: present, and plainly not counted. `--ink-4` is the
-     Field's lightest legal line at 4.61:1, well over the 3:1 a graphical object
-     needs. */
+  /* `pill`, not the 2px this had. A 3px-wide mark cannot take 8 without
+     becoming a lozenge, and 2 is not a step in the scale — a fully rounded bar
+     is, and at this width that is what it draws. */
+  border-radius: var(--r-pill);
+  /**
+   * Not read on this run: present, and plainly not counted.
+   *
+   * **This was `--ink-4` at `opacity: 0.45` and the comment here claimed 4.61:1
+   * for it.** That figure is the solid colour on the page; the opacity lands
+   * after it, compositing to `#bcbec2` — **1.68:1** against this panel's foot,
+   * against a 3:1 floor for a graphical object. The mark that carries the whole
+   * point of the meter could not be seen, and the note beside it would have
+   * survived the next person's check.
+   *
+   * Solid, and measured where it actually sits: `--ink-4` on `--parchment` is
+   * **3.72:1**. Opacity is the running animation's alone now.
+   */
   background: var(--ink-4);
-  opacity: 0.45;
-  transition: opacity 0.24s var(--ease);
+  /* No transition. The colour used to cross-fade over 240ms, which is
+     imperceptible on a 3px mark tied to a checkbox — and it is a *paint*
+     property, so the change only advances while the page is compositing. A
+     tab that is not painting leaves the mark stuck at the colour it started
+     on, which is the one state this element must not have. Instant, and the
+     only thing that animates here is opacity. */
 }
 .meter i[data-on] {
   background: var(--ink);
@@ -2783,10 +2832,14 @@ textarea {
 .meter[data-running] i {
   animation: reading 1.5s var(--ease) infinite;
 }
+/* The trough was 0.28, which put `--ink` at 1.80:1 on this ground — the one
+   signal that the machine is working faded to invisible twice a second. 0.55
+   measures 3.71:1, which is the floor for a graphical object and, by
+   coincidence worth keeping, the same contrast the resting off-mark holds. */
 @keyframes reading {
   0%,
   100% {
-    opacity: 0.28;
+    opacity: 0.55;
   }
   45% {
     opacity: 1;
@@ -2856,6 +2909,31 @@ textarea {
   cursor: pointer;
   transition: background-color 0.16s var(--ease);
 }
+/**
+ * The chevron follows the half it is attached to.
+ *
+ * It was painted `--primary` unconditionally, which was right while the wide
+ * half always was. From 19 August the wide half steps back to an outline once
+ * there is an analysis to open — and the split then rendered as a white pill
+ * with an orange stub welded to its end: one control, two treatments, and the
+ * loudest thing on it the part that only opens a list of names.
+ *
+ * `:has()` rather than a second prop threaded through the component: the
+ * chevron's job is to match its sibling, and that is a fact about the DOM it
+ * already sits in.
+ */
+.split:has(> .btn-outline) .splitmore {
+  background: transparent;
+  border: 1px solid var(--hairline);
+  border-left-color: var(--hairline);
+  color: var(--ink);
+}
+@media (hover: hover) {
+  .split:has(> .btn-outline) .splitmore:not(:disabled):hover {
+    border-color: var(--ink-3);
+    border-left-color: var(--ink-3);
+  }
+}
 @media (hover: hover) {
   .splitmore:not(:disabled):hover {
     background: var(--primary-deep);
@@ -2884,6 +2962,15 @@ textarea {
 /* Fixed and placed in JS, like the calendar and for the same two reasons — see
    `useAnchored`. Absolute would count toward the sheet's scrollable height and
    be clipped by the sheet's own corners. */
+/**
+ * The picker.
+ *
+ * **It scrolls.** There is no expected respondent count (rule 3) and no cap on
+ * the list, so twenty people drew a ~900px popover on an 844px phone with
+ * nothing to scroll it — the names past the fold were unreachable. `50dvh`
+ * rather than `vh` because the mobile toolbars move, and `overscroll-behavior`
+ * so reaching the end of the list does not start scrolling the sheet behind it.
+ */
 .splitmenu {
   position: fixed;
   z-index: 90;
@@ -2891,6 +2978,41 @@ textarea {
   background: var(--canvas);
   border: 1px solid var(--hairline);
   border-radius: var(--r-card);
+  max-height: min(50dvh, 340px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+/* Everyone / Nobody. Unticking nineteen of twenty people was nineteen presses,
+   and the row that fixes it is also the only one that says what the default is.
+   It sits under the hint and above the names, on the divider, so the list below
+   it stays one kind of thing. */
+.pickall {
+  display: flex;
+  gap: var(--sp-xs);
+  padding-bottom: var(--sp-xs);
+  margin-bottom: var(--sp-xxs);
+  border-bottom: 1px solid var(--divider);
+}
+.pickall button {
+  flex: 1;
+  min-height: 32px;
+  padding: 4px 10px;
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  color: var(--ink-2);
+  background: var(--parchment);
+  border: 0;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+}
+.pickall button:disabled {
+  color: var(--ink-4);
+  cursor: default;
+}
+@media (hover: hover) {
+  .pickall button:not(:disabled):hover {
+    background: var(--surface-fill);
+  }
 }
 .splitmenu .hintline {
   margin-bottom: var(--sp-xxs);
