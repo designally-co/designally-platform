@@ -2007,6 +2007,14 @@ textarea {
   flex-direction: column;
   align-items: stretch;
 }
+/* The rule between a menu's groups. One menu has two: what you do to read the
+   project, and what you do to finish with it. */
+.barmenu hr {
+  height: 1px;
+  border: 0;
+  margin: 5px 11px;
+  background: var(--divider-soft);
+}
 .moreslot {
   position: relative;
   display: flex;
@@ -2160,6 +2168,11 @@ textarea {
 .barmenu button:not(.btn) {
   display: flex;
   align-items: center;
+  /* A menu item is one line. `Download as Markdown` broke over two beside a
+     `Download as PDF` that did not, which reads as two kinds of item rather
+     than one pair — and the panel is sized by its content, so letting the
+     label set the width costs nothing but the pixels it needs. */
+  white-space: nowrap;
   gap: 12px;
   width: 100%;
   text-align: left;

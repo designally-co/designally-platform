@@ -19,7 +19,6 @@ import {
   DocMark,
   DownMark,
   PrintMark,
-  SaveMark,
   TrashMark,
   UndoMark,
 } from '../icons';
@@ -380,48 +379,6 @@ export default function ProjectSheet({
           a link that had been turning clients away for a week — on the one
           control the team uses to send it again. */}
       {link && p.token && <ShareLink token={p.token} url={link} closed={shut} />}
-      {/**
-       * Download has its own disc, the way it does on a response.
-       *
-       * It was two items inside More, which put taking a copy of the answers in
-       * the same drawer as closing collection and deleting the project — one of
-       * those is a thing you do to read something and the rest change the
-       * project. A person looking for the file had to open a menu of decisions
-       * to find out it was in there.
-       *
-       * Same control as the answers sheet: the mark names the act, the popover
-       * names the format. What differs is only the subject, and each says its
-       * own in the accessible name — "Download all 5 answers" against
-       * "Download คุณธนวัฒน์'s answers".
-       */}
-      {p.answers > 0 && (
-        <MoreMenu label={`Download all ${p.answers} answers`} icon={<SaveMark />}>
-          {(close) => (
-            <>
-              <button
-                disabled={pending}
-                onClick={() => {
-                  close();
-                  exportAll('md');
-                }}
-              >
-                <DocMark />
-                <span>Markdown</span>
-              </button>
-              <button
-                disabled={pending}
-                onClick={() => {
-                  close();
-                  exportAll('pdf');
-                }}
-              >
-                <PrintMark />
-                <span>PDF</span>
-              </button>
-            </>
-          )}
-        </MoreMenu>
-      )}
       {/* Closing the menu forgets which confirmation was open. It is held on
           the sheet rather than in the menu, so without this a person who opened
           Delete, thought better of it and clicked away found it still expanded —
@@ -435,6 +392,47 @@ export default function ProjectSheet({
       >
         {(close) => (
           <>
+            {/**
+             * Download, back inside More — 19 August 2026, asked for.
+             *
+             * It had its own disc beside this one for a day, on the argument
+             * that taking a copy of the answers is a thing you do to *read*
+             * something while everything in here changes the project. True, and
+             * it cost a third disc in a four-disc bar for an action nobody
+             * takes twice on the same project.
+             *
+             * The two formats are flat items rather than a popover inside a
+             * popover. That is the whole reason the disc existed — it had a
+             * format to ask about — and a menu that opens a menu is worse than
+             * two lines that say what they do. The rule under them is the
+             * grouping the disc was protecting: reading above it, deciding
+             * below.
+             */}
+            {p.answers > 0 && (
+              <>
+                <button
+                  disabled={pending}
+                  onClick={() => {
+                    close();
+                    exportAll('md');
+                  }}
+                >
+                  <DocMark />
+                  <span>Download as Markdown</span>
+                </button>
+                <button
+                  disabled={pending}
+                  onClick={() => {
+                    close();
+                    exportAll('pdf');
+                  }}
+                >
+                  <PrintMark />
+                  <span>Download as PDF</span>
+                </button>
+                <hr />
+              </>
+            )}
             {/* Closing and reopening left this menu on 18 August 2026 — they
                 are in the Collection section with the date, which is the other
                 control over whether the link is taking answers. What is left
