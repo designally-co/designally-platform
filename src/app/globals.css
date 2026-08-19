@@ -4291,6 +4291,33 @@ dialog::backdrop {
  * `bare` sheet rather than a `sheet-top`, and it was the last one still wearing
  * a ring.
  */
+/**
+ * The neutral pill takes the same hueless ramp as the discs.
+ *
+ * `--fill` is `#beb5b2` — the warm neutral, hued 45° to sit beside the orange,
+ * and the darkest neutral in the system. Beside a solid `--primary` Create it
+ * read as the heavier of the two buttons, which is backwards for the one that
+ * does nothing.
+ *
+ * DESIGN.md justifies the warm fill as "the icon disc's own ground", and that
+ * stopped being true here the moment those discs went hueless earlier in this
+ * experiment. Same ramp now, same reason the cards use it: these greys stand on
+ * a hueless surface, and a warm fill among them reads brown rather than
+ * neutral. `--ink` on it is 15.4:1.
+ */
+.sheet.paper .btn-fill {
+  background: #e9e9e9;
+  color: var(--ink);
+}
+@media (hover: hover) {
+  .sheet.paper .btn-fill:not(:disabled):hover {
+    background: #dedede;
+  }
+}
+.sheet.paper .btn-fill:not(:disabled):active {
+  background: #d2d2d2;
+}
+
 .sheet.paper .iconbtn,
 .sheet.paper .sheetclose,
 .sheet.paper .sheet-top .back {
