@@ -48,6 +48,10 @@ export default function SurveyMadeSheet({
       narrow
       width="onecol-w link-w"
       bare
+      /* The last sheet onto the paper ground, 19 August 2026 — the whole team
+         app is one surface now. Its QR frame keeps its white and its hairline
+         on purpose; see `.qrframe`. */
+      surface="paper"
       backLabel="Done"
       onClose={onClose}
     >

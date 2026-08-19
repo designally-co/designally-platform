@@ -8070,6 +8070,16 @@ dialog::backdrop {
   aspect-ratio: 1;
   height: auto;
   padding: 14px;
+  /**
+   * A literal white, and a border that stays — the two exceptions on the paper
+   * surface, and both are the camera's.
+   *
+   * A QR code needs a white quiet zone around it to be read; a tone would put
+   * the paper surface between a client's phone and the link. So this frame does
+   * not invert, which leaves it white on a white sheet — and there the hairline
+   * is the only thing that separates them. It is the one container on this
+   * surface whose tone cannot carry its own boundary, so it keeps the line.
+   */
   background: #fff;
   border: 1px solid var(--hairline);
   border-radius: var(--r-sm);

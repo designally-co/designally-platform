@@ -1086,11 +1086,23 @@ section's own exception: **a filled control deepens its own fill.** `#dbdbdb` an
 `--surface-fill` for the press: that ramp is hued 45° to sit beside the orange, and these
 cards are hueless, so pressing one turned it brown against four greys.
 
-**Which sheets take it.** The two that are nearly all cards — the project sheet and the
-insights sheet it opens — because on those the parchment between the cards stopped reading
-as a page. The insights sheet also has the stronger claim of being the reading surface.
-The New survey sheet stays parchment: it is three fields and holds no card, so there is
-nothing for the grey to fail at, and its white inputs are already the lift.
+**Which sheets take it: all of them.** It began as the two that are nearly all cards — the
+project sheet and the insights sheet it opens — and reached the rest the same day. The
+answers sheet came next because a respondent's chip opens it from the project sheet and a
+stack cannot be two grounds. Then New survey, which had been left out on the argument that
+it holds no card: wrong, the two package options are exactly that object and they are what
+the sheet exists to ask. Then Survey made, which shares its shell.
+
+There is no parchment sheet left. Past projects is the only one that would have nothing to
+gain — a list of rows separated by hairlines, no container anywhere in it — and it takes
+the ground anyway, because one app is one surface.
+
+**Two things do not invert.** A popover reads `--canvas` for its ground and would come up
+grey, so the four of them are pinned back to white and given the shadow above; and inside
+them `--recess` steps back down, or an archive confirmation is white on white. The other is
+`.qrframe`, which is a literal `#fff` because a QR code needs a white quiet zone to be
+read. That leaves it white on a white sheet, so it is the one container here that keeps its
+hairline: its tone cannot carry its own boundary.
 
 **Two sheets in one stack cannot be two grounds.** That is the constraint this rule has to
 respect, and the reason the insights sheet could not be left behind: going one level deeper
