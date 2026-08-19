@@ -120,13 +120,18 @@ way — 23.76px at 700, white, 3.24:1 against a 3:1 floor.
 `.btn.ok`/`.btn.start` and `0.44em/700` on `.qdisc`. Lower either and the white stops being
 legal on that fill; the fill has to go back to `--primary` in the same edit.
 
-Two things on that surface are still short of the standard and are recorded rather than
-hidden. The **disc itself** is 2.92:1 against the page, under the 3:1 for a graphical
-object — and it is not one: `aria-hidden`, identifying no control and no state, with the
-position it decorates read from the questions. The **denominator** in the disc is 10.5px
-white at 3.24:1 and simply fails; no size rescues it, because a denominator big enough to
-clear the large-text floor is the size of the number it qualifies. The honest fixes are to
-drop it — the total is on the welcome — or to return the disc to charcoal.
+**The disc holds one numeral and no total.** The `/9` came out the same day for three
+reasons at once: white on the orange cannot be made legible at any size that reads as
+small; `counts.total` counts *cards*, and a card has held two to four questions since
+17 August, so the disc counted to nine while the welcome promised twenty-one; and a
+fraction set in two sizes inside 54px is a caption pretending to be a graphic. The length
+is on the welcome, in both languages, where a client reads it once and decides whether they
+have twenty minutes.
+
+One thing on that surface is still short of the standard and is recorded rather than
+hidden: the **disc itself** is 2.92:1 against the page, under the 3:1 for a graphical
+object — and it is not one. It is `aria-hidden`, it identifies no control and no state, and
+the position it decorates is read from the questions.
 
 **The team app keeps `--primary` throughout.** It has no Cut, no disc and no brand mark on
 screen; there the deeper orange is the only orange and a white label on it is 5.03:1 at any
