@@ -106,7 +106,20 @@ export default function Today({
       : `${live.length} ${live.length === 1 ? 'project' : 'projects'} running. Everything not listed below is moving on its own.`;
 
   return (
-    <>
+    /**
+     * The team app's own ground, from 19 August 2026.
+     *
+     * `.paper` here is the same three-token swap `.sheet.paper` makes, applied
+     * one level up. Every sheet went white today and the page did not, so
+     * opening a project inverted the relationship under the reader: a white
+     * card on a grey page became grey cards on a white sheet. One app, one
+     * direction of depth.
+     *
+     * A wrapper rather than `:root`, because the client survey shares this
+     * `body` and has its own ground — `.survey-shell` sets `--parchment` for
+     * itself and would not want `--canvas` moving underneath it.
+     */
+    <div className="deck paper">
       <Toolbar
         today={today}
         needsCount={needs.length}
@@ -346,6 +359,6 @@ export default function Today({
       )}
 
       <Toast toast={toast} />
-    </>
+    </div>
   );
 }

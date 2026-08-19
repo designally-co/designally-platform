@@ -4341,6 +4341,37 @@ dialog::backdrop {
  * directly, so one declaration turns every card, input, popover and control
  * fill on this sheet over at once. Same mechanism as `[data-field="dark"]`.
  */
+/**
+ * The team app's page takes the same ground its sheets do.
+ *
+ * The inversion started on the sheets and stopped there, which left the app
+ * contradicting itself at the moment somebody opened a project: a white card on
+ * a grey page, and then grey cards on a white sheet. Depth pointed one way on
+ * the page and the other way one tap in.
+ *
+ * The same three tokens as `.sheet.paper`, and `body` takes the colour because
+ * the page's ground is the window's — a `min-height` wrapper would leave the
+ * old grey below the fold on a short list.
+ *
+ * `.deck` is only ever the team app, so the client survey's own ground is
+ * untouched: it sets `--parchment` on `.survey-shell` and is flat by decision
+ * (DESIGN.md §Two surfaces).
+ */
+.deck.paper {
+  --parchment: var(--white);
+  --canvas: var(--warm-white);
+  --recess: var(--white);
+}
+body:has(.deck.paper) {
+  background: var(--white);
+}
+/* A card is a tone here too, so it is not also drawn a line — the rule the
+   sheets already follow. The worklist is the only carded thing on this page;
+   the project table is rules between rows and keeps them. */
+.deck.paper .worklist {
+  border-color: transparent;
+}
+
 .sheet.paper {
   --parchment: var(--white);
   --canvas: var(--warm-white);

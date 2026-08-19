@@ -1086,6 +1086,20 @@ section's own exception: **a filled control deepens its own fill.** `#dbdbdb` an
 `--surface-fill` for the press: that ramp is hued 45° to sit beside the orange, and these
 cards are hueless, so pressing one turned it brown against four greys.
 
+**The page takes it too**, from 19 August 2026. The inversion started on the sheets and
+stopped there, which left the app contradicting itself the moment somebody opened a
+project: a white card on a grey page, then grey cards on a white sheet. Depth pointed one
+way on the page and the other way one tap in. `.deck.paper` is the same three-token swap
+one level up, and `body` takes the colour because the page's ground is the window's — a
+`min-height` wrapper leaves the old grey below the fold on a short list.
+
+The worklist loses its border with it, being the only carded thing on that page. The
+project table keeps its hairlines: those are rules *between* rows, which is the same
+distinction `.ansrow` and `.signal` are held to.
+
+`.deck` is only ever the team app. The client survey shares the `body` and is flat by
+decision, so it sets `--parchment` on `.survey-shell` and is untouched by this.
+
 **Which sheets take it: all of them.** It began as the two that are nearly all cards — the
 project sheet and the insights sheet it opens — and reached the rest the same day. The
 answers sheet came next because a respondent's chip opens it from the project sheet and a
