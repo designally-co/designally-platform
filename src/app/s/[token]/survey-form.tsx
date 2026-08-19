@@ -1068,11 +1068,14 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
               >
                 {started ? 'Continue' : 'Start'}
               </button>
-              {/* only the resume state now — the count and the time moved into
-                  the masthead, where they are read rather than skimmed */}
-              {started && (
-                <p className="takes">Your answers were saved on this device.</p>
-              )}
+              {/* "Your answers were saved on this device" was here, under the
+                  button, whenever a draft existed. It went on 19 August 2026:
+                  the button already says *Continue* rather than *Start*, which
+                  is the same fact in the place somebody is looking, and a line
+                  explaining the saving to a client who never asked about it is
+                  the product talking about itself. Nothing is lost — the draft
+                  behaves the same, and the failure case still says where the
+                  answers are, because there it is the reason to try again. */}
             </div>
           </section>
         )}

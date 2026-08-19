@@ -6216,8 +6216,10 @@ dialog::backdrop {
   display: block;
 }
 
-.client-surface .intro .th,
-.client-surface .takes .th {
+/* `.intro` alone — `.takes` went with the resume note on 19 August 2026, and
+   the welcome's `.intro` has no Thai on it either since that screen went
+   English, so what is left here serves the screens that still pair the two. */
+.client-surface .intro .th {
   display: block;
   font-size: inherit;
   color: inherit;
@@ -6611,11 +6613,8 @@ dialog::backdrop {
    `caption` — "Meta, secondary", which is exactly what this is. It was 13,
    which is on no rung of the ladder: between `caption` at 14 and `fine` at 12,
    and reached by nothing. */
-.takes {
-  margin-top: 14px;
-  font-size: 14px;
-  color: var(--ink-3);
-}
+/* `.takes` was the resume note under the welcome's button — removed 19 August
+   2026 with the line itself. */
 
 /**
  * The phone's back arrow, beside OK on the floor of the slide.
@@ -7091,9 +7090,6 @@ dialog::backdrop {
     width: auto;
   }
   /* the button is out of flow now, so this has to clear the space it occupies */
-  .takes {
-    margin: auto 0 62px;
-  }
   .savednote {
     display: none;
   }
