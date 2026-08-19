@@ -6593,6 +6593,12 @@ dialog::backdrop {
      any size, and the ones this product sees are Thai as often as not. */
   font-size: clamp(1.95rem, 6.1vw, 2.9rem);
   line-height: 1.14;
+  /* The frame steps back so the name does not have to step forward. Everything
+     but the client's own name is `--ink-3` — 7.26:1 on white, well over the 3:1
+     this size owes — and the name keeps full ink. Colour rather than the accent:
+     `#ef6148` measures 3.26:1 here and would be legal, but the accent means a
+     person is needed, and the person is needed on the control at the foot. */
+  color: var(--ink-3);
   /* The client's name is inside the sentence here, so where the lines fall is
      not cosmetic — greedy wrapping put "for F.W." on a line of its own and
      broke the name across the one below it. Balanced, the name survives on one
@@ -6617,10 +6623,29 @@ dialog::backdrop {
      it pretty. Greedy fills the line and the name survives. */
   text-wrap: wrap;
   margin-top: 14px;
+  /* one rung below the English frame, so the whole Thai line sits under the
+     English rather than competing with it — and its own name steps up the same
+     way inside it */
+  color: var(--ink-3);
   font-size: clamp(1.45rem, 3vw, 1.8rem);
-  font-weight: 600;
+  font-weight: 400;
   line-height: 1.55;
   letter-spacing: 0;
+  color: var(--ink-2);
+}
+/* The name, in both languages: full ink against the stepped-back frame. `em`
+   is not italic anywhere in this product — it marks what the sentence is
+   about, and here that is the only word on the screen the reader owns. */
+.slide[data-screen='closed'] h1 em {
+  font-style: normal;
+  color: var(--ink);
+}
+.slide[data-screen='closed'] h1 .th em {
+  /* The one place weight is spent on the Thai line. Regular against the
+     headline's bold is the point — the Thai says the same thing quietly, and
+     600 on the name alone is enough to lift it out of its own sentence without
+     making a second headline of the whole line. */
+  font-weight: 600;
   color: var(--ink-2);
 }
 /* `lead`, near enough: 20.8px on a phone and 24.8px above 1080, which is the

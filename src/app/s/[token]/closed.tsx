@@ -52,7 +52,23 @@ import { Masthead } from './questions';
  *
  * A long client name makes a tall headline. `ZZ Fixture — Precision Components`
  * runs five lines at 37.6px on a phone. This screen has nothing else on it.
+ *
+ * **The name is the darkest thing in its own sentence** — 19 August 2026, asked
+ * for; it was hiding inside the line. The frame steps back to `--ink-3` and the
+ * name holds full ink, in both languages. Not the accent: the CI orange is
+ * legal at this size on white — 3.26:1 against the 3:1 large-text floor — but
+ * DESIGN.md's rule is that the accent means a person is needed here, and nobody
+ * acts on a client's own name. It is needed twelve lines down, on the one
+ * control this screen has.
  */
+/* Designally's LINE official account, given 19 August 2026. Not an email
+   address and not the website: this product's clients are Thai and answer the
+   questionnaire on a phone, and LINE is where they already are — on a phone the
+   link opens the app with the account loaded, and on a desktop
+   `openQrModal=true` shows the QR to scan. One tap from a dead link to a person
+   at Designally, which is the whole job of this screen. */
+const CONTACT = 'https://page.line.me/designally?openQrModal=true';
+
 export default function Closed({ clientName }: { clientName: string }) {
   return (
     <div className="survey-shell client-surface">
@@ -69,19 +85,24 @@ export default function Closed({ clientName }: { clientName: string }) {
                   juxtaposes the noun and the name without a preposition and
                   reads as well for it: "the F.W. Dentogenesis questionnaire is
                   closed." */}
-              <span className="th">แบบสอบถาม {clientName} ปิดรับคำตอบแล้ว</span>
-            </h1>
-            <p className="intro">
-              If your perspective is missing, contact the Designally team.
-              {/* `ทีมงาน` is one word and Chrome's Thai line-breaker will part
-                  it at ทีม|งาน, which is a legal dictionary break and a wrong
-                  one here — it reads as "team" then "work" down the next line.
-                  Held together with the name it belongs to. */}
               <span className="th">
-                หากยังขาดความเห็นของคุณ <span className="nobr">กรุณาติดต่อทีมงาน Designally</span>
+                แบบสอบถาม <em>{clientName}</em> ปิดรับคำตอบแล้ว
               </span>
-            </p>
+            </h1>
           </div>
+          {/* The sentence this replaces read "If your perspective is missing,
+              contact the Designally team" — an instruction to go and do
+              something, with no way to do it, in two languages. A control does
+              the same work in two words and can be pressed.
+
+              It is the primary, and it is the only accented thing on the
+              screen. DESIGN.md's rule is that the accent means a person is
+              needed here; on every other closed-link page there was nothing to
+              accent, which is why this screen had no orange on it but the Cut.
+              Now there is exactly one act available and the accent is on it. */}
+          <a className="btn btn-primary start" href={CONTACT} target="_blank" rel="noreferrer">
+            Contact Designally
+          </a>
         </div>
       </div>
     </div>
