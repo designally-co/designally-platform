@@ -115,6 +115,71 @@ export function looksLikeEmail(raw: string): boolean {
 }
 
 /**
+ * Misspellings of the handful of mail hosts a client actually uses.
+ *
+ * **Exact domains only, never a pattern.** The tempting rule is "`.co` at the
+ * end of a mail host probably wanted `.com`" and it would be a disaster here:
+ * `.co` is a real TLD, this product's own survey lives at `s.designally.co`,
+ * and Thai companies run `.co.th`. A map of exact strings cannot produce that
+ * class of false positive — the worst it can do is fail to notice a typo, which
+ * costs nothing because it was only ever a suggestion.
+ */
+const TYPO_DOMAINS: Record<string, string> = {
+  'gmial.com': 'gmail.com',
+  'gmai.com': 'gmail.com',
+  'gamil.com': 'gmail.com',
+  'gnail.com': 'gmail.com',
+  'gmaill.com': 'gmail.com',
+  'gmail.co': 'gmail.com',
+  'gmail.con': 'gmail.com',
+  'gmail.cm': 'gmail.com',
+  'gmail.om': 'gmail.com',
+  'hotmial.com': 'hotmail.com',
+  'hotmal.com': 'hotmail.com',
+  'hotmai.com': 'hotmail.com',
+  'homail.com': 'hotmail.com',
+  'hotmail.co': 'hotmail.com',
+  'hotmail.con': 'hotmail.com',
+  'yahooo.com': 'yahoo.com',
+  'yaho.com': 'yahoo.com',
+  'yhaoo.com': 'yahoo.com',
+  'yahoo.co': 'yahoo.com',
+  'yahoo.con': 'yahoo.com',
+  'outlok.com': 'outlook.com',
+  'outloo.com': 'outlook.com',
+  'outook.com': 'outlook.com',
+  'outlook.co': 'outlook.com',
+  'outlook.con': 'outlook.com',
+  'iclod.com': 'icloud.com',
+  'icoud.com': 'icloud.com',
+  'icloud.co': 'icloud.com',
+  'hotmail.co.th': 'hotmail.com',
+};
+
+/**
+ * The address this one was probably meant to be, or null.
+ *
+ * A nudge and never a rule: `looksLikeEmail` decides whether somebody may move
+ * on, and this decides nothing at all. It cannot verify that a mailbox exists —
+ * nothing in this product can, because it never sends email — so it does the
+ * one thing that is possible without leaving the browser, which is to notice
+ * that a domain is one letter away from a very common one.
+ *
+ * The local part is returned untouched. `somchai@gmial.com` becomes
+ * `somchai@gmail.com`; a wrong name at a right domain is invisible here and
+ * always will be.
+ */
+export function suggestEmailFix(raw: string): string | null {
+  const v = raw.trim();
+  const at = v.lastIndexOf('@');
+  if (at < 1) return null;
+  const local = v.slice(0, at);
+  const domain = v.slice(at + 1).toLowerCase();
+  const fixed = TYPO_DOMAINS[domain];
+  return fixed ? `${local}@${fixed}` : null;
+}
+
+/**
  * Turns a draft value into the tagged shape stored in answers.value. Returns
  * null when nothing was answered — a blank answer is not written as an empty
  * row, it is simply absent, and the analysis reads that absence as a signal

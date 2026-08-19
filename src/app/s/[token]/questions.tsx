@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useEffect, useId, useRef, useState } from 'react';
 
 import type { QuestionConfig } from '@/lib/db/schema';
-import type { RawValue } from '@/lib/survey/answers';
+import { suggestEmailFix, type RawValue } from '@/lib/survey/answers';
 import type { SurveyQuestion } from '@/lib/survey/load';
 import { OTHER_LABEL, useLang, useOtherText, useText } from './lang';
 import { Disc } from './rail';
@@ -373,6 +373,10 @@ export function IdentityField({ question, value, onChange, onEnter }: Props) {
   /* An email field typed on a phone deserves the @ keyboard and no
      autocapitalise — the first character is otherwise a capital every time. */
   const email = question.config.maps_to === 'email';
+  /* Only ever on the email row, and only once the domain is fully typed as one
+     of the known misspellings — so it stays silent through every keystroke on
+     the way to a correct address. */
+  const meant = email ? suggestEmailFix(text) : null;
 
   return (
     <div>
@@ -397,6 +401,31 @@ export function IdentityField({ question, value, onChange, onEnter }: Props) {
           onEnter?.();
         }}
       />
+      {/**
+       * "Did you mean …?" — a suggestion, never a rule.
+       *
+       * `looksLikeEmail` decides whether somebody may leave this step; this
+       * decides nothing. It cannot tell whether a mailbox exists — nothing here
+       * can, because the platform never sends email — so it does the one useful
+       * thing available without leaving the browser: notices that a domain is a
+       * letter away from a very common one, and offers the fix as something to
+       * press.
+       *
+       * A button rather than a line of text, because the whole value is that
+       * correcting it costs one tap on a phone. Ignoring it also costs nothing:
+       * `somchai@gmial.com` is a well-formed address and Continue accepts it.
+       *
+       * The address itself is the label, so this is the one place the two
+       * languages sit on either side of one string rather than each carrying
+       * their own copy of it — repeating a 30-character address twice on a
+       * 390px row is how that reads as noise instead of help.
+       */}
+      {meant && (
+        <button type="button" className="qsuggest" onClick={() => onChange(meant)}>
+          <span>Did you mean · หมายถึง</span>
+          <b>{meant}</b>
+        </button>
+      )}
       {/* The email's help line — "So we can reach you if something in your
           answers needs a follow-up." — was here and went on 19 August 2026,
           asked for. It explained why the box exists to somebody already typing

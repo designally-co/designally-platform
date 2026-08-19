@@ -1121,6 +1121,46 @@ textarea {
   margin-top: 8px;
 }
 
+/**
+ * "Did you mean …?" under the email field.
+ *
+ * Not `--caution`, and that is the whole point of how it looks: the address
+ * above it is *valid*, nothing is blocked, and a warning colour on a row
+ * somebody may legitimately walk past would be the interface disagreeing with
+ * its own rule. It is a quiet offer in body ink, with the address it proposes
+ * carrying the only emphasis.
+ *
+ * A real button, laid out as two lines so a 30-character address never shares a
+ * 390px row with its own label. Left-aligned and unpadded on the leading edge
+ * so it hangs under the input's text rather than indenting away from it.
+ */
+.qsuggest {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink-3);
+  text-align: left;
+  cursor: pointer;
+}
+.qsuggest b {
+  display: block;
+  font-weight: 600;
+  color: var(--primary-mark);
+  /* an address is one string: break it rather than let it push the row wide */
+  overflow-wrap: anywhere;
+}
+@media (hover: hover) {
+  .qsuggest:hover b {
+    text-decoration: underline;
+  }
+}
+
 /* radio cards */
 .pick {
   display: grid;
