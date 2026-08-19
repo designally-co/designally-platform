@@ -254,6 +254,12 @@ export default function InsightsSheet({
           </i>
         </>
       }
+      /* The same ground as the project sheet it opens from — 19 August 2026.
+         Two sheets in one stack cannot be two different colours: going deeper
+         and getting darker inverts the rule this whole app is built on, where
+         white on parchment is the lift. And it is the reading surface, which is
+         the one that most wants to be paper. See `.sheet.paper`. */
+      surface="paper"
       actions={
         versions.length > 1 ? (
           <div className="shareslot" ref={versionsWrap}>

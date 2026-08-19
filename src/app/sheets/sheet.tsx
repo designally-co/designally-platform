@@ -52,11 +52,16 @@ export default function Sheet({
   /**
    * An extra class on `.sheet`, for a sheet that carries its own ground.
    *
-   * One sheet does: the project sheet is white where the others are parchment,
-   * because it is nearly all cards and the grey between them stopped reading as
-   * a page. `.sheet.pd` in globals.css swaps the two volumes over in two custom
-   * properties, and everything inside inherits it — which is why this is a
-   * class on the sheet rather than a prop threaded through its children.
+   * `paper` is the one there is: white where the other sheets are parchment,
+   * because those sheets are nearly all cards and the grey between them stopped
+   * reading as a page. `.sheet.paper` in globals.css swaps the two volumes over
+   * in three custom properties, and everything inside inherits them — which is
+   * why this is a class on the sheet rather than a prop threaded through its
+   * children.
+   *
+   * It was called `pd`, for the project detail sheet, until the insights sheet
+   * took it too. A surface class that names one screen stops being true the
+   * second a second screen wants it.
    */
   surface?: string;
   /**

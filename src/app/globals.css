@@ -73,7 +73,7 @@
 
   /* surface */
   /* the raw white, held one step above `--canvas` so a surface can take it by
-     name — see `.sheet.pd` */
+     name — see `.sheet.paper` */
   --white: #ffffff;
   --canvas: var(--white);
   --parchment: var(--warm-white);
@@ -89,7 +89,7 @@
    * nowhere near any of them.
    *
    * One token doing two jobs held until a sheet moved its own ground. The
-   * project sheet is white (`.sheet.pd`), and all nine went white with it —
+   * project sheet is white (`.sheet.paper`), and all nine went white with it —
    * every recess and every hover in it flattened at once, which is a control
    * losing its feedback rather than a panel losing a tint.
    *
@@ -4142,7 +4142,7 @@ dialog::backdrop {
  * directly, so one declaration turns every card, input, popover and control
  * fill on this sheet over at once. Same mechanism as `[data-field="dark"]`.
  */
-.sheet.pd {
+.sheet.paper {
   --parchment: var(--white);
   --canvas: var(--warm-white);
   --recess: var(--white);
@@ -4160,16 +4160,21 @@ dialog::backdrop {
  * standing on, and on a grey card their white fill is a step *up*, which is the
  * direction that has always meant "this one is live".
  */
-.sheet.pd .collbox,
-.sheet.pd .insbox,
-.sheet.pd .pd-people button,
-.sheet.pd .doc {
+.sheet.paper .collbox,
+.sheet.paper .insbox,
+.sheet.paper .pd-people button,
+.sheet.paper .doc,
+/* the insights sheet's own card — one conflict, boxed. It came over with the
+   ground on 19 August 2026 and takes the same rule: the tone is the boundary.
+   `.signal`'s top rule and the blockquote's left rule stay, because neither is
+   a container — they are lines between things, which is a different job. */
+.sheet.paper .conflict {
   border-color: transparent;
 }
 /* Back up to the page's own white: a control on a card, not part of it. */
-.sheet.pd .dpfield,
-.sheet.pd .input,
-.sheet.pd textarea {
+.sheet.paper .dpfield,
+.sheet.paper .input,
+.sheet.paper textarea {
   background: var(--white);
 }
 
@@ -4188,13 +4193,13 @@ dialog::backdrop {
  * 13.50:1 and `--ink-3` 5.82:1, so nothing on the card gets quieter for being
  * pointed at.
  *
- * Scoped to `.sheet.pd`, wrapped in `@media (hover: hover)` like every hover in
+ * Scoped to `.sheet.paper`, wrapped in `@media (hover: hover)` like every hover in
  * this codebase — a touch device has no way to end one, and a tapped card that
  * stays darkened reads as selected.
  */
 @media (hover: hover) {
-  .sheet.pd .person:hover,
-  .sheet.pd .doc:hover {
+  .sheet.paper .person:hover,
+  .sheet.paper .doc:hover {
     background: #e6e6e6;
     /* the line stays gone — one device, and it is the fill */
     border-color: transparent;
@@ -4205,8 +4210,8 @@ dialog::backdrop {
     text-decoration: none;
   }
 }
-.sheet.pd .person,
-.sheet.pd .doc {
+.sheet.paper .person,
+.sheet.paper .doc {
   transition: background-color 0.16s var(--ease);
 }
 /**
@@ -4224,8 +4229,8 @@ dialog::backdrop {
  * the same size, so depth on this sheet is one unit counted out. Ink on it is
  * 12.17:1.
  */
-.sheet.pd .person:active,
-.sheet.pd .doc:active {
+.sheet.paper .person:active,
+.sheet.paper .doc:active {
   background: #dbdbdb;
 }
 /**
