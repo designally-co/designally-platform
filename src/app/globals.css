@@ -5853,17 +5853,16 @@ dialog::backdrop {
   /**
    * One numeral, filling the point.
    *
-   * `0.52 × 54px` is 28px at weight 700 — past the 18.66px the large-text floor
+   * `0.50 × 54px` is 27px at weight 700 — past the 18.66px the large-text floor
    * begins at, so the white holds at 3.24:1 against a 3:1 requirement, and big
-   * enough that the figure *is* the disc rather than something printed inside
-   * it. It was 0.44 while a `/9` shared the space with it.
+   * enough that the figure carries the disc rather than sitting inside it.
    *
    * `-0.04em`: a single display numeral in this face carries side bearings
    * drawn for running text, and at 28px they read as a gap to the right of a
    * `1`. Tabular figures stay on, so `9` and `10` take the same width and the
    * disc never shifts under the Cut.
    */
-  font-size: calc(var(--disc) * 0.52);
+  font-size: calc(var(--disc) * 0.5);
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.04em;
@@ -5873,30 +5872,32 @@ dialog::backdrop {
 /* "21" and "/21" are one line and one weight — a fraction, not a headline with
    a subscript. The slash is the only thing between them. */
 /**
- * The total is not drawn — 19 August 2026.
+ * The total, kept — and sized so it is legal rather than merely small.
  *
- * It was `/9` beside the numeral, and three things were wrong with it at once.
+ * White on `#ef6148` is 3.24:1, which is under the 4.5:1 a normal numeral takes
+ * and over the **3:1 for large text**, and large text begins at 18.66px *bold*.
+ * `0.7em` of the 27px numeral is **18.9px**, which clears it by a quarter of a
+ * pixel — so both halves of this lockup are legal on this fill, rather than a
+ * legal numerator beside a denominator nobody measured.
  *
- * **It could not be made legible.** White on `#ef6148` is 3.24:1, which is only
- * legal at the large-text floor — 18.66px bold. A denominator big enough to
- * clear that is the size of the number it qualifies, so "small" and "legal"
- * were mutually exclusive here.
+ * **That quarter pixel is the whole rule.** Anything that shrinks either number
+ * — a smaller `--disc`, a lighter weight, a lower ratio here — puts the `/9`
+ * back under the floor. It is 27 and 19 at 700, or the disc goes back to
+ * charcoal.
  *
- * **It was the wrong number.** `counts.total` counts *cards*, and a card has
- * held two to four questions since 17 August. The welcome promises the client
- * twenty-one questions; the disc was then counting to nine.
- *
- * **And it crowded the one thing this object is.** The disc is the Point, the
- * head of the Cut — a brand mark carrying a position. A fraction set in two
- * sizes inside 54px is a caption pretending to be a graphic.
- *
- * The length is on the welcome, in both languages, where a client reads it once
- * and decides whether they have twenty minutes. It does not need restating on
- * every screen. Wanted back, it needs a real question count and a fill that can
- * carry small white type.
+ * The hierarchy survives the constraint: 19 against 27 is plainly the smaller
+ * of the two, and the slash and total sit off the baseline so the pair reads as
+ * one mark rather than as a fraction set in two sizes.
  */
 .qdisc span {
-  display: none;
+  font-size: 0.7em;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  /* off the baseline without leaving the flow, so the pair stays centred in the
+     disc as one lockup — `align-self: flex-start` hung it over the rim */
+  position: relative;
+  top: -0.16em;
+  opacity: 0.92;
 }
 
 /**

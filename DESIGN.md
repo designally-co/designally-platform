@@ -120,18 +120,22 @@ way — 23.76px at 700, white, 3.24:1 against a 3:1 floor.
 `.btn.ok`/`.btn.start` and `0.44em/700` on `.qdisc`. Lower either and the white stops being
 legal on that fill; the fill has to go back to `--primary` in the same edit.
 
-**The disc holds one numeral and no total.** The `/9` came out the same day for three
-reasons at once: white on the orange cannot be made legible at any size that reads as
-small; `counts.total` counts *cards*, and a card has held two to four questions since
-17 August, so the disc counted to nine while the welcome promised twenty-one; and a
-fraction set in two sizes inside 54px is a caption pretending to be a graphic. The length
-is on the welcome, in both languages, where a client reads it once and decides whether they
-have twenty minutes.
+**The disc holds `1/9` and both halves are large text.** 27px at 700 for the position,
+`0.7em` of it — **18.9px**, also at 700 — for the total. Large text begins at 18.66px
+bold, so the smaller number clears the floor by a quarter of a pixel and the white is legal
+on both. **Those two numbers are the rule, not a preference:** anything that shrinks
+either — a smaller `--disc`, a lighter weight, a lower ratio — puts the total back under
+it, and the disc has to return to charcoal in the same edit. 19 against 27 still reads as
+plainly the smaller of the two, so the hierarchy survives the constraint.
 
-One thing on that surface is still short of the standard and is recorded rather than
-hidden: the **disc itself** is 2.92:1 against the page, under the 3:1 for a graphical
-object — and it is not one. It is `aria-hidden`, it identifies no control and no state, and
-the position it decorates is read from the questions.
+Two things on that surface are short of the standard and are recorded rather than hidden.
+The **disc itself** is 2.92:1 against the page, under the 3:1 for a graphical object — and
+it is not one: `aria-hidden`, identifying no control and no state, with the position it
+decorates read from the questions. And the **total is the wrong number**: `counts.total`
+counts *cards*, and a card has held two to four questions since 17 August, so a Brand
+survey counts to nine while its welcome screen promises twenty-one questions. Both numbers
+are true of different things and a client sees only the mismatch. Fixing it means deciding
+which the disc counts.
 
 **The team app keeps `--primary` throughout.** It has no Cut, no disc and no brand mark on
 screen; there the deeper orange is the only orange and a white label on it is 5.03:1 at any
