@@ -1260,6 +1260,32 @@ The system had no spec for either, which is why the survey's question number mov
 
 It is an eyebrow above a heading, a pattern that is usually a defect. It earns its place under the one condition that redeems it: the sequence itself carries information the reader needs.
 
+### The reading meter — what the analysis will read
+
+One 3×15px mark per person who answered, on the insights panel beside the line
+that says the same thing in words. Ink for the answers this run will read,
+`--ink-4` at 45% for the ones the picker has unticked. **This is the only
+animated element in the team app**: while the analysis runs the marks pass a
+wave left to right, each delayed by its own index, so the motion is the shape of
+what is actually happening — it is reading them, one after another.
+
+**It is what "feels like AI" here, and it is a count rather than an effect.**
+Nothing on screen exists in order to say *machine*: the marks are there before,
+during and after the run, and the animation is opacity on marks that were
+already drawn. No sparkle glyph, no shimmer sweep, no gradient. What signals
+that something was written by a machine in a serious tool is provenance — what
+it read, when, and that the last run is still there — not ornament.
+
+- **Ink, not the accent**, though the marks do report a choice. The accent is
+  spoken for on that panel by *Generate*, and §1's ladder says nothing may take
+  a rung above its importance. What the analysis reads is a fact about the run;
+  the run is the thing being urged.
+- **Opacity only.** A wave built on `width` or `background-color` repaints a row
+  of marks for the length of an API call. `prefers-reduced-motion` drops the
+  animation and leaves every mark at full opacity.
+- **Rules 3 and 7 hold.** These are the people who actually answered — never a
+  fraction of an expected number, never a proportion of anything.
+
 ### Sticky bars
 
 Sub-nav, sheet headers, brief action bars: `rgba(245,245,247,0.8)` with `saturate(180%) blur(20px)`, 1px `--hairline` edge, height 52–64px.

@@ -927,8 +927,10 @@ export default function ProjectSheet({
        * of what the team described doing here, and a control you have to go
        * looking for is not offered.
        */}
+      {/* No heading over it, the way Collection has none. The panel names itself
+          on its own first line — see the eyebrow below. */}
       <div className="pd-sec pd-insights">
-        <h2>Insights</h2>
+        <div className="insbox">
 
         {/**
          * The *needs your team* banner, folded in — 18 August 2026, asked for.
@@ -951,37 +953,69 @@ export default function ProjectSheet({
          * the date it is reckoned from. The plain line underneath is the resting
          * state, and the two never both appear.
          */}
-        {p.action ? (
-          <>
-            {/* The Point — DESIGN.md §"five named pieces" gives it three jobs and
-                one of them is literally "the team app's needs you". It is the
-                brand's own mark for this exact moment, so the banner wears it
-                rather than inventing something to be branded with. */}
-            <p className="ineed">
-              <span className="pt" aria-hidden="true" />
-              NEEDS YOUR TEAM
-            </p>
-            <p className="isay">
-              <b>{p.action.say}</b> {p.action.emphasis}
-            </p>
-            <p className="iwhen">{p.action.when}</p>
-          </>
-        ) : p.insights ? (
-          <p className="isay">
-            <b>Written {p.insightsWrittenOn}</b>
-            {p.insightsVersions.length > 1 ? ` · ${p.insightsVersions.length} versions kept` : ''}
-          </p>
-        ) : (
-          <p className="isay">
-            <b>Not written yet</b>
-            {shut
-              ? ` · collection closed ${p.closedOn ?? p.dueOn}${p.closedByName ? ` by ${p.closedByName}` : ''}`
-              : p.answers
-                ? ' · collection is open'
-                : ''}
-          </p>
-        )}
+          <div className="inshead">
+            {/**
+             * One line that is always there, and says which of two things this
+             * panel is right now.
+             *
+             * With something outstanding it is the Point and NEEDS YOUR TEAM —
+             * DESIGN.md §"five named pieces" gives the Point three jobs and one
+             * of them is literally "the team app's needs you", so the panel
+             * wears the brand's own mark for this moment rather than inventing
+             * something to be branded with. The accent keeps its rule: it is
+             * here only when a person is actually needed.
+             *
+             * With nothing outstanding it is the panel's name, in the same slot
+             * at the same size with no dot and no accent. That is what let the
+             * `<h2>` go: a heading over a panel whose first line is a state
+             * sentence was the only thing naming it, and Collection lost its own
+             * heading an hour earlier for the same reason.
+             */}
+            {p.action ? (
+              <p className="ineed">
+                <span className="pt" aria-hidden="true" />
+                NEEDS YOUR TEAM
+              </p>
+            ) : (
+              <p className="ineed isname">Insights</p>
+            )}
 
+            {p.action ? (
+              <>
+                <p className="isay">
+                  <b>{p.action.say}</b> {p.action.emphasis}
+                </p>
+                <p className="iwhen">{p.action.when}</p>
+              </>
+            ) : p.insights ? (
+              <p className="isay">
+                <b>Written {p.insightsWrittenOn}</b>
+                {p.insightsVersions.length > 1
+                  ? ` · ${p.insightsVersions.length} versions kept`
+                  : ''}
+              </p>
+            ) : (
+              <p className="isay">
+                <b>Not written yet</b>
+                {shut
+                  ? ` · collection closed ${p.closedOn ?? p.dueOn}${p.closedByName ? ` by ${p.closedByName}` : ''}`
+                  : p.answers
+                    ? ' · collection is open'
+                    : ''}
+              </p>
+            )}
+          </div>
+
+          {/**
+           * The machine's half of the panel, on the recessed ground.
+           *
+           * Above the line is what has happened; below it is what it will read
+           * and the control that makes it read. Two bands rather than five loose
+           * paragraphs under a heading — the section had no object at all, which
+           * is what let a prompt, a provenance line and a split button sit at
+           * the same level as though they were a list.
+           */}
+          <div className="insfoot">
         {!p.people.length ? (
           <p className="quiet">
             {p.token
@@ -1032,12 +1066,55 @@ export default function ProjectSheet({
               </p>
             ) : (
               <>
-                <p className="ireads">
-                  {chosen === p.people.length
-                    ? `Reads all ${p.answers} ${p.answers === 1 ? 'answer' : 'answers'}.`
-                    : `Reads ${chosen} of ${p.people.length} answers.`}{' '}
-                  Every run is kept as a version, so this replaces nothing.
-                </p>
+                {/**
+                 * What it reads, as one mark per answer.
+                 *
+                 * **This is the only place in the app that looks like a machine
+                 * is doing something, and it is a count rather than an effect.**
+                 * One tick per person who answered: ink for the ones this run
+                 * will read, hairline for the ones it will not, so unticking
+                 * somebody in the menu empties a mark here and the sentence
+                 * beside it is not the only evidence of the choice.
+                 *
+                 * While it runs the ticks pass a wave left to right, which is
+                 * the honest shape of what is happening — it is reading them,
+                 * one after another. No sparkle and no shimmer: the wave is
+                 * opacity on marks that were already there, so there is nothing
+                 * on screen that exists only to say *AI*.
+                 *
+                 * Ink and not the accent, though these marks do report a
+                 * choice. The accent is spoken for on this panel by Generate,
+                 * and DESIGN.md's ladder says nothing may take a rung above its
+                 * importance — what the analysis reads is a fact about the run,
+                 * and the run is the thing being urged.
+                 *
+                 * Rules 3 and 7 are safe: these are the people who actually
+                 * answered, never a fraction of an expected number and never a
+                 * proportion of anything.
+                 */}
+                <div className="insreads">
+                  <span
+                    className="meter"
+                    data-running={pending || undefined}
+                    aria-hidden="true"
+                  >
+                    {p.people.map((person, i) => (
+                      <i
+                        key={person.id}
+                        data-on={only === null || only.includes(person.id) ? '' : undefined}
+                        style={{ animationDelay: `${i * 0.11}s` }}
+                      />
+                    ))}
+                  </span>
+                  <p className="ireads">
+                    {pending
+                      ? `Reading ${chosen} ${chosen === 1 ? 'answer' : 'answers'}…`
+                      : chosen === p.people.length
+                        ? `Reads all ${p.answers} ${p.answers === 1 ? 'answer' : 'answers'}.`
+                        : `Reads ${chosen} of ${p.people.length} answers.`}{' '}
+                    {!pending && 'Every run is kept as a version, so this replaces nothing.'}
+                  </p>
+                </div>
 
                 <div className="iacts">
                   <div className="splitwrap" ref={split}>
@@ -1117,6 +1194,8 @@ export default function ProjectSheet({
             )}
           </>
         )}
+          </div>
+        </div>
       </div>
 
       {error && <p className="formerror">{error}</p>}

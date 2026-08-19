@@ -2577,12 +2577,17 @@ textarea {
  * on the second is the difference between a headline and a paragraph that
  * happens to be short.
  *
- * No card around it, and that is a decision rather than an omission. The floor
- * this project builds to bans a coloured rule down the side of a callout and
- * allows no shadow but the focus ring, which leaves a box — and a box inside a
- * section, on a sheet, is the third nested container in a row. What marks this
- * as urgent is the Point and the accent above it, which is what the accent is
- * for.
+ * It had no card, and the argument was that a box inside a section on a sheet
+ * is a third nested container. **It has one from 19 August 2026**, and what
+ * changed is that the section next to it grew one first: the Collection bar is
+ * that same third container and reads as an object rather than as a stack, so
+ * the objection was to nesting in the abstract rather than to anything on
+ * screen. Beside it, this section was five loose paragraphs and a button at one
+ * level, with nothing saying where it began or that the button belonged to the
+ * sentence four lines above it.
+ *
+ * The accent still does the marking. The Point and NEEDS YOUR TEAM are what say
+ * *urgent*; the box only says *this is one thing*.
  *
  * 1.6 leading, because the resting version of this line carries whoever closed
  * collection and that name is Thai more often than not.
@@ -2631,6 +2636,12 @@ textarea {
  * has to clear 3:1, which the pure hue does not manage on parchment. The CI
  * orange keeps the Cut and the dark Field, where it is free to be itself.
  */
+/* The same slot with nothing outstanding: the panel's own name, no dot and no
+   accent. It is what replaced the `<h2>` — see the eyebrow in project.tsx. */
+.pd-insights .ineed.isname {
+  color: var(--ink-4);
+  text-transform: uppercase;
+}
 .pd-insights .ineed .pt {
   flex: none;
   width: 9px;
@@ -2683,6 +2694,109 @@ textarea {
 }
 .pd-insights .hintline {
   margin-top: var(--sp-sm);
+}
+
+/* ---- The insights panel ------------------------------------------------
+   One object with two bands: what has happened, and what the machine will read
+   if you press the button. Built the way the Collection bar is — canvas inside
+   the Edge at `--r-lg`, bands split by `--divider` — so the two sections of
+   this sheet are siblings rather than one object and one heap.
+   ------------------------------------------------------------------------ */
+.insbox {
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+.inshead {
+  padding: var(--sp-md);
+}
+/* The machine's half, recessed. Parchment is this system's own lower ground —
+   the same one a confirmation row stands on — so the split reads as depth
+   rather than as a second card stacked on the first. */
+.insfoot {
+  padding: var(--sp-md);
+  border-top: 1px solid var(--divider);
+  background: var(--parchment);
+}
+/* Bands end where their padding does; the paragraphs inside them carry margins
+   written for a section that had no edges. */
+.inshead > :last-child,
+.insfoot > :last-child,
+.insfoot .iacts {
+  margin-bottom: 0;
+}
+
+/**
+ * What it reads, as one mark per answer.
+ *
+ * The marks sit on the sentence's own line rather than above it: they are the
+ * same statement twice, once countable and once in words, and stacking them
+ * would read as two facts.
+ */
+.insreads {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-sm);
+  margin-bottom: var(--sp-sm);
+}
+.insreads .ireads {
+  margin-bottom: 0;
+}
+.meter {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  /* aligned to the first line's cap height rather than its box, so the marks
+     stand with the type and not above it */
+  padding-top: 4px;
+}
+.meter i {
+  width: 3px;
+  height: 15px;
+  border-radius: 2px;
+  /* not read on this run: present, and plainly not counted. `--ink-4` is the
+     Field's lightest legal line at 4.61:1, well over the 3:1 a graphical object
+     needs. */
+  background: var(--ink-4);
+  opacity: 0.45;
+  transition: opacity 0.24s var(--ease);
+}
+.meter i[data-on] {
+  background: var(--ink);
+  opacity: 1;
+}
+
+/**
+ * Reading, one after another.
+ *
+ * The only animation in the team app, and it is the marks that were already
+ * there changing opacity — nothing appears in order to say *AI*. Each tick is
+ * delayed by its own index (see the inline `animationDelay`), so the wave
+ * travels the way the reading does.
+ *
+ * Opacity only: DESIGN.md's motion floor and the GPU one agree here, and a wave
+ * built on `width` or `background` would repaint a row of marks sixty times a
+ * second for the length of an API call.
+ */
+.meter[data-running] i {
+  animation: reading 1.5s var(--ease) infinite;
+}
+@keyframes reading {
+  0%,
+  100% {
+    opacity: 0.28;
+  }
+  45% {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .meter[data-running] i {
+    animation: none;
+    opacity: 1;
+  }
 }
 
 /**
