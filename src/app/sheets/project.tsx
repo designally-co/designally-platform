@@ -748,8 +748,14 @@ export default function ProjectSheet({
                * this is over, nobody is going to answer. Keeping the guard
                * meant a survey reopened for a straggler who never came could
                * not be shut again by the person who reopened it.
+               *
+               * **It stands down while its own confirmation is open**, the way
+               * Reopen does. The button is what asked the question; leaving it
+               * lit beside the row answering it offers a second press that does
+               * nothing, and puts *Close now* and *Close* on screen together
+               * looking like two different amounts of closing.
                */}
-              {!shut && p.surveyId && (
+              {!shut && p.surveyId && confirming !== 'close' && (
                 <button
                   className="btn btn-outline collnow"
                   disabled={pending}
