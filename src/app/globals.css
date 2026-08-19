@@ -238,7 +238,10 @@
   /* The air around the new-link sheet's single column — see `.sheet.onecol-w`.
      Off the spacing scale on purpose, and named so the four places that need it
      cannot drift apart. */
-  --onecol-pad: 68px;
+  /* 24 — `--sp-lg`, the inset every other sheet stands its content at. It was
+     68, which gave the two `onecol` sheets an air nothing else in the app has
+     and made a three-field form sit in a 444px column inside a 580px sheet. */
+  --onecol-pad: 24px;
 
 
   /**
@@ -3555,8 +3558,19 @@ textarea {
  * `min-height` did instead was put twelve pixels of slack under a heading whose
  * next line is meant to belong to it.
  */
-.sheet.bare .onecol h1 {
+/* Room for the floating disc, on the sheets that still have one — `.noclose`
+   has nothing up there to clear. */
+.sheet.bare:not(.noclose) .onecol h1 {
   padding-right: calc(44px + var(--sp-xs));
+}
+
+/* A form's answers, at its foot and to its trailing edge. `gap` is the pair's
+   own, and the space above it is the step between a field and a decision. */
+.formacts {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-xs);
+  margin-top: var(--sp-lg);
 }
 
 /* ---- The Collection bar ------------------------------------------------

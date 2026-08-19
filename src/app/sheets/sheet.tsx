@@ -38,6 +38,7 @@ export default function Sheet({
   narrow = false,
   width,
   surface,
+  hideClose = false,
   dismiss = false,
   bare = false,
   actions,
@@ -64,6 +65,18 @@ export default function Sheet({
    * second a second screen wants it.
    */
   surface?: string;
+  /**
+   * A bare sheet that provides its own way out, so it draws no close disc.
+   *
+   * `bare` means no top bar, which is why it grew a floating close in the first
+   * place — there is no back chevron to leave by. A form that ends in Cancel
+   * beside its primary has one, and two exits eight hundred pixels apart are
+   * one more than the sheet needs.
+   *
+   * It also puts `noclose` on `.sheet`, because the h1 reserves room on its
+   * right for a disc that is no longer there.
+   */
+  hideClose?: boolean;
   /**
    * A close disc on the trailing edge instead of a back chevron on the leading
    * one — for a sheet that *dismisses* rather than goes back.
@@ -125,11 +138,11 @@ export default function Sheet({
   return (
     <dialog ref={ref} onClose={onClose} onCancel={onClose}>
       <div
-        className={`sheet${narrow ? ' narrow' : ''}${bare ? ' bare' : ''}${width ? ` ${width}` : ''}${
-          surface ? ` ${surface}` : ''
-        }`}
+        className={`sheet${narrow ? ' narrow' : ''}${bare ? ' bare' : ''}${
+          hideClose ? ' noclose' : ''
+        }${width ? ` ${width}` : ''}${surface ? ` ${surface}` : ''}`}
       >
-        {bare && (
+        {bare && !hideClose && (
           <button className="sheetclose floating" onClick={onClose} aria-label={backLabel}>
             <CloseMark />
           </button>
