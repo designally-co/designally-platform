@@ -4123,8 +4123,54 @@ dialog::backdrop {
  * `--white` is the raw value held one step above `--canvas`, so this line does
  * not have to write `#ffffff` in the middle of the stylesheet.
  */
+/**
+ * The project sheet, inverted.
+ *
+ * **The page is white and everything on it steps down.** The rest of the app
+ * runs the parchment inversion — warm-white page, white cards, so a card lifts
+ * by being lighter. That step is `#fff` against `#f3f3f3`, which measures
+ * **1.11:1**: the lift was always almost entirely the hairline, and turning the
+ * sheet white showed it by changing so little.
+ *
+ * So this sheet uses the same two tones the other way round. The ground is
+ * white, a card is the warm white, and the band inside a card that wants to be
+ * a different thing returns to white. Two values, three levels, no new grey —
+ * and the direction of depth is now the thing that says which surface you are
+ * on.
+ *
+ * `--canvas` and not a class per card: nothing below reads a surface colour
+ * directly, so one declaration turns every card, input, popover and control
+ * fill on this sheet over at once. Same mechanism as `[data-field="dark"]`.
+ */
 .sheet.pd {
   --parchment: var(--white);
+  --canvas: var(--warm-white);
+  --recess: var(--white);
+}
+/**
+ * A card is a tone now, so it does not also need a line.
+ *
+ * Two devices for one boundary is what "borders, not shadows" is guarding
+ * against — it says draw a container *one* way, and on the parchment sheet the
+ * line is that way because the tone is 1.11:1 and cannot be. Here the tone can
+ * be, so the line goes.
+ *
+ * **Controls keep theirs.** The date field, the option chips, the outline pills
+ * — a thing you press is bounded by an edge in this system whatever it is
+ * standing on, and on a grey card their white fill is a step *up*, which is the
+ * direction that has always meant "this one is live".
+ */
+.sheet.pd .collbox,
+.sheet.pd .insbox,
+.sheet.pd .pd-people button,
+.sheet.pd .doc {
+  border-color: transparent;
+}
+/* Back up to the page's own white: a control on a card, not part of it. */
+.sheet.pd .dpfield,
+.sheet.pd .input,
+.sheet.pd textarea {
+  background: var(--white);
 }
 /**
  * The scroller sits inside the sheet, and the sheet clips it.
