@@ -6421,14 +6421,23 @@ dialog::backdrop {
   display: grid;
   place-items: center;
 }
-/* 54% is where the two rims look equal: the lockup is not centred on its own
-   canvas, so half the disc puts it visually right of centre and the nudge takes
-   it back. */
+/**
+ * 56% of the disc, and all but centred.
+ *
+ * Retuned 19 August 2026 for the corrected mark, and the old numbers were
+ * corrections for the old art rather than anything about the disc: 54% with a
+ * `translate(2.9%, -0.9%)` because that lockup sat well off-centre on its own
+ * canvas. This one does not. Its ink measures 269x229 in a 290x256 file, so the
+ * centre of the drawing is 2px left and 1px above the centre of the file —
+ * +0.69% and +0.39%, which is the whole of the nudge now.
+ *
+ * 56% puts the ink at 52% of the disc, which is where the two rims read equal.
+ */
 .qdisc.markdisc img {
-  width: 54%;
+  width: 56%;
   height: auto;
   display: block;
-  transform: translate(2.9%, -0.9%);
+  transform: translate(0.69%, 0.39%);
 }
 
 /* the count, in a disc crossing the line at eye level */

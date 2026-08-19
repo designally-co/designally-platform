@@ -87,11 +87,14 @@ export function Disc({
     if (!mark) return <b className={cls} aria-hidden="true" />;
     return (
       <b className={`${cls} markdisc`} aria-hidden="true">
-        {/* plain <img>: 2KB of PNG with no layout shift to optimise away, and
+        {/* The intrinsic size matters: a browser derives `aspect-ratio` from
+            these two attributes, so leaving the previous art's 274x284 on a
+            290x256 file stretched the mark taller and narrower than it is. */}
+        {/* plain <img>: 5KB of PNG with no layout shift to optimise away, and
             next/image would put a fetch in front of a mark that is on the first
             paint of the first screen a client ever sees */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/designally-mark.png" alt="" width={274} height={284} />
+        <img src="/designally-mark.png" alt="" width={290} height={256} />
       </b>
     );
   }
