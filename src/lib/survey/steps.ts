@@ -68,15 +68,24 @@ const INFO = { sectionEn: 'Project Information', sectionTh: 'ข้อมูล�
 const DIRECTION = { sectionEn: 'Visual Direction', sectionTh: 'ทิศทางงานออกแบบ' };
 
 /**
- * The identity screen carries the section too.
+ * The identity screen carries a section of its own — 19 August 2026.
  *
- * It ran without one, on the reasoning that it is not really a question. But
- * the screen is inside Project Information — it is the first thing the section
- * asks — and a masthead that shows a section on every screen but the first
- * makes the first look unfinished rather than special.
+ * It ran without one, then took `INFO` on the reasoning that a masthead
+ * showing a section on every screen but the first makes the first look
+ * unfinished. The heading was right and the label was not: **Project
+ * Information is about the client's brand, and this screen is about the person
+ * answering.** Name, position and email are not information about a project,
+ * and a respondent reading "Project Information" over three fields asking who
+ * they are is being told the wrong thing about the screen they are on.
+ *
+ * "Before we start" is true of it and is a section rather than a second
+ * heading — the questionnaire proper begins on the next screen. The masthead
+ * keeps its two lines, which is what it is sized for, and the count still
+ * starts at the first real question.
  */
 const IDENTITY: StepDef = {
-  ...INFO,
+  sectionEn: 'Before we start',
+  sectionTh: 'ก่อนเริ่ม',
   headingEn: 'About you',
   descTh: 'ส่งลิงก์นี้ต่อให้ผู้ที่ควรมีส่วนร่วมได้เลย',
   questions: ['identity.1', 'identity.2', 'identity.3'],

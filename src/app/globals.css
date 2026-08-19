@@ -1253,11 +1253,37 @@ textarea {
  * question is a single column, and these are underlined fields —
  * two rules side by side read as one broken rule.
  */
+/**
+ * Three labelled fields, each one a group — 19 August 2026.
+ *
+ * **There was no proximity on this screen at all.** A label sat 25px above its
+ * own input and 26px below the previous one's — measured, not estimated — so
+ * nothing bound "Your name" to the box under it rather than to the box above
+ * it. Three labels and three fields read as six loose things.
+ *
+ * The 25 was two rules meeting: the label's own `margin-bottom: 7px` plus
+ * `.input`'s `margin-top: 18px`. That 18 is the *question card's* spacing,
+ * where what sits above the field is a question at headline size and wants air
+ * under it. Here the label is 14px, and the same gap that reads as breathing
+ * room under a question reads as a disconnection under a label.
+ *
+ * So the input's top margin goes on this screen and the label's 8px is the
+ * whole distance. 8 inside a group against 26 between them is a ratio nobody
+ * has to think about.
+ */
 .identitygrid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 26px;
   margin-bottom: 26px;
+}
+/* `.slide` in front so this outranks `.slide .input`, which carries the 18 and
+   sits later in the file — two classes each would tie and lose on order. */
+.slide .identitygrid .input {
+  margin-top: 0;
+}
+.identitygrid label.f {
+  margin-bottom: var(--sp-xs);
 }
 
 /* the same question in the other language, one tap away */
