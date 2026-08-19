@@ -105,7 +105,19 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [nameMissing, setNameMissing] = useState(false);
+  /**
+   * Whether the identity step has been pressed past with something blank.
+   *
+   * It was `nameMissing`, set only by `submit` — so the three fields were
+   * optional right up to the last screen, and a respondent who skipped them
+   * was thrown back twenty slides at the moment they tried to send.
+   *
+   * They are required to leave the step now (19 August 2026, asked for). Who is
+   * speaking is not one of the twenty-one questions; it is the frame the
+   * answers hang on, and the analysis reads it. Gating it here is also what
+   * lets the send screen stop listing the three of them.
+   */
+  const [identityMissing, setIdentityMissing] = useState(false);
   /** Whether the send screen is showing rather than a question. */
   const [sending, setSending] = useState(false);
   /**
@@ -366,7 +378,30 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   }, []);
 
   /* the questions end at the last card; past it is the send screen */
+  /**
+   * Forward, unless this is the identity step and something on it is blank.
+   *
+   * The rest of the questionnaire lets somebody move past a question and come
+   * back — PRODUCT.md is explicit that no question is gated, and the send is
+   * the wall. These three are not questions: they are who is answering, and a
+   * response without them cannot be attributed or followed up.
+   *
+   * It refuses rather than disabling the button. A disabled Continue with three
+   * empty boxes says nothing about which one it is waiting for; pressing it
+   * marks every blank field and leaves the reason under the field it belongs
+   * to.
+   */
   const advance = (n: number) => {
+    /* read from `cards` rather than the `card` binding, which is declared
+       further down — this keeps the guard next to the movement it guards */
+    const leaving = n > WELCOME ? cards[n - 1] : undefined;
+    if (
+      leaving?.kind === 'fields' &&
+      leaving.questions.some((q) => !isAnswered(q.type, values[q.ref]))
+    ) {
+      setIdentityMissing(true);
+      return;
+    }
     toTop();
     return n >= cards.length ? openSend() : setStep(n + 1);
   };
@@ -408,14 +443,13 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   /* ── submit ─────────────────────────────────────────────────────── */
 
   const nameQuestion = survey.steps[0]?.questions[0];
-  const emailQuestion = survey.steps[0]?.questions.find((q) => q.config.maps_to === 'email');
+  /* The email is read off `values` by the submit route, not here — the pair of
+     locals that held it were only ever for the send screen's `<dl>`, which is
+     gone. `respondentName` stays: `submit` guards on it and the thank-you
+     screen is greeted with it. */
   const respondentName =
     nameQuestion && typeof values[nameQuestion.ref] === 'string'
       ? (values[nameQuestion.ref] as string).trim()
-      : '';
-  const respondentEmail =
-    emailQuestion && typeof values[emailQuestion.ref] === 'string'
-      ? (values[emailQuestion.ref] as string).trim()
       : '';
 
 
@@ -432,7 +466,19 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
    */
   const review = useMemo(() => {
     const seen = new Set<string>();
-    return cards.flatMap((c, i) =>
+    /* Numbered questions only. The identity fields were here because they could
+       block a send without appearing anywhere else; they cannot be blank by the
+       time this screen is reachable, so listing them was showing somebody three
+       answers they had just been required to give.
+
+       **The index comes from `cards`, not from the filtered list.** `step` is
+       what each row navigates back to, so dropping the identity card before
+       numbering would shift every question back by one and send every row to
+       the question before its own. */
+    return cards
+      .map((c, i) => ({ card: c, i }))
+      .filter(({ card: c }) => c.kind !== 'fields')
+      .flatMap(({ card: c, i }) =>
       c.questions
         .filter((q) => !seen.has(q.ref) && seen.add(q.ref))
         .map((q) => ({
@@ -475,16 +521,19 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
    * something on it.
    */
   const numberedBlanks = blanks.filter(({ question }) => question.number !== null);
+  const answered = survey.questionCount - numberedBlanks.length;
 
   /* numbered questions only — name and email are not numbered anywhere else */
-  const answered = survey.questionCount - numberedBlanks.length;
 
   async function submit() {
     /* the button is disabled while anything is blank; this is the second door,
        in case a draft restores into a state the button was not re-rendered for */
     if (blanks.length > 0) return;
+    /* Belt and braces: the identity step cannot be left blank any more, but a
+       draft restored from an older version can still arrive here without a
+       name. */
     if (!respondentName) {
-      setNameMissing(true);
+      setIdentityMissing(true);
       leaveSend(1);
       return;
     }
@@ -512,7 +561,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
     draftKey.current = newDraftKey();
     setValues({});
     setSubmitted(null);
-    setNameMissing(false);
+    setIdentityMissing(false);
     setSavedAt(null);
     setSending(false);
     setFromSend(false);
@@ -649,61 +698,67 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   if (sending) {
     return (
       <LangContext.Provider value={LEAD}>
-        <div className="survey-shell client-surface">
-          {/* the end of the run: what is still blank is the grid's job, not
-              the disc's */}
-          <Rail n={counts.total} total={counts.total} />
+        <div
+          className="survey-shell client-surface sendshell"
+          data-blocked={numberedBlanks.length > 0 ? '' : undefined}
+        >
+          {/* The Point, empty. What is still blank is the list's job, and it
+              read `9/9` — a full count on the one screen where the count is not
+              the question, beside a line that was already saying how many were
+              answered. The disc stays because it is the head of the Cut; only
+              the number goes. */}
+          <Rail n={0} total={counts.total} />
+          {/**
+           * The same masthead the questions carry — 19 August 2026, asked for.
+           *
+           * "Ready to send" and the count were an `<h2>` and a `<p>` inside the
+           * slide, so this was the one screen in the run whose title scrolled
+           * with its content and sat under the Cut rather than on it. As a
+           * masthead they behave like every other screen's: the words hold the
+           * top, the Cut closes them, and the disc sits on that line beside
+           * them.
+           *
+           * The count takes the eyebrow and the title takes the heading, which
+           * is the shape the questions already use — a small label over a short
+           * line. The disc is empty because there is nothing left to count.
+           */}
+          <Masthead
+            counted
+            count={{ n: 0, total: counts.total }}
+            section={{ en: `${answered}/${survey.questionCount} answered` }}
+            heading={{ en: 'Ready to send' }}
+          />
           <div className="slide sendslide" data-active="" data-dir={dir}>
             <div className="slidebody">
               <div className="slidemain">
-                <h2>Ready to send</h2>
-                <p className="intro">
-                  {answered} of {survey.questionCount} answered
-                </p>
-                <p className="introth th">
-                  ตอบแล้ว {answered} จาก {survey.questionCount} ข้อ
-                </p>
+                {/**
+                 * One count, and it changes rather than repeating itself.
+                 *
+                 * There were two: "0 of 21 answered" over "21 questions still
+                 * need an answer before you can send" — the same arithmetic
+                 * twice, in both languages, which is four lines saying one
+                 * thing. The second is the useful one while anything is blank
+                 * because it says what *stops the send*, and it disappeared at
+                 * zero blanks, which is why the first existed at all.
+                 *
+                 * So it is one line that knows both states: what is missing
+                 * while something is, and that nothing is once nothing is.
+                 */}
 
-                {/* The link is forwardable, so somebody can reach this screen
-                    having answered as the wrong person. This is the last place
-                    it can be caught, and the only place it is shown. */}
-                <dl className="sendwho">
-                  <div>
-                    <dt>Sending as · ส่งในชื่อ</dt>
-                    <dd className={respondentName ? undefined : 'missing'}>
-                      {respondentName || 'not given · ยังไม่ได้กรอก'}
-                    </dd>
-                  </div>
-                  {/* Retired at question version 4. Surveys sent at 3 still
-                      carry it, and still show it here (rule 5). */}
-                  {emailQuestion && (
-                    <div>
-                      <dt>We&rsquo;ll reach you at · ติดต่อกลับที่</dt>
-                      <dd className={respondentEmail ? undefined : 'missing'}>
-                        {respondentEmail || 'not given · ยังไม่ได้กรอก'}
-                      </dd>
-                    </div>
-                  )}
-                </dl>
+                {/* *Sending as* and *We'll reach you at* were here, echoing the
+                    name and the email back before the send. They went on
+                    19 August 2026: the review list below already carries both,
+                    with the whole questionnaire, and each row is a button back
+                    to its own field. The `<dl>` said the same two things a
+                    second time and could only be read, not acted on.
 
-                {numberedBlanks.length > 0 && (
-                  <>
-                    {/* Every question is required, so this is the wall rather
-                        than a note. It is here and not on each question
-                        because a respondent who wants to think about one and
-                        come back can — they simply cannot leave without it. */}
-                    <p className="blankcount blocking">
-                      {numberedBlanks.length === 1
-                        ? 'One question still needs an answer before you can send.'
-                        : `${numberedBlanks.length} questions still need an answer before you can send.`}
-                    </p>
-                    <p className="blankcount blocking th">
-                      {numberedBlanks.length === 1
-                        ? 'ยังเหลืออีก 1 ข้อ ก่อนส่งคำตอบได้'
-                        : `ยังเหลืออีก ${numberedBlanks.length} ข้อ ก่อนส่งคำตอบได้`}
-                    </p>
-                  </>
-                )}
+                    What it was for still holds — a forwarded link can be
+                    answered as the wrong person, and this is the last screen
+                    where that can be caught. The list is where it is caught
+                    now, and better: it shows the answer *and* the way back to
+                    change it. */}
+
+
 
                 {/**
                  * The last look: every question and what was given for it.
@@ -898,10 +953,16 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                           onChange={(v) => setValue(q.ref, v)}
                           onEnter={() => advance(step)}
                         />
-                        {nameMissing && q.ref === nameQuestion?.ref && (
+                        {/* Names the field and stops. It said "Please tell us
+                            your name so we know whose perspective this is",
+                            which is three lines on a phone explaining a rule to
+                            somebody who has already met it — and the reason
+                            belongs to the screen, not to the error. Built from
+                            the question's own label so all three read the same
+                            and none of them is written twice. */}
+                        {identityMissing && !isAnswered(q.type, values[q.ref]) && (
                           <span className="qwarn">
-                            Please tell us your name so we know whose perspective this is. ·
-                            กรุณากรอกชื่อของคุณ
+                            Please fill in {q.textEn.toLowerCase()}. · กรุณากรอก{q.textTh}
                           </span>
                         )}
                       </div>

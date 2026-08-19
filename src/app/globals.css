@@ -999,10 +999,21 @@ textarea {
   line-height: 1.6;
   margin-top: 6px;
 }
-/* a required question that was left blank, after the respondent tried to move on */
-.sq .qwarn {
+/**
+ * A required field left blank, after the respondent tried to move on.
+ *
+ * Unscoped from `.sq` on 19 August 2026. It was written for a question card and
+ * the identity step is not one — so when those three fields became required,
+ * their warnings rendered at inherited body size, 17px, louder than the labels
+ * they belonged to. The send screen's own error had the same gap.
+ *
+ * It is the same object wherever it appears: the reason a thing you pressed did
+ * not happen, under the field it is about.
+ */
+.qwarn {
   display: block;
   font-size: 13.5px;
+  line-height: 1.6;
   color: var(--caution);
   margin-top: 8px;
 }
@@ -1394,38 +1405,19 @@ textarea {
  *
  * A ruled list, not a card: the survey's page is flat and nothing lifts off it.
  */
-.sendwho {
-  margin: 30px 0 0;
-  border-top: 1px solid var(--hairline);
-}
-.sendwho > div {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 13px 0;
-  border-bottom: 1px solid var(--divider);
-}
-.sendwho dt {
-  flex: 0 0 auto;
-  font-size: 13px;
-  color: var(--ink-3);
-  /* Thai never below 1.6 */
-  line-height: 1.7;
-}
-.sendwho dd {
-  margin: 0;
-  min-width: 0;
-  font-size: 15px;
-  line-height: 1.7;
-  color: var(--ink);
-  text-align: right;
-  overflow-wrap: anywhere;
-}
-/* an empty row reads as a layout fault; say it is missing instead */
-.sendwho dd.missing {
+/* The count in the send screen's masthead turns caution while anything is
+   still blank — the same signal the sentence it replaced carried, and the same
+   moment the Send button below it is disabled. The flag is on the shell because
+   the masthead is the shell's child, not the slide's. */
+.sendshell[data-blocked] .qsec {
   color: var(--caution);
 }
+
+/* `.sendwho` was here — the "Sending as" / "We'll reach you at" pair on the
+   send screen. It went on 19 August 2026: the review list under it already
+   carries the name and the email with every other answer, and each row there is
+   a button back to its own field, so the `<dl>` restated two of them in a form
+   nobody could act on. */
 @media (hover: hover) {
 }
 

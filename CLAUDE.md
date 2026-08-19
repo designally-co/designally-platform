@@ -85,8 +85,10 @@ changes; only `DATABASE_URL`.
   19 August 2026**, asked for directly: it carried three bilingual pairs before
   a single button, and on a phone the meta block wrapped to four lines. It holds
   no question and no instruction, so what a Thai-only reader loses there is a
-  title, a duration and a date — recorded in PRODUCT.md principle 6, which is
-  where the rule lives.
+  title, a duration and a date. **The send screen's count** went with it —
+  `0/21 answered` — where the list beneath still marks every blank question in
+  both languages. Both are recorded in PRODUCT.md principle 6, which is where
+  the rule lives.
 
 Keep them in one Next.js app. Do not build two projects.
 

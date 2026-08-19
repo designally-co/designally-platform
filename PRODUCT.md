@@ -112,7 +112,7 @@ WCAG 2.2 AA as the baseline. Complete keyboard navigation with visible focus sta
 
 Client surveys are answered on phones by people of every age and technical comfort, frequently in Thai. Touch targets are generous, the form saves as it goes, and no question is ever gated behind a previous answer being "correct".
 
-**The welcome screen is English-only from 19 August 2026.** Asked for directly, twice. It
+**The welcome screen and the send screen's count are English-only from 19 August 2026.** Asked for directly, twice. It
 carried three bilingual pairs — the length and deadline, the subject line, and the resume
 note — which is six lines of type before a button, and on a 390px phone the meta block
 alone wrapped to four. What it costs is real and is stated rather than argued away: a
@@ -121,5 +121,12 @@ on trust to reach the questionnaire — which is bilingual from the identity car
 including every question, every help line and the completion. The screen they cannot read
 contains no question and no instruction they must follow; it is a title, a duration, a date
 and a way in.
+
+The send screen's count went the same way, and is the sharper of the two because it is
+attached to a disabled button: `0/21 answered`, English, where two bilingual sentences said
+the same arithmetic in four lines. What carries it for a Thai reader is the list directly
+beneath — every question with its answer, every unanswered one marked *"Not answered yet ·
+ยังไม่ได้กรอก"*, each row a button back to that question. The count summarises what the list
+already shows in both languages, and turns the blocking colour while anything is missing.
 
 Because buttons are English-only (principle 6), a Thai-only respondent depends on position and surrounding bilingual content to read an action. Keep actions in conventional positions, keep their number small, and never make a button the only carrier of a meaning.
