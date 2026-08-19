@@ -21,8 +21,20 @@ The More menu keeps only what *finishes* with a project: archive and delete.
 **The insights section stopped closing.** Its button read *Close collection and
 generate* and did both — one press instead of two, and a second control that
 closes a survey a few inches from the one that does it deliberately. It says what
-is missing now and points at the section above. Generating still requires a
-closed survey; that has not changed, only who does the closing.
+is missing now and points at the section above.
+
+**Generating no longer requires a closed survey** — 19 August 2026, asked for.
+The team wanted to read two or three answers before deciding whether to chase
+the rest, and nothing about the analysis needed the survey shut: it reads the
+answers it is given, and PRODUCT.md already asks it to be worth reading on a
+single respondent. The one thing a closed survey guaranteed was that a run could
+not go out of date, and that is now something the sheet *says* rather than
+something the app forbids — every run records whose answers it read, so where
+the newest one is behind, the panel reads "read 2 of the 5 answers now in".
+
+The only condition left is having something to read. Closing still runs the
+analysis on the way, so the ordinary path is unchanged; this is the early read,
+taken deliberately.
 
 **The project sheet is where the insights are made** (18 August 2026, asked for by
 the team). Three sections in the order the work happens: *Who answered*, where each

@@ -315,7 +315,11 @@ Each one ends with something usable. Do not start the next before the previous h
 
 1. **One survey link that works** — public bilingual form, saves to Postgres. No auth, no team app.
 2. **The team can see it** — auth, Projects list, create survey, view responses. Already replaces Google Forms.
-3. **The team can prepare in ten minutes** — close and analyse, Anthropic API, structured output. The engine reports what they might miss or must be careful about; it does not read the answers for them. The team sees the full answers and that summary. Narrowed 13 August 2026 after the first real brief returned fifty items, and again on 17 August when the deck outline and the room notes went with the kick-off — see `docs/insight-engine-spec.md`.
+3. **The team can prepare in ten minutes** — analyse, Anthropic API, structured output.
+   **The analysis does not need a closed survey** (19 August 2026): it runs on
+   whatever answers are in, so an early read of two or three is a press. Closing
+   still runs it on the way, and where a run has been overtaken the project sheet
+   says so rather than the app forbidding the read. The engine reports what they might miss or must be careful about; it does not read the answers for them. The team sees the full answers and that summary. Narrowed 13 August 2026 after the first real brief returned fifty items, and again on 17 August when the deck outline and the room notes went with the kick-off — see `docs/insight-engine-spec.md`.
 4. ~~The human gate~~ — review and confirm the insights. **Retired 18 August 2026.** The
    platform stops at the insights themselves: milestone 3 produces them, and reading
    them is the team's job rather than a gate the app holds open. What survived is the

@@ -37,7 +37,7 @@ export async function analyse(input: {
     return {
       ok: false,
       error:
-        'ANTHROPIC_API_KEY is not set, so the insights cannot be written. Collection is still closed — run the analysis again once the key is configured.',
+        'ANTHROPIC_API_KEY is not set, so the insights cannot be written. Nothing else changed — run the analysis again once the key is configured.',
     };
   }
 

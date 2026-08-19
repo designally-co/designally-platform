@@ -311,15 +311,26 @@ export async function reanalyse(projectId: string, only?: string[]): Promise<Act
     .limit(1);
 
   if (!row) return { ok: false, error: 'No survey on this project.' };
-  /* Closed by either route. The analysis wants a survey nobody can still add
-     to, and the date shuts it as firmly as the button does — insisting on
-     `closed_at` meant a survey a week past its date, refusing every client who
-     opened the link, had to be reopened and closed again to be read. */
-  const takingAnswers =
-    !row.survey.closedAt && !(row.survey.dueAt && row.survey.dueAt.getTime() < Date.now());
-  if (takingAnswers) {
-    return { ok: false, error: 'Close collection first — the analysis reads a closed survey.' };
-  }
+  /**
+   * **An open survey can be analysed, from 19 August 2026, asked for.**
+   *
+   * It required a closed one, on the reasoning that the analysis wants a set
+   * nobody can still add to. That is a good description of the *final* read and
+   * a bad rule, because it forbids the one the team actually wanted: two or
+   * three answers are in, and somebody would like to know what is in them
+   * before deciding whether to chase the rest.
+   *
+   * Nothing about the analysis needed a closed survey. It reads the answers it
+   * is given and says what they contain, and PRODUCT.md already asks it to be
+   * worth reading on a single respondent. What a closed survey guaranteed was
+   * that the run would not go out of date — and every run is kept as its own
+   * version with the respondents it read recorded on it, so going out of date
+   * is a thing the sheet can *say* rather than something to forbid.
+   *
+   * The two gates are untouched. This never closes anything; `closeCollection`
+   * is still the only path to `closed_at`, and it still runs the analysis on
+   * the way.
+   */
 
   /* A confirmed insights are not replaced by a new run — it keeps its signature and
      stays in the history, and the new analysis becomes an unconfirmed version

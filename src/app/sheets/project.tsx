@@ -1112,6 +1112,29 @@ export default function ProjectSheet({
               <p className="iwhen">
                 Written {p.insightsWrittenOn}
                 {p.insightsVersions.length > 1 ? ` · ${p.insightsVersions.length} runs kept` : ''}
+                {/**
+                 * Whether the newest run has been overtaken.
+                 *
+                 * The analysis can be run on an open survey now, which means a
+                 * version can go out of date while it sits here — somebody
+                 * reads two answers on Tuesday and three more arrive on
+                 * Thursday. That is the whole reason the old rule existed, and
+                 * the answer to it is to say so rather than to forbid the early
+                 * read: every run records whose answers it read, so the gap
+                 * between that and the count now in is a fact this line can
+                 * state.
+                 *
+                 * Silent when they match, which is every closed survey and
+                 * every project nobody has answered since. `sources` is null on
+                 * runs written before it was stored, and null is not zero — it
+                 * means unknown, so it says nothing.
+                 */}
+                {(() => {
+                  const newest = p.insightsVersions.find((v) => v.isNewest);
+                  const read = newest?.sources?.length;
+                  if (read === undefined || read >= p.answers) return null;
+                  return ` · read ${read} of the ${p.answers} answers now in`;
+                })()}
               </p>
             ) : mine ? (
               <p className="iwhen">{p.action!.when}</p>
@@ -1180,27 +1203,21 @@ export default function ProjectSheet({
              * A single respondent gets no chevron: choosing between one person
              * and nobody is not a choice.
              */}
-            {!shut ? (
+            {p.answers === 0 ? (
               /**
-               * Generating needs a closed survey, and closing is the Collection
-               * section's job now.
+               * The only thing that still stops a run: nothing to read.
                *
-               * `shut`, not `closed_at` — a survey past its date is closed by
-               * the team's own definition, and it had been telling them to go
-               * and close a link that had been refusing clients for a week.
+               * It used to be an open survey. That went on 19 August 2026 —
+               * the team asked to read two or three answers before deciding
+               * whether to chase the rest, and nothing about the analysis
+               * needed the survey shut. See `reanalyse`.
                *
-               * This button used to read *Close collection and generate* and do
-               * both — which was one press instead of two, and put a second
-               * control that closes a survey a few inches below the one that
-               * does it deliberately. Two buttons closing the same survey is
-               * how somebody closes it meaning to do the other thing.
-               *
-               * So it says what is missing and where, and the section above is
-               * where it happens.
+               * Closing still runs it on the way, so the ordinary path is
+               * unchanged; this is the early read, taken deliberately.
                */
               <p className="ireads">
-                The analysis reads a closed survey. Close it above — on the date, or with{' '}
-                <b>Close now</b> when you have enough answers.
+                Nothing to read yet. The analysis runs on the answers that are in — one is
+                enough — and every run is kept, so an early read costs nothing.
               </p>
             ) : (
               <>
