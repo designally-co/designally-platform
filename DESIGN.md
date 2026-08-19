@@ -109,7 +109,12 @@ as a mistake rather than as a system, so the disc takes `--cut` and the count mo
 charcoal to pay for it: white on `#ef6148` is the 3.24:1 measured above, and charcoal on it
 is **5.19:1** — the second of the two places this section calls the pure orange legal.
 
-**And the survey's actions, from the same day, with white labels at 19px/700.** Asked for
+**The survey's ground is white**, from the same day — `--parchment` redefined on
+`.survey-shell`, so everything on that surface stepping to the page's own colour follows in
+one move. The answer field is `--canvas` white and now has no tone between it and the page;
+its hairline is the whole boundary.
+
+**And the survey's actions, with white labels at 19px/700.** Asked for
 directly. White on `#ef6148` is the 3.24:1 measured above, which fails the 4.5:1 a normal
 label takes — and clears the **3:1 WCAG gives large text**, which begins at 18.66px *bold*.
 So the size carries it rather than the hue, which is the trade the guideline is built on:
@@ -120,13 +125,21 @@ way — 23.76px at 700, white, 3.24:1 against a 3:1 floor.
 `.btn.ok`/`.btn.start` and `0.44em/700` on `.qdisc`. Lower either and the white stops being
 legal on that fill; the fill has to go back to `--primary` in the same edit.
 
-**The disc holds `1/9` and both halves are large text.** 27px at 700 for the position,
-`0.7em` of it — **18.9px**, also at 700 — for the total. Large text begins at 18.66px
-bold, so the smaller number clears the floor by a quarter of a pixel and the white is legal
-on both. **Those two numbers are the rule, not a preference:** anything that shrinks
-either — a smaller `--disc`, a lighter weight, a lower ratio — puts the total back under
-it, and the disc has to return to charcoal in the same edit. 19 against 27 still reads as
-plainly the smaller of the two, so the hierarchy survives the constraint.
+**The disc holds `1/9` on one baseline.** 27px at 700 for the position, `0.5em` of it —
+13.5px — for the total, sitting on the numeral's own baseline rather than raised off it.
+That works because the disc is a **block with a `--disc`-tall line**, not a flex row:
+inline boxes share a baseline by definition, and `line-height: var(--disc)` centres the
+single line in the circle with no alignment property at all. Flex could do one or the other
+and not both — `align-items: center` centres the two boxes independently, `flex-end`
+aligns them to the *disc's* floor nine pixels below the numeral's.
+
+The mark keeps `display: grid` for the same reason in reverse: an image has no baseline to
+share and a block does nothing to centre it.
+
+**The total is 13.5px white on `#ef6148` — 3.24:1, and it fails.** The 4.5:1 floor applies
+below 18.66px bold. It was built at 18.9px, which cleared the large-text floor, and made
+smaller on request after being seen. The position beside it is 27px at 700 and still clears
+that floor, so the number a client reads is legal and the total is context.
 
 Two things on that surface are short of the standard and are recorded rather than hidden.
 The **disc itself** is 2.92:1 against the page, under the 3:1 for a graphical object — and

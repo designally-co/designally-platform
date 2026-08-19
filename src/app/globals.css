@@ -803,6 +803,22 @@ textarea {
  * The gutter is on both sides, so a centred column is centred in the *window*
  * and not in what the rail leaves. The rail lives in the left one.
  */
+/**
+ * **The survey's ground is white** — 19 August 2026.
+ *
+ * The rest of the product runs the parchment inversion: warm-white page, white
+ * cards, a card lifting by being lighter. That step is 1.11:1, so it was never
+ * doing much, and on this surface there is almost nothing for it to do — the
+ * survey is one question on an open page, not a deck of cards. What it costs is
+ * that the answer field, which is `--canvas` white with a hairline, no longer
+ * has a tone between it and the page and is bounded by its line alone.
+ *
+ * `--parchment` is redefined rather than the background overridden, so
+ * everything on this surface that steps to the page's own colour follows it in
+ * one move — the masthead's band behind a pinned question, the send screen, the
+ * completion. Nothing below reads a surface colour directly, which is what
+ * makes one declaration enough.
+ */
 .survey-shell {
   padding-inline: var(--rail-gutter);
   min-height: 100dvh;
@@ -810,6 +826,7 @@ textarea {
      leaves, rather than a hardcoded subtraction of it */
   display: flex;
   flex-direction: column;
+  --parchment: #ffffff;
   background: var(--parchment);
   /**
    * Flat, deliberately.
@@ -5641,7 +5658,10 @@ dialog::backdrop {
     min-height: 60px;
   }
   .qmast .qdisc.mastdisc {
-    display: flex;
+    /* `block`, not `flex` — this rule exists to undo the base
+       `display: none`, and flex here would take the count out of its own
+       inline context and off its shared baseline. See `.qdisc`. */
+    display: block;
     position: absolute;
     top: 50%;
     left: calc(var(--rail-lead) * -1);
@@ -5799,9 +5819,26 @@ dialog::backdrop {
 .qdisc.mastdisc {
   display: none;
 }
-/* The mark, back on the welcome — see `Disc` in rail.tsx. 54% is where the two
-   rims look equal: the lockup is not centred on its own canvas, so half the
-   disc puts it visually right of centre and the nudge takes it back. */
+/**
+ * The mark keeps the grid the count gave up.
+ *
+ * `.qdisc` is a block with a `--disc`-tall line, which is what puts the count's
+ * two numbers on one baseline — and a block does nothing for a lone `<img>`,
+ * which sat at the top-left of the disc and hung over its rim. An image has no
+ * baseline to share, so nothing is lost by giving this one back the grid.
+ *
+ * `.qmast` in front for specificity, not for scope: the rules that reveal this
+ * disc at each breakpoint are `.qdisc.mastdisc`, and a bare `.qdisc.markdisc`
+ * ties with them and loses to whichever sits later. Three classes beat two at
+ * every width, so this is one rule instead of one per media query.
+ */
+.qmast .qdisc.markdisc {
+  display: grid;
+  place-items: center;
+}
+/* 54% is where the two rims look equal: the lockup is not centred on its own
+   canvas, so half the disc puts it visually right of centre and the nudge takes
+   it back. */
 .qdisc.markdisc img {
   width: 54%;
   height: auto;
@@ -5872,32 +5909,30 @@ dialog::backdrop {
 /* "21" and "/21" are one line and one weight — a fraction, not a headline with
    a subscript. The slash is the only thing between them. */
 /**
- * The total, kept — and sized so it is legal rather than merely small.
+ * The total, on the numeral's own baseline.
  *
- * White on `#ef6148` is 3.24:1, which is under the 4.5:1 a normal numeral takes
- * and over the **3:1 for large text**, and large text begins at 18.66px *bold*.
- * `0.7em` of the 27px numeral is **18.9px**, which clears it by a quarter of a
- * pixel — so both halves of this lockup are legal on this fill, rather than a
- * legal numerator beside a denominator nobody measured.
+ * Half the size and bottom-aligned rather than raised — asked for. Both have
+ * `line-height: 1`, so with `align-self: flex-end` their boxes end together and
+ * digits have no descender to separate box-bottom from baseline. The `0.06em`
+ * lift is the optical correction on top of that: the smaller box carries
+ * proportionally less space under its figures, so aligning the boxes exactly
+ * leaves the small numerals sitting a hair low against the large ones.
  *
- * **That quarter pixel is the whole rule.** Anything that shrinks either number
- * — a smaller `--disc`, a lighter weight, a lower ratio here — puts the `/9`
- * back under the floor. It is 27 and 19 at 700, or the disc goes back to
- * charcoal.
- *
- * The hierarchy survives the constraint: 19 against 27 is plainly the smaller
- * of the two, and the slash and total sit off the baseline so the pair reads as
- * one mark rather than as a fraction set in two sizes.
+ * **It is 13.5px white on `#ef6148` — 3.24:1, and it fails.** The 4.5:1 floor
+ * applies below 18.66px bold, and this is deliberately below it: smaller was
+ * asked for after the legal size was built and seen. Recorded here and in
+ * DESIGN.md §1 rather than left for somebody to find. The position beside it
+ * is still 27px at 700 and still clears the large-text floor, so the number a
+ * client actually reads is legal; the total is context.
  */
 .qdisc span {
-  font-size: 0.7em;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  /* off the baseline without leaving the flow, so the pair stays centred in the
-     disc as one lockup — `align-self: flex-start` hung it over the rim */
-  position: relative;
-  top: -0.16em;
-  opacity: 0.92;
+  font-size: 0.5em;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  /* Nothing else. It is an inline box in the same line as the numeral, so the
+     baseline it sits on is the numeral's own — no `align-self`, no offset, and
+     nothing to re-tune if either size changes. */
+  opacity: 0.95;
 }
 
 /**
@@ -5925,10 +5960,31 @@ dialog::backdrop {
  * look equal, checked side by side at 300px against the disc's own centre.
  */
 
+/**
+ * An inline context, not a flex one — 19 August 2026.
+ *
+ * The count is two numbers that have to sit on **one baseline**, and flexbox
+ * cannot give that here: its items are the text node and the `<span>`, and
+ * `align-items: center` centres their boxes while `flex-end` aligns them to the
+ * *disc's* floor, which left the smaller number nine pixels below the larger.
+ * `align-items: baseline` would align them and then abandon the vertical
+ * centring the disc needs.
+ *
+ * Inline boxes align on their baselines by definition. So the disc is a block
+ * with one line in it, and `line-height: var(--disc)` makes that line exactly
+ * as tall as the disc — which centres it vertically with no alignment property
+ * at all. The oldest trick in the box model, and the only one that gets both
+ * things at once.
+ */
 .qdisc {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: block;
+  text-align: center;
+  line-height: var(--disc);
+}
+/* `text-align` does not reach a block child, and the mark is one so it can take
+   a percentage width. */
+.qdisc.markdisc img {
+  margin-inline: auto;
 }
 
 /**
@@ -6776,7 +6832,8 @@ dialog::backdrop {
      pins the disc to the vertical rail's eye level and half-translates it, and
      an unset `top` beats a set `bottom` every time */
   .qdisc.mastdisc {
-    display: flex;
+    /* `block`, not `flex` — see the note on the wide-window rule above. */
+    display: block;
     position: absolute;
     top: auto;
     left: auto;
