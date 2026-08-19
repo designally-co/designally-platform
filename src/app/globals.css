@@ -8023,6 +8023,53 @@ dialog::backdrop {
   font-size: 14.5px;
 }
 
+/**
+ * The back control and the line it belongs to, on one row.
+ *
+ * 28px rather than the calendar's 32: this sits inside a 240px popover beside
+ * a 13px line, and a 32px disc there is the largest thing in the panel. It is
+ * bare like `.dpnav` — a fill would make it the second button in a block whose
+ * buttons are the two formats — and pulled 4px left so the chevron's own ink
+ * lines up with the sentence's left edge rather than its box doing.
+ */
+.stepbackrow {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: -6px;
+}
+/* Three classes, to clear `.barmenu button:not(.btn)`. That selector is (0,2,1)
+   — the `:not()` counts its argument — and sets every row in here to
+   `width: 100%` with 9px/11px padding, which stretched this control to 210px.
+   Two classes tie on the wrong side of it; matching order instead of
+   specificity is how the last three of these went wrong. */
+.barmenu .stepbackrow .stepback {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: none;
+  color: var(--ink-3);
+  cursor: pointer;
+  transition:
+    background-color 0.16s,
+    color 0.16s;
+}
+@media (hover: hover) {
+  .barmenu .stepbackrow .stepback:hover {
+    background: var(--surface-fill);
+    color: var(--ink);
+  }
+}
+.barmenu .stepbackrow .stepback:active {
+  transform: scale(0.94);
+}
 .delconfirm p {
   margin: 0;
   font-size: 13px;

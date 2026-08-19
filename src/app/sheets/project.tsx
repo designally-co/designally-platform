@@ -18,6 +18,7 @@ import {
   ArchiveMark,
   DocMark,
   DownMark,
+  PrevMark,
   PrintMark,
   SaveMark,
   TrashMark,
@@ -434,9 +435,25 @@ export default function ProjectSheet({
                      decision to back out of — these are two forms of the same
                      harmless act, and clicking away closes the menu. */
                   <div className="delconfirm">
-                    <p>
-                      All {p.answers} answer{p.answers === 1 ? '' : 's'} in one file.
-                    </p>
+                    {/* The way back to the menu, which Archive and Delete do not
+                        need: those two answer their own question — Cancel is the
+                        second half of the decision — and this row has no
+                        question, only two formats and no way to change your mind
+                        about opening it. Small, leading, and beside the line
+                        rather than above it: 240px of menu has no room for a
+                        control on its own row. */}
+                    <div className="stepbackrow">
+                      <button
+                        className="stepback"
+                        aria-label="Back to the menu"
+                        onClick={() => setConfirming(null)}
+                      >
+                        <PrevMark />
+                      </button>
+                      <p>
+                        All {p.answers} answer{p.answers === 1 ? '' : 's'} in one file.
+                      </p>
+                    </div>
                     <div className="iacts">
                       <button
                         className="btn btn-ink"
