@@ -2015,13 +2015,50 @@ textarea {
    * Menus with wider content are unaffected: the toolbar's own runs 378.
    */
   min-width: 240px;
+  /* named so the concentric corners below can be derived from it rather than
+     from a 6 written twice */
+  --menu-pad: 6px;
   background: var(--canvas);
   border: 1px solid var(--hairline);
   border-radius: var(--r-card);
-  padding: 6px;
+  padding: var(--menu-pad);
   display: flex;
   flex-direction: column;
   align-items: stretch;
+}
+
+/**
+ * The first and last rows curve with the panel, not against it.
+ *
+ * A row's highlight is `sm` (8px) and the panel is `card` (26px) with 6px
+ * between them, so at the top two corners an 8px curve sat inside a 26px one
+ * and left a thick white crescent that belonged to neither. DESIGN.md §3 names
+ * this exact failure once already — it is why Apple's 38px popover radius was
+ * dropped, "on a 240px menu it curves in far enough to crowd the first and last
+ * rows". 26 crowds them too, just less.
+ *
+ * The geometry that fixes it is concentric: an inner corner equals the outer
+ * corner minus the distance between them. 26 − 6 = 20, and it is derived rather
+ * than chosen — this is not a new step on the 8 / 11 / 18 ladder, it is the
+ * ladder's 26 restated from six pixels further in. If either value moves this
+ * follows.
+ *
+ * Only the corners that touch the panel. Every other corner stays at `sm`,
+ * because nothing is curving around them.
+ *
+ * The selectors carry `:not(.btn)` for the same reason the back control needed
+ * three classes: `.barmenu button:not(.btn)` sets `border-radius: sm` at
+ * (0,2,1), and a bare `.barmenu > *:first-child` is (0,2,0) and loses.
+ */
+.barmenu > button:not(.btn):first-child,
+.barmenu > .delconfirm:first-child {
+  border-top-left-radius: calc(var(--r-card) - var(--menu-pad));
+  border-top-right-radius: calc(var(--r-card) - var(--menu-pad));
+}
+.barmenu > button:not(.btn):last-child,
+.barmenu > .delconfirm:last-child {
+  border-bottom-left-radius: calc(var(--r-card) - var(--menu-pad));
+  border-bottom-right-radius: calc(var(--r-card) - var(--menu-pad));
 }
 .moreslot {
   position: relative;
