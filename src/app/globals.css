@@ -6860,13 +6860,22 @@ dialog::backdrop {
      * rail and never moves, so the one element that genuinely has to stay in
      * sight already does, and the disc rides it.
      *
-     * **`relative`, not `static`.** `sticky` was also making this the
-     * containing block for the disc below, which is `position: absolute` and
-     * hung off its bottom edge — `static` took the anchor away with the pin and
-     * dropped the disc to the foot of the page. `relative` gives up the pin and
-     * keeps the anchor, which is the whole of what was wanted.
+     * **Pinned again, on every screen** — asked for 19 August 2026, after a
+     * few hours unpinned. Unpinning was right about the cost on a question
+     * screen and wrong about the whole: the line, the disc, the section and the
+     * count are the only fixed point in a twenty-one question run, and a
+     * reference that leaves is not one. The send screen made it obvious — that
+     * page scrolls 1964px against a question screen's 228, so the same rule
+     * that barely showed on one took the masthead away for the whole of the
+     * other.
+     *
+     * `sticky` rather than `fixed`: it also has to be the containing block for
+     * the disc below, which is `position: absolute` and hangs off its bottom
+     * edge. `static` took that anchor away with the pin and dropped the disc to
+     * the foot of the page — measured, when this was briefly `static`.
      */
-    position: relative;
+    position: sticky;
+    top: 0;
     z-index: 5;
     background: var(--parchment);
     border-bottom: var(--cut-width) solid var(--cut);
@@ -6876,6 +6885,8 @@ dialog::backdrop {
        plus whatever the leading leaves under the baseline. */
     padding-bottom: 1px;
   }
+  /* The send screen had a rule of its own here for a few minutes, pinning only
+     that page. Every page pins now, so it is the same rule for all of them. */
   /* `top` and `left` have to be cancelled, not just overridden: the base rule
      pins the disc to the vertical rail's eye level and half-translates it, and
      an unset `top` beats a set `bottom` every time */
