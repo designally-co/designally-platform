@@ -4239,6 +4239,20 @@ dialog::backdrop {
 .sheet.paper .dppop {
   background: var(--white);
   /**
+   * Inside a popover, a recess steps *down* again.
+   *
+   * `.sheet.paper` sets `--recess: white`, and that is right on the sheet: a
+   * band inside a grey card returns to the page's own colour. A popover is not
+   * a card — it is white already — so the same token made the archive
+   * confirmation white on white and it vanished, along with the whole point of
+   * a recess.
+   *
+   * So within these four panels the token goes back to what it is everywhere
+   * else. It is set on the popover rather than on `.delconfirm` so anything
+   * else that reads a recess in here inherits the same correction.
+   */
+  --recess: var(--warm-white);
+  /**
    * The one shadow in the product that is not the focus ring — 19 August 2026,
    * asked for, and recorded as an exception in DESIGN.md §8 rather than left as
    * a rule quietly broken.
