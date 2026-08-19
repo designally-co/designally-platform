@@ -49,7 +49,8 @@ no decorative colour.
 --stone-500        #aaaaaa   /* the resting state of a point or rule */
 
 /* action */
---primary          #c73f29   /* the action orange: fill, line, dot and text */
+--primary          #ef6148   /* Designally Orange — fill, line, dot and text.
+                                 Was #c73f29 until 19 August 2026; see below */
 --on-primary       #ffffff   /* 5.03:1 */
 --primary-mark     var(--primary)        /* parts company only on the dark Field */
 --primary-deep     #b03f2b   /* hover darkens, never lightens — 5.85:1 */
@@ -98,6 +99,34 @@ clears 4.5:1**: `#c73f29`, 5.03 under white and 4.54 as a line on the page. One 
 legal as a fill, a rule, a dot and text — which is why `--primary` and `--primary-mark`
 hold the same value on the light Field. They part company only on the dark one, where a
 fill still wants depth under a white label but a rule has to lighten to be seen.
+
+### Reversed 19 August 2026 — `--primary` is `#ef6148`
+
+**Asked for directly, and reaffirmed once the measurement was put in front of it.** The
+team app ran `#c73f29` while the client survey ran `--cut`, which is the CI's own
+`#ef6148`. Two oranges in one product, and the difference is plain the moment the two
+surfaces are seen together. `--primary` is now `var(--orange-500)`, and `--primary-mark`
+follows it again, so the fills, the dots, the wordmark's full stop and the focus borders
+are all Designally Orange.
+
+**White stays on it, at 3.24:1.** The brand rule is a white label on Designally Orange and
+the brand rule wins here. This is the one place in this system where a contrast floor is
+crossed on purpose, and it is recorded rather than argued:
+
+| | measured | floor |
+|---|---|---|
+| White label on `--primary`, 17px/500 | **3.24:1** | 4.5 — *crossed, by decision* |
+| `--primary` as a status dot on the parchment page | **2.92:1** | 3 — *crossed, by decision* |
+| `--primary` as text on white | **3.24:1** | 4.5 — *crossed, by decision* |
+| White label on `--primary-deep` (hover) | 4.27:1 | 4.5 |
+| Charcoal on `--primary` — fitted, not shipped | 5.19:1 | 4.5 |
+
+The hover exists partly for this: `--primary-deep` is `#d9482d`, two steps down the hue, so
+the control under the pointer is the legible one while the resting state is the brand's.
+
+`#c73f29` is the value to restore if any of these ever has to be *read* rather than
+recognised, and the survey's own Start button shows the other way out — 19px at 700 puts a
+white label over the large-text floor of 3:1 without touching the fill.
 
 The pure CI orange keeps two jobs: **the Cut**, and **the dark Field** — where it is
 finally free to be itself.

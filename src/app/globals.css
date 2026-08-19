@@ -34,15 +34,44 @@
      on it is legal at 5.19:1 and was tried first, but dark-on-orange reads
      as a caution sign rather than a brand action — studio judgement.
 
-     So the action colour is the CI hue (32°) and chroma at the lightness
-     where a white label clears 4.5:1: 5.03 under white, 4.54 as a line on
-     the page. One orange, legal as a fill, a rule, a dot and text.
+     **Reversed 19 August 2026, asked for: the team app runs the CI orange.**
+     It was `#c73f29` — the CI hue at the lightness where a *white* label
+     clears 4.5 — and the survey ran `--cut`, which is `#ef6148`. Two oranges,
+     one product, and the difference is plainly visible when the two surfaces
+     sit side by side. The studio judgement above went the other way on the
+     grounds that dark-on-orange "reads as a caution sign"; it does not, on the
+     survey, where the disc has carried charcoal numerals on this exact fill
+     since 19 August and reads as the brand.
 
-     The pure CI orange keeps two jobs — the Cut, and the dark Field, where
-     it measures 5.99:1 and is finally free to be itself. */
-  --primary: #c73f29;
-  --on-primary: #ffffff; /* 5.03:1 */
-  --primary-deep: #b03f2b; /* hover darkens, never lightens — 5.85:1 */
+     The measurements did not move, so what they forbid still stands. This
+     token is a **fill, a ring and a border on white** and nothing else: every
+     one of its fifteen uses is `background`, `border-color`, `accent-color` or
+     `box-shadow`. Text and markers on light grounds take `--primary-mark`
+     below, which stays `#c73f29` — 2.92:1 on parchment is not a dot anybody
+     can see, and no amount of wanting one orange makes it one.
+
+     The Cut and the dark Field keep it too, where it measures 5.99:1. */
+  --primary: var(--orange-500);
+  /**
+   * White on the CI orange — **3.24:1**, and under the 4.5 this label size
+   * owes. Decided 19 August 2026, asked for directly and reaffirmed after the
+   * measurement was put in front of it: the brand rule is a white label on
+   * Designally Orange, and the brand rule wins here.
+   *
+   * Charcoal was fitted first and is legal at 5.19:1. It is not what the
+   * product is going to ship. Recorded rather than argued: this is a knowing
+   * divergence, not an oversight, and it is the one place in this stylesheet
+   * where a contrast floor is crossed on purpose.
+   *
+   * What it costs, stated plainly: a 17px white label on this fill is hard
+   * work in low light and on a dimmed laptop screen. The hover below darkens
+   * to 4.27, so the state somebody is pointing at is the legible one.
+   */
+  --on-primary: #ffffff; /* CI-DIVERGENCE: 3.24:1 on --primary, brand rule */
+  /* Hover darkens, never lightens. Two steps down the CI hue, which takes the
+     white label from 3.24 to 4.27 — so the button under the pointer is the
+     one that reads, and the resting state is the brand's. */
+  --primary-deep: #d9482d; /* 4.27:1 with white */
 
   /**
    * Orange as a line, a dot, or text.
@@ -54,6 +83,20 @@
    *
    * CI-DIVERGENCE: the system's own --text-accent is orange-600 #d95039 =
    * 3.67:1 on the page and cannot carry text.
+   */
+  /**
+   * Follows `--primary`, so the dots, the wordmark's full stop, a focused
+   * border and `.btn-quiet`'s label are all Designally Orange too — one orange
+   * across the product, which is the whole point of the change.
+   *
+   * The numbers, for the record: `#ef6148` is **3.24:1 on white and 2.92:1 on
+   * the parchment page**. Under 4.5 for text, and under 3 for the status dot
+   * as a graphical object. `#c73f29` was here for exactly that reason and is
+   * the value to restore if any of these ever has to be read rather than
+   * recognised.
+   *
+   * It still becomes `--primary-on-dark` on the dark Field, where the orange
+   * measures 5.99 and needs no help.
    */
   --primary-mark: var(--primary);
   --primary-tint: #fff0ec;
@@ -584,9 +627,10 @@ textarea {
 @media (hover: hover) {
   .client-surface .btn-primary:hover {
     /* darkens, never lightens — the one direction a hover moves in this
-       system. `--primary` is the same hue one step down, so the ramp stays the
-       CI's own and the white label goes from 3.24:1 to 5.03. */
-    background: var(--primary);
+       system. This pointed at `--primary` for a darker step, and `--primary`
+       is now this same `#ef6148`, so it had become a hover that does nothing.
+       `--primary-deep` is the step: the white label goes 3.24 → 4.27. */
+    background: var(--primary-deep);
   }
 }
 
@@ -4179,9 +4223,18 @@ dialog::backdrop {
   display: flex;
   flex-direction: column;
   border-radius: var(--r-sheet);
-  /* the Edge, at the size a floating object needs to hold its own boundary
-     against a dimmed page — DESIGN.md: borders, not shadows */
-  border: 1px solid var(--hairline);
+  /**
+   * No edge — 19 August 2026, asked for.
+   *
+   * It was a 1px `--hairline`, on the argument that a floating object holds its
+   * own boundary and this product uses borders rather than shadows. The
+   * boundary is not in doubt: a sheet sits on a dimmed page under a scrim, so
+   * the ground either side of that line already differs by more than the line
+   * does. It was drawing an edge onto a silhouette that had one.
+   *
+   * The scrim is the separation, the way the tone is on the cards inside — same
+   * instruction, one level up.
+   */
   animation: slideup 0.42s var(--ease);
 }
 
@@ -7920,7 +7973,7 @@ dialog::backdrop {
   border: 0;
   border-radius: var(--r-pill);
   background: var(--primary);
-  color: #fff;
+  color: var(--on-primary);
   cursor: pointer;
   transition: background-color 0.18s;
 }
