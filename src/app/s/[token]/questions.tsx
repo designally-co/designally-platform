@@ -52,7 +52,6 @@ type Props = {
 export function Masthead({
   counted,
   count,
-  mark,
   section,
   heading,
   action,
@@ -82,14 +81,6 @@ export function Masthead({
    * that was just deleted for reporting stale numbers.
    */
   count?: { n: number; total: number };
-  /**
-   * The welcome, and only the welcome.
-   *
-   * On a phone this block draws the disc and the rail's is hidden, so the mark
-   * has to be handed down here as well — passing it only to `Rail` put it on a
-   * disc no phone displays. See `Disc` in rail.tsx.
-   */
-  mark?: boolean;
   /** which of the questionnaire's two parts this screen belongs to */
   section?: { en?: string; th?: string };
   /**
@@ -205,7 +196,7 @@ export function Masthead({
              * against the masthead and still crosses its bottom edge.
              */}
             {count && (
-              <Disc n={count.n} total={count.total} className="mastdisc" mark={mark} />
+              <Disc n={count.n} total={count.total} className="mastdisc"  />
             )}
           </span>
         )}

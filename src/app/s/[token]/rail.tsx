@@ -35,43 +35,33 @@
  * 2026 — the disc measures groups, and the welcome counts the same groups
  * rather than the questions inside them.
  */
-export default function Rail({
-  n,
-  total,
-  mark = false,
-}: {
-  n: number | null;
-  total: number;
-  /** the welcome screen, and only it — see `Disc` */
-  mark?: boolean;
-}) {
+export default function Rail({ n, total }: { n: number | null; total: number }) {
   return (
     <div className="qrail" aria-hidden="true">
-      {n !== null && <Disc n={n} total={total} mark={mark} />}
+      {n !== null && <Disc n={n} total={total} />}
     </div>
   );
 }
 
 /**
- * The disc itself — a count, or nothing at all before there is anything to
- * count.
+ * The disc itself — a count, or the mark when there is nothing to count.
  *
- * The welcome and the identity screen come before question one, so the disc has
- * no number to hold. It read `0/9` at first; then the Designally mark; then
- * nothing at all from 18 August 2026.
+ * **One rule, from 19 August 2026: the disc is never empty.** It holds a number
+ * where there is one and the Designally mark where there is not, which is the
+ * welcome, the identity card, the send screen, the completion and the closed
+ * link — every screen outside the run of questions.
  *
- * **The mark is back on the welcome, and only there** — 19 August 2026. That
- * screen is the first thing a client ever sees of Designally and the one place
- * a brand mark is doing a job rather than decorating a counter. The identity
- * screen keeps the empty disc: it is one screen further in, the client has
- * already been introduced, and a mark repeated on the way to the questions is
- * the brand talking over itself.
+ * It took three goes to get here. It read `0/9`, which is a count of nothing;
+ * then the mark; then nothing at all on 18 August, on the argument that the
+ * Point at the head of the Cut is the job DESIGN.md gives it first; then the
+ * mark on the welcome alone on 19 August, on the argument that a mark repeated
+ * on the way in is the brand talking over itself. Asked for on every one of
+ * them the same day, and the simple rule is the one that survived: a disc with
+ * neither a number nor a mark in it is a hole.
  *
- * Empty is still not a gap where it stays empty. The disc *is* the Point — one
- * of the CI's five pieces, and DESIGN.md gives it "the head of the Cut" as its
- * first job. It fills with a number at question one and stays a counter to the
- * end, and the object never changes shape or colour on the way — only what is
- * inside it.
+ * The Point is not lost to this. It is the shape the mark is drawn inside, and
+ * on the nine screens that carry a number it is exactly what DESIGN.md asks
+ * for.
  *
  * `aria-hidden` all the way up at `.qrail`, so nothing is owed a label: a
  * screen reader is told where it is by the questions, not by a graphic.
@@ -80,16 +70,13 @@ export function Disc({
   n,
   total,
   className,
-  mark = false,
 }: {
   n: number;
   total: number;
   className?: string;
-  mark?: boolean;
 }) {
   const cls = className ? `qdisc ${className}` : 'qdisc';
   if (n === 0) {
-    if (!mark) return <b className={cls} aria-hidden="true" />;
     return (
       <b className={`${cls} markdisc`} aria-hidden="true">
         {/* The intrinsic size matters: a browser derives `aspect-ratio` from

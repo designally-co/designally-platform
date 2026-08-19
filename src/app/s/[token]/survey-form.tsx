@@ -633,10 +633,11 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
   /**
    * Zero, not nothing, before the questions start.
    *
-   * The identity card is outside the count and carried no masthead at all — no
-   * line, no disc. The mark belongs on every screen, so it reads `0/9` there
-   * and on the welcome: honest about where you are, and the brand's object is
-   * on the page from the first screen rather than arriving at the second.
+   * The identity card is outside the count and carried no masthead at all once
+   * — no line, no disc. Zero keeps the Cut and the disc on the screen, and
+   * `Disc` fills the disc with the mark rather than a count of nothing, so the
+   * brand's object is on the page from the first screen rather than arriving at
+   * the second.
    */
   const railAt = card ? (counts.position[step - 1] ?? 0) : 0;
 
@@ -866,9 +867,8 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
       <div className="survey-shell client-surface">
         {/* the rail is fixed to the viewport, so it belongs to the shell and
             not to any screen — it is the one thing that does not move */}
-        {/* `mark` on the welcome alone — the mark is an introduction, and the
-            identity screen is past being introduced. See `Disc`. */}
-        <Rail n={railAt} total={counts.total} mark={step === WELCOME} />
+        {/* The disc carries the mark wherever it has no number — see `Disc`. */}
+        <Rail n={railAt} total={counts.total} />
         {/**
          * The masthead sits here, outside the keyed <section>, and the reason
          * is the Cut.
@@ -931,8 +931,6 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
           <Masthead
             counted={false}
             count={{ n: 0, total: counts.total }}
-            /* the mark, on this screen alone — see `Disc` */
-            mark
             /* The count is in the sentence, not set as a figure beside it.
                It was `.qfig` at 46-58px — the display treatment the masthead
                used to give a position in the run — which made the first screen

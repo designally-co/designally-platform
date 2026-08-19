@@ -72,8 +72,8 @@ const CONTACT = 'https://page.line.me/designally?openQrModal=true';
 export default function Closed({ clientName }: { clientName: string }) {
   return (
     <div className="survey-shell client-surface">
-      <Rail n={0} total={0} mark />
-      <Masthead counted={false} count={{ n: 0, total: 0 }} mark />
+      <Rail n={0} total={0} />
+      <Masthead counted={false} count={{ n: 0, total: 0 }} />
       <div className="slide" data-screen="closed" data-active="" data-dir="next">
         <div className="slidebody">
           <div className="slidemain">
