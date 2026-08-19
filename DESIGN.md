@@ -1614,6 +1614,22 @@ Structural breakpoints from the source, reduced to those this product needs:
 | 834–1068px | Worklist rows keep horizontal layout; sheets go full-width |
 | 641–833px | Worklist rows stack, button below text |
 | ≤640px | Single column throughout; `display` drops 40 → 34px; page padding 32/20 |
+
+**The client survey has two layouts and one boundary, at 1080px.** It is not on the
+table above, which is the team app's. The survey's wide layout stands the Cut up as a
+vertical rail with the disc on it; everything below lies the Cut down as the masthead's
+own bottom edge and moves the disc into the masthead.
+
+Corrected 19 August 2026: the narrow layout said `620px` while the wide one starts at
+`1080px`, so every width between them matched **neither**, and an iPad in portrait — 820
+— drew the vertical rail's disc with the masthead's own on top of it. Two discs, one
+page. Anything falling between two breakpoints is not a third design, it is an unstyled
+gap. They meet exactly now, so an iPad reads as a phone in portrait and as a desktop in
+landscape, which is what 820 and 1180 are.
+
+Width, not `orientation`: a tall desktop window is "portrait" and has no business getting
+the phone layout on a 1400px screen. What this boundary is about is how much horizontal
+room the Cut and a Thai question have.
 | ≤419px | `display` drops to 28px; survey `hero` drops 56 → 34px |
 
 Touch targets minimum 44 × 44px. Inputs are exactly 44px tall, matching Apple's search input.

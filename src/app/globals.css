@@ -7500,7 +7500,32 @@ dialog::backdrop {
   z-index: 20;
 }
 
-@media (max-width: 620px) {
+/**
+ * The phone layout, and everything narrower than the wide one — corrected
+ * 19 August 2026.
+ *
+ * This said `620px` while the wide layout below starts at `1080px`, so every
+ * width between them matched **neither**: an iPad in portrait is 820, and it
+ * got the vertical rail from the wide layout's defaults with the masthead's own
+ * disc drawn on top of it. Two discs, one page. Anything falling between two
+ * breakpoints is not a third design, it is an unstyled gap.
+ *
+ * The two now meet exactly, so there is one boundary rather than two edges with
+ * a hole in the middle: an iPad reads as a phone in portrait and as a desktop
+ * in landscape, which is what its two orientations actually are — 820 against
+ * 1180.
+ *
+ * Width and not `orientation`, deliberately. Orientation would give a tall
+ * desktop window the phone layout on a 1400px screen, and this block is about
+ * how much horizontal room the Cut and the questions have, which is a width
+ * question.
+ *
+ * What is inside is layout, not type: the rail lies down, the masthead becomes
+ * the header and holds the disc. The only sizes here are the primary's 19px and
+ * a nested 360px block, so nothing is a phone-only measurement being stretched
+ * across a tablet.
+ */
+@media (max-width: 1079.98px) {
   /**
    * The Cut lies down again on a phone, and the masthead is the header.
    *
