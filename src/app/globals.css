@@ -1627,6 +1627,27 @@ textarea {
   letter-spacing: 0.1em;
 }
 /**
+ * The send screen's count is not a label, so it is not in caps.
+ *
+ * `.qsec` is set in caps because on a question screen it *is* a label —
+ * "Project Information" naming the part the screen sits in, over the subject
+ * beneath it. "21/21 answered" is a sentence about a number, and a number read
+ * in caps is a heading pretending the arithmetic is a category.
+ *
+ * Three things come off together, because they are one setting rather than
+ * three: the caps, the 0.1em that only exists to open caps up, and the 10.5px
+ * floor that only works *because* they were caps. Lowercase at 10.5 has half
+ * the x-height and reads as fine print; 13.5 is the size this surface already
+ * sets its help and warning lines at, and it stays a clear step under the
+ * 17px line above it.
+ */
+.sendshell .qsec {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 13.5px;
+}
+
+/**
  * What the welcome puts where a question puts its section and subject.
  *
  * Not `.qsec`: that is a label on the line beneath it and takes caps for it,
