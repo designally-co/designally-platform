@@ -6132,44 +6132,28 @@ dialog::backdrop {
  * with a single question open, it *is* the screen, and the size it was stepped
  * down from is the size it should be.
  */
-/* the date the team asked for, under the count it belongs with */
-.qdue {
-  margin: -6px 0 15px;
-  font-size: 13px;
-  color: var(--ink-3);
+/* `.qdue` was here — a block of its own for the date, above the headline on a
+   wide screen and pushed under the button on a phone by an `order: 1`. It is
+   gone: the date joined the count in the masthead on 19 August 2026, which is
+   one bilingual pair instead of two blocks and one reading order instead of
+   two. See the welcome's `lead` in survey-form.tsx. */
+
+/* The masthead's facts on the welcome: each one whole, breaking only at the
+   middot between them. `<b>` is the carrier because it is the shortest element
+   that groups a phrase — nothing here is bolder than its line. */
+.qwhen b {
+  font-weight: inherit;
+  white-space: nowrap;
 }
-/**
- * On a phone the date moves down to sit on the button.
- *
- * It belongs with the count on a wide screen — both are things a person weighs
- * before committing twenty minutes, and they are read together at the top. On a
- * phone the headline and the line under it push the button most of a screen
- * below them, so a date read at the top is a date forgotten by the time there
- * is something to press. Against the button it is the last thing read before
- * the decision, which is where a deadline earns its keep.
- *
- * `order` inside `.slidemain` rather than a second copy in the markup: one
- * element, one string, and a screen reader meets it once. It lands last in the
- * column, and the button is the next thing after `.slidemain` — so "last here"
- * and "just above the button" are the same place.
- */
-@media (max-width: 620px) {
-  .slide[data-screen='welcome'] .slidemain {
-    display: flex;
-    flex-direction: column;
-  }
-  .slide[data-screen='welcome'] .qdue {
-    order: 1;
-    /* the negative top was pulling it up under the masthead it no longer sits
-       beneath; down here it needs air above and none below — the button brings
-       its own */
-    margin: var(--sp-md) 0 0;
-  }
+/* The deadline takes the second line, the way the Thai used to. Two lines is
+   what this block was always sized for — see `.qmast .qhead`, whose height is
+   aimed at a two-line block. */
+.qwhen .qby {
+  display: block;
 }
 
 .client-surface .intro .th,
-.client-surface .takes .th,
-.client-surface .qdue .th {
+.client-surface .takes .th {
   display: block;
   font-size: inherit;
   color: inherit;

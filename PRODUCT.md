@@ -103,7 +103,7 @@ Nothing in the product should imply the software is deciding. The interface neve
 3. **Colour carries one meaning.** The accent means "a person is needed here" and appears on under ten percent of the surface. If it stops meaning that, it stops working.
 4. **The tool never decides on a timer.** It never closes a survey, confirms the insights, or archives a project by itself. It may notice that waiting has stopped being useful and ask; the answer belongs to a person, and the record stores who gave it.
 5. **State what is true, not what is estimated.** Report counts that exist — "3 answers so far · last one 2 days ago". Do not extrapolate volumes, percentages, or confidence from small samples.
-6. **Both languages, everywhere except the buttons.** Every client-facing question, heading, help line, placeholder and message exists in Thai and English. **Buttons are the one exception**, decided 13 August 2026: bilingual action labels wrapped to two lines on a phone and made the button the largest thing on screen, so navigation and action labels run in English alone. The exception is exactly that wide — it does not extend to step labels, system messages, or anything a respondent has to read to answer. Thai wraps differently and sits taller; layouts are tested in Thai before they are considered done.
+6. **Both languages, everywhere except the buttons — and except the welcome screen.** Every client-facing question, heading, help line, placeholder and message exists in Thai and English. **Buttons are the one exception**, decided 13 August 2026: bilingual action labels wrapped to two lines on a phone and made the button the largest thing on screen, so navigation and action labels run in English alone. The exception is exactly that wide — it does not extend to step labels, system messages, or anything a respondent has to read to answer. Thai wraps differently and sits taller; layouts are tested in Thai before they are considered done.
 7. **The client's own words survive the pipeline.** Quotes from stakeholders reach the insights verbatim, in the language they were written in.
 
 ## Accessibility & Inclusion
@@ -111,5 +111,15 @@ Nothing in the product should imply the software is deciding. The interface neve
 WCAG 2.2 AA as the baseline. Complete keyboard navigation with visible focus states; body text at or above 4.5:1 contrast and large text at or above 3:1; full `prefers-reduced-motion` alternatives for every animation. Status must never rely on colour alone — conflict severity and survey state each carry a text label as well as a colour.
 
 Client surveys are answered on phones by people of every age and technical comfort, frequently in Thai. Touch targets are generous, the form saves as it goes, and no question is ever gated behind a previous answer being "correct".
+
+**The welcome screen is English-only from 19 August 2026.** Asked for directly, twice. It
+carried three bilingual pairs — the length and deadline, the subject line, and the resume
+note — which is six lines of type before a button, and on a 390px phone the meta block
+alone wrapped to four. What it costs is real and is stated rather than argued away: a
+Thai-only stakeholder now meets a first screen they cannot read, and has to press *Start*
+on trust to reach the questionnaire — which is bilingual from the identity card onwards,
+including every question, every help line and the completion. The screen they cannot read
+contains no question and no instruction they must follow; it is a title, a duration, a date
+and a way in.
 
 Because buttons are English-only (principle 6), a Thai-only respondent depends on position and surrounding bilingual content to read an action. Keep actions in conventional positions, keep their number small, and never make a button the only carrier of a meaning.

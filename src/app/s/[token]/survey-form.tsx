@@ -841,10 +841,40 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                shout a number the client has no use for yet, and made it the
                only screen whose head was built differently from the rest. It
                reads at the size every other screen's subject reads at. */
+            /**
+             * Both practical facts, on one bilingual pair — 19 August 2026.
+             *
+             * The count and the time were here; the date was a separate block
+             * in the body. They are the same kind of thing — what somebody
+             * weighs before committing twenty minutes — and split across the
+             * screen they cost **six lines** of metadata in two languages
+             * before the button, with the smallest type on the page sitting
+             * above the headline.
+             *
+             * One pair now: how long, and by when, in each language, as the
+             * masthead's own line. Four lines of meta become two, the body is
+             * headline → reassurance → action, and the date is still the last
+             * fact read before Start on a phone because the masthead is the
+             * thing directly above it there.
+             *
+             * **The Thai stays.** Dropping it was considered and is what
+             * PRODUCT.md principle 6 exists to stop: every client-facing line
+             * carries both languages, buttons excepted, and this is the first
+             * screen a Thai-only stakeholder ever sees. A shorter screen is
+             * worth having; a screen they cannot read is not.
+             */
             lead={
+              /* Each fact is `nowrap`, so a narrow column breaks between them
+                 and never inside one. Left to itself the Thai split as
+                 "ตอบภายใน 2 / กันยายน" — a language breaking in the middle of
+                 its own phrase, which is the same defect that put the Thai on
+                 its own line under `.intro`. */
               <span className="qwhen">
-                {survey.questionCount} questions · about 20 minutes
-                <span className="th">{survey.questionCount} ข้อ · ประมาณ 20 นาที</span>
+                <b>{survey.questionCount} questions</b> · <b>about 20 minutes</b>
+                {/* Its own line, not a third fact after a middot: how long it
+                    takes and when it is wanted by are two different questions,
+                    and run together they wrapped wherever the column ended. */}
+                {survey.dueOn && <span className="qby">Answer by {survey.dueOn.en}</span>}
               </span>
             }
           />
@@ -939,41 +969,25 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                  * shown at zero. Full, it is simply the Cut, and it starts
                  * measuring on the first question.
                  */}
-                {/* The date the team asked for. It is the one thing on this
-                    screen that makes somebody answer this week rather than
-                    next, so it sits with the count rather than in the small
-                    print — and from 18 August 2026 it is a deadline: past it
-                    the link stops taking answers and says who to contact. The
-                    wording already read as one, which is why it is unchanged. */}
-                {survey.dueOn && (
-                  <p className="qdue">
-                    Please answer by {survey.dueOn.en}
-                    <span className="th">กรุณาตอบภายในวันที่ {survey.dueOn.th}</span>
-                  </p>
-                )}
-
                 <h1>Let&apos;s shape your brand, together.</h1>
                 {/**
-                 * One line, and it is the only one that had to be here.
+                 * The sentence that says what the questionnaire is for.
                  *
-                 * This was a sentence in each language explaining that the
-                 * questionnaire helps the team understand the brand before
-                 * designing — which is what the headline above it already says,
-                 * and what a client who followed a link from their own project
-                 * lead already knows. What they do not know, facing twenty-one
-                 * questions about their own company, is that they cannot get it
-                 * wrong. That is the sentence worth keeping.
+                 * It was cut in August down to "There are no wrong answers", on
+                 * the argument that a client who followed a link from their own
+                 * project lead already knows why they are here and the headline
+                 * says the rest. Asked back on 19 August 2026: the reassurance
+                 * is the smaller point, and the screen was left saying nothing
+                 * about what the twenty minutes are *for*.
                  *
-                 * The Thai takes its own line rather than following a middot.
-                 * Run together they wrapped mid-phrase — ไม่มีคำตอบ / ที่ผิด —
-                 * and a language that breaks in the middle of its own sentence
-                 * reads as an afterthought. One block each, same size, same
-                 * tone: two languages given the same line, not one queued
-                 * behind the other.
+                 * **Without the kick-off.** The original ran a second line —
+                 * "We'll bring every perspective together and see you at the
+                 * kick-off" — and the kick-off went on 17 August 2026 with the
+                 * stage meter and the decisions table. The platform stops at
+                 * the summary and promises no meeting, so neither does this.
                  */}
                 <p className="intro">
-                  There are no wrong answers
-                  <span className="th">ไม่มีคำตอบที่ผิด</span>
+                  It helps us understand your brand before we start designing.
                 </p>
               </div>
 
@@ -991,10 +1005,7 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
               {/* only the resume state now — the count and the time moved into
                   the masthead, where they are read rather than skimmed */}
               {started && (
-                <p className="takes">
-                  Your answers were saved on this device.
-                  <span className="th">คำตอบของคุณถูกบันทึกไว้ในเครื่องนี้</span>
-                </p>
+                <p className="takes">Your answers were saved on this device.</p>
               )}
             </div>
           </section>

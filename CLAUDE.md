@@ -80,7 +80,13 @@ changes; only `DATABASE_URL`.
   first half. *Data is untouched* — client and respondent names, positions and
   answers appear exactly as they arrive, which is Thai more often than not, so
   DESIGN.md §2's leading rule still governs anywhere content is shown.
-  The survey stays fully bilingual; it is the surface the rule was written for.
+  The survey stays bilingual from the identity card onwards — every question,
+  every help line, the completion. **The welcome screen alone is English from
+  19 August 2026**, asked for directly: it carried three bilingual pairs before
+  a single button, and on a phone the meta block wrapped to four lines. It holds
+  no question and no instruction, so what a Thai-only reader loses there is a
+  title, a duration and a date — recorded in PRODUCT.md principle 6, which is
+  where the rule lives.
 
 Keep them in one Next.js app. Do not build two projects.
 
