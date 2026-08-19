@@ -84,6 +84,37 @@ export function isAnswered(type: QuestionType, raw: RawValue | undefined): boole
 }
 
 /**
+ * Does this look like somebody's email address?
+ *
+ * **A format check, not a verification.** It says the string is shaped like an
+ * address; it cannot say anybody reads it. Nothing here can: this platform
+ * never sends email — PRODUCT.md, "there is no email from the platform, ever" —
+ * so there is no confirmation loop to close, and an MX lookup would only prove
+ * the domain exists, not the mailbox. `khun@gmial.com` passes and always will.
+ * What this catches is the typo somebody can see once it is pointed at: `abcd`,
+ * a missing `@`, a domain with no dot.
+ *
+ * **Deliberately forgiving.** It is on the road between a client and twenty
+ * minutes of their work, on a phone, and a false rejection there costs far more
+ * than a bad address in a contact column. So it takes anything with one `@`, a
+ * non-empty local part, and a dotted domain ending in two or more letters.
+ * Addresses this rejects that RFC 5322 allows — an IP-literal domain, a quoted
+ * local part, a single-label host — are not addresses a client types on a
+ * phone, and the trade is made knowingly rather than by picking the shortest
+ * regex.
+ *
+ * One rule, used by the identity gate in `survey-form.tsx` and again by the
+ * submit route, so the two cannot disagree about what passes.
+ */
+export function looksLikeEmail(raw: string): boolean {
+  const v = raw.trim();
+  /* 254 is the length a mailbox may actually have. Anything longer is a paste
+     accident, and worth catching before it becomes a column nobody can read. */
+  if (!v || v.length > 254) return false;
+  return /^[^\s@]+@[^\s@.]+(?:\.[^\s@.]+)*\.[A-Za-z]{2,}$/.test(v);
+}
+
+/**
  * Turns a draft value into the tagged shape stored in answers.value. Returns
  * null when nothing was answered — a blank answer is not written as an empty
  * row, it is simply absent, and the analysis reads that absence as a signal

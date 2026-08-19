@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { answerPreview, isAnswered, type DraftValues } from '@/lib/survey/answers';
+import { answerPreview, isAnswered, looksLikeEmail, type DraftValues } from '@/lib/survey/answers';
 import type { SurveyPayload, SurveyQuestion, SurveyStep } from '@/lib/survey/load';
 import Chevron from '../../chevron';
 import Rail from './rail';
@@ -403,14 +403,28 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
    * marks every blank field and leaves the reason under the field it belongs
    * to.
    */
+  /**
+   * Is this identity field good enough to leave the step on?
+   *
+   * Filled, and — for the one that says it is an email — shaped like one.
+   * `abcd` in the email box passed every check the survey had: the field is
+   * `type="email"`, which buys the `@` keyboard on a phone and nothing else,
+   * because React submits this and no native form validation ever runs.
+   *
+   * The same rule the submit route applies, so a client cannot be told the
+   * address is fine and then have the server disagree.
+   */
+  const identityOk = (q: SurveyQuestion, v: DraftValues) => {
+    if (!isAnswered(q.type, v[q.ref])) return false;
+    if (q.config.maps_to !== 'email') return true;
+    return looksLikeEmail(String(v[q.ref] ?? ''));
+  };
+
   const advance = (n: number) => {
     /* read from `cards` rather than the `card` binding, which is declared
        further down — this keeps the guard next to the movement it guards */
     const leaving = n > WELCOME ? cards[n - 1] : undefined;
-    if (
-      leaving?.kind === 'fields' &&
-      leaving.questions.some((q) => !isAnswered(q.type, values[q.ref]))
-    ) {
+    if (leaving?.kind === 'fields' && leaving.questions.some((q) => !identityOk(q, values))) {
       setIdentityMissing(true);
       return;
     }
@@ -999,9 +1013,16 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
                             belongs to the screen, not to the error. Built from
                             the question's own label so all three read the same
                             and none of them is written twice. */}
-                        {identityMissing && !isAnswered(q.type, values[q.ref]) && (
+                        {/* Two things can be wrong with this row and they get
+                            different sentences: nothing typed, or something
+                            typed that is not an address. "Please fill in your
+                            email" under a box holding `abcd` reads as a bug —
+                            it is filled in. */}
+                        {identityMissing && !identityOk(q, values) && (
                           <span className="qwarn">
-                            Please fill in {q.textEn.toLowerCase()}. · กรุณากรอก{q.textTh}
+                            {isAnswered(q.type, values[q.ref])
+                              ? 'Please enter a valid email address. · กรุณากรอกอีเมลให้ถูกต้อง'
+                              : `Please fill in ${q.textEn.toLowerCase()}. · กรุณากรอก${q.textTh}`}
                           </span>
                         )}
                       </div>

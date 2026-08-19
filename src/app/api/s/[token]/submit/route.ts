@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 import { getDb } from '@/lib/db';
 import { answers, responses, surveyDrafts, surveys } from '@/lib/db/schema';
-import { toAnswerValue, type DraftValues, type RawValue } from '@/lib/survey/answers';
+import { looksLikeEmail, toAnswerValue, type DraftValues, type RawValue } from '@/lib/survey/answers';
 import { loadSurvey, type SurveyQuestion } from '@/lib/survey/load';
 import { normaliseToken } from '@/lib/survey/token';
 
@@ -80,6 +80,22 @@ export async function POST(req: NextRequest, ctx: RouteContext<'/api/s/[token]/s
   const { name, role, email } = identityOf(questions, values);
 
   if (!name) return NextResponse.json({ error: 'respondent name is required' }, { status: 400 });
+  /**
+   * The same shape check the identity step applies, applied again here.
+   *
+   * Not because the client is expected to get past its own gate — it is the
+   * gate that stops this being reachable — but because this route is a public
+   * endpoint on a guessable path, and the column it writes is the one the team
+   * uses to reach a person. A check that lives only in the browser is a
+   * suggestion.
+   *
+   * Empty stays legal: the email is contact detail, the survey has always
+   * accepted a response without one, and versions 1-4 never asked for it at all
+   * (rule 5). What is refused is a value that is present and not an address.
+   */
+  if (email && !looksLikeEmail(email)) {
+    return NextResponse.json({ error: 'that email address does not look right' }, { status: 400 });
+  }
 
   const rows = questions
     .map((q) => ({
