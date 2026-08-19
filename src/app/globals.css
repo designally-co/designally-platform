@@ -2726,6 +2726,12 @@ textarea {
   border-top: 1px solid var(--divider);
   background: var(--parchment);
 }
+/* The way in, under the record of what there is to go in to. `--sp-sm` and not
+   the `--sp-md` a section would take: it belongs to the lines above it rather
+   than following them. */
+.insopen {
+  margin-top: var(--sp-sm);
+}
 /* Bands end where their padding does; the paragraphs inside them carry margins
    written for a section that had no edges. */
 .inshead > :last-child,

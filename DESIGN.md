@@ -1260,6 +1260,28 @@ The system had no spec for either, which is why the survey's question number mov
 
 It is an eyebrow above a heading, a pattern that is usually a defect. It earns its place under the one condition that redeems it: the sequence itself carries information the reader needs.
 
+### The insights panel — two bands, two jobs
+
+One object, split by the recessed ground into the two things the section is for.
+
+- **Above the line: what exists, and how to read it.** The eyebrow — the Point
+  and NEEDS YOUR TEAM when a person is needed, the panel's own name in muted
+  caps when not — the state in a sentence, when it was written and how many runs
+  are kept, and *Open the insights*.
+- **Below it, on `--parchment`: what a new run would read, and how to run it.**
+  The reading meter, the sentence beside it, and the split *Generate* button.
+
+**The accent goes to the band that has something to give.** *Open the insights*
+takes it whenever there is an analysis; *Generate* steps back to an outline the
+moment there is, and takes the accent only when there is nothing to open. Either
+way exactly one primary is visible — the floor's item 6 — and it is the one
+somebody opened the sheet for. Re-running costs money and minutes and is rare;
+reading is why they are here.
+
+Both buttons used to sit in the foot, which made the foot do two jobs and left
+the head as four inert lines. Asked for 19 August 2026, and it is the split the
+two bands were drawn for.
+
 ### The reading meter — what the analysis will read
 
 One 3×15px pill per person who answered, on the insights panel beside the line

@@ -1062,6 +1062,32 @@ export default function ProjectSheet({
             ) : mine ? (
               <p className="iwhen">{p.action!.when}</p>
             ) : null}
+
+            {/**
+             * The way in, with the thing it opens.
+             *
+             * It used to sit in the foot beside Generate, which made the foot do
+             * two jobs — run a new analysis, and read the old one — and left the
+             * head as four inert lines. Asked for 19 August 2026, and it is the
+             * split the two bands were drawn for: **above the line is what
+             * exists and how to read it; below it is what a new run would read
+             * and how to run it.** Each band is one complete thing now, which is
+             * the meaning the recessed ground was already claiming.
+             *
+             * It takes the accent because it is what somebody opened this sheet
+             * for. That leaves exactly one primary on the panel — the floor's
+             * item 6 — because Generate steps back to an outline the moment
+             * there is anything here to open.
+             */}
+            {p.insights && (
+              <button
+                className="btn btn-primary insopen"
+                disabled={genPending}
+                onClick={onOpenInsights}
+              >
+                Open the insights
+              </button>
+            )}
           </div>
 
           {/**
@@ -1326,15 +1352,6 @@ export default function ProjectSheet({
                     )}
                   </div>
 
-                  {p.insights && (
-                    <button
-                      className="btn btn-primary"
-                      disabled={genPending}
-                      onClick={onOpenInsights}
-                    >
-                      Open the insights
-                    </button>
-                  )}
                 </div>
 
                 {/**
