@@ -19,6 +19,7 @@ import {
   DocMark,
   DownMark,
   PrintMark,
+  SaveMark,
   TrashMark,
   UndoMark,
 } from '../icons';
@@ -81,7 +82,9 @@ export default function ProjectSheet({
    * either now closes the other because there is only one value to hold, rather
    * than because two handlers each remember to reset the other's flag.
    */
-  const [confirming, setConfirming] = useState<'close' | 'archive' | 'delete' | null>(null);
+  const [confirming, setConfirming] = useState<
+    'close' | 'archive' | 'delete' | 'download' | null
+  >(null);
   const [typed, setTyped] = useState('');
   /**
    * The typed name, back on 18 August 2026 after a few hours without it.
@@ -401,35 +404,61 @@ export default function ProjectSheet({
              * it cost a third disc in a four-disc bar for an action nobody
              * takes twice on the same project.
              *
-             * The two formats are flat items rather than a popover inside a
-             * popover. That is the whole reason the disc existed — it had a
-             * format to ask about — and a menu that opens a menu is worse than
-             * two lines that say what they do. The rule under them is the
-             * grouping the disc was protecting: reading above it, deciding
-             * below.
+             * **Two levels, from 19 August 2026, asked for.** It was two flat
+             * items — `Download as Markdown`, `Download as PDF` — which put the
+             * format on the same rung as *Archive project*, and made a menu of
+             * four items where the first two were one decision said twice. The
+             * act is one thing and the format is a detail of it, so the act is
+             * the row and the formats open under it.
+             *
+             * It opens **in place, exactly as Archive does** — not a dropdown,
+             * asked for. A menu that opens a menu is the thing the disc beside
+             * it was already doing wrong, and this menu has its own grammar for
+             * a row that unfolds: a line of fact, then the answers to it, with
+             * `onClose` already forgetting which row was open. Download is that
+             * shape without a decision to back out of.
              */}
             {p.answers > 0 && (
               <>
-                <button
-                  disabled={pending}
-                  onClick={() => {
-                    close();
-                    exportAll('md');
-                  }}
-                >
-                  <DocMark />
-                  <span>Download as Markdown</span>
-                </button>
-                <button
-                  disabled={pending}
-                  onClick={() => {
-                    close();
-                    exportAll('pdf');
-                  }}
-                >
-                  <PrintMark />
-                  <span>Download as PDF</span>
-                </button>
+                {confirming === 'download' ? (
+                  /* The archive panel's shape exactly: a line saying what you
+                     get, and the answers to it underneath. Two ink pills rather
+                     than one and a Cancel, because unlike archiving there is no
+                     decision to back out of — these are two forms of the same
+                     harmless act, and clicking away closes the menu. */
+                  <div className="delconfirm">
+                    <p>
+                      All {p.answers} answer{p.answers === 1 ? '' : 's'} in one file.
+                    </p>
+                    <div className="iacts">
+                      <button
+                        className="btn btn-ink"
+                        disabled={pending}
+                        onClick={() => {
+                          close();
+                          exportAll('md');
+                        }}
+                      >
+                        Markdown
+                      </button>
+                      <button
+                        className="btn btn-ink"
+                        disabled={pending}
+                        onClick={() => {
+                          close();
+                          exportAll('pdf');
+                        }}
+                      >
+                        PDF
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button disabled={pending} onClick={() => setConfirming('download')}>
+                    <SaveMark />
+                    <span>Download all responses</span>
+                  </button>
+                )}
                 <hr />
               </>
             )}
