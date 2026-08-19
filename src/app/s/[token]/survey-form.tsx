@@ -768,7 +768,9 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
       <div className="survey-shell client-surface">
         {/* the rail is fixed to the viewport, so it belongs to the shell and
             not to any screen — it is the one thing that does not move */}
-        <Rail n={railAt} total={counts.total} />
+        {/* `mark` on the welcome alone — the mark is an introduction, and the
+            identity screen is past being introduced. See `Disc`. */}
+        <Rail n={railAt} total={counts.total} mark={step === WELCOME} />
         {/**
          * The masthead sits here, outside the keyed <section>, and the reason
          * is the Cut.
@@ -831,6 +833,8 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
           <Masthead
             counted={false}
             count={{ n: 0, total: counts.total }}
+            /* the mark, on this screen alone — see `Disc` */
+            mark
             /* The count is in the sentence, not set as a figure beside it.
                It was `.qfig` at 46-58px — the display treatment the masthead
                used to give a position in the run — which made the first screen

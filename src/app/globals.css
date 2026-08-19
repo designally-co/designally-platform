@@ -5752,8 +5752,36 @@ dialog::backdrop {
 .qdisc.mastdisc {
   display: none;
 }
+/* The mark, back on the welcome — see `Disc` in rail.tsx. 54% is where the two
+   rims look equal: the lockup is not centred on its own canvas, so half the
+   disc puts it visually right of centre and the nudge takes it back. */
+.qdisc.markdisc img {
+  width: 54%;
+  height: auto;
+  display: block;
+  transform: translate(2.9%, -0.9%);
+}
 
 /* the count, in a disc crossing the line at eye level */
+/**
+ * One orange on this surface — 19 August 2026.
+ *
+ * The disc was `--primary` (`#c73f29`) and the Cut running through it is
+ * `--orange-500` (`#ef6148`). Two oranges edge to edge on the screen a client
+ * sees first, which reads as a mistake rather than as a system, however well
+ * each is justified on its own.
+ *
+ * So the disc takes `--cut`, and **the numerals move to charcoal to pay for
+ * it**. White on `#ef6148` is 3.24:1 — DESIGN.md §1 measured exactly that and
+ * it is the whole reason the CI orange cannot carry a button label. Charcoal on
+ * it is 5.19:1, and §1 names that as one of the two places the pure orange is
+ * legal: *with charcoal on top of it*.
+ *
+ * The disc itself is 2.92:1 against the page, under the 3:1 a graphical object
+ * takes — and it is not one. It is `aria-hidden`, it identifies no control and
+ * no state, and the position it decorates is read from the questions. A brand
+ * mark is allowed to be a brand mark.
+ */
 .qdisc {
   position: absolute;
   top: var(--eye);
@@ -5764,8 +5792,8 @@ dialog::backdrop {
   width: var(--disc);
   height: var(--disc);
   border-radius: var(--r-pill);
-  background: var(--primary);
-  color: var(--on-dark);
+  background: var(--cut);
+  color: var(--ink);
   font-size: calc(var(--disc) * 0.23);
   font-weight: 600;
   line-height: 1;
@@ -6608,8 +6636,27 @@ dialog::backdrop {
     padding-top: calc(var(--rail-y) + 34px);
   }
   .qmast {
-    position: sticky;
-    top: 0;
+    /**
+     * **Static on a phone** — asked for 19 August 2026.
+     *
+     * It was pinned here, on the argument that the line, the disc, the section
+     * and the subject say where you are, and a reference point that scrolls
+     * away stops being one. That holds on a wide window, where the band costs a
+     * tenth of the height. On a 390px screen it is a permanent slice of the
+     * viewport spent on two words the client read once, with the questions —
+     * which are the entire screen — scrolling behind it through what is left.
+     *
+     * Nothing is lost by letting it go. The Cut is `position: fixed` on the
+     * rail and never moves, so the one element that genuinely has to stay in
+     * sight already does, and the disc rides it.
+     *
+     * **`relative`, not `static`.** `sticky` was also making this the
+     * containing block for the disc below, which is `position: absolute` and
+     * hung off its bottom edge — `static` took the anchor away with the pin and
+     * dropped the disc to the foot of the page. `relative` gives up the pin and
+     * keeps the anchor, which is the whole of what was wanted.
+     */
+    position: relative;
     z-index: 5;
     background: var(--parchment);
     border-bottom: var(--cut-width) solid var(--cut);

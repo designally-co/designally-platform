@@ -15,19 +15,34 @@
  * directly, and it settles what the line is for — it is the brand's mark, not a
  * track, so it runs its full length on every screen and never fills.
  *
- * **The disc is `--primary`, not the CI's `#ef6148`.** DESIGN.md §1 measured
- * the CI's orange at 3.24:1 under white, which is why it cannot carry a button
- * label — and this disc carries white numerals, which is the same job. The line
- * beside it keeps the pure CI orange, because nothing is read from a line.
+ * **The disc is the CI's `#ef6148`, and its numerals are charcoal.** It was
+ * `--primary` (`#c73f29`) with white numerals, which put a second orange
+ * touching the first: the Cut runs through this disc, so the two sat edge to
+ * edge and read as a mistake rather than as a system. One orange on this
+ * surface, asked for 19 August 2026.
+ *
+ * The numerals had to move for it. White on `#ef6148` is **3.24:1** — DESIGN.md
+ * §1 measured it and that is the whole reason the CI orange cannot carry a
+ * button label. Charcoal on it is **5.19:1**, which is the other of the two
+ * places §1 calls the pure orange legal: *with charcoal on top of it*.
  *
  * It counts questions, not screens: a screen opens one question at a time, so
  * the client really is on question 8 of 21, which is the number the welcome
  * screen promised them.
  */
-export default function Rail({ n, total }: { n: number | null; total: number }) {
+export default function Rail({
+  n,
+  total,
+  mark = false,
+}: {
+  n: number | null;
+  total: number;
+  /** the welcome screen, and only it — see `Disc` */
+  mark?: boolean;
+}) {
   return (
     <div className="qrail" aria-hidden="true">
-      {n !== null && <Disc n={n} total={total} />}
+      {n !== null && <Disc n={n} total={total} mark={mark} />}
     </div>
   );
 }
@@ -37,23 +52,49 @@ export default function Rail({ n, total }: { n: number | null; total: number }) 
  * count.
  *
  * The welcome and the identity screen come before question one, so the disc has
- * no number to hold. It read `0/9` at first, which is honest and dull; then it
- * carried the Designally mark, knocked out white; it is empty now, asked for on
- * 18 August 2026.
+ * no number to hold. It read `0/9` at first; then the Designally mark; then
+ * nothing at all from 18 August 2026.
  *
- * Empty is not a gap. The disc *is* the Point — one of the CI's five pieces,
- * and DESIGN.md gives it "the head of the Cut" as its first job. On these two
- * screens that is exactly what it is doing: the head of a line that has not
- * started measuring. It fills with a number at question one and stays a counter
- * to the end, and the object never changes shape or colour on the way — only
- * what is inside it.
+ * **The mark is back on the welcome, and only there** — 19 August 2026. That
+ * screen is the first thing a client ever sees of Designally and the one place
+ * a brand mark is doing a job rather than decorating a counter. The identity
+ * screen keeps the empty disc: it is one screen further in, the client has
+ * already been introduced, and a mark repeated on the way to the questions is
+ * the brand talking over itself.
+ *
+ * Empty is still not a gap where it stays empty. The disc *is* the Point — one
+ * of the CI's five pieces, and DESIGN.md gives it "the head of the Cut" as its
+ * first job. It fills with a number at question one and stays a counter to the
+ * end, and the object never changes shape or colour on the way — only what is
+ * inside it.
  *
  * `aria-hidden` all the way up at `.qrail`, so nothing is owed a label: a
  * screen reader is told where it is by the questions, not by a graphic.
  */
-export function Disc({ n, total, className }: { n: number; total: number; className?: string }) {
+export function Disc({
+  n,
+  total,
+  className,
+  mark = false,
+}: {
+  n: number;
+  total: number;
+  className?: string;
+  mark?: boolean;
+}) {
   const cls = className ? `qdisc ${className}` : 'qdisc';
-  if (n === 0) return <b className={cls} aria-hidden="true" />;
+  if (n === 0) {
+    if (!mark) return <b className={cls} aria-hidden="true" />;
+    return (
+      <b className={`${cls} markdisc`} aria-hidden="true">
+        {/* plain <img>: 2KB of PNG with no layout shift to optimise away, and
+            next/image would put a fetch in front of a mark that is on the first
+            paint of the first screen a client ever sees */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/designally-mark.png" alt="" width={274} height={284} />
+      </b>
+    );
+  }
   return (
     <b className={cls} aria-hidden="true">
       {n}

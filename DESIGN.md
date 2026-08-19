@@ -102,6 +102,19 @@ fill still wants depth under a white label but a rule has to lighten to be seen.
 The pure CI orange keeps two jobs: **the Cut**, and **the dark Field** — where it is
 finally free to be itself.
 
+**And the survey's disc, from 19 August 2026 — with charcoal numerals.** The disc was
+`--primary` while the Cut running through it was `--orange-500`, which put two oranges edge
+to edge on the screen a client sees first. However well each is justified alone, that reads
+as a mistake rather than as a system, so the disc takes `--cut` and the count moves to
+charcoal to pay for it: white on `#ef6148` is the 3.24:1 measured above, and charcoal on it
+is **5.19:1** — the second of the two places this section calls the pure orange legal.
+
+The disc itself is 2.92:1 against the page, under the 3:1 a graphical object takes, and it
+is not one: it is `aria-hidden`, it identifies no control and no state, and the position it
+decorates is read from the questions. **The Start button stays `--primary`** and is the one
+remaining second orange on that screen — a white label on `#ef6148` is 3.24:1 and there is
+no version of that which passes.
+
 **The icon disc is a warm neutral, not the CI's cool one.** The CI hues its whole neutral
 ramp 265° "so light surfaces echo the steel grey-blue Field". That reasoning does not
 survive contact with where this control actually sits: the page behind it is `#f3f3f3`, a
