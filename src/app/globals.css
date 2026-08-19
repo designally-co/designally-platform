@@ -3461,6 +3461,26 @@ textarea {
   margin-top: var(--sp-md);
   text-wrap: pretty;
 }
+/**
+ * Inside a field, the hint belongs to the field.
+ *
+ * `.onecol .hintline`'s 17px was written for the *Survey made* sheet, where
+ * the line is a standalone note under a QR block and has nothing above it to
+ * belong to. On the New survey form it sits under a control it describes, and
+ * 17px put it 17 from its own field against 22 between one field and the next
+ * — a five-pixel difference doing the work of saying which of the two it is
+ * part of.
+ *
+ * 7px, which is `.f`'s own step above the control. The label sits 7 over the
+ * field and the hint sits 7 under it: one group, symmetrical, and a third of
+ * the distance to the next.
+ *
+ * Three classes so it clears `.onecol .hintline` on specificity rather than on
+ * which line comes last.
+ */
+.onecol .field .hintline {
+  margin-top: 7px;
+}
 
 /**
  * The link, its code and its Save, in one column of one width.
