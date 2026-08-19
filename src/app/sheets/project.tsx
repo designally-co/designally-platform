@@ -18,6 +18,7 @@ import {
   ArchiveMark,
   DocMark,
   DownMark,
+  PrevMark,
   PrintMark,
   SaveMark,
   TrashMark,
@@ -82,7 +83,9 @@ export default function ProjectSheet({
    * either now closes the other because there is only one value to hold, rather
    * than because two handlers each remember to reset the other's flag.
    */
-  const [confirming, setConfirming] = useState<'close' | 'archive' | 'delete' | null>(null);
+  const [confirming, setConfirming] = useState<
+    'close' | 'archive' | 'delete' | 'download' | null
+  >(null);
   const [typed, setTyped] = useState('');
   /**
    * The typed name, back on 18 August 2026 after a few hours without it.
@@ -380,48 +383,6 @@ export default function ProjectSheet({
           a link that had been turning clients away for a week — on the one
           control the team uses to send it again. */}
       {link && p.token && <ShareLink token={p.token} url={link} closed={shut} />}
-      {/**
-       * Download has its own disc, the way it does on a response.
-       *
-       * It was two items inside More, which put taking a copy of the answers in
-       * the same drawer as closing collection and deleting the project — one of
-       * those is a thing you do to read something and the rest change the
-       * project. A person looking for the file had to open a menu of decisions
-       * to find out it was in there.
-       *
-       * Same control as the answers sheet: the mark names the act, the popover
-       * names the format. What differs is only the subject, and each says its
-       * own in the accessible name — "Download all 5 answers" against
-       * "Download คุณธนวัฒน์'s answers".
-       */}
-      {p.answers > 0 && (
-        <MoreMenu label={`Download all ${p.answers} answers`} icon={<SaveMark />}>
-          {(close) => (
-            <>
-              <button
-                disabled={pending}
-                onClick={() => {
-                  close();
-                  exportAll('md');
-                }}
-              >
-                <DocMark />
-                <span>Markdown</span>
-              </button>
-              <button
-                disabled={pending}
-                onClick={() => {
-                  close();
-                  exportAll('pdf');
-                }}
-              >
-                <PrintMark />
-                <span>PDF</span>
-              </button>
-            </>
-          )}
-        </MoreMenu>
-      )}
       {/* Closing the menu forgets which confirmation was open. It is held on
           the sheet rather than in the menu, so without this a person who opened
           Delete, thought better of it and clicked away found it still expanded —
@@ -435,6 +396,95 @@ export default function ProjectSheet({
       >
         {(close) => (
           <>
+            {/**
+             * Download, back inside More — 19 August 2026, asked for.
+             *
+             * It had its own disc beside this one for a day, on the argument
+             * that taking a copy of the answers is a thing you do to *read*
+             * something while everything in here changes the project. True, and
+             * it cost a third disc in a four-disc bar for an action nobody
+             * takes twice on the same project.
+             *
+             * **Two levels, from 19 August 2026, asked for.** It was two flat
+             * items — `Download as Markdown`, `Download as PDF` — which put the
+             * format on the same rung as *Archive project*, and made a menu of
+             * four items where the first two were one decision said twice. The
+             * act is one thing and the format is a detail of it, so the act is
+             * the row and the formats open under it.
+             *
+             * It opens **in place, exactly as Archive does** — not a dropdown,
+             * asked for. A menu that opens a menu is the thing the disc beside
+             * it was already doing wrong, and this menu has its own grammar for
+             * a row that unfolds: a line of fact, then the answers to it, with
+             * `onClose` already forgetting which row was open. Download is that
+             * shape without a decision to back out of.
+             *
+             * **No rule under it.** There was one for a few minutes, grouping
+             * reading above it and deciding below — and it put 11px between
+             * this row and Archive where Archive and Delete sit flush. Four
+             * rows in one menu do not need a divider to be read as two kinds of
+             * thing; an uneven column is a defect in a way a missing grouping
+             * is not.
+             */}
+            {p.answers > 0 && (
+              <>
+                {confirming === 'download' ? (
+                  /* The archive panel's shape exactly: a line saying what you
+                     get, and the answers to it underneath. Two ink pills rather
+                     than one and a Cancel, because unlike archiving there is no
+                     decision to back out of — these are two forms of the same
+                     harmless act, and clicking away closes the menu. */
+                  <div className="delconfirm">
+                    {/* The way back to the menu, which Archive and Delete do not
+                        need: those two answer their own question — Cancel is the
+                        second half of the decision — and this row has no
+                        question, only two formats and no way to change your mind
+                        about opening it. Small, leading, and beside the line
+                        rather than above it: 240px of menu has no room for a
+                        control on its own row. */}
+                    <div className="stepbackrow">
+                      <button
+                        className="stepback"
+                        aria-label="Back to the menu"
+                        onClick={() => setConfirming(null)}
+                      >
+                        <PrevMark />
+                      </button>
+                      <p>
+                        All {p.answers} answer{p.answers === 1 ? '' : 's'} in one file.
+                      </p>
+                    </div>
+                    <div className="iacts">
+                      <button
+                        className="btn btn-ink"
+                        disabled={pending}
+                        onClick={() => {
+                          close();
+                          exportAll('md');
+                        }}
+                      >
+                        Markdown
+                      </button>
+                      <button
+                        className="btn btn-ink"
+                        disabled={pending}
+                        onClick={() => {
+                          close();
+                          exportAll('pdf');
+                        }}
+                      >
+                        PDF
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button disabled={pending} onClick={() => setConfirming('download')}>
+                    <SaveMark />
+                    <span>Download all responses</span>
+                  </button>
+                )}
+              </>
+            )}
             {/* Closing and reopening left this menu on 18 August 2026 — they
                 are in the Collection section with the date, which is the other
                 control over whether the link is taking answers. What is left
@@ -598,6 +648,10 @@ export default function ProjectSheet({
         </>
       }
       actions={actions}
+      /* This sheet carries its own ground — it is nearly all cards, and the
+         parchment between them stopped reading as a page. See `.sheet.paper`,
+         which the insights sheet takes as well. */
+      surface="paper"
       backLabel="Back to all projects"
       onClose={onClose}
     >

@@ -49,7 +49,8 @@ no decorative colour.
 --stone-500        #aaaaaa   /* the resting state of a point or rule */
 
 /* action */
---primary          #c73f29   /* the action orange: fill, line, dot and text */
+--primary          #ef6148   /* Designally Orange — fill, line, dot and text.
+                                 Was #c73f29 until 19 August 2026; see below */
 --on-primary       #ffffff   /* 5.03:1 */
 --primary-mark     var(--primary)        /* parts company only on the dark Field */
 --primary-deep     #b03f2b   /* hover darkens, never lightens — 5.85:1 */
@@ -98,6 +99,34 @@ clears 4.5:1**: `#c73f29`, 5.03 under white and 4.54 as a line on the page. One 
 legal as a fill, a rule, a dot and text — which is why `--primary` and `--primary-mark`
 hold the same value on the light Field. They part company only on the dark one, where a
 fill still wants depth under a white label but a rule has to lighten to be seen.
+
+### Reversed 19 August 2026 — `--primary` is `#ef6148`
+
+**Asked for directly, and reaffirmed once the measurement was put in front of it.** The
+team app ran `#c73f29` while the client survey ran `--cut`, which is the CI's own
+`#ef6148`. Two oranges in one product, and the difference is plain the moment the two
+surfaces are seen together. `--primary` is now `var(--orange-500)`, and `--primary-mark`
+follows it again, so the fills, the dots, the wordmark's full stop and the focus borders
+are all Designally Orange.
+
+**White stays on it, at 3.24:1.** The brand rule is a white label on Designally Orange and
+the brand rule wins here. This is the one place in this system where a contrast floor is
+crossed on purpose, and it is recorded rather than argued:
+
+| | measured | floor |
+|---|---|---|
+| White label on `--primary`, 17px/500 | **3.24:1** | 4.5 — *crossed, by decision* |
+| `--primary` as a status dot on the parchment page | **2.92:1** | 3 — *crossed, by decision* |
+| `--primary` as text on white | **3.24:1** | 4.5 — *crossed, by decision* |
+| White label on `--primary-deep` (hover) | 4.27:1 | 4.5 |
+| Charcoal on `--primary` — fitted, not shipped | 5.19:1 | 4.5 |
+
+The hover exists partly for this: `--primary-deep` is `#d9482d`, two steps down the hue, so
+the control under the pointer is the legible one while the resting state is the brand's.
+
+`#c73f29` is the value to restore if any of these ever has to be *read* rather than
+recognised, and the survey's own Start button shows the other way out — 19px at 700 puts a
+white label over the large-text floor of 3:1 without touching the fill.
 
 The pure CI orange keeps two jobs: **the Cut**, and **the dark Field** — where it is
 finally free to be itself.
@@ -1021,6 +1050,64 @@ The parchment inversion above is the **team app's** rule and stays exactly as wr
 
 This is not the two-volumes idea in section 7 stretched further. It is a second surface rule, and the reason it is allowed is that each surface earns its own: a worklist has layers, a single question does not.
 
+### Paper — the inversion, inverted
+
+**Experimental, 19 August 2026.** Two sheets run the parchment inversion the other way
+round: the sheet is white, a card is the warm white, and a band inside a card that wants
+to be a different thing returns to white. `.sheet.paper` in `globals.css`, applied by the
+`surface` prop on `Sheet`.
+
+```
+page   #ffffff
+card   #f3f3f3   1.110 down
+hover  #e6e6e6   1.125 down
+press  #dbdbdb   1.110 down
+```
+
+**Why it exists.** The first pass turned the sheet white and kept the cards white, which
+changed almost nothing — and that was the finding. `#fff` on `#f3f3f3` is **1.11:1**: the
+lift was always the hairline doing the work, and the tone was never really carrying it.
+Reversed, the same two values give three levels with no new grey, and the *direction* of
+depth says which surface you are standing on.
+
+**A card here has no border.** A filled silhouette at 1.11 reads where an outlined shape
+at 1.11 plus a line does not, because the eye takes the shape rather than hunting for its
+edge. A tone that can carry the boundary should not also be drawn one — which is what
+"borders, not shadows" is asking for. On the parchment sheets the tone *cannot* carry it,
+so there the line stays and the rule is unchanged.
+
+**Controls keep their edge and step back up to white.** The date field, the inputs, the
+option chips. A thing you press is bounded in this system whatever it stands on, and on a
+grey card a white fill is the direction that has always meant live.
+
+**Hover is the fill, not the line.** §Hover's rule — *a hover darkens the line to
+`--ink-3` and nothing else* — has no line to act on here, so these cards take that
+section's own exception: **a filled control deepens its own fill.** `#dbdbdb` and not
+`--surface-fill` for the press: that ramp is hued 45° to sit beside the orange, and these
+cards are hueless, so pressing one turned it brown against four greys.
+
+**Which sheets take it: all of them.** It began as the two that are nearly all cards — the
+project sheet and the insights sheet it opens — and reached the rest the same day. The
+answers sheet came next because a respondent's chip opens it from the project sheet and a
+stack cannot be two grounds. Then New survey, which had been left out on the argument that
+it holds no card: wrong, the two package options are exactly that object and they are what
+the sheet exists to ask. Then Survey made, which shares its shell.
+
+There is no parchment sheet left. Past projects is the only one that would have nothing to
+gain — a list of rows separated by hairlines, no container anywhere in it — and it takes
+the ground anyway, because one app is one surface.
+
+**Two things do not invert.** A popover reads `--canvas` for its ground and would come up
+grey, so the four of them are pinned back to white and given the shadow above; and inside
+them `--recess` steps back down, or an archive confirmation is white on white. The other is
+`.qrframe`, which is a literal `#fff` because a QR code needs a white quiet zone to be
+read. That leaves it white on a white sheet, so it is the one container here that keeps its
+hairline: its tone cannot carry its own boundary.
+
+**Two sheets in one stack cannot be two grounds.** That is the constraint this rule has to
+respect, and the reason the insights sheet could not be left behind: going one level deeper
+and getting darker inverts the whole app's meaning of white-on-parchment.
+
 ### Materials — blur and scrim
 
 The system's vocabulary is ink, line and surface. Two materials are admitted beyond it, and only for the jobs named here.
@@ -1117,6 +1204,14 @@ Only one visible per region — and on the client survey, only once in the whole
 Where a primary sits beside a secondary on a phone's floor, the primary takes all the width the secondary leaves. Its label is centred in the button, which is not the centre of the screen — that is correct: the label belongs to the button, and the button is what the thumb aims at.
 
 **Ghost pill** — transparent fill, `--primary` text, 1px `--primary` border, same size and radius. The second CTA when two appear together.
+
+**Neutral filled pill** — `--surface-fill`, `--ink` label, **no border**, same size and radius. The answer inside a confirmation that does not act: Cancel, beside the ink pill that does.
+
+**Added 19 August 2026, and the ground is the reason.** This role was the ghost pill in ink — transparent inside `--hairline`. Transparent works where the page is a tone: on parchment it shows a tone through. The project sheet went white the same day, and there transparent means white, so the button became a hairline with nothing in it, standing beside an ink pill solid all the way through. Two answers to one question, one a shape and one an edge.
+
+It takes the icon disc's own ground, which is what a neutral control is made of here: 2.01:1 against white where a white pill manages 1.07, and an `--ink` label at 8.37:1 — the label carries the meaning, as it must, because a fill is not asked to. Hover and press step through `--surface-fill-deep` and `--surface-fill-press`, the disc's states. The transparent 1px border stays: `.btn` counts it in the 44px, and dropping it shrinks the pill 2px below the one beside it.
+
+The ghost pill in ink keeps every sheet that is still parchment.
 
 **Pearl capsule** — quiet secondary actions. `--surface-pearl` fill, `--ink-muted-80` text, `caption` (14px), 3px `--divider-soft` ring, padding `8px 14px`.
 
@@ -1469,7 +1564,8 @@ Recording it because an undocumented borrowing looks like an oversight, and the 
 
 **Don't**
 - Introduce a second accent colour
-- Add a shadow to any card, button, panel or text — there are no shadows in this product
+- Add a shadow to any card, button, panel or text — there are no shadows in this product,
+  with **one exception, added 19 August 2026**: a popover on the paper surface. See below.
 - Use gradients, glassmorphism as decoration, or decorative grid backgrounds
 - Round a full-bleed dark tile
 - Tighten body leading below 1.44 in Latin or 1.6 in Thai
@@ -1479,6 +1575,32 @@ Recording it because an undocumented borrowing looks like an oversight, and the 
 - Put two colours in one line of text
 - Use a coloured glyph as a status marker
 - Stripe, fill or rule the project table
+
+### The shadow exception
+
+**One, added 19 August 2026.** A popover opening over a `.sheet.paper` surface — More,
+Share, the version list, the date picker — carries a soft two-layer shadow:
+
+```css
+box-shadow:
+  0 1px 2px rgba(27, 29, 35, 0.05),
+  0 12px 28px -6px rgba(27, 29, 35, 0.14);
+```
+
+**Why this is not the rule collapsing.** "Borders, not shadows" holds wherever a border can
+carry the separation, and on the parchment sheets it can — a white panel over grey is a
+tone apart before the line is drawn. On paper the panel and the page are the same white, so
+the 1px hairline at **1.56:1** is the whole of it: a 300px menu held above a page by a line
+the eye has to hunt for. The exception is scoped to the case that created it and does not
+extend to cards, buttons, sheets or text, on paper or anywhere else.
+
+Ink-hued rather than black — the neutral ramp is hued 265° toward the steel Field and a
+black shadow on it reads cold. Two layers: the close pair seats the edge, the far pair is
+the lift, wide and weak enough to show no band against white. Both carry a real offset and
+a real blur; a zero-offset halo is decoration, and this is doing a job.
+
+**The hairline stays.** The shadow says how far above the page the panel is; the line says
+where it ends.
 
 ---
 

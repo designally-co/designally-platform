@@ -82,30 +82,32 @@ export default function ShareLink({ token, url, closed }: { token: string; url: 
           style={{ top: at.top, left: at.left, width: at.width }}
         >
           {/**
-           * The status, set as a status rather than as a sentence about one.
+           * The status, and only when it is the one worth saying.
            *
-           * It was a line of grey prose that read like a footnote, on the one
-           * thing in this panel that changes what the link *does*. The state is
-           * a label now — the system's established form for one, uppercase and
-           * tracked, the same treatment `.qsec` gives a section — with the
-           * consequence under it, one line each. Both wrapped at first, and a
-           * two-line consequence under a one-word label is the paragraph this
-           * was meant to stop being: "anyone who should have a say" became
-           * "anyone who should answer", and "anyone opening this link now" lost
-           * the noun the label above it had already said.
+           * "Open — anyone with this link can answer" went on 19 August 2026,
+           * asked for. It was the panel's first line in the ordinary case, and
+           * it described the ordinary case: somebody who has opened Share on a
+           * live survey is about to send the link precisely because it works.
+           * A label that is true every time it is read is not a status, it is a
+           * heading over the thing below it.
+           *
+           * **Closed stays**, and the asymmetry is the point. That one is a
+           * warning — the panel is handing over a link that turns every client
+           * away, and nothing else here would say so. The open case loses a line
+           * nobody needed; the closed case keeps the only line that changes what
+           * somebody does next.
            *
            * No coloured dot, and that is not an omission. DESIGN.md §2: "a
            * status is the word for it, never a star or a dot beside a name.
            * A bare glyph needs a legend; words don't." So the word carries it,
-           * and the two lines take two inks — which the same section allows
-           * across separate lines and forbids inside one.
+           * and the two inks sit across two lines — which the same section
+           * allows, and forbids inside one.
            */}
-          <p className="sharestate">
-            <b>{closed ? 'Closed' : 'Open'}</b>
-            {closed
-              ? ' — anyone who opens it now is told so.'
-              : ' — anyone with this link can answer.'}
-          </p>
+          {closed && (
+            <p className="sharestate">
+              <b>Closed</b> — anyone who opens it now is told so.
+            </p>
+          )}
 
           <LinkAndCode token={token} url={url} />
         </div>

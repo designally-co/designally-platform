@@ -48,20 +48,34 @@ export default function SurveyMadeSheet({
       narrow
       width="onecol-w link-w"
       bare
+      /* The last sheet onto the paper ground, 19 August 2026 — the whole team
+         app is one surface now. Its QR frame keeps its white and its hairline
+         on purpose; see `.qrframe`. */
+      surface="paper"
       backLabel="Done"
       onClose={onClose}
     >
       <div className="onecol">
         <h1>The link is ready.</h1>
-        <p className="lede">Send it to the client&apos;s main contact. They can forward it on.</p>
+        {/* One line, measured — 19 August 2026, asked for. The sentence was
+            "Send it to the client's main contact. They can forward it on.",
+            which is 437px at 15px against a 332px column and broke in two. This
+            is 312, and it keeps both facts: one person receives it, and it is
+            theirs to pass on. "client's" went because the sheet is already
+            about their project and the word was carrying nothing the reader did
+            not have. */}
+        <p className="lede">Send it to the main contact to forward on.</p>
 
         <LinkAndCode token={token} url={url} />
 
-        {/* One fact, and the one somebody needs before sending it. What went:
-            that collection is closed by a person and not by the date — true,
-            and rule 1's business on the project, not on a line under a QR code
-            somebody is about to photograph. */}
-        <p className="hintline">Opens without a login. Anyone who has it can answer.</p>
+        {/* "Opens without a login. Anyone who has it can answer." was here and
+            went on 19 August 2026, asked for. It was the last of three lines of
+            standing policy on this sheet — the other two, that collection is
+            closed by a person rather than by the date, went earlier for the same
+            reason. Every one of them is true, and none is news to the person who
+            just pressed Create: they are reading this screen to get the link
+            out, and the sheet is a sentence, a link and a code. The share panel
+            on the project says the state where it can change. */}
       </div>
     </Sheet>
   );

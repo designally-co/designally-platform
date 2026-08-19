@@ -93,7 +93,18 @@ export default function NewSurveySheet({
       narrow
       width="onecol-w form-w"
       bare
+      /* No close disc — the form ends in Cancel, which is the same act said in
+         a word, at the place a person's eye already is when they decide not to
+         create anything. Two exits at opposite ends of the sheet is one more
+         than it needs. */
+      hideClose
       backLabel="Close"
+      /* The fourth sheet on the paper ground, 19 August 2026. It was left on
+         parchment on the argument that it holds no card — which was wrong: the
+         two package options are exactly that object, `--canvas` inside a
+         hairline, and they are the thing the sheet is *for*. See
+         `.sheet.paper`. */
+      surface="paper"
       onClose={onClose}
     >
       {/**
@@ -207,9 +218,29 @@ export default function NewSurveySheet({
           session. Rare, and it has nowhere better to go. */}
         {error && !error.field && <p className="formerror">{error.text}</p>}
 
-        <button className="btn btn-primary" onClick={submit} disabled={pending}>
-          {pending ? "Creating…" : "Create"}
-        </button>
+        {/**
+         * The pair, at the foot and to the trailing edge.
+         *
+         * Create was alone and left-aligned under the last field, which is
+         * where a single button belongs and not where two do — a form with a
+         * way out ends in a decision, and a decision reads at the end of the
+         * line.
+         *
+         * Cancel first, Create last, which is the other way round from
+         * `.iacts`. That order is right where it lives: a confirmation inside a
+         * 240px menu, two full-width halves, the act named first because the
+         * question was asked directly above it. This is a form footer, the
+         * buttons are hugging their labels rather than splitting a row, and the
+         * primary belongs at the end of the reading order.
+         */}
+        <div className="formacts">
+          <button className="btn btn-fill" onClick={onClose} disabled={pending}>
+            Cancel
+          </button>
+          <button className="btn btn-primary" onClick={submit} disabled={pending}>
+            {pending ? "Creating…" : "Create"}
+          </button>
+        </div>
       </div>
     </Sheet>
   );

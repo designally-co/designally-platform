@@ -34,15 +34,44 @@
      on it is legal at 5.19:1 and was tried first, but dark-on-orange reads
      as a caution sign rather than a brand action — studio judgement.
 
-     So the action colour is the CI hue (32°) and chroma at the lightness
-     where a white label clears 4.5:1: 5.03 under white, 4.54 as a line on
-     the page. One orange, legal as a fill, a rule, a dot and text.
+     **Reversed 19 August 2026, asked for: the team app runs the CI orange.**
+     It was `#c73f29` — the CI hue at the lightness where a *white* label
+     clears 4.5 — and the survey ran `--cut`, which is `#ef6148`. Two oranges,
+     one product, and the difference is plainly visible when the two surfaces
+     sit side by side. The studio judgement above went the other way on the
+     grounds that dark-on-orange "reads as a caution sign"; it does not, on the
+     survey, where the disc has carried charcoal numerals on this exact fill
+     since 19 August and reads as the brand.
 
-     The pure CI orange keeps two jobs — the Cut, and the dark Field, where
-     it measures 5.99:1 and is finally free to be itself. */
-  --primary: #c73f29;
-  --on-primary: #ffffff; /* 5.03:1 */
-  --primary-deep: #b03f2b; /* hover darkens, never lightens — 5.85:1 */
+     The measurements did not move, so what they forbid still stands. This
+     token is a **fill, a ring and a border on white** and nothing else: every
+     one of its fifteen uses is `background`, `border-color`, `accent-color` or
+     `box-shadow`. Text and markers on light grounds take `--primary-mark`
+     below, which stays `#c73f29` — 2.92:1 on parchment is not a dot anybody
+     can see, and no amount of wanting one orange makes it one.
+
+     The Cut and the dark Field keep it too, where it measures 5.99:1. */
+  --primary: var(--orange-500);
+  /**
+   * White on the CI orange — **3.24:1**, and under the 4.5 this label size
+   * owes. Decided 19 August 2026, asked for directly and reaffirmed after the
+   * measurement was put in front of it: the brand rule is a white label on
+   * Designally Orange, and the brand rule wins here.
+   *
+   * Charcoal was fitted first and is legal at 5.19:1. It is not what the
+   * product is going to ship. Recorded rather than argued: this is a knowing
+   * divergence, not an oversight, and it is the one place in this stylesheet
+   * where a contrast floor is crossed on purpose.
+   *
+   * What it costs, stated plainly: a 17px white label on this fill is hard
+   * work in low light and on a dimmed laptop screen. The hover below darkens
+   * to 4.27, so the state somebody is pointing at is the legible one.
+   */
+  --on-primary: #ffffff; /* CI-DIVERGENCE: 3.24:1 on --primary, brand rule */
+  /* Hover darkens, never lightens. Two steps down the CI hue, which takes the
+     white label from 3.24 to 4.27 — so the button under the pointer is the
+     one that reads, and the resting state is the brand's. */
+  --primary-deep: #d9482d; /* 4.27:1 with white */
 
   /**
    * Orange as a line, a dot, or text.
@@ -54,6 +83,20 @@
    *
    * CI-DIVERGENCE: the system's own --text-accent is orange-600 #d95039 =
    * 3.67:1 on the page and cannot carry text.
+   */
+  /**
+   * Follows `--primary`, so the dots, the wordmark's full stop, a focused
+   * border and `.btn-quiet`'s label are all Designally Orange too — one orange
+   * across the product, which is the whole point of the change.
+   *
+   * The numbers, for the record: `#ef6148` is **3.24:1 on white and 2.92:1 on
+   * the parchment page**. Under 4.5 for text, and under 3 for the status dot
+   * as a graphical object. `#c73f29` was here for exactly that reason and is
+   * the value to restore if any of these ever has to be read rather than
+   * recognised.
+   *
+   * It still becomes `--primary-on-dark` on the dark Field, where the orange
+   * measures 5.99 and needs no help.
    */
   --primary-mark: var(--primary);
   --primary-tint: #fff0ec;
@@ -72,8 +115,32 @@
   --body-muted: #b9bcc2;
 
   /* surface */
-  --canvas: #ffffff;
+  /* the raw white, held one step above `--canvas` so a surface can take it by
+     name — see `.sheet.paper` */
+  --white: #ffffff;
+  --canvas: var(--white);
   --parchment: var(--warm-white);
+  /**
+   * The lower ground *inside* a white box — the same grey, a different job.
+   *
+   * Nine rules read `--parchment` because the value matched, not because they
+   * were the page: the insights panel's foot, the collection box's question
+   * row, a confirmation, and the step a control takes when a cursor is on it or
+   * a thumb is down on it — the menu row, the icon button, the sheet's back
+   * disc, and the date picker's trigger, month arrows and days. All of them sit
+   * on `--canvas` and take their depth from the box around them. The page is
+   * nowhere near any of them.
+   *
+   * One token doing two jobs held until a sheet moved its own ground. The
+   * project sheet is white (`.sheet.paper`), and all nine went white with it —
+   * every recess and every hover in it flattened at once, which is a control
+   * losing its feedback rather than a panel losing a tint.
+   *
+   * They are their own name now, and it resolves to the same `--warm-white`, so
+   * nothing rendered differently the day this was split. A surface can change
+   * what it is made of without reaching inside its own cards.
+   */
+  --recess: var(--warm-white);
   --pearl: #fafaf9;
   /**
    * The neutral control fill — an icon button with no label to carry it.
@@ -214,7 +281,12 @@
   /* The air around the new-link sheet's single column — see `.sheet.onecol-w`.
      Off the spacing scale on purpose, and named so the four places that need it
      cannot drift apart. */
-  --onecol-pad: 68px;
+  /* 24 — `--sp-lg`, the inset every other sheet stands its content at. It was
+     68, which gave the two `onecol` sheets an air nothing else in the app has
+     and made a three-field form sit in a 444px column inside a 580px sheet.
+     Survey made overrides it back up to 64 at `.sheet.link-w`: that one is a
+     link and a QR code rather than a form, and air is its content. */
+  --onecol-pad: 24px;
 
 
   /**
@@ -557,9 +629,10 @@ textarea {
 @media (hover: hover) {
   .client-surface .btn-primary:hover {
     /* darkens, never lightens — the one direction a hover moves in this
-       system. `--primary` is the same hue one step down, so the ramp stays the
-       CI's own and the white label goes from 3.24:1 to 5.03. */
-    background: var(--primary);
+       system. This pointed at `--primary` for a darker step, and `--primary`
+       is now this same `#ef6148`, so it had become a hover that does nothing.
+       `--primary-deep` is the step: the white label goes 3.24 → 4.27. */
+    background: var(--primary-deep);
   }
 }
 
@@ -582,6 +655,45 @@ textarea {
     /* the one rule for a hover in this system: the line darkens, nothing else */
     border-color: var(--ink-3);
   }
+}
+
+/**
+ * The neutral filled pill — a way out that has a body.
+ *
+ * `.btn-outline` is the same role drawn as a line: transparent inside
+ * `--hairline`. That works on parchment, where transparent means the page shows
+ * through and the page is a tone. On the project sheet, which is white from
+ * 19 August 2026, transparent means white, and a white pill on a white ground is
+ * a hairline with nothing in it — the outline *was* the button, beside an ink
+ * pill that is solid all the way through. Two answers to one question, one of
+ * them a shape and one of them an edge.
+ *
+ * So it takes the ground the icon disc takes: `--fill`, and **no border**, which
+ * is the point — an object needs a body, not a boundary. It is 2.01:1 against
+ * white, well clear of the 1.07 a white pill manages, and its `--ink` label
+ * measures 8.37:1, so the label carries the meaning as it should. Hover and
+ * press step through the same `--fill-deep` / `--fill-press` the disc uses;
+ * there is one neutral control in this product and this is its pill form.
+ *
+ * The transparent 1px border stays. `.btn` counts it in the 44px, and dropping
+ * it would shrink this pill 2px below the ink one beside it.
+ *
+ * Where it is used: Cancel, in all five confirmations on the project sheet. The
+ * ink pill is the answer that acts and this is the answer that does not, which
+ * is exactly the hierarchy a solid black pill and a solid grey one already read
+ * as. `.btn-outline` keeps the sheets that are still parchment.
+ */
+.btn-fill {
+  background: var(--fill);
+  color: var(--ink);
+}
+@media (hover: hover) {
+  .btn-fill:not(:disabled):hover {
+    background: var(--fill-deep);
+  }
+}
+.btn-fill:not(:disabled):active {
+  background: var(--fill-press);
 }
 @media (hover: hover) {
   .btn-quiet:hover {
@@ -1935,14 +2047,67 @@ textarea {
   top: calc(100% + 8px);
   right: 0;
   z-index: 20;
-  min-width: 232px;
+  /**
+   * The floor is the widest row this menu can show, so the panel does not
+   * change size when a row opens.
+   *
+   * It was 232px, and the menu is sized by its content — which is fine until
+   * the row that opens is the widest one in it. `Download all responses` sets
+   * the project sheet's menu at 240; opening *that* row replaces it, the width
+   * leaves with it, and the panel snapped 8px narrower while Archive and Delete
+   * opening kept it. A popover that resizes depending on which of its own rows
+   * you pressed reads as a glitch, not as a layout.
+   *
+   * 240 is that label at 14.5/600 plus the row's padding and mark. It is a
+   * measurement, so it has to be retaken if the longest label changes — every
+   * label in here is a fixed English string, so it does not move on its own.
+   * Menus with wider content are unaffected: the toolbar's own runs 378.
+   */
+  min-width: 240px;
+  /* named so the concentric corners below can be derived from it rather than
+     from a 6 written twice */
+  --menu-pad: 6px;
   background: var(--canvas);
   border: 1px solid var(--hairline);
   border-radius: var(--r-card);
-  padding: 6px;
+  padding: var(--menu-pad);
   display: flex;
   flex-direction: column;
   align-items: stretch;
+}
+
+/**
+ * The first and last rows curve with the panel, not against it.
+ *
+ * A row's highlight is `sm` (8px) and the panel is `card` (26px) with 6px
+ * between them, so at the top two corners an 8px curve sat inside a 26px one
+ * and left a thick white crescent that belonged to neither. DESIGN.md §3 names
+ * this exact failure once already — it is why Apple's 38px popover radius was
+ * dropped, "on a 240px menu it curves in far enough to crowd the first and last
+ * rows". 26 crowds them too, just less.
+ *
+ * The geometry that fixes it is concentric: an inner corner equals the outer
+ * corner minus the distance between them. 26 − 6 = 20, and it is derived rather
+ * than chosen — this is not a new step on the 8 / 11 / 18 ladder, it is the
+ * ladder's 26 restated from six pixels further in. If either value moves this
+ * follows.
+ *
+ * Only the corners that touch the panel. Every other corner stays at `sm`,
+ * because nothing is curving around them.
+ *
+ * The selectors carry `:not(.btn)` for the same reason the back control needed
+ * three classes: `.barmenu button:not(.btn)` sets `border-radius: sm` at
+ * (0,2,1), and a bare `.barmenu > *:first-child` is (0,2,0) and loses.
+ */
+.barmenu > button:not(.btn):first-child,
+.barmenu > .delconfirm:first-child {
+  border-top-left-radius: calc(var(--r-card) - var(--menu-pad));
+  border-top-right-radius: calc(var(--r-card) - var(--menu-pad));
+}
+.barmenu > button:not(.btn):last-child,
+.barmenu > .delconfirm:last-child {
+  border-bottom-left-radius: calc(var(--r-card) - var(--menu-pad));
+  border-bottom-right-radius: calc(var(--r-card) - var(--menu-pad));
 }
 .moreslot {
   position: relative;
@@ -2031,7 +2196,7 @@ textarea {
 }
 
 .iconbtn:active {
-  background: var(--parchment);
+  background: var(--recess);
   color: var(--ink);
   transform: scale(0.94);
 }
@@ -2097,6 +2262,11 @@ textarea {
 .barmenu button:not(.btn) {
   display: flex;
   align-items: center;
+  /* A menu item is one line. `Download as Markdown` broke over two beside a
+     `Download as PDF` that did not, which reads as two kinds of item rather
+     than one pair — and the panel is sized by its content, so letting the
+     label set the width costs nothing but the pixels it needs. */
+  white-space: nowrap;
   gap: 12px;
   width: 100%;
   text-align: left;
@@ -2177,7 +2347,7 @@ textarea {
 }
 @media (hover: hover) {
   .barmenu button:not(.btn):not(:disabled):hover {
-    background: var(--parchment);
+    background: var(--recess);
   }
 }
 .linkish {
@@ -2830,7 +3000,7 @@ textarea {
 .insfoot {
   padding: var(--sp-md);
   border-top: 1px solid var(--divider);
-  background: var(--parchment);
+  background: var(--recess);
 }
 /* The way in, under the record of what there is to go in to. `--sp-sm` and not
    the `--sp-md` a section would take: it belongs to the lines above it rather
@@ -3337,6 +3507,26 @@ textarea {
   margin-top: var(--sp-md);
   text-wrap: pretty;
 }
+/**
+ * Inside a field, the hint belongs to the field.
+ *
+ * `.onecol .hintline`'s 17px was written for the *Survey made* sheet, where
+ * the line is a standalone note under a QR block and has nothing above it to
+ * belong to. On the New survey form it sits under a control it describes, and
+ * 17px put it 17 from its own field against 22 between one field and the next
+ * — a five-pixel difference doing the work of saying which of the two it is
+ * part of.
+ *
+ * 7px, which is `.f`'s own step above the control. The label sits 7 over the
+ * field and the hint sits 7 under it: one group, symmetrical, and a third of
+ * the distance to the next.
+ *
+ * Three classes so it clears `.onecol .hintline` on specificity rather than on
+ * which line comes last.
+ */
+.onecol .field .hintline {
+  margin-top: 7px;
+}
 
 /**
  * The link, its code and its Save, in one column of one width.
@@ -3434,8 +3624,19 @@ textarea {
  * `min-height` did instead was put twelve pixels of slack under a heading whose
  * next line is meant to belong to it.
  */
-.sheet.bare .onecol h1 {
+/* Room for the floating disc, on the sheets that still have one — `.noclose`
+   has nothing up there to clear. */
+.sheet.bare:not(.noclose) .onecol h1 {
   padding-right: calc(44px + var(--sp-xs));
+}
+
+/* A form's answers, at its foot and to its trailing edge. `gap` is the pair's
+   own, and the space above it is the step between a field and a decision. */
+.formacts {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-xs);
+  margin-top: var(--sp-lg);
 }
 
 /* ---- The Collection bar ------------------------------------------------
@@ -3573,7 +3774,7 @@ textarea {
  */
 .collask {
   display: block;
-  background: var(--parchment);
+  background: var(--recess);
   border-top: 1px solid var(--divider);
   padding: var(--sp-sm) var(--sp-md);
   /* Centred, where the bar above it is a row read left to right.
@@ -3731,7 +3932,7 @@ textarea {
 }
 @media (hover: hover) {
   .dpopen:hover {
-    background: var(--parchment);
+    background: var(--recess);
     color: var(--ink);
   }
 }
@@ -3788,7 +3989,7 @@ textarea {
 }
 @media (hover: hover) {
   .dpnav:hover {
-    background: var(--parchment);
+    background: var(--recess);
     color: var(--ink);
   }
 }
@@ -3836,7 +4037,7 @@ textarea {
 }
 @media (hover: hover) {
   .dpday:not(:disabled):hover {
-    background: var(--parchment);
+    background: var(--recess);
   }
 }
 .dpday:focus-visible {
@@ -4024,10 +4225,315 @@ dialog::backdrop {
   display: flex;
   flex-direction: column;
   border-radius: var(--r-sheet);
-  /* the Edge, at the size a floating object needs to hold its own boundary
-     against a dimmed page — DESIGN.md: borders, not shadows */
-  border: 1px solid var(--hairline);
+  /**
+   * No edge — 19 August 2026, asked for.
+   *
+   * It was a 1px `--hairline`, on the argument that a floating object holds its
+   * own boundary and this product uses borders rather than shadows. The
+   * boundary is not in doubt: a sheet sits on a dimmed page under a scrim, so
+   * the ground either side of that line already differs by more than the line
+   * does. It was drawing an edge onto a silhouette that had one.
+   *
+   * The scrim is the separation, the way the tone is on the cards inside — same
+   * instruction, one level up.
+   */
   animation: slideup 0.42s var(--ease);
+}
+
+/**
+ * The project sheet is white.
+ *
+ * Every other sheet is parchment holding white cards — the page arrangement,
+ * carried inside the dialog. This one is nearly all cards: who answered,
+ * collection, the insights panel, the delete confirmation, each a box stacked
+ * down a long scroll. At that density the grey ground stopped reading as a page
+ * and started reading as gaps between the cards.
+ *
+ * **The ground moves and nothing on it does.** `--canvas` is untouched, so the
+ * cards, the buttons, the menus and the inputs are the same white they are on
+ * every other sheet — asked for 19 August 2026, and it is the right way round:
+ * `--canvas` is what a control is made of throughout this product, and a sheet
+ * changing its own ground has no business changing what stands on it.
+ *
+ * What that costs is the fill as a boundary. White on white is 1.07:1, so the
+ * hairline is now the whole edge — 1.66:1 on white against 1.55:1 on parchment,
+ * so it is very slightly stronger than it was, and it is the same treatment
+ * DESIGN.md §8 already gives the quiet action on the survey's flat page:
+ * `--canvas` inside a 1px `--hairline`, same object, different ground.
+ *
+ * What the sheet's ground must not reach is the grey *inside* its cards — the
+ * insights foot, the collection question row, a confirmation, and every hover
+ * and press that steps a control off white. Those took `--parchment` too, and
+ * moving it under them flattened all of them at once. They read `--recess` now;
+ * see the token.
+ *
+ * `--white` is the raw value held one step above `--canvas`, so this line does
+ * not have to write `#ffffff` in the middle of the stylesheet.
+ */
+/**
+ * The project sheet, inverted.
+ *
+ * **The page is white and everything on it steps down.** The rest of the app
+ * runs the parchment inversion — warm-white page, white cards, so a card lifts
+ * by being lighter. That step is `#fff` against `#f3f3f3`, which measures
+ * **1.11:1**: the lift was always almost entirely the hairline, and turning the
+ * sheet white showed it by changing so little.
+ *
+ * So this sheet uses the same two tones the other way round. The ground is
+ * white, a card is the warm white, and the band inside a card that wants to be
+ * a different thing returns to white. Two values, three levels, no new grey —
+ * and the direction of depth is now the thing that says which surface you are
+ * on.
+ *
+ * `--canvas` and not a class per card: nothing below reads a surface colour
+ * directly, so one declaration turns every card, input, popover and control
+ * fill on this sheet over at once. Same mechanism as `[data-field="dark"]`.
+ */
+.sheet.paper {
+  --parchment: var(--white);
+  --canvas: var(--warm-white);
+  --recess: var(--white);
+}
+/**
+ * A card is a tone now, so it does not also need a line.
+ *
+ * Two devices for one boundary is what "borders, not shadows" is guarding
+ * against — it says draw a container *one* way, and on the parchment sheet the
+ * line is that way because the tone is 1.11:1 and cannot be. Here the tone can
+ * be, so the line goes.
+ *
+ * **Controls keep theirs.** The date field, the option chips, the outline pills
+ * — a thing you press is bounded by an edge in this system whatever it is
+ * standing on, and on a grey card their white fill is a step *up*, which is the
+ * direction that has always meant "this one is live".
+ */
+.sheet.paper .collbox,
+.sheet.paper .insbox,
+.sheet.paper .pd-people button,
+.sheet.paper .doc,
+/* the insights sheet's own card — one conflict, boxed. It came over with the
+   ground on 19 August 2026 and takes the same rule: the tone is the boundary.
+   `.signal`'s top rule and the blockquote's left rule stay, because neither is
+   a container — they are lines between things, which is a different job. */
+.sheet.paper .conflict,
+/* the answers sheet's chips — what somebody ticked, one word each. The same
+   object `.pd-people button` is on the project sheet, so it loses its line for
+   the same reason. The hairlines *between* answers are not containers and
+   stay. */
+.sheet.paper .anschips li,
+/**
+ * the New survey sheet's package options — but only while unchosen.
+ *
+ * `:not([aria-pressed='true'])` rather than letting the selected rule win on
+ * file order: `.opt[aria-pressed='true']` is (0,2,0) and so is `.sheet.paper
+ * .opt`, and a tie decided by which line comes last is how four of today's
+ * defects happened.
+ *
+ * The chosen one keeps its 2px `--primary`, and reads better for this: an
+ * unchosen card is now a tone with no line at all, so the accent is the only
+ * border on the sheet rather than a thicker one among three.
+ */
+.sheet.paper .opt:not([aria-pressed='true']) {
+  border-color: transparent;
+}
+/**
+ * The disc buttons lose their ring — 19 August 2026, asked for: the outline
+ * read hard.
+ *
+ * It was a 1px `--hairline` around a `--canvas` fill. On the parchment sheets
+ * that fill is white and lifts off the grey, so the ring is a second, softer
+ * device on a shape the tone already carries. Inverted, the fill *is* the page's
+ * near-neighbour — 1.11:1 — so the ring became the only edge, and the only edge
+ * on a 44px circle is a hard one: a dark hoop drawn around almost nothing.
+ *
+ * So the disc takes the surface's own rule, the one the cards took: a tone
+ * carries the boundary, and a thing with a tone is not also drawn a line. The
+ * fill steps down to where the shape reads on its own and the ring goes.
+ *
+ * **What identifies the control is the glyph, and it always was.** `--glyph` on
+ * this fill measures 10.41:1, its hover 9.40 and its press 11.14. The disc is a
+ * ground for it, not a boundary
+ * around it — which is why softening this one does not cost what softening an
+ * input's border would, and why the date field and the text inputs below keep
+ * theirs to the pixel.
+ *
+ * Hover and press are the fill, not the line, for the same reason `.person` and
+ * `.doc` are on this surface: `--ink-3` on a ring that is no longer there does
+ * nothing at all. They continue the ramp the cards run on.
+ *
+ * `.sheetclose` came in with the New survey sheet on 19 August 2026 — it is the
+ * same 44px disc with the same `--canvas` fill and the same hairline, on a
+ * `bare` sheet rather than a `sheet-top`, and it was the last one still wearing
+ * a ring.
+ */
+/**
+ * The neutral pill takes the same hueless ramp as the discs.
+ *
+ * `--fill` is `#beb5b2` — the warm neutral, hued 45° to sit beside the orange,
+ * and the darkest neutral in the system. Beside a solid `--primary` Create it
+ * read as the heavier of the two buttons, which is backwards for the one that
+ * does nothing.
+ *
+ * DESIGN.md justifies the warm fill as "the icon disc's own ground", and that
+ * stopped being true here the moment those discs went hueless earlier in this
+ * experiment. Same ramp now, same reason the cards use it: these greys stand on
+ * a hueless surface, and a warm fill among them reads brown rather than
+ * neutral. `--ink` on it is 15.4:1.
+ */
+.sheet.paper .btn-fill {
+  background: #e9e9e9;
+  color: var(--ink);
+}
+@media (hover: hover) {
+  .sheet.paper .btn-fill:not(:disabled):hover {
+    background: #dedede;
+  }
+}
+.sheet.paper .btn-fill:not(:disabled):active {
+  background: #d2d2d2;
+}
+
+.sheet.paper .iconbtn,
+.sheet.paper .sheetclose,
+.sheet.paper .sheet-top .back {
+  border-color: transparent;
+  background: #e9e9e9;
+}
+@media (hover: hover) {
+  .sheet.paper .iconbtn:hover,
+  .sheet.paper .sheetclose:hover,
+  .sheet.paper .sheet-top .back:hover {
+    border-color: transparent;
+    background: #dedede;
+    color: var(--ink);
+  }
+}
+.sheet.paper .iconbtn:active,
+.sheet.paper .sheetclose:active,
+.sheet.paper .sheet-top .back:active {
+  background: #d2d2d2;
+  color: var(--ink);
+}
+
+/**
+ * A popover floats, so it takes the page's own white — not the card tone.
+ *
+ * `--canvas` is the raised surface, and on the parchment sheets raised *is*
+ * white. Inverted, `--canvas` became the card tone, and every panel that opens
+ * over this sheet — More, Share, the version list, the date picker — came up
+ * grey. A menu is not a card lying on the page; it is a thing held above it,
+ * and on this surface the value for held-above is white.
+ *
+ * They keep their hairline, and here it is doing the whole job: a white panel
+ * over the white page has nothing else to separate it, and there are no shadows
+ * in this product. Over a card it has the tone as well.
+ */
+.sheet.paper .barmenu,
+.sheet.paper .vermenu,
+.sheet.paper .sharepanel,
+.sheet.paper .dppop {
+  background: var(--white);
+  /**
+   * Inside a popover, a recess steps *down* again.
+   *
+   * `.sheet.paper` sets `--recess: white`, and that is right on the sheet: a
+   * band inside a grey card returns to the page's own colour. A popover is not
+   * a card — it is white already — so the same token made the archive
+   * confirmation white on white and it vanished, along with the whole point of
+   * a recess.
+   *
+   * So within these four panels the token goes back to what it is everywhere
+   * else. It is set on the popover rather than on `.delconfirm` so anything
+   * else that reads a recess in here inherits the same correction.
+   */
+  --recess: var(--warm-white);
+  /**
+   * The one shadow in the product that is not the focus ring — 19 August 2026,
+   * asked for, and recorded as an exception in DESIGN.md §8 rather than left as
+   * a rule quietly broken.
+   *
+   * The reason is this surface and only this surface. "Borders, not shadows"
+   * works when a border can carry the separation, and on the parchment sheets it
+   * can: a white panel over grey is a tone apart before the line is drawn. Here
+   * the panel and the page are the same white, so the 1px hairline at 1.56:1 is
+   * the whole of it — a 300px menu held above a page by a line the eye has to
+   * hunt for.
+   *
+   * Two layers, ink-hued rather than black, because the ramp is hued 265° toward
+   * the steel Field and a neutral black shadow on it reads cold. The close pair
+   * seats the edge; the far pair is the lift and is wide and weak enough that no
+   * band is visible against white. Offset and blur both real — a zero-offset
+   * halo is decoration, and this is doing a job.
+   *
+   * The hairline stays. The shadow says how far above the page the panel is; the
+   * line says where it ends.
+   */
+  box-shadow:
+    0 1px 2px rgba(27, 29, 35, 0.05),
+    0 12px 28px -6px rgba(27, 29, 35, 0.14);
+}
+
+/* Back up to the page's own white: a control on a card, not part of it. */
+.sheet.paper .dpfield,
+.sheet.paper .input,
+.sheet.paper textarea {
+  background: var(--white);
+}
+
+/**
+ * The hover, on a card that no longer has a line to darken.
+ *
+ * DESIGN.md §Hover gives one rule — *a hover darkens the line to `--ink-3` and
+ * nothing else* — and one exception: **a filled control deepens its own fill.**
+ * A borderless tone-card is the filled case, so it takes the exception. On the
+ * parchment sheet these cards keep their border and keep the rule; this is the
+ * same instruction expressed on a surface that has no line to give.
+ *
+ * `#e6e6e6` is one more step of the size the surface is already built from:
+ * the page-to-card step is **1.11:1** and this is **1.125:1**, so pointing at
+ * a card moves it by as much as being a card is worth. Ink on it measures
+ * 13.50:1 and `--ink-3` 5.82:1, so nothing on the card gets quieter for being
+ * pointed at.
+ *
+ * Scoped to `.sheet.paper`, wrapped in `@media (hover: hover)` like every hover in
+ * this codebase — a touch device has no way to end one, and a tapped card that
+ * stays darkened reads as selected.
+ */
+@media (hover: hover) {
+  .sheet.paper .person:hover,
+  .sheet.paper .doc:hover {
+    background: #e6e6e6;
+    /* the line stays gone — one device, and it is the fill */
+    border-color: transparent;
+    /* `.doc` underlines its name on hover on the parchment sheet, which was a
+       second device even there — `.person` had the same thing removed on the
+       argument that link decoration on a name is wrong. With a fill carrying
+       the state it is plainly one too many. */
+    text-decoration: none;
+  }
+}
+.sheet.paper .person,
+.sheet.paper .doc {
+  transition: background-color 0.16s var(--ease);
+}
+/**
+ * Pressed: one more step, so the card answers the finger before the sheet
+ * opens.
+ *
+ * `--surface-fill` was the obvious pick — it is the system's own press ground
+ * for a neutral control — and it is wrong here. That ramp is deliberately warm,
+ * hued 45° to sit beside the orange, and these cards are hueless: pressing one
+ * turned it brown against four greys. The whole point of this surface is a
+ * single neutral run.
+ *
+ * `#dbdbdb` continues it at the interval the other two steps use — 1.110 from
+ * the hover, against 1.110 page-to-card and 1.125 card-to-hover. Three moves of
+ * the same size, so depth on this sheet is one unit counted out. Ink on it is
+ * 12.17:1.
+ */
+.sheet.paper .person:active,
+.sheet.paper .doc:active {
+  background: #dbdbdb;
 }
 /**
  * The scroller sits inside the sheet, and the sheet clips it.
@@ -4223,6 +4729,19 @@ dialog::backdrop {
   }
   .sheet.link-w {
     width: min(460px, 100%);
+    /**
+     * 64, where New survey stands at 24 — asked for, 19 August 2026.
+     *
+     * They share the `onecol` shell and took the same inset until now. They are
+     * not the same kind of screen: New survey is a form, and a form wants its
+     * fields wide and its footer close. This one holds a sentence, a link and a
+     * code somebody is about to photograph, and it is the moment a survey
+     * exists. Air is the content here.
+     *
+     * Set as the variable rather than as padding, so the two rules below stay
+     * the single place the inset is applied.
+     */
+    --onecol-pad: 64px;
   }
 
   /* `.sheet.onecol-w`, not `.onecol-w`: the bare sheet's own `padding-top` is
@@ -4453,7 +4972,7 @@ dialog::backdrop {
 }
 
 .sheet-top .back:active {
-  background: var(--parchment);
+  background: var(--recess);
   color: var(--ink);
   transform: scale(0.96);
 }
@@ -7357,10 +7876,57 @@ dialog::backdrop {
   font-weight: 600;
 }
 
+/**
+ * One pill, with the copy disc sitting inside its right end.
+ *
+ * It was a rounded box and a disc beside it with 8px between, which is two
+ * controls doing one job — read this link, take this link — and the eye had to
+ * put them together. The row is the control now: the field is its inside, and
+ * the button is a thing held within it.
+ *
+ * **The right cap and the disc are concentric, which is the whole geometry.**
+ * A pill's cap radius is half its height, so for the gap between them to hold
+ * the same width all the way round that curve, the disc's radius has to be the
+ * cap's radius minus how far it is inset. 54 ÷ 2 = 27; the disc is 44, so 22;
+ * and 27 − 22 = 5, which is the padding. Both centres land 27px in from the
+ * right edge and 27px down, measured — not near it. Move any one of the three
+ * and the other two follow.
+ *
+ * **No outline.** The fill is the boundary, which is the rule this surface's
+ * cards already follow: a tone that can carry the edge should not also be drawn
+ * one. It was a hairline for a few minutes and it cost a pixel of the geometry
+ * as well — box-sizing is border-box, so the border ate into the cap and the
+ * two centres came out 1px apart, which shows on two arcs meant to read as one
+ * gap.
+ *
+ * **54 rather than the 44 DESIGN.md gives an input, and the 44 is still there.**
+ * This is a field *containing* a control, so its height is the control plus the
+ * inset twice over. Shrinking the pill to 44 would put the disc at 36 and take
+ * it under the touch floor, which is the number that actually protects
+ * somebody; the input height is a consistency rule and this is not a plain
+ * input.
+ */
 .sharerow {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  height: 54px;
+  padding: 5px 5px 5px 16px;
+  border-radius: var(--r-pill);
+  /**
+   * `--canvas`, not `--recess`, and the difference is a bug.
+   *
+   * This control also stands on the *Survey made* sheet, which is parchment —
+   * and there `--recess` and `--parchment` are the same `--warm-white`, so a
+   * borderless pill filled with it disappeared into the page. It was invisible
+   * only because the hairline had been carrying it, which is the thing removing
+   * the hairline was supposed to prove was unnecessary.
+   *
+   * `--canvas` is the token that means *a step off whatever you are standing
+   * on*, and it is the one that inverts: white on the parchment sheet, warm
+   * white inside the white share popover. Both read; neither needs a line.
+   */
+  background: var(--canvas);
 }
 /**
  * The URL on one line, truncated, with the button beside it.
@@ -7377,15 +7943,10 @@ dialog::backdrop {
 .sharelink {
   flex: 1;
   min-width: 0;
-  /* the same 44 as the disc beside it, so the row has one height rather than a
-     box and a control that nearly line up */
-  min-height: 44px;
+  /* Bare now. The border, the fill and the height moved out to `.sharerow`,
+     which is the control — this is only the text inside it. */
   display: flex;
   align-items: center;
-  padding: 0 12px;
-  border: 1px solid var(--hairline);
-  border-radius: var(--r-sm);
-  background: var(--parchment);
   font-size: 13px;
   line-height: 1.55;
   color: var(--ink);
@@ -7427,7 +7988,7 @@ dialog::backdrop {
   border: 0;
   border-radius: var(--r-pill);
   background: var(--primary);
-  color: #fff;
+  color: var(--on-primary);
   cursor: pointer;
   transition: background-color 0.18s;
 }
@@ -7521,9 +8082,28 @@ dialog::backdrop {
      Capped at that width and centred, so the same code in the wider New survey
      sheet is the same object rather than a 400px wall of squares. */
   width: 100%;
+  /**
+   * Capped, which the note above `.sheet.onecol-w` has claimed since it was
+   * written and no rule ever did — the code filled whatever column it stood in.
+   * It changes nothing at today's widths and holds if either sheet is ever
+   * widened: a QR gains nothing past the size a phone locks onto, and a 450px
+   * wall of modules is only a bigger wall.
+   */
+  max-width: 332px;
+  margin-inline: auto;
   aspect-ratio: 1;
   height: auto;
   padding: 14px;
+  /**
+   * A literal white, and a border that stays — the two exceptions on the paper
+   * surface, and both are the camera's.
+   *
+   * A QR code needs a white quiet zone around it to be read; a tone would put
+   * the paper surface between a client's phone and the link. So this frame does
+   * not invert, which leaves it white on a white sheet — and there the hairline
+   * is the only thing that separates them. It is the one container on this
+   * surface whose tone cannot carry its own boundary, so it keeps the line.
+   */
   background: #fff;
   border: 1px solid var(--hairline);
   border-radius: var(--r-sm);
@@ -7587,7 +8167,7 @@ dialog::backdrop {
   gap: 6px;
   padding: 10px 11px;
   margin-top: 4px;
-  background: var(--parchment);
+  background: var(--recess);
   border-radius: var(--r-lg);
 }
 /**
@@ -7616,6 +8196,25 @@ dialog::backdrop {
  */
 .barmenu > .delconfirm:first-child {
   margin-top: 0;
+}
+/**
+ * And the same 4px under it, for the row below.
+ *
+ * `.delconfirm` had a top margin and no bottom one, which was invisible while
+ * the row under it was bare. It stops being invisible the moment that row is
+ * hovered: a hover is `--recess`, which is the confirmation's own background to
+ * the byte, so an expanded panel with a hovered row beneath it rendered as one
+ * grey shape with a corner missing out of its middle.
+ *
+ * Zeroed as the last child for the reason the first-child rule exists: the menu
+ * already has 6px of padding there, and 4 more made the panel visibly heavier at
+ * one end.
+ */
+.barmenu > .delconfirm {
+  margin-bottom: 4px;
+}
+.barmenu > .delconfirm:last-child {
+  margin-bottom: 0;
 }
 
 /**
@@ -7696,6 +8295,53 @@ dialog::backdrop {
   font-size: 14.5px;
 }
 
+/**
+ * The back control and the line it belongs to, on one row.
+ *
+ * 28px rather than the calendar's 32: this sits inside a 240px popover beside
+ * a 13px line, and a 32px disc there is the largest thing in the panel. It is
+ * bare like `.dpnav` — a fill would make it the second button in a block whose
+ * buttons are the two formats — and pulled 4px left so the chevron's own ink
+ * lines up with the sentence's left edge rather than its box doing.
+ */
+.stepbackrow {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: -6px;
+}
+/* Three classes, to clear `.barmenu button:not(.btn)`. That selector is (0,2,1)
+   — the `:not()` counts its argument — and sets every row in here to
+   `width: 100%` with 9px/11px padding, which stretched this control to 210px.
+   Two classes tie on the wrong side of it; matching order instead of
+   specificity is how the last three of these went wrong. */
+.barmenu .stepbackrow .stepback {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: none;
+  color: var(--ink-3);
+  cursor: pointer;
+  transition:
+    background-color 0.16s,
+    color 0.16s;
+}
+@media (hover: hover) {
+  .barmenu .stepbackrow .stepback:hover {
+    background: var(--surface-fill);
+    color: var(--ink);
+  }
+}
+.barmenu .stepbackrow .stepback:active {
+  transform: scale(0.94);
+}
 .delconfirm p {
   margin: 0;
   font-size: 13px;
