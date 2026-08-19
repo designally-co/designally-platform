@@ -432,7 +432,7 @@ export default function AnswersSheet({
                     >
                       {pending ? 'Deleting…' : warned ? 'Delete anyway' : 'Delete'}
                     </button>
-                    <button className="btn btn-quiet" onClick={close}>
+                    <button className="btn btn-outline" onClick={close}>
                       Cancel
                     </button>
                   </div>

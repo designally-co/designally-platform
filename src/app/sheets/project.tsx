@@ -415,7 +415,7 @@ export default function ProjectSheet({
                   >
                     {pending ? 'Archiving…' : 'Archive'}
                   </button>
-                  <button className="btn btn-quiet" onClick={() => setConfirming(null)}>
+                  <button className="btn btn-outline" onClick={() => setConfirming(null)}>
                     Cancel
                   </button>
                 </div>
@@ -502,7 +502,7 @@ export default function ProjectSheet({
                     {pending ? 'Deleting…' : 'Delete'}
                   </button>
                   <button
-                    className="btn btn-quiet"
+                    className="btn btn-outline"
                     onClick={() => {
                       setConfirming(null);
                       setTyped('');
@@ -771,15 +771,19 @@ export default function ProjectSheet({
              */}
             {reopening && (
               <div className="collask">
+                {/* The date is the whole question, so it is the whole
+                    sentence. It carried a clause explaining that the link takes
+                    answers again and stops after the date — which is what
+                    *reopen until* already says, twice over, to somebody who
+                    pressed Reopen a second ago. */}
                 <p>
-                  <b>{due ? `Reopen until ${niceDay(due)}?` : 'Reopen until when?'}</b>{' '}
-                  <span className="why">
+                  <b>
                     {!due
-                      ? 'A reopened survey needs a date, or the link has nothing telling it to serve.'
+                      ? 'Pick a date.'
                       : due < today
-                        ? 'That date has passed, so the link would stop again straight away.'
-                        : 'The link takes answers again, and stops after this date.'}
-                  </span>
+                        ? 'That date has passed.'
+                        : `Reopen until ${niceDay(due)}?`}
+                  </b>
                 </p>
                 <div className="iacts">
                   <button
@@ -796,7 +800,7 @@ export default function ProjectSheet({
                     {pending ? 'Reopening…' : 'Reopen'}
                   </button>
                   <button
-                    className="btn btn-quiet"
+                    className="btn btn-outline"
                     disabled={pending}
                     onClick={() => {
                       setReopening(false);
@@ -817,16 +821,21 @@ export default function ProjectSheet({
                     — 19 August 2026 — because a survey without a date takes
                     answers until somebody remembers to close it. An empty field
                     is somebody halfway through typing, so it says what is
-                    missing and Save waits. */}
+                    missing and Save waits.
+
+                    One line. The clause under it said the client sees the date
+                    and the link stops after it, which is the bar's own second
+                    line a few pixels above — a confirmation is not where a
+                    control explains itself again. What survives is the case
+                    the date alone does not carry: a date already gone. */}
                 <p>
-                  <b>{due ? `Change to ${niceDay(due)}?` : 'Finish the date.'}</b>{' '}
-                  <span className="why">
-                    {!due
-                      ? 'A survey needs a date to close on — it cannot be left empty.'
-                      : due < today
-                        ? 'It has already passed, so the link stops serving straight away.'
-                        : 'The client sees it, and the link stops serving after it.'}
-                  </span>
+                  <b>{due ? `Change to ${niceDay(due)}?` : 'Finish the date.'}</b>
+                  {due && due < today ? (
+                    <>
+                      {' '}
+                      <span className="why">It has passed — the link stops at once.</span>
+                    </>
+                  ) : null}
                 </p>
                 <div className="iacts">
                   <button
@@ -839,7 +848,7 @@ export default function ProjectSheet({
                     {pending ? 'Saving…' : 'Save'}
                   </button>
                   <button
-                    className="btn btn-quiet"
+                    className="btn btn-outline"
                     disabled={pending}
                     onClick={() => setDue(p.dueDay ?? '')}
                   >
@@ -851,16 +860,20 @@ export default function ProjectSheet({
 
             {confirming === 'close' && (
               <div className="collask">
-                {/* What actually happens, which is not the same sentence when
-                    there is nothing to read: `closeCollection` returns with a
-                    warning and writes no analysis. Promising one and delivering
-                    a warning is how a person learns to distrust the line. */}
+                {/* Four words of consequence, and they differ: `closeCollection`
+                    runs the analysis on the way out, unless there is nothing to
+                    read — then it returns a warning and writes none. Promising
+                    an analysis and delivering a warning is how a person learns
+                    to stop reading the line.
+
+                    What went: that the link stops serving, which is what
+                    *close* means, and that it can be reopened afterwards, which
+                    is a reassurance about a button sitting on the bar behind
+                    this row. */}
                 <p>
                   <b>Close it now?</b>{' '}
                   <span className="why">
-                    {p.answers > 0
-                      ? 'The analysis is written and the link stops serving. You can reopen it afterwards.'
-                      : 'The link stops serving. Nobody has answered, so there is nothing to analyse — you can reopen it afterwards.'}
+                    {p.answers > 0 ? 'The analysis runs.' : 'Nothing to analyse yet.'}
                   </span>
                 </p>
                 <div className="iacts">
@@ -874,7 +887,7 @@ export default function ProjectSheet({
                   >
                     {pending ? 'Closing…' : 'Close'}
                   </button>
-                  <button className="btn btn-quiet" onClick={() => setConfirming(null)}>
+                  <button className="btn btn-outline" onClick={() => setConfirming(null)}>
                     Cancel
                   </button>
                 </div>

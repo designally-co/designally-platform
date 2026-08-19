@@ -2859,26 +2859,24 @@ textarea {
  */
 
 /**
- * Cancel is neutral in every confirmation, for the reason the affirmative is.
+ * Cancel is `.btn-outline`, everywhere — 19 August 2026.
  *
- * `.btn-quiet` is an accent-outlined pill, and the accent means *a person is
- * needed here*. Backing out of a question you already answered by opening it is
- * not that. It began scoped to the danger blocks — where an orange outline on a
- * red wash also put two hues in one small object — and there was never a reason
- * the ordinary ones should differ: once the affirmative went to ink, Cancel was
- * the only orange left in an archive confirmation, which made the way *out* the
- * loudest thing in it.
+ * There used to be a rule here undoing `.btn-quiet` inside the danger blocks,
+ * with a comment arguing that Cancel is neutral in *every* confirmation and no
+ * reason the ordinary ones should differ. That argument was right and the fix
+ * was in the wrong place: it repainted a component instead of choosing a
+ * different one, so every confirmation written afterwards — the Collection
+ * bar's three — arrived orange again and had to be caught by eye.
+ *
+ * `.btn-quiet` is an accent-outlined pill and the accent means *a person is
+ * needed here*. Backing out of a question you opened yourself is not that.
+ * `.btn-outline` is already defined as an available action that nobody is
+ * waiting on, which is exactly what Cancel is, so Cancel simply is one.
+ *
+ * What is left on `.btn-quiet` is what it was drawn for: an accent secondary
+ * beside a primary — *Open the insights* next to Generate, and the survey's
+ * *Answer as another stakeholder*.
  */
-.delconfirm .btn-quiet {
-  color: var(--ink-2);
-  border-color: var(--hairline);
-}
-@media (hover: hover) {
-  .delconfirm .btn-quiet:hover {
-    border-color: var(--ink-3);
-    background: var(--canvas);
-  }
-}
 
 /* The run on screen. A left rule would be a coloured border on a list item,
    which this project's floor bans outright — so it is the ground that changes,
@@ -3202,13 +3200,27 @@ textarea {
   background: var(--parchment);
   border-top: 1px solid var(--divider);
   padding: var(--sp-sm) var(--sp-md);
+  /* Centred, where the bar above it is a row read left to right.
+     The bar is three things side by side and the eye runs along it; this is one
+     question and two answers, and it is the only thing being asked. Centring is
+     what says the row has stopped being a row — the same move the sheet's own
+     confirmations make. */
+  text-align: center;
 }
 .collask p {
-  margin: 0 0 var(--sp-xs);
+  /* A little more air under the question than the `--sp-xs` a left-aligned
+     block wanted: centred text and centred buttons share an axis, so the gap
+     between them is the only thing separating the question from its answers. */
+  margin: 0 0 var(--sp-sm);
   font-size: 13px;
   /* Thai never below 1.6 on a line that can carry a client's name */
   line-height: 1.6;
-  text-wrap: pretty;
+  /* `balance` rather than `pretty` now it is centred. Pretty only protects the
+     last line from being a single word, which is a left-aligned concern; a
+     centred block wants its lines the same length or the shape reads as a
+     mistake. It is two or three short lines, well inside the limit browsers
+     stop balancing at. */
+  text-wrap: balance;
   color: var(--ink-2);
 }
 .collask p b {
@@ -3217,6 +3229,9 @@ textarea {
 }
 .collask .why {
   color: var(--ink-3);
+}
+.collask .iacts {
+  justify-content: center;
 }
 .collask .iacts .btn {
   min-height: 36px;

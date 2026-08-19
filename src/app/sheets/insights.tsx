@@ -303,7 +303,7 @@ export default function InsightsSheet({
                             >
                               {busy ? 'Deleting…' : 'Delete'}
                             </button>
-                            <button className="btn btn-quiet" onClick={() => setDropping(null)}>
+                            <button className="btn btn-outline" onClick={() => setDropping(null)}>
                               Cancel
                             </button>
                           </div>
