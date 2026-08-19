@@ -6422,22 +6422,32 @@ dialog::backdrop {
   place-items: center;
 }
 /**
- * 56% of the disc, and all but centred.
+ * 56% of the disc, seated optically rather than mathematically.
  *
- * Retuned 19 August 2026 for the corrected mark, and the old numbers were
- * corrections for the old art rather than anything about the disc: 54% with a
- * `translate(2.9%, -0.9%)` because that lockup sat well off-centre on its own
- * canvas. This one does not. Its ink measures 269x229 in a 290x256 file, so the
- * centre of the drawing is 2px left and 1px above the centre of the file —
- * +0.69% and +0.39%, which is the whole of the nudge now.
+ * Asked for, and the difference is large here because a `D.` is not a balanced
+ * shape: a solid letter on the left, a gap, then a small point. Two centres can
+ * be measured on it and they are 30px apart on a 290px canvas —
  *
- * 56% puts the ink at 52% of the disc, which is where the two rims read equal.
+ *     bounding-box centre   143.5, 127.5   ->  translate( 0.69%,  0.39%)
+ *     ink centroid          113.8, 134.1   ->  translate(10.74%, -2.38%)
+ *
+ * Centring the box is what the eye reads as *left*: the D nearly touches the
+ * rim while a wide crescent of orange opens on the right. Centring the centroid
+ * over-corrects — the mass of the D lands dead centre and the point is pushed
+ * out to crowd the rim, with the gap now on the left.
+ *
+ * The eye does neither. It weighs the extents and the mass together, so this
+ * sits about halfway between the two, checked against a centre line at 236px
+ * and again at the sizes it is actually drawn: 100px on the desktop masthead
+ * and 44px on a phone.
+ *
+ * 56% puts the ink at 52% of the disc.
  */
 .qdisc.markdisc img {
   width: 56%;
   height: auto;
   display: block;
-  transform: translate(0.69%, 0.39%);
+  transform: translate(5%, -1%);
 }
 
 /* the count, in a disc crossing the line at eye level */
