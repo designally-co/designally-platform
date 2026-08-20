@@ -46,6 +46,8 @@ import {
   MoreHorizontal,
   Printer,
   RotateCcw,
+  Search,
+  Settings,
   Share,
   Trash2,
   X,
@@ -80,6 +82,19 @@ function mark(Icon: LucideIcon) {
  * you" is now behind this, so the mark carries a job rather than decorating one.
  */
 export const BellMark = mark(Bell);
+
+/**
+ * Settings.
+ *
+ * The gear, and the same concession the bell is: chosen for what people already
+ * know rather than for what it depicts. `docs/navigation-decisions.md` bans a
+ * bare glyph where it needs a legend, and this is the other kind — taught by
+ * every machine on earth, and a control rather than a reading.
+ */
+export const SettingsMark = mark(Settings);
+
+/** Search. It labels the field it sits in, which is otherwise a bare pill. */
+export const SearchMark = mark(Search);
 
 /** Copy link — the thing on the clipboard is a link, so the mark names the thing. */
 export const LinkMark = mark(LinkIcon);

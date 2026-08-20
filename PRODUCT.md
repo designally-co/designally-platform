@@ -105,12 +105,18 @@ Nothing in the product should imply the software is deciding. The interface neve
    container at all — the absence of a card is the demotion."
 
    That put two treatments of one thing on one page, and it meant the home
-   screen changed shape depending on the week. The home screen is now a roster —
-   every running project, one to a line, in one list — and what needs a person
-   is behind the notification bell in the toolbar. A row that has something
-   waiting carries the accent dot, and the sentence above the list counts those
-   dots in words, so the mark has its legend and a reader who never opens the
-   bell still learns from the page.
+   screen changed shape depending on the week. The home screen is a hero and a
+   sheet of projects now — one card per running project, the sheet rising over
+   the hero as you scroll — and what needs a person is behind the notification
+   bell in the toolbar. A card that has something waiting carries the accent
+   dot, and the bell names the same projects in sentences, so the mark has its
+   legend.
+
+   **The headline is fixed and does not report state.** It asks whether you are
+   ready to send a questionnaire, above the button that does it, and reads the
+   same every morning. Principle 2 below — an empty screen is success — moved
+   into the bell with everything else: it says "Nothing is waiting" and carries
+   no badge when there is nothing to carry.
 
    What survives unchanged is the reasoning: priority is still form rather than
    a label, the accent still means *a person is needed here* and appears on

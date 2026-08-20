@@ -70,9 +70,9 @@ no decorative colour.
 --canvas           #ffffff   /* raised: cards, sheets, inputs */
 --canvas-parchment var(--warm-white)     /* the page */
 --surface-pearl    #fafaf9
---surface-fill     #dfd7d4  /* icon-button fill — a warm neutral, see below */
---surface-fill-deep #d3cac6 /* its hover */
---surface-fill-press #c6bbb6 /* its press */
+--fill             #beb5b2  /* icon-button fill — a warm neutral, see below */
+--fill-deep        #b1a7a3  /* its hover */
+--fill-press       #a49994  /* its press */
 --glyph            #514c49   /* an icon sitting on that fill */
 --surface-tile-1   #0b0d12   /* the dark Field */
 --surface-black    #000000   /* true void — rare */
@@ -1083,7 +1083,7 @@ grey card a white fill is the direction that has always meant live.
 **Hover is the fill, not the line.** §Hover's rule — *a hover darkens the line to
 `--ink-3` and nothing else* — has no line to act on here, so these cards take that
 section's own exception: **a filled control deepens its own fill.** `#dbdbdb` and not
-`--surface-fill` for the press: that ramp is hued 45° to sit beside the orange, and these
+`--fill` for the press: that ramp is hued 45° to sit beside the orange, and these
 cards are hueless, so pressing one turned it brown against four greys.
 
 **The page takes it too**, from 19 August 2026. The inversion started on the sheets and
@@ -1219,11 +1219,11 @@ Where a primary sits beside a secondary on a phone's floor, the primary takes al
 
 **Ghost pill** — transparent fill, `--primary` text, 1px `--primary` border, same size and radius. The second CTA when two appear together.
 
-**Neutral filled pill** — `--surface-fill`, `--ink` label, **no border**, same size and radius. The answer inside a confirmation that does not act: Cancel, beside the ink pill that does.
+**Neutral filled pill** — `--fill`, `--ink` label, **no border**, same size and radius. The answer inside a confirmation that does not act: Cancel, beside the ink pill that does.
 
 **Added 19 August 2026, and the ground is the reason.** This role was the ghost pill in ink — transparent inside `--hairline`. Transparent works where the page is a tone: on parchment it shows a tone through. The project sheet went white the same day, and there transparent means white, so the button became a hairline with nothing in it, standing beside an ink pill solid all the way through. Two answers to one question, one a shape and one an edge.
 
-It takes the icon disc's own ground, which is what a neutral control is made of here: 2.01:1 against white where a white pill manages 1.07, and an `--ink` label at 8.37:1 — the label carries the meaning, as it must, because a fill is not asked to. Hover and press step through `--surface-fill-deep` and `--surface-fill-press`, the disc's states. The transparent 1px border stays: `.btn` counts it in the 44px, and dropping it shrinks the pill 2px below the one beside it.
+It takes the icon disc's own ground, which is what a neutral control is made of here: 2.01:1 against white where a white pill manages 1.07, and an `--ink` label at 8.37:1 — the label carries the meaning, as it must, because a fill is not asked to. Hover and press step through `--fill-deep` and `--fill-press`, the disc's states. The transparent 1px border stays: `.btn` counts it in the 44px, and dropping it shrinks the pill 2px below the one beside it.
 
 The ghost pill in ink keeps every sheet that is still parchment.
 
@@ -1233,9 +1233,9 @@ The ghost pill in ink keeps every sheet that is still parchment.
 
 And its fill depends on the surface beneath it. Pearl was chosen against the team app's parchment page; on the client survey's flat page, pearl is all but invisible, so the quiet action there is `--canvas` with a 1px `--hairline` and an `--ink-muted-48` glyph. Same object, same weight, different ground.
 
-**Icon button — a white disc with the Edge.** `pill` radius, `--canvas`, 1px `--hairline`, `--glyph` mark. **Changed 18 August 2026**: it was `--surface-fill`, a warm grey, and on a parchment sheet that is a control the same temperature as the paper under it. White is the one surface here that is not the page — it is what the team app's cards are made of — so the disc reads as an object *on* the sheet. White on parchment is 1.06:1 and carries no boundary of its own, which is what the border is for; hover and press move the border and the ground rather than the fill. **52px where a thumb uses it** — the survey's back control, everywhere it appears — and **40px where only a cursor does**, which is the deck's stepper pair, hidden below 620px because swiping already does its job. The glyph scales with the disc (24px at 52, 18px at 40) so the mark holds its proportions instead of growing chunky in a smaller circle.
+**Icon button — a white disc with the Edge.** `pill` radius, `--canvas`, 1px `--hairline`, `--glyph` mark. **Changed 18 August 2026**: it was `--fill`, a warm grey, and on a parchment sheet that is a control the same temperature as the paper under it. White is the one surface here that is not the page — it is what the team app's cards are made of — so the disc reads as an object *on* the sheet. White on parchment is 1.06:1 and carries no boundary of its own, which is what the border is for; hover and press move the border and the ground rather than the fill. **52px where a thumb uses it** — the survey's back control, everywhere it appears — and **40px where only a cursor does**, which is the deck's stepper pair, hidden below 620px because swiping already does its job. The glyph scales with the disc (24px at 52, 18px at 40) so the mark holds its proportions instead of growing chunky in a smaller circle.
 
-Three states, no others: hover deepens the fill to `--surface-fill-deep` and takes the glyph to `--ink`; **press** deepens it again to `--surface-fill-press` and shrinks the disc to `scale(0.95)`, the same value the primary button uses. Press matters more here than anywhere else in the system — a touch device has no hover, so without it the only feedback for a tap is the screen changing, which on a poor connection is neither immediate nor obviously caused by the tap.
+Three states, no others: hover deepens the fill to `--fill-deep` and takes the glyph to `--ink`; **press** deepens it again to `--fill-press` and shrinks the disc to `scale(0.95)`, the same value the primary button uses. Press matters more here than anywhere else in the system — a touch device has no hover, so without it the only feedback for a tap is the screen changing, which on a poor connection is neither immediate nor obviously caused by the tap.
 
 **The chevron.** 2.5px stroke, round cap and join, **arms at 45° — a right angle between them, 9 wide to 18 tall** — drawn about **a third of the height of the control** it sits in. One geometry, used by every chevron in the product.
 
@@ -1249,7 +1249,7 @@ Three states, no others: hover deepens the fill to `--surface-fill-deep` and tak
 
 The glyph measures **3.83:1** on the fill — above the 3:1 floor for a graphical object, which is the thing carrying the meaning. The disc is 1.23:1 against the page and is not asked to carry any.
 
-**Changed 17 August 2026 — the survey's back control is white.** Asked for. On the survey, and there only, the disc is `--canvas` with a 1px `--hairline` — the quiet-action treatment from two paragraphs above, the same object as `.pickone`. White is 1.07:1 against the parchment page, so the fill cannot draw the boundary and the hairline has to: it is 1.66:1 on white, and the `--glyph` chevron inside clears 11:1, comfortably past the 3:1 floor. Hover and press have no fill to deepen, so they step *off* white — `--parchment`, then `--divider` — and the line darkens to `--ink-3` with them. This is the 13 August correction below being spent back deliberately: it is the one control on the screen whose neighbour is the accented primary, so it can afford to be the page's own white and let the pill carry the weight. Everywhere else — the sheet header's back, the deck stepper — the disc stays `--surface-fill`.
+**Changed 17 August 2026 — the survey's back control is white.** Asked for. On the survey, and there only, the disc is `--canvas` with a 1px `--hairline` — the quiet-action treatment from two paragraphs above, the same object as `.pickone`. White is 1.07:1 against the parchment page, so the fill cannot draw the boundary and the hairline has to: it is 1.66:1 on white, and the `--glyph` chevron inside clears 11:1, comfortably past the 3:1 floor. Hover and press have no fill to deepen, so they step *off* white — `--parchment`, then `--divider` — and the line darkens to `--ink-3` with them. This is the 13 August correction below being spent back deliberately: it is the one control on the screen whose neighbour is the accented primary, so it can afford to be the page's own white and let the pill carry the weight. Everywhere else — the sheet header's back, the deck stepper — the disc stays `--fill`.
 
 **Corrected 13 August 2026 — the stepper is this too.** It was specified here as the exception: a bare glyph with no container until hover, on the grounds that it duplicates a gesture the scroll already offers and should not look as loud as the first way. What that produced was a control a pointer had to find before it looked like anything. Quieter is a matter of *size*, not of withholding the shape — so it is the same disc at 40px, and there is one icon button in this product rather than two that resemble each other.
 
@@ -1496,13 +1496,13 @@ Full-screen dialog. Backdrop `rgba(0,0,0,0.32)`. Inner sheet 760px on `--canvas-
 
 **The header is a toolbar**, in three slots: **back · title · actions**.
 
-Back is the **52px disc** specified under *Icon button* below — `pill` radius, `--surface-fill`,
+Back is the **52px disc** specified under *Icon button* below — `pill` radius, `--fill`,
 no border, the shared `--glyph` chevron — at the far leading edge, on its own. 44px where only a
 cursor reaches it. It was a text `Close` pill on the trailing edge until 17 August 2026; Apple's
 HIG asks for the standard symbol, at the leading edge, and never the word, and it is the one
 glyph this product spends (see `docs/navigation-decisions.md`). It is the same object as the
 survey's back control, at the same size, drawn from the same component — except for its fill,
-which stayed `--surface-fill` when the survey's went white on 17 August 2026.
+which stayed `--fill` when the survey's went white on 17 August 2026.
 
 Actions take the trailing edge — one visible at most, the rest behind **More** — and the body
 describes rather than acts. They are **bare marks, not discs**: 44px hit area, a 20px glyph at
@@ -1525,14 +1525,28 @@ sheet always has content under its header.
 The team app is **one landing page**. There are no tabs and no sidebar.
 
 0. **The toolbar** — sticky, no background of its own, a hairline that appears only once content
-   is under it. Leading: the mark, then one title slot holding the date — which leaves the bar
-   below 560px. Trailing: the **notification bell** with its count, then More, fixed space, then
-   the one primary action, **New survey**, last. Spec and the Apple HIG reading behind it are in
+   is under it. Leading: the mark, and an empty title slot. Trailing: the **notification bell**
+   with its count, then **Settings**. Nothing else — the date, the More menu and *New survey* all
+   left on 20 August 2026. Spec and the Apple HIG reading behind it are in
    `docs/navigation-decisions.md` and the header of `app/toolbar.tsx`.
-1. **The roster** — every running project, one to a line, those needing somebody first and each
-   marked with the accent dot. Name · package, then one sentence of state. Rewritten from a
-   *Needs you* card stack over a three-column table on 20 August 2026 — see
+1. **The hero** — a full screen holding the product name, one fixed question and **New Survey**.
+   `position: sticky` at the top, and covered rather than scrolled.
+2. **The projects sheet** — white on the parchment, inset, rounded at the top only, riding up over
+   the hero as the page scrolls and coming to rest against the toolbar. Its head is sticky beneath
+   the bar and holds the heading, the search pill and the archived disc; under it, a grid of cards,
+   four columns at 1280 and one at 390 from `auto-fill` on a 250px floor with no media query.
+   Rewritten from a *Needs you* card stack over a three-column table on 20 August 2026 — see
    `docs/navigation-decisions.md` and PRODUCT.md principle 1.
+
+**The page's ground is the parchment and the sheet is the white**, which is the direction
+`.deck.paper` inverted on 19 August and this reverses for the landing page alone. `.paper` was
+right for a page that *was* a stack of cards; under it a sheet rising over the page would be the
+same white as everything behind it. The modal sheets still pass `surface="paper"` for themselves
+and are unaffected. **A card on that sheet is a tone and therefore is not also drawn a line** —
+the same rule `.sheet.paper` follows — and so are the sheet's own controls: the search pill and
+the archived disc take `--parchment` rather than the `--fill` the toolbar discs use, because
+`--fill` was solved against the grey page and measures 2.01:1 against white, where it reads as a
+slab rather than as a control.
 
 **The badge on the bell is the one number this system draws on a glyph**, and the only place
 `--primary` carries white below the large-text floor without the size argument behind it:

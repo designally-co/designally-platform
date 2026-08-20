@@ -7,31 +7,29 @@ import type { ProjectAnswers } from '@/lib/team/answers';
 import type { ProjectView } from '@/lib/team/projects';
 import { plural } from '@/lib/team/words';
 import { readAnswers } from '@/lib/team/actions';
+import { ArchiveMark, SearchMark } from './icons';
 import NewSurveySheet from './sheets/new-survey';
 import SurveyMadeSheet from './sheets/survey-made';
 import ProjectSheet from './sheets/project';
 import AnswersSheet from './sheets/answers';
 import InsightsSheet from './sheets/insights';
 import PastSheet from './sheets/past';
+import SettingsSheet from './sheets/settings';
 import Toolbar from './toolbar';
 import Toast, { useToast } from './toast';
 
-const WORDS = ['Nothing', 'One thing', 'Two things', 'Three things', 'Four things', 'Five things'];
-
-type Panel = 'new' | 'past' | null;
+type Panel = 'new' | 'past' | 'settings' | null;
 
 export default function Today({
-  today,
-  partOfDay,
+  user,
   live,
   archived,
   library,
   origin,
   signOut,
 }: {
-  today: string;
-  /** "this morning" / "this afternoon" / "this evening" — see lib/team/projects */
-  partOfDay: string;
+  /** who this browser is signed in as — read in Settings, and nowhere else */
+  user: { name: string | null; email: string | null };
   live: ProjectView[];
   archived: ProjectView[];
   library: LibraryBlock[];
@@ -102,118 +100,174 @@ export default function Today({
   const insightsProject = openInsights ? live.find((p) => p.id === openInsights) : null;
 
   /**
-   * An empty screen is success. Say so and let them close the laptop.
+   * The headline never changes — 20 August 2026, asked for, drawn in the mock.
    *
-   * The greeting still answers "is there anything I have to do", and it is
-   * still the first thing on the page — but what it counts now lives in the
-   * bell rather than in a section below it, so the sentence under it says
-   * where to look.
+   * It said "Two things need you this morning" or "Nothing needs you right
+   * now", which made the top of the page a status report that read differently
+   * every week. It is an invitation now, and it sits directly above the button
+   * that accepts it.
+   *
+   * PRODUCT.md principle 2 — an empty screen is success — is not lost with it.
+   * It moves to the bell, which says "Nothing is waiting" and carries no badge
+   * when there is nothing to carry. The principle was never about the greeting;
+   * it was about not manufacturing activity to fill space, and a page that says
+   * the same calm thing every morning is that principle rather than a casualty
+   * of it.
    */
-  const heading =
-    needs.length === 0 ? (
-      <>
-        Nothing needs you <em>right now</em>.
-      </>
-    ) : (
-      <>
-        {WORDS[needs.length] ?? `${needs.length} things`} need{needs.length === 1 ? 's' : ''} you{' '}
-        {/* The hour, not the word "morning". It said morning at every hour of
-            the day — the one sentence on a page of plain fact that could be
-            read at four in the afternoon and be wrong. See `partOfDay`. */}
-        <em>{partOfDay}</em>.
-      </>
-    );
+  const [query, setQuery] = useState('');
 
   /**
-   * The line under the greeting, and the mark's legend.
+   * Search filters the live projects by client name, here in the browser.
    *
-   * `docs/navigation-decisions.md`: a bare glyph needs a legend where words do
-   * not. The dot on a row is exactly that glyph, so the sentence that
-   * introduces the list names it and counts it — which means nobody has to
-   * learn what the dot means, and the count is stated in words for a reader
-   * who never sees either.
+   * A studio running three projects a month has ten of these, and ten rows are
+   * already on the page — so this is a filter over what is loaded rather than a
+   * query, and it costs no request and cannot be slow. `toLocaleLowerCase` and
+   * not `toLowerCase`, because these names are Thai as often as not and the
+   * locale-aware form is the one that does not surprise.
    */
-  const sub =
-    live.length === 0
-      ? 'Nothing is running.'
-      : needs.length === 0
-        ? `${plural(live.length, 'project')} running, all moving on their own. Close the laptop.`
-        : `${plural(live.length, 'project')} running · the ${needs.length === 1 ? 'one' : needs.length} marked below ${needs.length === 1 ? 'is' : 'are'} in the bell.`;
+  const shown = useMemo(() => {
+    const q = query.trim().toLocaleLowerCase();
+    if (!q) return ordered;
+    return ordered.filter(
+      (p) =>
+        p.clientName.toLocaleLowerCase().includes(q) ||
+        p.packageLabel.toLocaleLowerCase().includes(q),
+    );
+  }, [ordered, query]);
 
   return (
     /**
-     * The team app's own ground, from 19 August 2026.
+     * The page's ground is the parchment again — 20 August 2026.
      *
-     * `.paper` here is the same three-token swap `.sheet.paper` makes, applied
-     * one level up. Every sheet went white today and the page did not, so
-     * opening a project inverted the relationship under the reader: a white
-     * card on a grey page became grey cards on a white sheet. One app, one
-     * direction of depth.
+     * `.deck.paper` inverted it on 19 August: the page went white and cards
+     * became the tone, so that opening a project did not flip the relationship
+     * under the reader. That was right for a page which *was* a stack of cards.
      *
-     * A wrapper rather than `:root`, because the client survey shares this
-     * `body` and has its own ground — `.survey-shell` sets `--parchment` for
-     * itself and would not want `--canvas` moving underneath it.
+     * It is not one now. The page is a hero on the ground with a white sheet
+     * rising over it, and under `.paper` that sheet would be the same white as
+     * everything behind it — a surface with nothing to be raised above. The
+     * ground steps back to the parchment, the projects sheet takes the white,
+     * and the cards on it take the tone.
+     *
+     * The modal sheets are unaffected: every one of them passes
+     * `surface="paper"` for itself, so opening a project still lands on white.
      */
-    <div className="deck paper">
+    <div className="deck">
       <Toolbar
-        today={today}
         needs={needs}
         onOpenProject={(id) => setOpenProject(id)}
-        archivedCount={archived.length}
-        onNewSurvey={() => setPanel('new')}
-        onPastProjects={() => setPanel('past')}
-        signOut={signOut}
+        onSettings={() => setPanel('settings')}
       />
 
-      <main className="page">
-        <h1 className="greet">{heading}</h1>
-        <p className="greet-sub">{sub}</p>
+      {/**
+       * The hero, and it does not move.
+       *
+       * `position: sticky` at the top with the projects sheet riding over it —
+       * asked for: "when the user scrolls down the All projects sheet will go
+       * up and cover the whole screen." The sheet is what scrolls; this stays
+       * where it is and is covered.
+       *
+       * It is the whole of the page's first screen: what this is, what it is
+       * for today, and the one thing to press.
+       */}
+      <section className="hero">
+        {/* The product name over the invitation. Structurally a kicker, which
+            the craft floor bans outright — and it is not a category label
+            standing in for a heading: it is the name of the thing, the same
+            words the sign-in page sets as its headline, and this is the first
+            screen a person sees after that one. Drawn this way in the mock. */}
+        <p className="heroname">Designally&rsquo;s Survey Platform</p>
+        <h1 className="heroask">Ready to send the client questionnaires?</h1>
+        <button className="btn btn-primary herocta" onClick={() => setPanel('new')}>
+          New Survey
+        </button>
+      </section>
+
+      {/**
+       * The projects sheet.
+       *
+       * A white surface on the page's own ground, inset from both edges and
+       * rounded at the top only, that rises over the hero as the page scrolls
+       * and fills the window. Its `min-height` is what lets it cover: without
+       * one, a studio with two projects has a sheet 400px tall and the hero
+       * never leaves.
+       */}
+      <section className="projsheet">
+        <div className="pshead">
+          <h2>All projects</h2>
+          <div className="pstools">
+            {/**
+             * Search, over what is already loaded.
+             *
+             * `type="search"` for the clear affordance the browser draws and
+             * for the announcement; a real `<label>`, hidden, because a
+             * placeholder is not a label — it leaves when you type, and it is
+             * the thing a reader needs when the field has content in it.
+             */}
+            <span className="pssearch">
+              <SearchMark />
+              <label className="vh" htmlFor="projsearch">
+                Search projects by client or package
+              </label>
+              <input
+                id="projsearch"
+                type="search"
+                className="input"
+                placeholder="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+            </span>
+            {/* Archived. It was behind the toolbar's More menu; it belongs
+                beside the list it is the other half of. */}
+            <button
+              className="iconbtn"
+              aria-label={`Archived projects — ${archived.length}`}
+              title="Archived projects"
+              onClick={() => setPanel('past')}
+            >
+              <ArchiveMark />
+            </button>
+          </div>
+        </div>
 
         {/**
-         * A short list of sentences — 20 August 2026.
+         * The grid.
          *
-         * This was a three-column table with a `<thead>`, a `data-label`
-         * pseudo-element hack to survive a phone, a visually-hidden `<caption>`
-         * explaining that rows could be pressed, and a "click any project to
-         * open it" hint in the section head. PRODUCT.md names that shape by
-         * name in its anti-references: the team's screens "must not resemble a
-         * project-management dashboard, a CRM, or an analytics tool… it needs
-         * a short list of sentences."
+         * A card per project, ordered with the ones that need somebody first.
+         * The card's body is **who answered** — this product's whole subject is
+         * the answers arriving, and a name is worth more than the digit beside
+         * it, especially since PRODUCT.md records that one respondent is the
+         * normal case rather than the degenerate one.
          *
-         * Every one of those four pieces of scaffolding existed to make a
-         * table behave like a list of buttons. A list of buttons needs none of
-         * them: `<button>` carries Enter, Space, focus and the announcement
-         * that this thing activates, for free and in every reader, and one
-         * column cannot break on a narrow screen.
-         *
-         * No heading over it and no count beside one. It is the only list on
-         * the page now, and the sentence above already counts it — a heading
-         * would be a label on the page's single subject.
+         * Everything here is text. There is no imagery in this product — no
+         * logos, no thumbnails, nothing to put in a tile — so a card that is
+         * not filled with real content is a loading skeleton with a name on it.
          */}
         {live.length === 0 ? (
-          <div className="calm">
-            <p>No projects yet. Create the first survey when a deal is signed.</p>
-          </div>
+          <p className="psnone">
+            No projects yet. Create the first survey when a deal is signed.
+          </p>
+        ) : shown.length === 0 ? (
+          <p className="psnone">
+            Nothing matches &ldquo;{query.trim()}&rdquo;. {plural(live.length, 'project')} running.
+          </p>
         ) : (
-          <ul className="plist">
-            {ordered.map((p) => (
+          <ul className="pgrid">
+            {shown.map((p) => (
               <li key={p.id}>
                 <button
-                  className="prow"
+                  className="pcard"
                   type="button"
                   /**
                    * Named outright rather than left to be computed.
                    *
-                   * The row's text is four runs across two blocks and an inline
-                   * span, and how a browser joins those into one announced
-                   * string is not something to find out from a client. Stated
-                   * here it is the same in every reader, it carries every fact
-                   * the row shows rather than only the name, and it ends with
-                   * what pressing does — which the visible row says by being a
-                   * button and the label otherwise would not say at all.
-                   *
-                   * The mark is drawn with no text at all, so this is the only
-                   * place a reader is told the project needs somebody.
+                   * The card's text is a name, a package, a list of people and
+                   * a sentence, across half a dozen elements — and how a
+                   * browser joins those into one announced string is not
+                   * something to find out from a client. The mark is drawn with
+                   * no text at all, so this is the only place a reader is told
+                   * the project needs somebody.
                    */
                   aria-label={[
                     p.action ? 'Needs you.' : null,
@@ -226,25 +280,36 @@ export default function Today({
                     .join(' ')}
                   onClick={() => setOpenProject(p.id)}
                 >
-                  <span className="pname">
-                    {/* The mark, on the rows with something waiting. Its legend
-                        is the line above the list, which counts these in
-                        words — a bare glyph needs one and this one has it. */}
+                  <span className="pcname">
+                    {/* The mark, on the cards with something waiting. Its
+                        legend is the notification panel, which names the same
+                        projects in sentences — a bare glyph needs one. */}
                     {p.action && <i className="pmark" aria-hidden="true" />}
-                    {/* The package sits with the name because it identifies the
-                        project rather than describing its state — a Brand and a
-                        Design job for the same client are two rows.
-
-                        The space between them is real and in the markup, and it
-                        is the only thing separating the two for a screen
-                        reader: the middot is drawn by CSS so it cannot be
-                        selected or copied into a client's name, and what CSS
-                        draws is not in the accessible name. Without it the row
-                        announced "Siam Piwat Retail GroupDesign". */}
-                    {p.clientName}{' '}
-                    <span className="ppkg">{p.packageLabel}</span>
+                    {p.clientName}
                   </span>
-                  <span className="pstate">
+                  <span className="pcpkg">{p.packageLabel}</span>
+
+                  {/* The people, newest first — the card's whole reason for
+                      being taller than a line. Four at most: five respondents
+                      is already the top of this product's range and a card that
+                      grows with the list stops being a grid. */}
+                  {p.people.length > 0 ? (
+                    <ul className="pcwho">
+                      {[...p.people]
+                        .reverse()
+                        .slice(0, 4)
+                        .map((who) => (
+                          <li key={who.id}>{who.name}</li>
+                        ))}
+                      {p.people.length > 4 && (
+                        <li className="pcmore">and {p.people.length - 4} more</li>
+                      )}
+                    </ul>
+                  ) : (
+                    <p className="pcwait">Waiting for the first answer.</p>
+                  )}
+
+                  <span className="pcstate">
                     {p.standing.arrived}
                     {p.standing.due && <span className="pdue">{p.standing.due}</span>}
                   </span>
@@ -253,8 +318,7 @@ export default function Today({
             ))}
           </ul>
         )}
-
-      </main>
+      </section>
 
       {panel === 'new' && (
         <NewSurveySheet
@@ -275,6 +339,14 @@ export default function Today({
           token={made.token}
           url={`${origin}${made.link}`}
           onClose={() => setMade(null)}
+        />
+      )}
+      {panel === 'settings' && (
+        <SettingsSheet
+          name={user.name}
+          email={user.email}
+          signOut={signOut}
+          onClose={() => setPanel(null)}
         />
       )}
       {panel === 'past' && (

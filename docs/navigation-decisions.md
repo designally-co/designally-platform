@@ -2,92 +2,96 @@
 
 _Designally Platform · final (prototype v2.3)_
 
-## One landing page, one list, no tabs
+## One landing page: a hero, and a sheet of projects that covers it
 
-**Rewritten 20 August 2026, asked for.** The page had two zones — cards for work
-blocked on the team, then a table of everything else — and both are gone. What
-follows the greeting is a roster: every running project, one to a line, and
-nothing else. The four things this page does are see the running projects,
-create one, reach the archived ones, and read the notifications.
+**Rewritten to a wireframe, 20 August 2026.** The page had two zones — cards for
+work blocked on the team, then a table of everything else — and then briefly one
+list. It is a hero and a sheet now.
 
-**The list.** Ordered with the projects that need somebody first. Each row is a
-button and carries three things:
+**The hero.** A full screen: the product name, one fixed question —
+*"Ready to send the client questionnaires?"* — and **New Survey**. It never
+changes. It used to be a status report that read differently every week
+(*"Two things need you this morning"*), and what needs a person moved into the
+bell. PRODUCT.md principle 2 — an empty screen is success — moved with it: the
+bell says *"Nothing is waiting"* and carries no badge when there is nothing to
+carry.
+
+**The projects sheet** rides up over the hero as the page scrolls and fills the
+window. `position: sticky` on the hero with the sheet at a higher layer, so the
+browser does the whole interaction — no listener, no transform, nothing that can
+fall out of step with the scroll position. It comes to rest with its top against
+the toolbar rather than at zero, so its own head is never behind the bar.
+
+**Its head is sticky** under the toolbar: the heading, the search field, and the
+archived disc. Without it the one control that finds a project among thirty went
+off the top with the sheet.
+
+**Search** filters the loaded projects by client name or package, in the browser.
+A studio running three a month has ten, and they are already on the page.
+
+**Archived** is a disc beside the search. It was behind the toolbar's More menu;
+it belongs beside the list it is the other half of.
+
+**A card per project**, four columns at 1280 and one at 390, with no media query —
+`auto-fill` on a 250px floor does it. Each card carries:
 
 | | |
 |---|---|
-| the mark | an accent dot, on the rows with something waiting, hung in the margin so every client name starts on the same vertical |
-| the name | client · package, the package quieter and on the same line |
-| the sentence | what has arrived, and when the link shuts — "3 answers, last one 2 days ago · closes 26 Aug", or "5 answers · closed 18 Aug" |
+| the mark | an accent dot when something is waiting, in the name's left margin so every client name starts on the same vertical |
+| the name | client, with the package beneath it |
+| the body | **who answered** — their names, newest first, four at most |
+| the floor | what has arrived and when the link shuts: "5 answers, last one 1 day ago · closes 2 Sept", or "5 answers · closed 18 Aug" |
 
-**The dot has a legend, and it is the line above the list**, which counts the
-marked rows in words. A bare glyph needs one; see below.
+**The body is the people, and that is what the card's height is for.** This
+product's whole subject is answers arriving, and a respondent's name is worth
+more than the digit beside it — PRODUCT.md records that one respondent is the
+normal case rather than the degenerate one. Everything on the card is text:
+there is no imagery in this product, so a card carrying anything else would be a
+loading skeleton with a name on it.
 
-**It was a three-column table** — Project, Answers, Latest — until 20 August
-2026. PRODUCT.md names that shape in its anti-references, and the table needed a
-`data-label` hack to survive a phone, a hidden caption to say rows could be
-pressed, and a hint above them reading "click any project to open it". All three
-existed to make a table behave like a list of buttons.
+**The ground is the parchment again and the sheet is the white.** `.deck.paper`
+inverted the page on 19 August so it would not flip under the reader when a
+project opened. That was right for a page which *was* a stack of cards. It is a
+hero with a sheet rising over it now, and under `.paper` the sheet would be the
+same white as everything behind it. The modal sheets are unaffected — each
+passes `surface="paper"` for itself.
 
-**Who answered went with it.** The Answers column named them — "Khun Tanawat
-+2" — and the row now spends that space on the date the survey shuts, which
-decides whether anybody can still answer at all. The names are in the project.
+**Notifications — the bell, on the toolbar's trailing edge.** One row per
+project with something outstanding: a client name and a sentence. Derived from
+current state, so there is no unread and nothing stored, and nothing is ever
+sent — see PRODUCT.md principle 1. **The rows open the project rather than
+acting**, because every action they could offer is already in the project sheet.
 
-**Notifications — the bell, on the toolbar's trailing edge.** It holds what was
-in *Needs you*: one row per project with something outstanding, each a client
-name and a sentence. Derived from current state, so there is no unread and
-nothing stored, and nothing is ever sent — see PRODUCT.md principle 1. **The
-rows open the project rather than acting**, because every action they could
-offer is already in the project sheet.
-
-There was a **Stage** column — a segment meter reading "Analysis · 4 of 5". It went on
-17 August 2026 with the kick-off, and it was the weakest column before that: five stages for
-a project that is either collecting answers or has a summary, and four of the five moved
-because somebody remembered to move them. The Latest column already says the true thing.
-
-Real `<table>` markup, `th scope="col"`, keyboard-focusable rows, hairline dividers, no zebra striping, no fills. Below 820px the header is visually hidden and each row becomes a labelled block via `data-label`.
-
-**3 · Nothing at the foot.** There were three destinations there — *Question templates* went on
-17 August 2026 because the questionnaire is fixed, an editor for something nobody edits being a
-surface to maintain and a way to break rule 5; *What's coming* went the same day, a roadmap panel
-inside the tool being a place to write intentions in that nobody on a five-person team reads back.
-**Past projects** followed them off the page later that day, upward: it is in the toolbar's More
-menu now, because reaching archived work should not mean scrolling past every live project.
-
-**There was never a "Library" grouping.** Question templates and past projects were unrelated
-tasks and were wrongly combined as tabs in one dialog; separating them is what left one standing
-when the other was cut.
-
-## No star
-A status is carried in words, never a ★ beside a name. Two reasons: the star was drawn in Action Blue, which is reserved for "a person is needed here", and a bare glyph needs a legend where words do not.
-
-The rule outlived its first case. It was written for decision-maker status, which the questionnaire stopped asking at question version 3 — the branding team's own reading is that a survey usually has one respondent, so there is rarely anyone to rank. The Answers column now names who answered instead, and says **"nobody named"** rather than leaving the cell blank.
-
-## One colour per line
-No line of text carries two colours. Emphasis comes from weight only. Colour still differentiates across separate lines and columns — never within one.
-
-## The toolbar
+**Settings — the gear beside it.** Who this browser is signed in as, and Sign
+out. Nothing in this product is configurable and the sheet says so rather than
+inventing preferences: the questionnaire is fixed, the 14-day default lives in
+code, and who may sign in is the Workspace. Sign out was in the More menu, and
+that menu went when Past projects moved onto the sheet — leaving one item behind
+an ellipsis, where nobody looks for it.
 
 Built against Apple's HIG for toolbars, 17 August 2026, and against parts of it deliberately.
 
 **Leading** — the wordmark, then one title slot. The HIG says not to title a window with the app
 name, and it is right that the *title* slot is not where a mark belongs; the mark stays beside it
-as identity. The slot holds the date and nothing else.
+as identity. **The slot is empty now** — 20 August 2026.
 
-**The scroll handover went on 20 August 2026.** The slot used to swap the date for
-**"Needs you · 1"** once the greeting passed under the bar — the HIG's large-title
-pattern, earning its place because the list runs long and the answer to *is there
-anything I have to do* scrolled away with the greeting. The bell answers the same
-question better: it holds the count at every scroll position rather than only past
-one, it can be pressed, and what it opens is the work. Keeping both would have put
-one number in two places four inches apart.
+It held the date, and swapped it for **"Needs you · 1"** once the greeting passed
+under the bar, on the HIG's large-title pattern. Both went. The bell answers
+*is there anything I have to do* at every scroll position rather than only past
+one, it can be pressed, and what it opens is the work; and the date was
+orientation every machine this runs on already provides, which had also stopped
+fitting — the bell took the width it was surviving on and "Thursday 20 August"
+ellipsised to "Thurs…".
 
-**The date leaves the bar below 560px.** The bell took the width it was surviving
-on and "Thursday 20 August" ellipsised to "Thurs…". This is a phone; the day is in
-the status bar an inch above.
+**Trailing** — the notification bell, then Settings. Nothing else.
 
-**Trailing** — the notification bell, then More, fixed space, then **New survey** last. One primary action, on the trailing
-edge, as the HIG asks; Sign out used to sit after it, so the bar ended on the least important
-control in the app. Sign out and Past projects are in More.
+**New survey moved into the page**, under the headline that asks for it. A
+toolbar's trailing edge is where the HIG puts the one primary action, and that is
+right when the page has other subjects. This page has one.
+
+**The More menu went with them.** It held Past projects, now a disc on the
+projects sheet, and Sign out, now in Settings. A More menu with nothing left in
+it is a menu about nothing.
 
 **No background of its own.** The bar is the page's parchment, and the hairline appears only once
 content is under it. It was a hardcoded `rgba(245, 245, 247, 0.8)` behind a 20px blur — a cool grey

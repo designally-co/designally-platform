@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 
 import { auth, signOut } from '@/auth';
 import { loadQuestionLibrary } from '@/lib/team/library';
-import { formatToday, loadProjects, partOfDay } from '@/lib/team/projects';
+import { loadProjects } from '@/lib/team/projects';
 import { surveyOrigin } from '@/lib/survey/origin';
 import Today from './today';
 
@@ -44,8 +44,9 @@ export default async function Home() {
 
   return (
     <Today
-      today={formatToday()}
-      partOfDay={partOfDay()}
+      /* Read in Settings and nowhere else — the toolbar shows the Designally
+         mark, not the person. See sheets/settings.tsx. */
+      user={{ name: session.user.name ?? null, email: session.user.email ?? null }}
       live={live}
       archived={archived}
       library={library}
