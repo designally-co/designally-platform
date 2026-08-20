@@ -757,7 +757,7 @@ export default function ProjectSheet({
                       nothing — rule 2's whole distinction, said in the one
                       place somebody reads it. */}
                   {!shut
-                    ? 'The client sees this date. After it, the link stops taking answers.'
+                    ? 'The client sees this date. After it, the link closes.'
                     : p.closedOn
                       ? `${p.closedByName ? `by ${p.closedByName}. ` : ''}Nobody can answer until you reopen it.`
                       : 'The date arrived. Nobody can answer until you reopen it.'}

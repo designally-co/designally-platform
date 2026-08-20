@@ -4889,11 +4889,32 @@ textarea {
   overflow: hidden;
 }
 
+/**
+ * The same discipline as the insights panel, and none of its volume —
+ * 20 August 2026, asked for.
+ *
+ * Structurally it was already this: text left, controls right, one row. What
+ * it did not have was one number. The padding was `12 12 12 17` — four values
+ * — and the box was sized by its *text* rather than by its controls, which is
+ * the opposite way round from the panel below it: two lines of explanation set
+ * an 89px bar around a 44px control, leaving 23 above and below it against 13
+ * at the right.
+ *
+ * One padding now, and the sentence shortened by five words so it sits beside
+ * the controls on one line. The bar is its controls plus its padding, which is
+ * as small as it goes.
+ *
+ * **It stays light, and that is the point of doing it here.** This is an
+ * option, not the product: it says when the link shuts and offers one way to
+ * shut it sooner. The insights panel earns the dark Field by being the only
+ * thing the platform makes; a second dark tile on the same sheet would make
+ * neither of them mean anything. Same geometry, opposite volume.
+ */
 .collbanner {
   display: flex;
   align-items: center;
-  gap: var(--sp-sm);
-  padding: var(--sp-sm) var(--sp-sm) var(--sp-sm) var(--sp-md);
+  gap: var(--sp-md);
+  padding: var(--sp-md);
 }
 
 /* No icon disc — 19 August 2026. The reference had one and it was the first
@@ -5040,7 +5061,7 @@ textarea {
 @media (max-width: 620px) {
   .collbanner {
     flex-wrap: wrap;
-    padding: var(--sp-sm) var(--sp-md);
+    padding: var(--sp-md);
   }
   .colltext {
     flex: 1 1 100%;
