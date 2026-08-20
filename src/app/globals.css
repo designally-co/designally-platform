@@ -5484,97 +5484,262 @@ body:has(.deck.paper) {
 }
 
 /* ---- sign in ---- */
-/**
- * The one gradient in the product — 20 August 2026, asked for.
- *
- * DESIGN.md §8 says no gradients, and that rule is about decoration: a wash
- * laid over a working surface to make it look richer. This is not laid over
- * anything. It *is* the page — one screen, one control, no content to compete
- * with — and it is the only place in the product where Designally Orange gets
- * to be the ground rather than a 44px disc or a pill. Recorded in §8 as an
- * exception with the case that earned it, not left as a rule quietly broken.
- *
- * **Interpolated `in oklab`.** sRGB from white to `#ef6148` runs through a
- * chalky pink around the middle and bands visibly across 900px of height.
- * Oklab is perceptually even, so the ramp holds its hue and the steps fall
- * below what a screen can show.
- *
- * White holds the top 40% flat before the ramp begins, which is what makes the
- * content sit on *white* rather than on a tint that happens to be pale. The
- * fade has the remaining 60% to travel, so there is no edge anywhere in it.
- */
+/* ============================================================
+   SIGN-IN — the one page in this product that is allowed to be
+   an image of itself. It holds a name and a single control, so
+   it is composed rather than laid out, and DESIGN.md's bans on
+   gradients, grain and shadow do not reach it. Recorded in §8.
+   ============================================================ */
+
 .signin {
+  position: relative;
   min-height: 100dvh;
   display: grid;
   justify-items: center;
   align-content: center;
-  /* The bottom inset lifts the block out of the colour and into the white it
-     was asked to sit in — the content centres in what is left, so it holds its
-     place at any height rather than at one screen size. */
   padding: var(--sp-lg) var(--sp-lg) 42dvh;
+  isolation: isolate;
 }
+
 /**
- * The gradient is painted by `body`, not by `.signin`, and that is the whole
- * reason it reaches the edges.
+ * The canvas: a flat white hold, a long fade, and a bloom sitting inside the
+ * colour so it reads as light rather than as fill.
  *
- * The page reserves a scrollbar gutter — `scrollbar-gutter: stable`, so a list
- * growing past the fold never shifts the layout sideways. On a screen with
- * nothing to scroll that gutter is 15px of body showing past the element, and
- * a full-bleed canvas with a white stripe down one side is not full bleed. A
- * background on `body` propagates to the viewport canvas and covers it whatever
- * the gutter does.
+ * Painted by `body` because the app reserves a scrollbar gutter — an element
+ * background stops 15px short and a full-bleed canvas with a stripe down one
+ * side is not full bleed. Three classes to clear `body:has(.deck.paper)`.
  *
- * Three classes so it clears `body:has(.deck.paper)`, which paints this app
- * white and is (0,2,1). Two would tie and leave the winner to file order.
+ * `in oklab` on the ramp: white to `#ef6148` in sRGB runs through a chalky pink
+ * and bands across 900px. The bloom is a wide, weak ellipse below the fold —
+ * it lifts the middle of the field so the orange has a source instead of being
+ * evenly poured.
  *
- * White holds the top 58% flat before the ramp starts, and the number comes
- * from the worst case rather than from the comfortable one. The block ends at
- * 43% of a 900px window but at **52%** of a 560px one — a short window does not
- * move the content, it shrinks the space around it — so a stop chosen against
- * a laptop would have put the button on a tint on a small screen. 58 clears
- * every size measured: 390x667, 1440x700 and 1280x560 included.
- *
- * The fade still has 42% of the height to travel, which at any real window is
- * hundreds of pixels — there is no edge anywhere in it.
+ * 58% is measured against the worst case, not the comfortable one: the block
+ * ends at 43% of a 900px window and 52% of a 560px one, because a short window
+ * shrinks the space around the content rather than moving it.
  */
 body:has(.signin.deck.paper) {
-  background: linear-gradient(in oklab, #ffffff 0%, #ffffff 58%, var(--orange-500) 100%);
+  background:
+    radial-gradient(120% 62% at 50% 108%, rgba(255, 168, 132, 0.55) 0%, transparent 62%),
+    linear-gradient(in oklab, #ffffff 0%, #ffffff 58%, var(--orange-500) 100%);
+  background-attachment: fixed;
 }
+
 /**
- * No card. The content stands on the canvas.
+ * Grain — fixed, inert, and the reason the field looks like paper.
  *
- * A tone-card here would be a grey rectangle floating on a colour field — two
- * surfaces arguing, on a screen that has one thing to say. What the card was
- * doing was holding a measure, so that is all it does now.
+ * Two jobs: it breaks the 8-bit steps a large ramp shows on an ordinary panel,
+ * and it gives the colour a surface. `soft-light` so it darkens and lightens
+ * around the mid-tone instead of laying grey over everything, and it is pinned
+ * to the viewport so nothing repaints it while the page moves.
+ *
+ * **Under the content, over the canvas.** It sat on top of everything first and
+ * softened the type — a texture meant for a colour field was being applied to
+ * a 70px headline, which cost it its edges and a measurable amount of its
+ * contrast. `.signin` isolates, so z-index 0 here puts the grain above the
+ * body's canvas and below the column, which is exactly the one layer it has
+ * business touching.
  */
+.sl-grain {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.42;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+}
+
+/* The column, and nothing else — the card stopped being a surface when the
+   page became one. A tone-card here would be a grey rectangle floating on a
+   colour field: two surfaces arguing on a screen with one thing to say. */
 .signin .card {
-  width: min(440px, 100%);
+  position: relative;
+  z-index: 1;
+  width: min(460px, 100%);
 }
+
 /**
- * Two lines, one heading: the company, then what it opens.
+ * The lockup.
  *
- * Not a kicker. `Designally` is the same size and the same weight as `Survey
- * Platform` and sits *in* the heading rather than over it — DESIGN.md's floor
- * bans the small label above a title, and this is a headline that happens to
- * take two lines.
- *
- * The second line steps back in ink rather than in size. The company is the
- * fixed half and the product is the half that could one day be something else,
- * so they read as one lockup with the emphasis on the name that never changes.
- * 1.2 leading because two display lines at 28px want closing up.
+ * Zalando at its heavy end and tracked in, because a name set large wants the
+ * letters closer than a paragraph does. The product line underneath goes the
+ * other way — small, tracked wide, and a step back in ink — so the pair reads
+ * as one mark rather than as a heading with a caption.
  */
-.signin h1 {
-  font-size: 28px;
-  font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-  margin: var(--sp-md) 0 var(--sp-xs);
-}
-.signin h1 span {
+.sl-lockup {
   display: block;
+  margin: 0 0 var(--sp-sm);
+  font-family: var(--font-display);
+}
+.sl-name {
+  display: block;
+  font-size: clamp(2.9rem, 6.4vw, 4.4rem);
+  font-weight: 700;
+  line-height: 0.96;
+  letter-spacing: -0.038em;
+  color: var(--ink);
+}
+.sl-product {
+  display: block;
+  margin-top: 0.62em;
+  font-size: clamp(0.78rem, 1.1vw, 0.86rem);
+  font-weight: 500;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
   color: var(--ink-3);
 }
-.signin p {
+/* `--ink-3`, not `--ink-4`. Quiet was the intent and 4.13:1 was the result —
+   `--ink-4` is documented for placeholders and measures its 4.61 against the
+   warm canvas, not against the pure white this page is. This is a fact
+   somebody needs before they press a Google button and get refused, so it
+   reads: 7.26:1. It stays subordinate by size and case rather than by being
+   faint. */
+.sl-meta {
+  margin: 0 0 var(--sp-xl);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-3);
+}
+
+/**
+ * The control. A pill of ink, with the arrow in its own well.
+ *
+ * Ink and not the accent, which is the one place this page argues with the rest
+ * of the app: the whole lower half is already Designally Orange, and an orange
+ * pill on the white half would be the same colour asking for attention twice.
+ * Charcoal anchors the composition and lets the field be the brand.
+ *
+ * The well is `inset` white rather than a border, so the pill reads as one
+ * machined object with a recess in it rather than as a button with a circle
+ * stuck on.
+ */
+.sl-cta {
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 7px 7px 7px 26px;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: var(--ink);
+  color: #fff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.006em;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(27, 29, 35, 0.16), 0 14px 34px -12px rgba(27, 29, 35, 0.42);
+  transition:
+    transform 0.55s var(--ease-out-expo),
+    box-shadow 0.55s var(--ease-out-expo),
+    background-color 0.55s var(--ease-out-expo);
+}
+.sl-cta i {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, 0.14);
+  transition:
+    transform 0.55s var(--ease-out-expo),
+    background-color 0.55s var(--ease-out-expo);
+}
+.sl-cta svg {
+  width: 17px;
+  height: 17px;
+}
+@media (hover: hover) {
+  .sl-cta:hover {
+    background: #000;
+    box-shadow: 0 1px 2px rgba(27, 29, 35, 0.18), 0 22px 46px -14px rgba(27, 29, 35, 0.5);
+  }
+  .sl-cta:hover i {
+    background: rgba(255, 255, 255, 0.22);
+    transform: translateX(3px);
+  }
+}
+.sl-cta:active {
+  transform: scale(0.985);
+}
+.sl-cta:focus-visible {
+  outline: 2px solid var(--primary-focus);
+  outline-offset: 3px;
+}
+
+/**
+ * The seal, standing in the colour.
+ *
+ * White ink on the orange it was drawn for, so it needs no disc — the field is
+ * the disc. Placed off the content flow entirely and low in the frame, where it
+ * closes the composition without asking to be read.
+ */
+.sl-seal {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(30px, 6dvh, 58px);
+  z-index: 1;
+  transform: translateX(-50%);
+  opacity: 0.92;
+}
+.sl-seal img {
+  display: block;
+  width: clamp(34px, 3.4vw, 46px);
+  height: auto;
+}
+
+/**
+ * Entrance. One movement, staggered, and it starts from *visible* rather than
+ * from nothing — a page that flashes empty before it resolves is worse than a
+ * page that simply appears.
+ */
+@keyframes sl-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+.sl-lockup,
+.sl-meta,
+.signin form,
+.sl-seal {
+  animation: sl-rise 0.95s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.sl-meta {
+  animation-delay: 0.09s;
+}
+.signin form {
+  animation-delay: 0.17s;
+}
+.sl-seal {
+  animation-delay: 0.3s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sl-lockup,
+  .sl-meta,
+  .signin form,
+  .sl-seal {
+    animation: none;
+  }
+}
+
+/* `.signin h1` and `.signin h1 span` were the previous lockup's rules and are
+   gone: `h1 span` is (0,1,2) and was quietly outranking `.sl-name` at (0,1,0),
+   so the headline rendered in `--ink-3` while the rule that was supposed to
+   own it said `--ink`. The lockup carries its own classes now and nothing
+   addresses it by tag.
+
+   `.signin p` stays for the development sign-in's own paragraphs, scoped so it
+   cannot reach `.sl-meta`. */
+.signin .warn ~ p,
+.signin form p:not(.sl-meta) {
   color: var(--ink-2);
   font-size: 15px;
   line-height: 1.6;

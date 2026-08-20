@@ -18,31 +18,21 @@ export default async function SignIn(props: PageProps<'/sign-in'>) {
        behind it and every sheet in it had inverted. See `.deck.paper`. */
     <main className="signin deck paper">
       <div className="card">
-        <Mark size={44} />
         {/**
-         * The product, not the act — 20 August 2026, asked for.
+         * The lockup. Company in display, product beneath it.
          *
-         * It read `Sign in` over a paragraph, which is the button's own word
-         * used as a heading: the only control on the card already says
-         * *Continue with Google*, so the largest type on the page was spending
-         * itself on something nobody could mistake. What a door should say is
-         * which building it opens, and it never did.
-         *
-         * One heading rather than a small `Designally` above a larger `Survey
-         * Platform`. That arrangement is a kicker, and DESIGN.md's floor bans
-         * it outright — the heading carries its own weight. The two lines are
-         * one object here: the company sets the line, the product answers it,
-         * and neither is a label on the other.
+         * The two lines were held at one size to avoid a kicker; with the
+         * hierarchy opened up they are a name and its subject instead — the
+         * company carries the display weight and the product is set small and
+         * widely tracked under it, which is a lockup rather than a label over a
+         * heading.
          */}
-        <h1>
-          Designally
-          <span>Survey Platform</span>
+        <h1 className="sl-lockup">
+          <span className="sl-name">Designally</span>
+          <span className="sl-product">Survey Platform</span>
         </h1>
-        {/* The half of the old paragraph that still does something. Which
-            accounts may pass is a fact somebody needs *before* they press a
-            Google button and get refused; that clients need no sign-in was
-            true and told to the one audience that never reads this screen. */}
-        <p>For {ALLOWED_DOMAIN} accounts.</p>
+
+        <p className="sl-meta">For {ALLOWED_DOMAIN} accounts</p>
 
         {hasGoogleCredentials && (
           <form
@@ -51,8 +41,16 @@ export default async function SignIn(props: PageProps<'/sign-in'>) {
               await signIn('google', { redirectTo: target });
             }}
           >
-            <button className="btn btn-primary" type="submit">
-              Continue with Google
+            {/* The arrow rides in its own well rather than sitting naked beside
+                the label — on hover the well travels and the pill takes a
+                fraction of a millimetre off, so the control has some mass. */}
+            <button className="sl-cta" type="submit">
+              <span>Continue with Google</span>
+              <i aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                  <path d="M5 12h13M12.5 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </i>
             </button>
           </form>
         )}
@@ -98,6 +96,19 @@ export default async function SignIn(props: PageProps<'/sign-in'>) {
           </form>
         )}
       </div>
+
+      {/* The mark stands in the colour, not on the white — white ink on the
+          orange it was drawn for, no disc needed. It anchors the lower half so
+          the field reads as composed rather than as leftover space. */}
+      <span className="sl-seal" aria-hidden="true">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/designally-mark.png" alt="" width={290} height={256} />
+      </span>
+
+      {/* Grain, fixed and inert. A colour field this large bands on an 8-bit
+          panel; a little noise breaks the steps and gives the orange a printed
+          surface rather than a rendered one. */}
+      <span className="sl-grain" aria-hidden="true" />
     </main>
   );
 }
