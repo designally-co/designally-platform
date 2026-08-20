@@ -4951,29 +4951,6 @@ textarea {
 }
 
 /**
- * The action, outlined.
- *
- * Closing is available rather than urged — the app asks for it through the
- * *Needs you* card when it has a reason to — and reopening is a way back
- * rather than a thing to be sold. Neither is this sheet's action: that is
- * *Generate insights* below, and it is the only control here wearing the
- * accent. Two filled pills competing above it would be the section demanding a
- * decision every time somebody opens a project to read an answer.
- *
- * Sized to the bar and not to a section — a 15px label rather than a CTA's 17,
- * on the 44 the date field beside it stands at. It was 40 while the field had
- * square-ish corners and the difference read as two sizes of control; once both
- * are pills, two pills of different heights on one line is the only thing you
- * can see.
- */
-.collbanner .collnow {
-  flex: none;
-  min-height: 44px;
-  padding: 8px 20px;
-  font-size: 15px;
-}
-
-/**
  * The date field is a pill here, and nowhere else — 19 August 2026, asked for.
  *
  * **This is an exception to the radius rule and it is worth naming as one.**
@@ -5055,8 +5032,8 @@ textarea {
  * Below 620 the bar stops fitting on one line and wraps into two: the disc and
  * the two lines of text keep the first, the date and the action take the
  * second. The text is given the whole of its row less the disc, which is what
- * pushes the controls down — `flex-wrap` alone would leave the date squeezed
- * beside a two-word column.
+ * pushes the date down — `flex-wrap` alone would leave it squeezed beside a
+ * two-word column.
  */
 @media (max-width: 620px) {
   .collbanner {
@@ -5069,9 +5046,6 @@ textarea {
   .collbanner .dpwrap {
     flex: 1 1 auto;
     min-width: 0;
-  }
-  .collbanner .collnow {
-    margin-left: auto;
   }
 }
 

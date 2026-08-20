@@ -508,6 +508,41 @@ export default function ProjectSheet({
              * that was wrong above is the correct one: Reopen is what hands the
              * date back.
              */}
+            {/**
+             * Reopening, from the menu too — 20 August 2026, asked for.
+             *
+             * It stayed on the bar this morning when closing moved, on the
+             * argument that reopening *needs a date* (rule 1 — every shut
+             * survey is past its own), so it is a question about the field and
+             * belongs beside it. True of the question; not true of the press
+             * that raises it. Closing and reopening are one gate seen from
+             * either side, and a person who has just learned to shut a survey
+             * from this menu should not have to learn a second place to open it.
+             *
+             * **It is the one item here that does not confirm in place**, and
+             * cannot: what it asks for is a date, and the date is on the bar.
+             * So it closes the menu, fills the field with the fourteen days the
+             * New survey sheet prefills, and opens the question under it.
+             * Nothing is written until somebody reads that date and presses
+             * Reopen there.
+             *
+             * No answer-count guard, unlike closing: a survey nobody answered is
+             * the one most likely to have run past its date, and exactly the one
+             * somebody needs to reopen.
+             */}
+            {shut && !reopening && p.surveyId ? (
+              <button
+                onClick={() => {
+                  close();
+                  setReopening(true);
+                  setDue(defaultDueDay());
+                }}
+              >
+                <UndoMark />
+                <span>Reopen collection</span>
+              </button>
+            ) : null}
+
             {!shut && p.surveyId ? (
               confirming === 'close' ? (
                 <div className="delconfirm">
@@ -842,37 +877,6 @@ export default function ProjectSheet({
                 onChange={setDue}
               />
 
-              {/**
-               * Reopen, which is one control over both ways of being shut.
-               *
-               * It used to be two: a Reopen on the closed bar that cleared the
-               * gate, and nothing at all past the date but a sentence telling
-               * somebody to move it. Neither worked alone once closing began
-               * moving `due_at` to the moment it closed — clearing the gate on
-               * a survey whose date has passed produces one that says open and
-               * refuses every client who opens the link.
-               *
-               * So it asks for a date, both times. This press only fills the
-               * field with the fourteen days the New survey sheet prefills and
-               * opens the question below; nothing is written until somebody
-               * reads the date and presses Reopen again.
-               *
-               * No answer-count guard, unlike closing: a survey nobody answered
-               * is the one most likely to have run past its date, and exactly
-               * the one somebody needs to reopen.
-               */}
-              {shut && !reopening && p.surveyId && (
-                <button
-                  className="btn btn-ink collnow"
-                  disabled={pending}
-                  onClick={() => {
-                    setReopening(true);
-                    setDue(defaultDueDay());
-                  }}
-                >
-                  Reopen
-                </button>
-              )}
 
             </div>
 

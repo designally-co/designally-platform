@@ -997,13 +997,16 @@ none 0 · sm 8 · md 11 · lg 18 · card 26 · sheet 34 · pill 9999
   controls on it, and the other is a pill. Scoped to `.collbanner .dpfield`, with
   the 20px of padding a pill needs to clear its own curve, and both at 44 — two
   pills of different heights on one line is the only thing you can see.
-- **The pair it matches changed on 20 August 2026.** *Close now* moved into the
-  sheet’s More menu, so on an open bar the date is the only control on the line
-  and the exception rests on the rhyme alone. It still holds where it was written
-  for: a **closed** bar is the two-control line the paragraph above describes, and
-  the pill it matches is Reopen. If the field ever starts reading as a button on
-  the open bar, this is the first thing to revert — `border-radius` and
-  `padding-left` on one selector.
+- **The pair it matched is gone, and the exception is now on its own — 20 August
+  2026.** Close and Reopen both moved into the sheet’s More menu, where the
+  other gate already was, so the bar holds one control in either state: the date.
+  Nothing survives of the reasoning above except the shape it produced. It is
+  kept because it was asked for and because a segmented date behind a calendar
+  glyph does not, in practice, read as something to press — but it is now a
+  preference rather than an argument, and it is the one input in the product that
+  breaks the rule two bullets up. **If it ever reads as a button, revert it**: it
+  is `border-radius` and `padding-left` on `.collbanner .dpfield`, and the field
+  falls back to the team app’s `md` like every other.
 - **The two surfaces then split, later the same day.** The survey keeps `lg`: a
   field there *is* a card on a page of cards, sized to be answered on a phone. The
   team app went to `md` — 18px on a 44px box curves through most of its own
