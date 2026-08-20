@@ -2183,10 +2183,30 @@ textarea {
  * its use in `toolbar.tsx`.
  */
 .barname {
-  font-size: 15px;
+  /**
+   * Set as a wordmark, not as a caption — 20 August 2026, asked for: it was
+   * invisible.
+   *
+   * It was 15px at 400 in `--ink-2`, which is this system's *caption* — the
+   * treatment a date or a hint gets. Beside a mark, at that weight, it read as
+   * a label somebody had left next to the logo rather than as the other half of
+   * a lockup, and the flat D. it now sits against gives it no orange disc to
+   * borrow presence from.
+   *
+   * The display face, full ink, and the negative tracking a name set small
+   * wants — the same three moves the sign-in page's headline makes on the same
+   * words. It is 16px and 600, not 18 and 700: a toolbar is chrome, and the
+   * page's subject is the question in the hero. Loud enough to be the identity,
+   * quiet enough not to compete with it.
+   *
+   * 15.18:1 on the parchment.
+   */
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
   line-height: 1.4;
-  letter-spacing: 0;
-  color: var(--ink-2);
+  letter-spacing: -0.015em;
+  color: var(--ink);
   white-space: nowrap;
 }
 @media (max-width: 560px) {
