@@ -5514,14 +5514,20 @@ body:has(.deck.paper) {
  * it lifts the middle of the field so the orange has a source instead of being
  * evenly poured.
  *
- * 58% is measured against the worst case, not the comfortable one: the block
- * ends at 43% of a 900px window and 52% of a 560px one, because a short window
- * shrinks the space around the content rather than moving it.
+ * **Less of it, 20 August 2026.** White held to 58% and the colour took the
+ * bottom four tenths of every screen, which made the page about its gradient.
+ * It holds to 74% now: the orange is a hem the composition stands above rather
+ * than a field it floats on, and the bloom narrowed with it. A quarter of the
+ * height is still hundreds of pixels of ramp, so there is no edge in it.
+ *
+ * There is headroom either way. The block ends at 43% of a 900px window and
+ * 52% of a 560px one — a short window shrinks the space around the content
+ * rather than moving it — so 74 clears the worst case by twenty points.
  */
 body:has(.signin.deck.paper) {
   background:
-    radial-gradient(120% 62% at 50% 108%, rgba(255, 168, 132, 0.55) 0%, transparent 62%),
-    linear-gradient(in oklab, #ffffff 0%, #ffffff 58%, var(--orange-500) 100%);
+    radial-gradient(96% 40% at 50% 112%, rgba(255, 176, 143, 0.4) 0%, transparent 64%),
+    linear-gradient(in oklab, #ffffff 0%, #ffffff 74%, var(--orange-500) 100%);
   background-attachment: fixed;
 }
 
@@ -5557,6 +5563,10 @@ body:has(.signin.deck.paper) {
   position: relative;
   z-index: 1;
   width: min(460px, 100%);
+  /* Centred, asked for. The seal below already sits on the page's axis, so the
+     composition hangs off one line instead of a left edge for the type and a
+     centre for the mark. */
+  text-align: center;
 }
 
 /**
@@ -5569,7 +5579,7 @@ body:has(.signin.deck.paper) {
  */
 .sl-lockup {
   display: block;
-  margin: 0 0 var(--sp-sm);
+  margin: 0 0 var(--sp-xl);
   font-family: var(--font-display);
 }
 .sl-name {
@@ -5589,75 +5599,52 @@ body:has(.signin.deck.paper) {
   text-transform: uppercase;
   color: var(--ink-3);
 }
-/* `--ink-3`, not `--ink-4`. Quiet was the intent and 4.13:1 was the result —
-   `--ink-4` is documented for placeholders and measures its 4.61 against the
-   warm canvas, not against the pure white this page is. This is a fact
-   somebody needs before they press a Google button and get refused, so it
-   reads: 7.26:1. It stays subordinate by size and case rather than by being
-   faint. */
-.sl-meta {
-  margin: 0 0 var(--sp-xl);
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--ink-3);
-}
-
 /**
- * The control. A pill of ink, with the arrow in its own well.
+ * The control: the accent, as a pill.
  *
- * Ink and not the accent, which is the one place this page argues with the rest
- * of the app: the whole lower half is already Designally Orange, and an orange
- * pill on the white half would be the same colour asking for attention twice.
- * Charcoal anchors the composition and lets the field be the brand.
+ * It was charcoal while the colour ran up to 42% of the screen — an orange pill
+ * on the white half would have been the same colour asking for attention twice.
+ * With the gradient pulled back to a hem that argument goes with it, and the
+ * one action on the page takes the one colour this product reserves for
+ * actions.
  *
- * The well is `inset` white rather than a border, so the pill reads as one
- * machined object with a recess in it rather than as a button with a circle
- * stuck on.
+ * White on `#ef6148` is **3.24:1**, the divergence DESIGN.md §1 records and the
+ * brand rule decides. The hover darkens to `--primary-deep` and 4.27, so the
+ * state somebody is pointing at is the legible one.
+ *
+ * The shadow is tinted from the fill: a grey shadow under an orange pill reads
+ * as dirt beneath it, and this is the colour's own shade.
  */
 .sl-cta {
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   display: inline-flex;
   align-items: center;
-  gap: 14px;
-  padding: 7px 7px 7px 26px;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0 34px;
   border: 0;
   border-radius: var(--r-pill);
-  background: var(--ink);
+  background: var(--primary);
   color: #fff;
   font: inherit;
   font-size: 15px;
-  font-weight: 500;
-  letter-spacing: -0.006em;
+  font-weight: 600;
+  letter-spacing: -0.004em;
   cursor: pointer;
-  box-shadow: 0 1px 2px rgba(27, 29, 35, 0.16), 0 14px 34px -12px rgba(27, 29, 35, 0.42);
+  box-shadow:
+    0 2px 4px rgba(199, 63, 41, 0.16),
+    0 18px 38px -14px rgba(199, 63, 41, 0.5);
   transition:
     transform 0.55s var(--ease-out-expo),
     box-shadow 0.55s var(--ease-out-expo),
     background-color 0.55s var(--ease-out-expo);
 }
-.sl-cta i {
-  display: grid;
-  place-items: center;
-  width: 38px;
-  height: 38px;
-  border-radius: var(--r-pill);
-  background: rgba(255, 255, 255, 0.14);
-  transition:
-    transform 0.55s var(--ease-out-expo),
-    background-color 0.55s var(--ease-out-expo);
-}
-.sl-cta svg {
-  width: 17px;
-  height: 17px;
-}
 @media (hover: hover) {
   .sl-cta:hover {
-    background: #000;
-    box-shadow: 0 1px 2px rgba(27, 29, 35, 0.18), 0 22px 46px -14px rgba(27, 29, 35, 0.5);
-  }
-  .sl-cta:hover i {
-    background: rgba(255, 255, 255, 0.22);
-    transform: translateX(3px);
+    background: var(--primary-deep);
+    box-shadow:
+      0 2px 4px rgba(199, 63, 41, 0.18),
+      0 26px 48px -16px rgba(199, 63, 41, 0.58);
   }
 }
 .sl-cta:active {
@@ -5707,23 +5694,18 @@ body:has(.signin.deck.paper) {
   }
 }
 .sl-lockup,
-.sl-meta,
 .signin form,
 .sl-seal {
   animation: sl-rise 0.95s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
-.sl-meta {
-  animation-delay: 0.09s;
-}
 .signin form {
-  animation-delay: 0.17s;
+  animation-delay: 0.12s;
 }
 .sl-seal {
   animation-delay: 0.3s;
 }
 @media (prefers-reduced-motion: reduce) {
   .sl-lockup,
-  .sl-meta,
   .signin form,
   .sl-seal {
     animation: none;
@@ -5736,10 +5718,9 @@ body:has(.signin.deck.paper) {
    own it said `--ink`. The lockup carries its own classes now and nothing
    addresses it by tag.
 
-   `.signin p` stays for the development sign-in's own paragraphs, scoped so it
-   cannot reach `.sl-meta`. */
-.signin .warn ~ p,
-.signin form p:not(.sl-meta) {
+   `.signin p` stays for the development sign-in's own paragraphs and is scoped
+   to them — the composed page has no prose of its own left to catch. */
+.signin form p {
   color: var(--ink-2);
   font-size: 15px;
   line-height: 1.6;

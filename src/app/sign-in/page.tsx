@@ -31,8 +31,6 @@ export default async function SignIn(props: PageProps<'/sign-in'>) {
           <span className="sl-product">Survey Platform</span>
         </h1>
 
-        <p className="sl-meta">For {ALLOWED_DOMAIN} accounts</p>
-
         {hasGoogleCredentials && (
           <form
             action={async () => {
@@ -40,16 +38,8 @@ export default async function SignIn(props: PageProps<'/sign-in'>) {
               await signIn('google', { redirectTo: target });
             }}
           >
-            {/* The arrow rides in its own well rather than sitting naked beside
-                the label — on hover the well travels and the pill takes a
-                fraction of a millimetre off, so the control has some mass. */}
             <button className="sl-cta" type="submit">
-              <span>Continue with Google</span>
-              <i aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-                  <path d="M5 12h13M12.5 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </i>
+              Continue with Google
             </button>
           </form>
         )}
