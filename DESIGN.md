@@ -1525,7 +1525,11 @@ sheet always has content under its header.
 The team app is **one landing page**. There are no tabs and no sidebar.
 
 0. **The toolbar** — sticky, no background of its own, a hairline that appears only once content
-   is under it. Leading: the mark, and an empty title slot. Trailing: the **notification bell**
+   is under it. Leading: the mark **without its disc** — the D in `--ink`, the full stop in
+   `--primary-mark`, both masked from the one `designally-mark.png` and clipped either side of the
+   three-pixel gap the artwork leaves between them (`FlatMark`, 20 August 2026). A third filled
+   orange disc beside two 44px control discs was the heaviest thing on the page. Then the product
+   name, which leaves the bar below 560px. Trailing: the **notification bell**
    with its count, then **Settings**. Nothing else — the date, the More menu and *New survey* all
    left on 20 August 2026. Spec and the Apple HIG reading behind it are in
    `docs/navigation-decisions.md` and the header of `app/toolbar.tsx`.

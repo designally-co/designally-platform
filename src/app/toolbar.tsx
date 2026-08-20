@@ -1,6 +1,6 @@
 'use client';
 
-import Mark from './mark';
+import { FlatMark } from './mark';
 
 import { BellMark, SettingsMark } from './icons';
 import MoreMenu from './menu';
@@ -57,12 +57,11 @@ export default function Toolbar({
   return (
     <header className="topbar">
       <div className="inner">
-        {/* 44, the icon discs' own diameter — 20 August 2026, asked for. It was
-            30, which is the size the mark took when it replaced a wordmark on a
-            bar that had a title slot beside it. The slot is gone and the mark's
-            only neighbours are two 44px discs, so a 30px disc between them read
-            as the small one rather than as the identity. */}
-        <Mark size={44} />
+        {/* No disc here — the D in ink and the stop in the accent. It was a
+            44px orange circle, which on a bar whose other two controls are
+            44px discs made the identity a third disc, filled solid, and the
+            heaviest thing on the page. See `FlatMark`. */}
+        <FlatMark size={30} />
         {/**
          * The product's name, beside the mark — 20 August 2026, asked for.
          *
