@@ -1650,8 +1650,10 @@ Recording it because an undocumented borrowing looks like an oversight, and the 
   See below.
 - Use gradients, glassmorphism as decoration, or decorative grid backgrounds — with **two
   exceptions**, both asked for and both where the surface *is* the message: the sign-in page
-  (19 August 2026), and the project sheet's **insights panel** (20 August 2026), which ramps
-  white into the accent's own tint on an `oklab` interpolation. The argument for the second:
+  (19 August 2026), and the project sheet's **insights panel** (20 August 2026), which is lit
+  from a point past its top-trailing corner — a radial of the accent over an `oklab` ramp of
+  white into `--primary-tint`. Two layers rather than one: a wash from corner to corner reads
+  as a tinted card, and colour falling off from a point reads as material. The argument for the second:
   every other block on that sheet is a record of what happened — who answered, when the link
   shuts, who closed it — and this is the only thing the platform *makes*. It sat in the same
   white card as the rest. `--ink` on its darkest end measures 14.6:1 and `--ink-2` 11.3:1, so
