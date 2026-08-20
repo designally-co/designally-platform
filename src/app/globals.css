@@ -3208,6 +3208,54 @@ textarea {
   text-wrap: pretty;
 }
 
+/**
+ * Nothing archived yet — alone in its sheet, so it sits in the middle of it.
+ *
+ * The body grows to fill the sheet and centres its one child, rather than the
+ * line carrying a `min-height` of its own. A number here would be a guess at
+ * how tall the sheet is, and the sheet is a different height on a phone (the
+ * whole screen) than on a laptop (as tall as its content) — so the guess would
+ * be wrong on one of them by construction.
+ *
+ * `:has(> .pastnone)` keeps it to this one case: `.sheet-body` is shared by
+ * every sheet in the app and none of the others wants to be stretched. The same
+ * mechanism `.barmenu:has(> .delconfirm:only-child)` uses a few hundred lines
+ * up, for the same reason — a container behaving differently because of what it
+ * happens to hold.
+ */
+/**
+ * The centring goes on the scroll container, not on the body inside it.
+ *
+ * Two attempts failed before this one and both are worth naming. `flex: 1` on
+ * the body did nothing, because its parent `.sheetscroll` is a block and there
+ * was no flex context to grow in. `min-height: 100%` did nothing either: the
+ * scroll container's own height comes from `flex: 1 1 0%` inside `.sheet`, and
+ * a percentage on a child does not resolve against a basis-zero flex item.
+ *
+ * `.sheetscroll` already fills the sheet, so making *it* the grid and centring
+ * its one child needs no height at all — the box that already has the height
+ * does the centring, instead of a box inside it being told to match.
+ */
+.sheetscroll:has(.pastnone) {
+  display: grid;
+  place-items: center;
+}
+/* The body's vertical padding is 28 over 72 — the bottom half is there to clear
+   the action rows other sheets carry, and this one has none. Centring a box
+   with 44px more padding below than above puts the words 22px high, which is
+   exactly what it did. Nothing to clear here, so nothing to reserve. */
+.sheetscroll:has(.pastnone) .sheet-body {
+  padding-block: 0;
+}
+.pastnone {
+  padding: var(--sp-lg);
+  font-size: 15px;
+  line-height: 1.6;
+  letter-spacing: 0;
+  color: var(--ink-3);
+  text-align: center;
+}
+
 /* No projects, or none matching the search. Set as a line in the sheet rather
    than as a card — there is nothing to put a container around. */
 .psnone {

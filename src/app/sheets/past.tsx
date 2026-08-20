@@ -29,11 +29,19 @@ export default function PastSheet({
       surface="paper"
       onClose={onClose}
     >
-      <p className="lede">
-        Projects arrive here when your team archives them — never automatically. Nothing is deleted;
-        every survey, answer, insights and decision stays searchable.
-      </p>
-
+      {/**
+       * The paragraph that stood here went on 20 August 2026, asked for.
+       *
+       * It explained that projects arrive by hand and that nothing is deleted —
+       * three facts a reader can see for themselves the moment there is a list,
+       * and which they are told again by the archive confirmation on the way in.
+       * It was also going stale: it promised that "every survey, answer,
+       * insights and decision stays searchable", and decisions were retired with
+       * the kick-off on 17 August.
+       *
+       * A sheet whose first line explains the sheet is a sheet that does not
+       * trust its own title.
+       */}
       {archived.length ? (
         <ul className="past">
           {archived.map((p) => (
@@ -63,7 +71,11 @@ export default function PastSheet({
           ))}
         </ul>
       ) : (
-        <p className="quiet">Nothing archived yet.</p>
+        /* Centred in the sheet, now that it is the only thing in it. Set as a
+           line rather than a card: there is nothing here to draw a container
+           around, which is the same reasoning the projects sheet's own empty
+           state follows. */
+        <p className="pastnone">Nothing archived yet.</p>
       )}
     </Sheet>
   );
