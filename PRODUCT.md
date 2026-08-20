@@ -98,7 +98,34 @@ Nothing in the product should imply the software is deciding. The interface neve
 
 ## Design Principles
 
-1. **Priority is expressed as form, not labels.** Work blocked on the team sits at the top on a white surface with the largest type and the only accent-coloured buttons. Work waiting on the client sits below with no container at all — the absence of a card is the demotion. Templates and finished projects live behind one quiet line at the bottom.
+1. **Priority is expressed where the work is, not by rearranging the page.**
+   **Revised 20 August 2026, asked for.** It read: "work blocked on the team sits
+   at the top on a white surface with the largest type and the only
+   accent-coloured buttons; work waiting on the client sits below with no
+   container at all — the absence of a card is the demotion."
+
+   That put two treatments of one thing on one page, and it meant the home
+   screen changed shape depending on the week. The home screen is now a roster —
+   every running project, one to a line, in one list — and what needs a person
+   is behind the notification bell in the toolbar. A row that has something
+   waiting carries the accent dot, and the sentence above the list counts those
+   dots in words, so the mark has its legend and a reader who never opens the
+   bell still learns from the page.
+
+   What survives unchanged is the reasoning: priority is still form rather than
+   a label, the accent still means *a person is needed here* and appears on
+   nothing else, and finished projects still live behind one quiet line. What
+   changed is that the form is a mark and a count rather than a second layout.
+
+   **Notifications are derived, never stored, and nothing is ever sent.** The
+   bell holds what is true at that moment, computed from the same state the page
+   reads. There is no unread, no history, no table, and no email — see the
+   Operating Context, which is explicit that the platform sends nothing. It is
+   not a log of what happened; it is what is waiting.
+
+   **The notification rows do not act, they open.** Every action they could
+   offer already exists in the project sheet, and an action in two places is two
+   places to keep true.
 2. **An empty screen is success.** When nothing needs the team, say so plainly and let them close the laptop. Never manufacture activity to fill space.
 3. **Colour carries one meaning.** The accent means "a person is needed here" and appears on under ten percent of the surface. If it stops meaning that, it stops working.
 4. **The tool never decides on a timer.** It never closes a survey, confirms the insights, or archives a project by itself. It may notice that waiting has stopped being useful and ask; the answer belongs to a person, and the record stores who gave it.

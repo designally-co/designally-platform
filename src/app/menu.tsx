@@ -30,6 +30,8 @@ export default function MoreMenu({
   label = 'More',
   icon,
   danger = false,
+  badge,
+  menuClass,
   onClose,
   children,
 }: {
@@ -45,6 +47,26 @@ export default function MoreMenu({
   icon?: ReactNode;
   /** the control is destructive, and the mark says so before it is pressed */
   danger?: boolean;
+  /**
+   * A count riding the mark. Zero and undefined both draw nothing.
+   *
+   * The one place this app puts a number on a glyph, and it earns it: the
+   * notification bell has to say *how many* without being opened, because
+   * otherwise the page has no way at all to report outstanding work — the
+   * section that used to do that is gone. `aria-hidden`, because `label`
+   * already states the count in words and a badge read twice is a stutter.
+   */
+  badge?: number;
+  /**
+   * A class on the panel itself.
+   *
+   * One caller needs it: the notification bell, whose rows carry a whole
+   * sentence rather than a two-word label, and the panel's default rule is
+   * `white-space: nowrap` — sized by the widest item, which is correct for
+   * `Download as Markdown` and would put a 60-character sentence across the
+   * window. See `.barmenu.notes`.
+   */
+  menuClass?: string;
   /**
    * The menu has shut — by the button, by Escape, or by a click away.
    *
@@ -102,8 +124,15 @@ export default function MoreMenu({
         onClick={() => (open ? shut() : setOpen(true))}
       >
         {icon ?? <MoreMark />}
+        {!!badge && (
+          <span className="iconbadge" aria-hidden="true">
+            {badge}
+          </span>
+        )}
       </button>
-      {open && <div className="barmenu">{children(shut)}</div>}
+      {open && (
+        <div className={menuClass ? `barmenu ${menuClass}` : 'barmenu'}>{children(shut)}</div>
+      )}
     </div>
   );
 }

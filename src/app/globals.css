@@ -2072,6 +2072,23 @@ textarea {
   opacity: 1;
   transform: none;
 }
+/**
+ * The date leaves the bar on a phone — 20 August 2026.
+ *
+ * The bell took the width it was surviving on and "Thursday 20 August"
+ * ellipsised to "Thurs…", which is not a date and not orientation, it is a
+ * word cut in half. The slot holds one thing and it does not fit.
+ *
+ * Nothing is lost that the device does not already show: this is a phone, and
+ * the day is in the status bar an inch above. On a laptop, where there is room
+ * and where the operating system shows the date only if you look for it, it
+ * stays.
+ */
+@media (max-width: 560px) {
+  .barttl {
+    display: none;
+  }
+}
 
 /**
  * The trailing edge: the More menu, then the one primary action, last.
@@ -2214,6 +2231,8 @@ textarea {
 .iconbtn {
   display: grid;
   place-items: center;
+  /* the badge on the notification bell hangs off the corner — see .iconbadge */
+  position: relative;
   width: 44px;
   height: 44px;
   flex: 0 0 auto;
@@ -2377,6 +2396,106 @@ textarea {
 /* 1.6, not 1.4 — these wrap to two and three lines and some of them carry
    Thai, which stacks four levels and clips tone marks at Latin-tuned leading.
    DESIGN.md §2: 1.6 in a paragraph, 1.25 only on a line that stands alone. */
+/**
+ * The notification panel.
+ *
+ * `.barmenu` with two things changed, because a notification is not a menu
+ * item: it is a client's name and a sentence about them, where every other row
+ * in this app is a two-word action.
+ *
+ * The default panel is sized by its widest row and forbids wrapping — right
+ * for `Download as Markdown`, and it would put "Collection is closed with 5
+ * answers, but no insights were written" across the whole window. Here the
+ * width is set and the sentence wraps inside it.
+ *
+ * The rows sit apart rather than flush, because each is about a different
+ * client and the reader has to see where one ends. Nothing else changes: the
+ * hover, the radius, the focus and the ink are the panel's own.
+ */
+.barmenu.notes {
+  width: 320px;
+  max-width: calc(100vw - 32px);
+}
+/**
+ * On a phone it belongs to the window, not to the button.
+ *
+ * `.barmenu` right-aligns to the slot it hangs from, which is right for the
+ * More menu — that one sits beside the trailing edge. The bell does not: *New
+ * survey* is to its right, so a 320px panel aligned to the bell's right edge
+ * started 154px off the left of a 390px screen. Nothing clipped, because the
+ * page cannot scroll sideways; the first half of every notification was simply
+ * not on the display.
+ *
+ * Fixed, and inset from both edges, so the width is the window's rather than
+ * the button's. 77px is the 69px bar plus the 8px this panel already stands off
+ * whatever it hangs from — the same gap `top: calc(100% + 8px)` gives it above.
+ */
+@media (max-width: 560px) {
+  .barmenu.notes {
+    position: fixed;
+    top: 77px;
+    right: 16px;
+    left: 16px;
+    width: auto;
+    max-width: none;
+  }
+}
+.barmenu.notes button:not(.btn) {
+  display: block;
+  white-space: normal;
+  padding: 11px;
+}
+.barmenu.notes button:not(.btn) + button:not(.btn) {
+  border-top: 1px solid var(--divider-soft);
+  border-radius: 0;
+}
+/* Nothing waiting. Set as a row rather than as a heading — the panel has one
+   thing to say and it is a sentence, not a title over an absence. */
+.barnote {
+  padding: 11px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-3);
+  letter-spacing: 0;
+}
+
+/**
+ * The count on the bell.
+ *
+ * The one number this app draws on a glyph. It rides the disc's top-trailing
+ * corner, in the accent, with a ring of the bar's own colour so it reads as
+ * sitting *on* the button rather than as part of the mark inside it.
+ *
+ * White on `--primary` is the 3.24:1 DESIGN.md §1 records as crossed by
+ * decision — and this one has the size argument the survey's buttons use:
+ * 12.5px at 700 is below the 18.66px large-text floor, so it does not clear
+ * anything on its own. It is `aria-hidden` and the button's label states the
+ * count in words, which is what makes it legal to draw: nothing here is the
+ * only carrier of the number.
+ */
+.iconbadge {
+  position: absolute;
+  /* A third of its own size clear of the disc, which is where a badge sits and
+     what keeps it off the mark underneath: at -1px it took a 6px bite out of
+     the bell's top-right corner and read as part of the drawing. The 12px
+     between this disc and the next absorbs the overhang, and the ring holds
+     the two apart. */
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--primary);
+  box-shadow: 0 0 0 2px var(--parchment);
+  color: var(--on-primary);
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 18px;
+  letter-spacing: 0;
+  text-align: center;
+}
+
 .barmenu small {
   display: block;
   font-size: 13px;
@@ -4179,7 +4298,33 @@ textarea {
   box-shadow: inset 0 0 0 2px var(--primary-focus);
   background: var(--canvas);
 }
+/**
+ * The mark on a row with something waiting.
+ *
+ * Accent, and it is the accent's own meaning — DESIGN.md: it means "a person is
+ * needed here", which is precisely and only what this dot says. It appears on
+ * under a tenth of the surface and on nothing that does not need somebody.
+ *
+ * It hangs in the row's left margin rather than pushing the name across, so
+ * every client name in the list starts on the same vertical. A dot that indents
+ * the row it marks makes the list ragged and the names harder to scan than the
+ * dot makes the marked ones easier to find.
+ *
+ * `top`, not `align-items: center` — the name may wrap to two lines and the
+ * mark belongs beside the first, level with the capitals. Half the line box
+ * less half the dot lands it there without a magic number.
+ */
+.pmark {
+  position: absolute;
+  left: -14px;
+  top: calc(0.675em - 4px);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary-mark);
+}
 .pname {
+  position: relative;
   display: block;
   font-size: 17px;
   font-weight: 600;

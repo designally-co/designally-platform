@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useTransition } from 'react';
+import { useMemo, useState } from 'react';
 
 import type { LibraryBlock } from '@/lib/team/library-types';
 import type { ProjectAnswers } from '@/lib/team/answers';
@@ -15,7 +15,6 @@ import InsightsSheet from './sheets/insights';
 import PastSheet from './sheets/past';
 import Toolbar from './toolbar';
 import Toast, { useToast } from './toast';
-import { reanalyse } from '@/lib/team/actions';
 
 const WORDS = ['Nothing', 'One thing', 'Two things', 'Three things', 'Four things', 'Five things'];
 
@@ -78,28 +77,38 @@ export default function Today({
     setCameFrom(null);
   };
   const toast = useToast();
-  const [writing, startWriting] = useTransition();
 
   const needs = useMemo(() => live.filter((p) => p.action), [live]);
   /**
-   * Everything else — and *only* everything else, from 20 August 2026.
+   * One list of every running project — 20 August 2026, asked for.
    *
-   * This was `[...needs, ...live.filter(p => !p.action)]`: every project that
-   * needed somebody appeared twice, once as a card and again as the first row
-   * of the list beneath, wearing a dot to say what the card above had already
-   * said in a whole sentence. The line over it claimed "everything not listed
-   * below is moving on its own" while the list below opened with the two
-   * projects that were not.
+   * The page had two sections: cards for work blocked on the team, and a quiet
+   * list for everything else. That was PRODUCT.md's first design principle
+   * expressed literally — priority as form, the demotion carried by the absence
+   * of a container — and it is now expressed in the toolbar instead. What
+   * needs a person is behind the bell; the page is the roster.
    *
-   * One project, one place. The dot went with the duplication: nothing down
-   * here needs marking, because everything down here is fine.
+   * The ones with something outstanding still sort first, because a list of
+   * ten wants its live end at the top, and each carries a mark. The mark's
+   * legend is the line above the list, which counts them in words — see
+   * `docs/navigation-decisions.md` on bare glyphs.
    */
-  const resting = useMemo(() => live.filter((p) => !p.action), [live]);
+  const ordered = useMemo(
+    () => [...needs, ...live.filter((p) => !p.action)],
+    [live, needs],
+  );
 
   const project = openProject ? live.find((p) => p.id === openProject) : null;
   const insightsProject = openInsights ? live.find((p) => p.id === openInsights) : null;
 
-  /* An empty screen is success. Say so and let them close the laptop. */
+  /**
+   * An empty screen is success. Say so and let them close the laptop.
+   *
+   * The greeting still answers "is there anything I have to do", and it is
+   * still the first thing on the page — but what it counts now lives in the
+   * bell rather than in a section below it, so the sentence under it says
+   * where to look.
+   */
   const heading =
     needs.length === 0 ? (
       <>
@@ -116,22 +125,20 @@ export default function Today({
     );
 
   /**
-   * The sub-line counts the same two groups the page is now split into.
+   * The line under the greeting, and the mark's legend.
    *
-   * It said "everything not listed below is moving on its own" while the list
-   * below opened with the projects that were not. With the duplication gone
-   * the sentence can simply be true: this many running, that many fine.
+   * `docs/navigation-decisions.md`: a bare glyph needs a legend where words do
+   * not. The dot on a row is exactly that glyph, so the sentence that
+   * introduces the list names it and counts it — which means nobody has to
+   * learn what the dot means, and the count is stated in words for a reader
+   * who never sees either.
    */
   const sub =
-    needs.length === 0
-      ? live.length === 0
-        ? 'Nothing is running.'
-        : `${plural(live.length, 'project')} moving on their own. Close the laptop.`
-      : resting.length === 0
-        ? `${plural(live.length, 'project')} running, and every one of them is here.`
-        : resting.length === 1
-          ? `${plural(live.length, 'project')} running · the other one is moving on its own.`
-          : `${plural(live.length, 'project')} running · the other ${resting.length} are moving on their own.`;
+    live.length === 0
+      ? 'Nothing is running.'
+      : needs.length === 0
+        ? `${plural(live.length, 'project')} running, all moving on their own. Close the laptop.`
+        : `${plural(live.length, 'project')} running · the ${needs.length === 1 ? 'one' : needs.length} marked below ${needs.length === 1 ? 'is' : 'are'} in the bell.`;
 
   return (
     /**
@@ -150,7 +157,8 @@ export default function Today({
     <div className="deck paper">
       <Toolbar
         today={today}
-        needsCount={needs.length}
+        needs={needs}
+        onOpenProject={(id) => setOpenProject(id)}
         archivedCount={archived.length}
         onNewSurvey={() => setPanel('new')}
         onPastProjects={() => setPanel('past')}
@@ -160,80 +168,6 @@ export default function Today({
       <main className="page">
         <h1 className="greet">{heading}</h1>
         <p className="greet-sub">{sub}</p>
-
-        <div className="sec">
-          <h2>Needs you</h2>
-          <span className="count">{needs.length}</span>
-        </div>
-
-        {needs.length ? (
-          <div className="worklist">
-            {needs.map((p, i) => (
-              <article className="work" key={p.id} style={{ animationDelay: `${0.05 + i * 0.07}s` }}>
-                <div className="body">
-                  <div className="name">
-                    <span className="dot" aria-hidden="true" />
-                    {p.clientName}
-                  </div>
-                  <p className="say">
-                    <b>{p.action!.say}</b> {p.action!.emphasis}
-                  </p>
-                  <p className="when">{p.action!.when}</p>
-                </div>
-                <div className="act">
-                  <button
-                    className="btn btn-primary"
-                    disabled={writing}
-                    onClick={() => {
-                      if (p.action!.kind === 'review-insights') return setOpenInsights(p.id);
-                      if (p.action!.kind === 'write-insights') {
-                        return startWriting(async () => {
-                          const result = await reanalyse(p.id);
-                          toast.show(
-                            result.ok
-                              ? `Insights written for ${p.clientName}`
-                              : result.error,
-                          );
-                        });
-                      }
-                      setOpenProject(p.id);
-                    }}
-                  >
-                    {writing && p.action!.kind === 'write-insights'
-                      ? 'Writing — this takes a few minutes…'
-                      : p.action!.label}
-                  </button>
-                </div>
-              </article>
-            ))}
-          </div>
-        ) : (
-          <div className="calm">
-            {/* "We'll tell you when a survey goes quiet" went on 20 August
-                2026. The platform sends nothing, ever — no email, no
-                notification, by design — so the one promise the empty state
-                made was the one thing on the page that was not true. What is
-                true is that a survey going quiet shows up here, next time
-                somebody opens the page. */}
-            <p>
-              All clear. A survey that goes quiet will be waiting here.{' '}
-              <em>Have a good one.</em>
-            </p>
-          </div>
-        )}
-
-        <div className="sec">
-          {/**
-           * Not "All projects" any more, because it is not all of them.
-           *
-           * The name is the sub-line's own words, so the heading and the
-           * sentence three lines above it stop being two vocabularies for one
-           * idea. It says why these are down here rather than what they are:
-           * nothing about them needs a person today.
-           */}
-          <h2>Moving on their own</h2>
-          <span className="count">{resting.length}</span>
-        </div>
 
         {/**
          * A short list of sentences — 20 August 2026.
@@ -252,35 +186,17 @@ export default function Today({
          * that this thing activates, for free and in every reader, and one
          * column cannot break on a narrow screen.
          *
-         * No chevron on the row, and no dot. DESIGN.md's first principle is
-         * that priority is expressed as form and that the absence of a
-         * container is the demotion — a glyph on every row would promote the
-         * quiet list back up beside the cards it is meant to sit below.
+         * No heading over it and no count beside one. It is the only list on
+         * the page now, and the sentence above already counts it — a heading
+         * would be a label on the page's single subject.
          */}
         {live.length === 0 ? (
           <div className="calm">
             <p>No projects yet. Create the first survey when a deal is signed.</p>
           </div>
-        ) : resting.length === 0 ? (
-          /**
-           * Every live project is in Needs you.
-           *
-           * Not `.calm`, which is the bordered card the section above uses when
-           * *it* is empty. This is the demoted group, and DESIGN.md's first
-           * principle is that the absence of a container is the demotion — a
-           * 44px card, centred, drawing a border around one short sentence,
-           * would make the quiet half of the page the heaviest thing on it.
-           * It sits where the list would sit and reads like the lines it
-           * replaces.
-           *
-           * It is also not an empty state in the usual sense: nothing is
-           * missing and nothing has gone wrong, so it states the fact and does
-           * not apologise or offer a way to fix it.
-           */
-          <p className="pnone">Every project is in the list above.</p>
         ) : (
           <ul className="plist">
-            {resting.map((p) => (
+            {ordered.map((p) => (
               <li key={p.id}>
                 <button
                   className="prow"
@@ -296,11 +212,11 @@ export default function Today({
                    * what pressing does — which the visible row says by being a
                    * button and the label otherwise would not say at all.
                    *
-                   * The middot becomes a comma on the way: it is punctuation
-                   * for the eye, and read aloud it is either "middle dot" or
-                   * nothing.
+                   * The mark is drawn with no text at all, so this is the only
+                   * place a reader is told the project needs somebody.
                    */
                   aria-label={[
+                    p.action ? 'Needs you.' : null,
                     `${p.clientName}, ${p.packageLabel}.`,
                     `${p.standing.arrived}.`,
                     p.standing.due ? `It ${p.standing.due}.` : null,
@@ -311,6 +227,10 @@ export default function Today({
                   onClick={() => setOpenProject(p.id)}
                 >
                   <span className="pname">
+                    {/* The mark, on the rows with something waiting. Its legend
+                        is the line above the list, which counts these in
+                        words — a bare glyph needs one and this one has it. */}
+                    {p.action && <i className="pmark" aria-hidden="true" />}
                     {/* The package sits with the name because it identifies the
                         project rather than describing its state — a Brand and a
                         Design job for the same client are two rows.

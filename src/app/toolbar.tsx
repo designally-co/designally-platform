@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
 import Mark from './mark';
 
+import { BellMark } from './icons';
 import MoreMenu from './menu';
+import type { ProjectView } from '@/lib/team/projects';
 
 /**
  * The team app's toolbar.
@@ -56,60 +57,98 @@ import MoreMenu from './menu';
  */
 export default function Toolbar({
   today,
-  needsCount,
+  needs,
+  onOpenProject,
   onNewSurvey,
   onPastProjects,
   archivedCount,
   signOut,
 }: {
   today: string;
-  needsCount: number;
+  /** every live project with something outstanding, newest concern first */
+  needs: ProjectView[];
+  onOpenProject: (id: string) => void;
   onNewSurvey: () => void;
   onPastProjects: () => void;
   archivedCount: number;
   signOut: () => Promise<void>;
 }) {
-  /* true once the greeting has scrolled under the bar */
-  const [past, setPast] = useState(false);
-  const barRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const greet = document.querySelector('.greet');
-    const bar = barRef.current;
-    if (!greet || !bar) return;
-    /* IntersectionObserver rather than a scroll listener: the browser reports
-       the crossing itself instead of the main thread measuring every frame.
-
-       The margin is the bar's own height, measured rather than guessed — the
-       handover has to happen when the greeting goes under the bar, and a
-       hardcoded number is wrong the moment the bar wraps on a narrow window. */
-    const io = new IntersectionObserver(([entry]) => setPast(!entry.isIntersecting), {
-      rootMargin: `-${Math.round(bar.getBoundingClientRect().height)}px 0px 0px 0px`,
-    });
-    io.observe(greet);
-    return () => io.disconnect();
-  }, []);
-
   /**
-   * The title names where you are, in the app's own words: "Needs you" is what
-   * the section beneath is called, so the bar does not invent a second name for
-   * it. Short, as the HIG asks — it caps a toolbar title at fifteen characters
-   * to leave room for controls.
+   * The scroll handover went on 20 August 2026, with the section it served.
+   *
+   * The bar used to swap the date for "Needs you · 2" once the greeting passed
+   * under it, on the HIG's large-title pattern: the answer to "is there
+   * anything I have to do" left the screen at 161px while the project list ran
+   * on, so the bar caught it. An `IntersectionObserver`, a measured root
+   * margin, and two spans cross-fading.
+   *
+   * The bell is a better answer to the same problem and it is always there.
+   * It holds the count at every scroll position rather than only past one, it
+   * can be pressed, and what it opens is the work itself. Keeping both would
+   * put the same number in two places four inches apart.
+   *
+   * The date keeps the title slot outright now, which is what a title slot is
+   * for.
    */
-  const title = needsCount === 0 ? 'Nothing needs you' : `Needs you · ${needsCount}`;
+  const bellLabel =
+    needs.length === 0
+      ? 'Notifications — nothing is waiting'
+      : `Notifications — ${needs.length} waiting`;
 
   return (
-    <header className={past ? 'topbar past' : 'topbar'} ref={barRef}>
+    <header className="topbar">
       <div className="inner">
         {/* leading — identity, then the title slot beside it */}
         <Mark size={30} />
-        <span className="barttl" aria-live="polite">
-          <span className={past ? 'ttl on' : 'ttl'}>{title}</span>
-          <span className={past ? 'ttl' : 'ttl on'}>{today}</span>
+        <span className="barttl">
+          <span className="ttl on">{today}</span>
         </span>
 
-        {/* trailing — the More menu, then the one primary action */}
+        {/* trailing — notifications, the More menu, then the one primary action */}
         <div className="bartrail">
+          {/**
+           * The bell, and the whole of what the *Needs you* section used to be.
+           *
+           * It is `MoreMenu` with a different mark, deliberately: that component
+           * is already this app's popover — Escape, click-away, `aria-expanded`,
+           * and a `.barmenu` of title-and-`<small>` rows — and a second one
+           * written beside it would drift from it within a week. The HIG's own
+           * reason for one More menu across two toolbars is the reason for one
+           * popover across two jobs.
+           *
+           * **The rows do not act; they open.** Every action a notification
+           * could offer — write the insights, review them, close collection —
+           * already exists in the project sheet, and a button that appears in
+           * two places is two places to keep true. Pressing a row opens the
+           * project it is about, which is where the work is done and where the
+           * rest of the context already is.
+           *
+           * **Nothing is stored and there is no unread.** The list is derived
+           * from what is true right now — the same `action` the page reads — so
+           * it cannot go stale, cannot need marking as read, and needs no table.
+           * It is not a log of what happened; it is what is waiting.
+           */}
+          <MoreMenu label={bellLabel} icon={<BellMark />} badge={needs.length} menuClass="notes">
+            {(close) =>
+              needs.length === 0 ? (
+                /* Principle 2 — an empty screen is success. Say so and stop. */
+                <p className="barnote">Nothing is waiting.</p>
+              ) : (
+                needs.map((p) => (
+                  <button
+                    key={p.id}
+                    onClick={() => {
+                      close();
+                      onOpenProject(p.id);
+                    }}
+                  >
+                    {p.clientName}
+                    <small>{p.action!.say}</small>
+                  </button>
+                ))
+              )
+            }
+          </MoreMenu>
           <MoreMenu>
             {(close) => (
               <>

@@ -309,10 +309,12 @@ function buildAction(v: {
  * invented "no date" would be a fact about the software rather than about the
  * project.
  *
- * Only projects with nothing pending reach this line. Every shut survey has an
- * action of some kind — see `buildAction`, where all three branches test
- * `shut` — so the survey behind this sentence is always open and its date is
- * always ahead. `Closed …` cannot be reached from here, and is not written.
+ * **Every live project reaches this line, from 20 August 2026.** It used to
+ * describe only the ones with nothing pending — the page had a second list for
+ * the rest — so it could assume an open survey and an unreached date. With one
+ * list it has to say `closed 18 Aug` as readily as `closes 26 Aug`, and a shut
+ * survey drops the recency: "last one 2 days ago" is a fact about a door that
+ * is no longer open, and the date it shut is the one that matters.
  *
  * The sent date went with the table. It was only ever read as recency, which
  * the answer clause states directly and in the words a person would use.
@@ -320,18 +322,32 @@ function buildAction(v: {
 function buildStanding(v: {
   sentOn: string | null;
   dueOn: string | null;
+  closedOn: string | null;
+  /** closed by a person, or past its date — see `buildAction` */
+  shut: boolean;
   answers: number;
   quietDays: number | null;
 }): { arrived: string; due: string | null } {
+  if (!v.sentOn) return { arrived: 'Not sent yet', due: null };
+
+  if (v.shut) {
+    return {
+      arrived: v.answers === 0 ? 'No answers' : plural(v.answers, 'answer'),
+      /* `closedOn` when a person pressed the button, the date when the date did
+         it. Rule 1: the client meets the same screen either way, and so does
+         whoever reads this line. */
+      due: nbsp(`closed ${v.closedOn ?? v.dueOn}`),
+    };
+  }
+
   /* The recency phrase is bound with non-breaking spaces so the clause can
      only break at its comma. Left loose it wrapped to "5 answers, last one 12
      days" / "ago" on a phone — `text-wrap: pretty` evens a ragged edge and has
      no notion that "12 days ago" is one thing. The longest this ever gets is
      "last one 365 days ago", which is well inside the column. */
   const ago = nbsp(agoText(v.quietDays ?? 0));
-  const arrived = !v.sentOn
-    ? 'Not sent yet'
-    : v.answers === 0
+  const arrived =
+    v.answers === 0
       ? 'No answers yet'
       : v.answers === 1
         ? `1 answer, ${ago}`
@@ -503,7 +519,17 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
         archived: project.archived,
         conflicts: insights?.unsettled.length ?? 0,
       }),
-      standing: buildStanding({ sentOn, dueOn, answers, quietDays }),
+      /* The same `shut` both readings of a survey depend on — see rule 1. It is
+         derived once here rather than twice, so the sentence and the action can
+         never disagree about whether anybody can still answer. */
+      standing: buildStanding({
+        sentOn,
+        dueOn,
+        closedOn,
+        shut: Boolean(closedOn) || (overdueDays !== null && overdueDays > 0),
+        answers,
+        quietDays,
+      }),
     };
   });
 }

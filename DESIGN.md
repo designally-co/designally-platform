@@ -1525,12 +1525,20 @@ sheet always has content under its header.
 The team app is **one landing page**. There are no tabs and no sidebar.
 
 0. **The toolbar** — sticky, no background of its own, a hairline that appears only once content
-   is under it. Leading: the wordmark, then one title slot holding the date until the greeting
-   scrolls under the bar and **"Needs you · 1"** after. Trailing: More, fixed space, then the one
-   primary action, **New survey**, last. Spec and the Apple HIG reading behind it are in
+   is under it. Leading: the mark, then one title slot holding the date — which leaves the bar
+   below 560px. Trailing: the **notification bell** with its count, then More, fixed space, then
+   the one primary action, **New survey**, last. Spec and the Apple HIG reading behind it are in
    `docs/navigation-decisions.md` and the header of `app/toolbar.tsx`.
-1. **Needs you** — white utility card on the parchment page, rich rows, one Action Blue pill each
-2. **All projects** — the table, action-needed rows first, marked with the blue dot
+1. **The roster** — every running project, one to a line, those needing somebody first and each
+   marked with the accent dot. Name · package, then one sentence of state. Rewritten from a
+   *Needs you* card stack over a three-column table on 20 August 2026 — see
+   `docs/navigation-decisions.md` and PRODUCT.md principle 1.
+
+**The badge on the bell is the one number this system draws on a glyph**, and the only place
+`--primary` carries white below the large-text floor without the size argument behind it:
+12.5px at 700 measures the 3.24:1 §1 records as crossed by decision. It is legal here because it
+is `aria-hidden` and the button's own label states the count in words — nothing on that control
+depends on reading the badge.
 
 **Nothing at the foot.** Three destinations sat there until 17 August 2026. *Question templates*
 went with the fixed questionnaire and *What's coming* with the kick-off; **Past projects** went

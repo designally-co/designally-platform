@@ -2,17 +2,42 @@
 
 _Designally Platform · final (prototype v2.3)_
 
-## One landing page, three zones, no tabs
+## One landing page, one list, no tabs
 
-**1 · Needs you** — work blocked on the team. White cards on the parchment page, 21px client name, one sentence at 17px, one Action Blue pill each. Empty is a calm card, not a gap.
+**Rewritten 20 August 2026, asked for.** The page had two zones — cards for work
+blocked on the team, then a table of everything else — and both are gone. What
+follows the greeting is a roster: every running project, one to a line, and
+nothing else. The four things this page does are see the running projects,
+create one, reach the archived ones, and read the notifications.
 
-**2 · All projects — a table.** Three columns:
+**The list.** Ordered with the projects that need somebody first. Each row is a
+button and carries three things:
 
-| Column | Contents |
+| | |
 |---|---|
-| Project | Accent dot when the project needs the team · client name · package beneath |
-| Answers | "3 answers" · who answered — "Khun Tanawat", or "Khun Tanawat +2" |
-| Latest | Two lines of state |
+| the mark | an accent dot, on the rows with something waiting, hung in the margin so every client name starts on the same vertical |
+| the name | client · package, the package quieter and on the same line |
+| the sentence | what has arrived, and when the link shuts — "3 answers, last one 2 days ago · closes 26 Aug", or "5 answers · closed 18 Aug" |
+
+**The dot has a legend, and it is the line above the list**, which counts the
+marked rows in words. A bare glyph needs one; see below.
+
+**It was a three-column table** — Project, Answers, Latest — until 20 August
+2026. PRODUCT.md names that shape in its anti-references, and the table needed a
+`data-label` hack to survive a phone, a hidden caption to say rows could be
+pressed, and a hint above them reading "click any project to open it". All three
+existed to make a table behave like a list of buttons.
+
+**Who answered went with it.** The Answers column named them — "Khun Tanawat
++2" — and the row now spends that space on the date the survey shuts, which
+decides whether anybody can still answer at all. The names are in the project.
+
+**Notifications — the bell, on the toolbar's trailing edge.** It holds what was
+in *Needs you*: one row per project with something outstanding, each a client
+name and a sentence. Derived from current state, so there is no unread and
+nothing stored, and nothing is ever sent — see PRODUCT.md principle 1. **The
+rows open the project rather than acting**, because every action they could
+offer is already in the project sheet.
 
 There was a **Stage** column — a segment meter reading "Analysis · 4 of 5". It went on
 17 August 2026 with the kick-off, and it was the weakest column before that: five stages for
@@ -46,12 +71,21 @@ Built against Apple's HIG for toolbars, 17 August 2026, and against parts of it 
 
 **Leading** — the wordmark, then one title slot. The HIG says not to title a window with the app
 name, and it is right that the *title* slot is not where a mark belongs; the mark stays beside it
-as identity. The slot holds the date while the greeting is on screen and hands over to
-**"Needs you · 1"** once it scrolls under the bar — the HIG's large-title pattern, and the reason
-it earns its place is that the projects table runs long and the answer to *is there anything I have
-to do* used to scroll away with the greeting.
+as identity. The slot holds the date and nothing else.
 
-**Trailing** — More, fixed space, then **New survey** last. One primary action, on the trailing
+**The scroll handover went on 20 August 2026.** The slot used to swap the date for
+**"Needs you · 1"** once the greeting passed under the bar — the HIG's large-title
+pattern, earning its place because the list runs long and the answer to *is there
+anything I have to do* scrolled away with the greeting. The bell answers the same
+question better: it holds the count at every scroll position rather than only past
+one, it can be pressed, and what it opens is the work. Keeping both would have put
+one number in two places four inches apart.
+
+**The date leaves the bar below 560px.** The bell took the width it was surviving
+on and "Thursday 20 August" ellipsised to "Thurs…". This is a phone; the day is in
+the status bar an inch above.
+
+**Trailing** — the notification bell, then More, fixed space, then **New survey** last. One primary action, on the trailing
 edge, as the HIG asks; Sign out used to sit after it, so the bar ended on the least important
 control in the app. Sign out and Past projects are in More.
 
@@ -86,7 +120,7 @@ with the shared chevron.
 
 **Back is a step, not a dismissal.** The chevron promises a place behind this one, so there has to
 be one: the answers sheet and the insights return to the project they were opened from. Insights
-opened from the Needs you card have no project behind them and go back to the page. Before the
+opened from anywhere but a project have no project behind them and go back to the page. Before the
 chevron they all dropped you on the landing page, which cost two clicks to get back to where you
 were.
 

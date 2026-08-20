@@ -32,6 +32,7 @@
  */
 import {
   Archive,
+  Bell,
   Calendar,
   Check,
   ChevronLeft,
@@ -65,6 +66,20 @@ function mark(Icon: LucideIcon) {
   Mark.displayName = `Mark(${Icon.displayName ?? 'icon'})`;
   return Mark;
 }
+
+/**
+ * Notifications.
+ *
+ * The bell, and it is the one mark in this set chosen for what people already
+ * know rather than for what it depicts — nothing in this product rings. The
+ * argument for it is the one `docs/navigation-decisions.md` makes against bare
+ * glyphs in general and concedes for the standard ones: a bell on the trailing
+ * edge of a toolbar with a number on it needs no legend anywhere on earth.
+ *
+ * It replaces a section of the page. What sat under a heading reading "Needs
+ * you" is now behind this, so the mark carries a job rather than decorating one.
+ */
+export const BellMark = mark(Bell);
 
 /** Copy link — the thing on the clipboard is a link, so the mark names the thing. */
 export const LinkMark = mark(LinkIcon);
