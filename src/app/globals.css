@@ -4137,84 +4137,47 @@ textarea {
   }
 }
 
+/**
+ * Read above Generate, stacked — 20 August 2026, asked for.
+ *
+ * They were a row, and everything that row needed went with it: the `nowrap`
+ * that kept them on one line, the 8px gap and 12px padding that bought the
+ * space to do it, the 15px type, and the grid of equal columns that made the
+ * two halves match. All of it was width arithmetic in 292px, and stacked there
+ * is no arithmetic — each control has the whole column.
+ *
+ * `stretch`, so the two are the same width whatever their labels are. Read is
+ * shorter than Generate-and-its-chevron, and two pills of different lengths
+ * stacked read as a list rather than as a pair.
+ *
+ * The ellipsis stays. A label is still reachable that no width is safe against
+ * — "Generate from 3", produced by unticking people in the picker — and a
+ * button spilling past its panel is worse than a clipped word.
+ */
 .insbox .iacts {
-  flex-wrap: nowrap;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--sp-sm);
 }
-@media (max-width: 560px) {
-  /* 8, not `--sp-sm`'s 12. Three controls in 262px on a 360 phone leave the gap
-     as one of the few places left to find room, and 8px still reads as a gap
-     between two pills rather than a seam. */
-  .insbox .iacts {
-    gap: 8px;
-  }
-  .insbox .iacts .btn {
-    padding-inline: 12px;
-    font-size: 15px;
-    /* The safety valve. The labels are short enough that nothing truncates in
-       the ordinary two cases — measured — but "Generate from 3" is a phrase a
-       person can produce by unticking people in the dropdown, and a button
-       spilling past the panel is worse than a clipped word. */
-    min-width: 0;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  }
-  .insbox .splitmore {
-    width: 34px;
-  }
-
-  /**
-   * They spread to fill the row — asked for 20 August 2026.
-   *
-   * At their natural widths the pair sat left with 42px of slack on a 390
-   * phone, which on a panel whose other elements all run edge to edge read as
-   * two buttons that had been left where they fell. Sharing the row makes them
-   * the panel's own foot.
-   *
-   * `flex: 1 1 0` on both, so the basis is nothing and the space is split
-   * evenly rather than in proportion to how long each label happens to be.
-   * The chevron is exempt — it is a fixed 34px target welded to the pill beside
-   * it, and a chevron that grows with the window is a chevron in a field of
-   * empty orange.
-   *
-   * `min-width: 0` throughout, or a flex item refuses to shrink below its
-   * content and the ellipsis above never gets the chance to do its job.
-   */
-  /**
-   * A grid, not flex, and the reason is worth writing down.
-   *
-   * `flex: 1 1 0` on both halves should split the row evenly, and measured it
-   * did not: 155 against 129 on a 390 phone, with both reporting `1 1 0px` and
-   * `min-width: 0`. Whatever the flex algorithm was resolving against — the
-   * split button inside the second half is itself a flex container with its own
-   * intrinsic width — the outcome did not match the declaration, which is not a
-   * thing to leave in the file and hope about.
-   *
-   * `grid-auto-flow: column` with `grid-auto-columns: 1fr` states the intent
-   * directly: as many equal columns as there are children. It also handles the
-   * one-button states for free — a single child gets a single full-width
-   * column, where `1fr 1fr` would have left it holding half a row.
-   */
-  .insbox .iacts {
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: 1fr;
-  }
-  .insbox .iacts > .btn,
-  .insbox .iacts > .splitwrap {
-    min-width: 0;
-  }
-  .insbox .splitwrap .split {
-    display: flex;
-    width: 100%;
-  }
-  .insbox .split > .btn {
-    flex: 1 1 0;
-    min-width: 0;
-  }
-  .insbox .splitmore {
-    flex: 0 0 34px;
-  }
+.insbox .iacts .btn {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+/* The split fills its row so Generate lines up with Read above it, and the
+   chevron stays the fixed target it has always been. */
+.insbox .splitwrap .split {
+  display: flex;
+  width: 100%;
+}
+.insbox .split > .btn {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.insbox .splitmore {
+  flex: 0 0 42px;
 }
 
 /**
