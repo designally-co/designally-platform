@@ -4079,16 +4079,32 @@ textarea {
   color: var(--warm-white);
 }
 /* The Field's `--ink-2`, 14.97:1. A measure, because it is prose. */
+/**
+ * Two lines, deliberately — 20 August 2026, asked for.
+ *
+ * The measure has been chased twice: 52ch forced two lines at every width, then
+ * 68ch let it run to one on a laptop, and one line of 71 characters beside a
+ * two-line column of buttons left the text block short and adrift on the panel's
+ * axis. 40ch is narrower than the sentence needs, which is the point — it breaks
+ * once and only once.
+ *
+ * `balance` rather than `pretty`: pretty guards the last line against an orphan
+ * and leaves the first as long as it likes, and what this wants is two lines of
+ * roughly equal length under a heading of its own. Balance is written for
+ * exactly this — a short block of two or three lines where the ragged edge is
+ * part of the composition.
+ *
+ * The panel does not grow. Its height is the stacked buttons plus the padding,
+ * and the text column is shorter than they are either way.
+ */
 .inslede {
   margin-top: 3px;
-  /* 68ch, not 52 — the sentence is 71 characters and 52 forced a second line at
-     every width. Beside the buttons it fits on one on a laptop. */
-  max-width: 68ch;
+  max-width: 40ch;
   font-size: 14px;
   line-height: 1.6;
   letter-spacing: 0;
   color: #e0e2e5;
-  text-wrap: pretty;
+  text-wrap: balance;
 }
 /* and the sentence that stands in for it when nobody has answered */
 .insempty .ireads {
@@ -4233,7 +4249,21 @@ textarea {
  */
 .insbox .split > .btn-outline,
 .insbox .split:has(> .btn-outline) .splitmore {
-  background: var(--charcoal-900);
+  /**
+   * No fill — 20 August 2026, asked for. An outline, on the tile itself.
+   *
+   * It was `--charcoal-900`, the Field's raised surface, which made it a second
+   * solid beside the orange one. Two filled pills stacked read as two primaries
+   * of different colours; one filled and one drawn reads as an action and its
+   * alternative, which is what they are.
+   *
+   * The border does all of it now, so it is the whole control rather than a
+   * reinforcement of a fill — 4.53:1 against the tile, past the 3:1 a boundary
+   * takes, which is why this can lose its body without losing its shape. The
+   * label is `--warm-white` at 17.51:1 on the tile and 9.62 at the hottest
+   * point of the glow.
+   */
+  background: transparent;
   border-color: #75777d;
   color: var(--warm-white);
 }
@@ -4246,9 +4276,15 @@ textarea {
 @media (hover: hover) {
   .insbox .split > .btn-outline:not(:disabled):hover,
   .insbox .split:has(> .btn-outline) .splitmore:not(:disabled):hover {
-    /* it lifts on this ground rather than darkening — the direction that has
-       always meant "live" here, inverted with the Field */
-    background: #262a30;
+    /**
+     * The line lifts, and the faintest wash comes with it.
+     *
+     * A ghost control needs *something* under the pointer, and on this ground
+     * the honest something is light: 6% white is a breath rather than a fill —
+     * it does not turn the button back into the solid it stopped being, and it
+     * is enough that a pointer crossing it is answered.
+     */
+    background: rgba(255, 255, 255, 0.06);
     border-color: #919399;
   }
   .insbox .split:has(.splitmore) > .btn-outline:not(:disabled):hover {
@@ -4257,7 +4293,7 @@ textarea {
 }
 .insbox .split > .btn-outline:not(:disabled):active,
 .insbox .split:has(> .btn-outline) .splitmore:not(:disabled):active {
-  background: #31363e;
+  background: rgba(255, 255, 255, 0.12);
 }
 
 /**
