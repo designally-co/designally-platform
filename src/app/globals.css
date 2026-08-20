@@ -4039,7 +4039,21 @@ textarea {
   display: flex;
   align-items: center;
   gap: var(--sp-lg);
-  padding: var(--sp-md) var(--sp-lg);
+  /**
+   * One number on all four sides — asked for: the same above the buttons,
+   * below them and to their right.
+   *
+   * It was `--sp-md --sp-lg`, two numbers, and with the foot's own inset on top
+   * of it the buttons sat in 17 / 41 / 48. A control block that is the panel's
+   * whole right-hand side wants the same air on every side it touches, or the
+   * panel reads as having been assembled rather than composed.
+   *
+   * `--sp-md` and not `--sp-lg`, because the stacked pair is 101px tall and the
+   * padding is the only other thing setting the height: 16 puts the panel at
+   * 133 where 24 would put it at 149. The panel is sized by its buttons and
+   * nothing else, which is as small as it goes.
+   */
+  padding: var(--sp-md);
 }
 
 /**
@@ -4262,19 +4276,20 @@ textarea {
   color: #75777d;
 }
 /**
- * The machine's half — no line at all, 20 August 2026, asked for.
+ * The machine's half holds no padding of its own — 20 August 2026.
  *
- * It stood on `--recess` so the split read as depth, then on a hairline when
- * the recess would have cut the gradient in half. Both were drawing a boundary
- * inside one object: the ramp already tells the eye which end of the panel it
- * is at, and the two bands were never two things — they are a sentence and the
- * buttons that act on it.
+ * It was `0 --sp-lg --sp-lg`, from when this was a band across the bottom of a
+ * stacked panel and had to inset itself. It became a column beside the text and
+ * the rule stayed, so it was adding 24 to the right and 24 to the bottom of a
+ * panel that was already padding itself: the gaps around the buttons measured
+ * 17 at the top, 41 at the bottom and 48 at the right, three numbers where
+ * there should have been one.
  *
- * No top padding either. With the rule gone, `--sp-lg` on both sides of a line
- * that is not there is a gap where a divider used to be.
+ * The panel is the flex container and the padding is its. Nothing inside it
+ * insets itself.
  */
 .insfoot {
-  padding: 0 var(--sp-lg) var(--sp-lg);
+  padding: 0;
 }
 /* `.insopen` went on 20 August 2026 with the button it spaced — *Read insights*
    sits in the actions row beside Generate now, not under the head. */
