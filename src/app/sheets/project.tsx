@@ -1280,22 +1280,30 @@ export default function ProjectSheet({
                         disabled={genPending || chosen === 0}
                         onClick={generate}
                       >
-                        {/* Short when it shares the row, full when it has the
-                            row to itself. With an analysis written there are
-                            two pills and a chevron in 292px on a phone, and
-                            "Generate again" spent 46 of them on a word the
-                            button beside it already implies — you do not read
-                            insights that do not exist. With nothing written it
-                            is the only control here and says what it makes. */}
+                        {/**
+                         * It says Generate — 20 August 2026, asked for.
+                         *
+                         * It used to become "Generate from 3" the moment a name
+                         * was unticked, which put the state of the *picker* on
+                         * the face of the button that runs it: the label moved
+                         * because of something you did in a panel that is no
+                         * longer open, and the one control on the sheet that
+                         * should be a constant became the one that moved most.
+                         * Whose answers a run reads is the picker's business
+                         * and the picker shows it, in ticks.
+                         *
+                         * What is left varies by what the panel *is*, not by
+                         * what is selected in it: the full name when it is the
+                         * only control on the row, the short one when it shares
+                         * the row with Read, and the two operation states.
+                         */}
                         {genPending
                           ? 'Reading…'
                           : error
                             ? 'Try again'
-                            : chosen !== p.people.length
-                              ? `Generate from ${chosen}`
-                              : p.insights
-                                ? 'Generate'
-                                : 'Generate insights'}
+                            : p.insights
+                              ? 'Generate'
+                              : 'Generate insights'}
                       </button>
                       {p.people.length > 1 && (
                         <button
@@ -1326,49 +1334,24 @@ export default function ProjectSheet({
                         style={{ top: at.top, left: at.left, width: at.width }}
                       >
                         {/**
-                         * Everyone / Nobody, and which one is currently true.
+                         * Everyone and Nobody went on 20 August 2026, asked
+                         * for, and the panel opens with everybody ticked.
                          *
-                         * `aria-pressed`, not `disabled` — 20 August 2026.
-                         * Being the current state was expressed by greying the
-                         * button out, which is the same picture as "you cannot
-                         * use this": the state a person had chosen looked like
-                         * the one thing on the panel that had been taken away.
-                         * It also killed the hover on whichever one was true,
-                         * so half the control stopped responding.
+                         * They were a shortcut for a list this product does not
+                         * have: PRODUCT.md records that one person usually
+                         * answers and three to twenty is the whole range, so
+                         * *unticking nineteen of twenty* was the case they were
+                         * built for and it is not a case that occurs. Against
+                         * two names they were two more controls than the job
+                         * needed, and the pair spent the accent — a chosen
+                         * segment in orange — on saying that the default was
+                         * still the default.
                          *
-                         * Pressed is the accent ladder's *selected* rung — pale
-                         * orange field, orange line, ink label, exactly what a
-                         * chosen day in the date picker wears. Both stay
-                         * pressable; pressing the one that is already true is a
-                         * no-op rather than an error.
-                         *
-                         * Neither is pressed when a subset is ticked, which is
-                         * a state these two shortcuts cannot express and
-                         * `aria-pressed` reports honestly.
-                         *
-                         * The "Read the answers of:" line above them went the
-                         * same day. The panel opens from a control labelled
-                         * "Choose whose answers to read" and holds nothing but
-                         * names with checkboxes — a heading to say so was the
-                         * panel introducing itself to somebody already reading
-                         * it.
+                         * Everyone remains the default, which is what `only ===
+                         * null` has always meant. Nobody is still reachable by
+                         * unticking the names, and still refuses to run: the
+                         * warning below is what says so.
                          */}
-                        <div className="pickall">
-                          <button
-                            type="button"
-                            aria-pressed={only === null}
-                            onClick={() => setOnly(null)}
-                          >
-                            Everyone
-                          </button>
-                          <button
-                            type="button"
-                            aria-pressed={chosen === 0}
-                            onClick={() => setOnly([])}
-                          >
-                            Nobody
-                          </button>
-                        </div>
                         {p.people.map((person) => {
                           const on = only === null || only.includes(person.id);
                           return (

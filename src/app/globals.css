@@ -4338,65 +4338,12 @@ textarea {
   overflow-y: auto;
   overscroll-behavior: contain;
 }
-/* Everyone / Nobody. Unticking nineteen of twenty people was nineteen presses,
-   and the row that fixes it is also the only one that says what the default is.
-   It sits under the hint and above the names, on the divider, so the list below
-   it stays one kind of thing. */
-.pickall {
-  display: flex;
-  gap: var(--sp-xs);
-  padding-bottom: var(--sp-xs);
-  margin-bottom: var(--sp-xxs);
-  border-bottom: 1px solid var(--divider);
-}
-/**
- * A pair of segments, and one of them is usually true.
- *
- * At rest they took `--parchment`, which inside this popover is the page's own
- * white — so two white buttons on a white panel, findable only by their labels.
- * `--recess` gives them a body, which is what makes the pair read as a control
- * rather than as two more lines of text.
- *
- * Hover steps down the same neutral ramp every other control on this surface
- * uses. It was `--fill`, `#beb5b2`, which is the icon disc's warm ground and
- * lands as a brown slab under a 13.5px label.
- *
- * Pressed is the accent ladder's *selected* rung — pale orange field, 2px
- * orange line, ink label — and it is drawn exactly as `.dpday[aria-pressed]`
- * draws a chosen day, because it is the same statement. The label goes to full
- * ink rather than orange: DESIGN.md is explicit that the field and the line
- * already say chosen, and orange text would be a third signal for one state.
- */
-.pickall button {
-  flex: 1;
-  min-height: 32px;
-  padding: 4px 10px;
-  font-family: var(--font-display);
-  font-size: 13.5px;
-  color: var(--ink-2);
-  background: var(--recess);
-  border: 0;
-  border-radius: var(--r-sm);
-  cursor: pointer;
-  transition: background var(--dur-feedback) var(--ease);
-}
-@media (hover: hover) {
-  .pickall button:hover {
-    background: #e9e9e9;
-  }
-}
-.pickall button[aria-pressed='true'] {
-  background: var(--primary-tint);
-  box-shadow: inset 0 0 0 2px var(--primary);
-  color: var(--ink);
-  font-weight: 600;
-}
-@media (hover: hover) {
-  /* the chosen one darkens within its own tint rather than leaving the ladder */
-  .pickall button[aria-pressed='true']:hover {
-    background: #ffe4dc;
-  }
-}
+/* `.pickall` and its segments went on 20 August 2026 with the Everyone /
+   Nobody row they styled. They were a shortcut for unticking nineteen of
+   twenty, and PRODUCT.md records that one person usually answers — so the case
+   they existed for does not occur, and against two names they were two more
+   controls than the job needed. */
+
 .splitmenu .hintline {
   margin-bottom: var(--sp-xxs);
 }
