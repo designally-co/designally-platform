@@ -169,7 +169,16 @@ export default function ProjectSheet({
   /* 340 is the menu's own `max-height` — it only decides whether to open down
      or up, and it was 200, which a five-person list already passed. A list that
      is taller than the estimate opens downward off the bottom of the screen. */
-  const at = useAnchored(picking, split, 260, 340);
+  /**
+   * The picker, measured rather than estimated once it exists.
+   *
+   * There is rarely room below this control — it sits at the foot of the
+   * insights panel, itself near the foot of the sheet — so the panel almost
+   * always opens upward, and upward is the direction where a wrong height
+   * becomes a visible gap. See `useAnchored`.
+   */
+  const pickPanel = useRef<HTMLDivElement>(null);
+  const at = useAnchored(picking, split, 260, 340, 'left', pickPanel);
   /* Focus goes back to the control that opened it. Escape used to drop it on
      the sheet's scroller, which puts a keyboard user at the top of the sheet
      having pressed one key. */
@@ -1309,6 +1318,7 @@ export default function ProjectSheet({
 
                     {picking && at && (
                       <div
+                        ref={pickPanel}
                         id={`pick-${p.id}`}
                         className="splitmenu"
                         role="group"

@@ -59,10 +59,18 @@ function fixedOrigin(from: HTMLElement) {
  * Viewport coordinates for a panel of roughly `width` x `height`, under
  * `anchor` — or above it when there is no room below.
  *
- * `height` is an estimate and only decides which side to open on; the panel is
- * not sized by it. Being a little wrong means opening downward when upward
- * would have been slightly better, which is not worth a measure-then-render
- * pass to get exactly right.
+ * `height` is an estimate, used until the panel exists and can be measured.
+ *
+ * **It decides more than which side to open on, which is what went wrong.**
+ * When there is no room below, the panel is placed at `anchor.top - height - 8`
+ * — so an estimate that is larger than the panel puts it that much too high. A
+ * 340px guess in front of a 250px picker opened it ninety pixels clear of the
+ * chevron that produced it, with nothing in between: it read as a panel
+ * belonging to something else on the sheet.
+ *
+ * So `panel` is optional and, once given, replaces the guess with the real
+ * height on the frame after mount. The estimate still does the first placement,
+ * because there is nothing to measure before the panel renders.
  */
 export function useAnchored(
   open: boolean,
@@ -75,12 +83,18 @@ export function useAnchored(
    * back into the sheet rather than off the side of it.
    */
   align: 'left' | 'right' = 'left',
+  /** the panel itself, so its true height can replace `height` once it exists */
+  panel?: React.RefObject<HTMLElement | null>,
 ) {
   const [at, setAt] = useState<Anchored | null>(null);
   /* Read through a ref so `place` can stay stable across renders — as a
      dependency it is also what the listeners are added and removed with. */
   const size = useRef({ width, height });
   size.current = { width, height };
+  /* Read through a ref for the same reason `size` is: `place` has to stay
+     stable, and it is what the scroll and resize listeners are keyed on. */
+  const panelRef = useRef(panel);
+  panelRef.current = panel;
 
   const place = useCallback(() => {
     const el = anchor.current;
@@ -88,10 +102,10 @@ export function useAnchored(
     const box = el.getBoundingClientRect();
     const w = Math.min(size.current.width, window.innerWidth - 16);
     const below = window.innerHeight - box.bottom;
-    const top =
-      below < size.current.height && box.top > size.current.height
-        ? box.top - size.current.height - 8
-        : box.bottom + 8;
+    /* The panel's own height the moment there is one, and the estimate before
+       that. Both the choice of side and the distance depend on it. */
+    const h = panelRef.current?.current?.getBoundingClientRect().height || size.current.height;
+    const top = below < h && box.top > h ? box.top - h - 8 : box.bottom + 8;
     /* Kept on screen: a control near an edge would otherwise hang a panel off
        it, and there is nothing to scroll it back into view. */
     const wanted = align === 'right' ? box.right - w : box.left;
@@ -103,6 +117,9 @@ export function useAnchored(
   useEffect(() => {
     if (!open) return;
     place();
+    /* Again on the next frame, when the panel exists and can be measured. The
+       first call uses the estimate because there is nothing else to use. */
+    const measured = requestAnimationFrame(place);
     /* Capture, so the sheet's own scroller is heard and not only the window. */
     window.addEventListener('scroll', place, true);
     window.addEventListener('resize', place);
@@ -112,6 +129,7 @@ export function useAnchored(
     document.addEventListener('animationend', place, true);
     document.addEventListener('transitionend', place, true);
     return () => {
+      cancelAnimationFrame(measured);
       window.removeEventListener('scroll', place, true);
       window.removeEventListener('resize', place);
       document.removeEventListener('animationend', place, true);
