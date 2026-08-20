@@ -1051,49 +1051,31 @@ export default function ProjectSheet({
          */}
           <div className="inshead">
             {/**
-             * One line that is always there, and says which of two things this
-             * panel is right now.
+             * The panel names itself, then says what it is for.
              *
-             * With something outstanding it is the Point and NEEDS YOUR TEAM —
-             * DESIGN.md §"five named pieces" gives the Point three jobs and one
-             * of them is literally "the team app's needs you", so the panel
-             * wears the brand's own mark for this moment rather than inventing
-             * something to be branded with. The accent keeps its rule: it is
-             * here only when a person is actually needed.
+             * It opened with an eyebrow — the Point and NEEDS YOUR TEAM when
+             * something was outstanding, the word *Insights* when it was not —
+             * over a sentence reporting the state. Both went on 20 August 2026,
+             * asked for. The eyebrow's job was to make this panel the loud thing
+             * on the sheet when a person was needed, and the panel is now the
+             * loud thing on the sheet at all times: it is the only surface in
+             * the app carrying a gradient, and an accent label inside an accent
+             * banner is the same signal twice.
              *
-             * With nothing outstanding it is the panel's name, in the same slot
-             * at the same size with no dot and no accent. That is what let the
-             * `<h2>` go: a heading over a panel whose first line is a state
-             * sentence was the only thing naming it, and Collection lost its own
-             * heading an hour earlier for the same reason.
+             * **"AI insights", and the noun is doing the work.** PRODUCT.md's
+             * anti-references forbid the interface implying its own output
+             * decides anything — no "recommended", no "AI suggests", no
+             * "smart". Naming the mechanism is not that: the page *is* written
+             * by Claude, and a team that knows which of their surfaces is
+             * machine-written reads it with the right amount of suspicion. What
+             * the rule bars is the next sentence claiming authority, which is
+             * why the one below reports rather than concludes.
              */}
-            {mine ? (
-              <p className="ineed">
-                <span className="pt" aria-hidden="true" />
-                NEEDS YOUR TEAM
-              </p>
-            ) : (
-              <p className="ineed isname">Insights</p>
-            )}
-
-            {mine ? (
-              <p className="isay">
-                <b>{p.action!.say}</b> {p.action!.emphasis}
-              </p>
-            ) : (
-              /* The state, not the date — the date is the line below, and this
-                 said "Written 19 Aug" directly over "Written 19 Aug · 3 runs
-                 kept" until the provenance line came out of its ternary. */
-              <p className="isay">
-                <b>{p.insights ? 'The analysis is written.' : 'Not written yet'}</b>
-                {!p.insights &&
-                  (shut
-                    ? ` · collection closed ${p.closedOn ?? p.dueOn}${p.closedByName ? ` by ${p.closedByName}` : ''}`
-                    : p.answers
-                      ? ' · collection is open'
-                      : '')}
-              </p>
-            )}
+            <h3 className="institle">AI insights</h3>
+            <p className="inslede">
+              One page from the answers: what your client has settled, where they contradict
+              themselves, and what is still open. It reports — reading it is still the job.
+            </p>
 
             {/**
              * When it was written, and how many runs are kept — now always,
@@ -1140,31 +1122,11 @@ export default function ProjectSheet({
               <p className="iwhen">{p.action!.when}</p>
             ) : null}
 
-            {/**
-             * The way in, with the thing it opens.
-             *
-             * It used to sit in the foot beside Generate, which made the foot do
-             * two jobs — run a new analysis, and read the old one — and left the
-             * head as four inert lines. Asked for 19 August 2026, and it is the
-             * split the two bands were drawn for: **above the line is what
-             * exists and how to read it; below it is what a new run would read
-             * and how to run it.** Each band is one complete thing now, which is
-             * the meaning the recessed ground was already claiming.
-             *
-             * It takes the accent because it is what somebody opened this sheet
-             * for. That leaves exactly one primary on the panel — the floor's
-             * item 6 — because Generate steps back to an outline the moment
-             * there is anything here to open.
-             */}
-            {p.insights && (
-              <button
-                className="btn btn-primary insopen"
-                disabled={genPending}
-                onClick={onOpenInsights}
-              >
-                Open the insights
-              </button>
-            )}
+            {/* The way in moved down beside Generate on 20 August 2026, asked
+                for: where there is an analysis the panel offers two acts, and
+                two acts belong in one row. It keeps the accent — it is what
+                somebody opened this sheet for — and Generate steps back to an
+                outline behind it, so exactly one primary is on the panel. */}
           </div>
 
           {/**
@@ -1178,11 +1140,30 @@ export default function ProjectSheet({
            */}
           <div className="insfoot">
         {!p.people.length ? (
-          <p className="quiet">
-            {p.token
-              ? 'Nobody has answered yet. The analysis reads the answers, so it has nothing to read.'
-              : 'No link has been issued for this project yet.'}
-          </p>
+          /**
+           * Nothing to read — and the control says so by being there.
+           *
+           * This was a sentence alone. A person scanning the panel for the
+           * thing to press found nothing at all, and an absent button is
+           * indistinguishable from a button that has not loaded. Disabled, it
+           * reports the state in the same place the state will be resolved:
+           * the shape of what will happen is already on screen, greyed, waiting
+           * for the one thing that is missing.
+           *
+           * No chevron on it either. There is nobody to choose between.
+           */
+          <div className="insempty">
+            <p className="ireads">
+              {p.token
+                ? 'Nobody has answered yet. The analysis reads the answers, so it has nothing to read.'
+                : 'No link has been issued for this project yet.'}
+            </p>
+            <div className="iacts">
+              <button className="btn btn-primary" disabled>
+                Generate insights
+              </button>
+            </div>
+          </div>
         ) : (
           <>
 
@@ -1314,6 +1295,19 @@ export default function ProjectSheet({
                 </p>
 
                 <div className="iacts">
+                  {/* Two acts, one row — asked for 20 August 2026. Read first:
+                      it is what somebody opened the sheet for, and it is the
+                      cheap one. Generate is beside it and costs money and
+                      minutes, which is why the accent sits on the left. */}
+                  {p.insights && (
+                    <button
+                      className="btn btn-primary"
+                      disabled={genPending}
+                      onClick={onOpenInsights}
+                    >
+                      Read insights
+                    </button>
+                  )}
                   {/**
                    * Filled only when there is nothing to open.
                    *

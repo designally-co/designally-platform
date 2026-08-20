@@ -1648,7 +1648,15 @@ Recording it because an undocumented borrowing looks like an oversight, and the 
   only visible edge is its top — so its shadow is cast **upward**, and is one very
   diffuse layer rather than the popovers' two: `0 -24px 56px -20px rgba(27,29,35,.035)`.
   See below.
-- Use gradients, glassmorphism as decoration, or decorative grid backgrounds
+- Use gradients, glassmorphism as decoration, or decorative grid backgrounds — with **two
+  exceptions**, both asked for and both where the surface *is* the message: the sign-in page
+  (19 August 2026), and the project sheet's **insights panel** (20 August 2026), which ramps
+  white into the accent's own tint on an `oklab` interpolation. The argument for the second:
+  every other block on that sheet is a record of what happened — who answered, when the link
+  shuts, who closed it — and this is the only thing the platform *makes*. It sat in the same
+  white card as the rest. `--ink` on its darkest end measures 14.6:1 and `--ink-2` 11.3:1, so
+  nothing on it comes near a floor, and its border and divider take the accent at 20% and 14%
+  rather than the hairline — a neutral line around a warm field reads as borrowed.
 - Round a full-bleed dark tile
 - Tighten body leading below 1.44 in Latin or 1.6 in Thai
 - Mix radii grammars — 8, 11, 18, pill, and nothing between
