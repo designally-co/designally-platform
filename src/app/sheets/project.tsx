@@ -1271,14 +1271,21 @@ export default function ProjectSheet({
                         disabled={genPending || chosen === 0}
                         onClick={generate}
                       >
+                        {/* Short when it shares the row, full when it has the
+                            row to itself. With an analysis written there are
+                            two pills and a chevron in 292px on a phone, and
+                            "Generate again" spent 46 of them on a word the
+                            button beside it already implies — you do not read
+                            insights that do not exist. With nothing written it
+                            is the only control here and says what it makes. */}
                         {genPending
                           ? 'Reading…'
                           : error
                             ? 'Try again'
                             : chosen !== p.people.length
-                              ? `Generate from ${chosen} ${chosen === 1 ? 'answer' : 'answers'}`
+                              ? `Generate from ${chosen}`
                               : p.insights
-                                ? 'Generate again'
+                                ? 'Generate'
                                 : 'Generate insights'}
                       </button>
                       {p.people.length > 1 && (

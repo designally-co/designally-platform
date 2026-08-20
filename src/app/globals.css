@@ -4022,6 +4022,47 @@ textarea {
 }
 
 /**
+ * The two acts stay on one row, at every width — asked for 20 August 2026.
+ *
+ * `.iacts` wraps by default, which is right where it is shared: a sheet's
+ * action row can hold three or four controls and a phone has to put them
+ * somewhere. This row holds exactly two, they are a pair, and stacked they read
+ * as a list of things to choose between rather than one act and its
+ * alternative.
+ *
+ * `nowrap` alone is not enough — at 390 the pair intrinsically needs 357px and
+ * the panel gives it 294 — so on a phone the pills spend less on padding and a
+ * step less on type. The 44px minimum height is untouched: what shrinks is the
+ * air either side of the words, never the target.
+ */
+.insbox .iacts {
+  flex-wrap: nowrap;
+}
+@media (max-width: 560px) {
+  /* 8, not `--sp-sm`'s 12. Three controls in 262px on a 360 phone leave the gap
+     as one of the few places left to find room, and 8px still reads as a gap
+     between two pills rather than a seam. */
+  .insbox .iacts {
+    gap: 8px;
+  }
+  .insbox .iacts .btn {
+    padding-inline: 12px;
+    font-size: 15px;
+    /* The safety valve. The labels are short enough that nothing truncates in
+       the ordinary two cases — measured — but "Generate from 3" is a phrase a
+       person can produce by unticking people in the dropdown, and a button
+       spilling past the panel is worse than a clipped word. */
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .insbox .splitmore {
+    width: 34px;
+  }
+}
+
+/**
  * On the gradient the secondary is a **white pill**, not an outline — asked for
  * 20 August 2026.
  *
