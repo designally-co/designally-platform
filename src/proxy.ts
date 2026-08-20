@@ -22,7 +22,20 @@ import { NextResponse, type NextRequest } from 'next/server';
  * 400, which renders as an empty box — the client would have been asked to
  * choose between six blank cards with no error anywhere they could see.
  */
-const PUBLIC_PREFIXES = ['/s/', '/c/', '/api/s/', '/api/c/', '/api/auth/', '/moodboard/'];
+/**
+ * `/api/cron/` carries no session and must not be redirected to one.
+ *
+ * A scheduled invocation arrives from Vercel with no cookie, so this would have
+ * sent it a 307 to `/sign-in` — a redirect the cron follows, gets HTML from,
+ * and reports as a success. The job would have looked like it was running
+ * daily and never have written a thing.
+ *
+ * It is not open for being listed here. The route checks
+ * `Authorization: Bearer $CRON_SECRET` itself and refuses without it, which is
+ * the right place for that check: this file only knows whether a browser
+ * session cookie exists, and a cron has no browser.
+ */
+const PUBLIC_PREFIXES = ['/s/', '/c/', '/api/s/', '/api/c/', '/api/auth/', '/api/cron/', '/moodboard/'];
 const PUBLIC_EXACT = ['/sign-in'];
 
 const SESSION_COOKIES = [

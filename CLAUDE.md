@@ -316,6 +316,14 @@ Each one ends with something usable. Do not start the next before the previous h
 1. **One survey link that works** — public bilingual form, saves to Postgres. No auth, no team app.
 2. **The team can see it** — auth, Projects list, create survey, view responses. Already replaces Google Forms.
 3. **The team can prepare in ten minutes** — analyse, Anthropic API, structured output.
+   **The analysis runs itself once the date passes** (20 August 2026, asked for) — a
+   daily Vercel cron at `/api/cron/lapsed` finds every unarchived survey past its
+   date with answers and no analysis, and writes one. It needs `CRON_SECRET`, and
+   refuses outright without it: the route spends money at Anthropic. This is not
+   rule 2 or principle 4 being broken — it writes an `insights` row and nothing
+   else, so `closed_at` and `closed_by` still record only what a person did, and
+   generating the insights was never a gate. It also picks up a manual close whose
+   analysis failed, because closing moves `due_at` to the moment it closed.
    **The analysis does not need a closed survey** (19 August 2026): it runs on
    whatever answers are in, so an early read of two or three is a press. Closing
    still runs it on the way, and where a run has been overtaken the project sheet

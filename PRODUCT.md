@@ -134,7 +134,20 @@ Nothing in the product should imply the software is deciding. The interface neve
    places to keep true.
 2. **An empty screen is success.** When nothing needs the team, say so plainly and let them close the laptop. Never manufacture activity to fill space.
 3. **Colour carries one meaning.** The accent means "a person is needed here" and appears on under ten percent of the surface. If it stops meaning that, it stops working.
-4. **The tool never decides on a timer.** It never closes a survey, confirms the insights, or archives a project by itself. It may notice that waiting has stopped being useful and ask; the answer belongs to a person, and the record stores who gave it.
+4. **The tool never decides on a timer.** It never closes a survey, confirms the insights, or archives a project by itself.
+
+   **It does write the insights on a timer, from 20 August 2026 — asked for, and
+   it is not an exception to this.** What this principle protects is the record
+   of who acted: a gate is a person's decision and the app must never sign one.
+   A daily job reads the answers of any survey whose date has passed and writes
+   the analysis, and it writes an `insights` row and nothing else — `closed_at`
+   and `closed_by` stay empty unless somebody pressed the button. Generating the
+   insights was never one of the gates; confirming them was, and that gate was
+   retired on 18 August.
+
+   The step it removes had no decision in it. The notification said "the date has
+   passed with 3 answers in, the analysis has not been run" and the button under
+   it read every one of those answers with nothing to choose. It may notice that waiting has stopped being useful and ask; the answer belongs to a person, and the record stores who gave it.
 5. **State what is true, not what is estimated.** Report counts that exist — "3 answers so far · last one 2 days ago". Do not extrapolate volumes, percentages, or confidence from small samples.
 6. **Both languages, everywhere except the buttons — and except the welcome screen.** Every client-facing question, heading, help line, placeholder and message exists in Thai and English. **Buttons are the one exception**, decided 13 August 2026: bilingual action labels wrapped to two lines on a phone and made the button the largest thing on screen, so navigation and action labels run in English alone. The exception is exactly that wide — it does not extend to step labels, system messages, or anything a respondent has to read to answer. Thai wraps differently and sits taller; layouts are tested in Thai before they are considered done.
 7. **The client's own words survive the pipeline.** Quotes from stakeholders reach the insights verbatim, in the language they were written in.
