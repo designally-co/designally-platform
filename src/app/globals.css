@@ -2778,6 +2778,27 @@ textarea {
   padding: var(--sp-xl) var(--sp-xl) var(--sp-xxl);
   background: var(--parchment);
   border-radius: var(--r-sheet) var(--r-sheet) 0 0;
+  /**
+   * The second shadow in this product, and the second exception — 20 August
+   * 2026, asked for. Recorded in DESIGN.md §8 beside the popovers' rather than
+   * left as a rule quietly broken.
+   *
+   * The reason is the same one the popovers have: "borders, not shadows" works
+   * when a border can carry the separation, and here it cannot. This sheet
+   * slides over the hero and the two are the same family of near-whites, so a
+   * hairline at 1.11:1 is the whole of what says one is in front of the other —
+   * on an edge the reader is meant to want to pull.
+   *
+   * Cast **upward**, which is the departure from the popovers' values. A
+   * popover is held above the page and drops its shadow down; this comes up
+   * from the bottom of the window and the only edge anybody sees is its top, so
+   * the light has to come from above it. Same two-layer construction and the
+   * same ink: a 2px contact shadow for the edge itself, and a wide soft one
+   * carrying the lift.
+   */
+  box-shadow:
+    0 -1px 2px rgba(27, 29, 35, 0.04),
+    0 -14px 34px -8px rgba(27, 29, 35, 0.12);
 }
 
 /**

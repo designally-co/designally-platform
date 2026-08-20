@@ -1602,7 +1602,11 @@ Recording it because an undocumented borrowing looks like an oversight, and the 
 **Don't**
 - Introduce a second accent colour
 - Add a shadow to any card, button, panel or text — there are no shadows in this product,
-  with **one exception, added 19 August 2026**: a popover on the paper surface. See below.
+  with **two exceptions**, both on surfaces where a border cannot do the job:
+  a popover on the paper surface (19 August 2026), and the landing page's projects
+  sheet (20 August 2026), which slides over a hero of the same near-white and whose
+  only visible edge is its top — so its shadow is cast **upward**,
+  `0 -1px 2px rgba(27,29,35,.04), 0 -14px 34px -8px rgba(27,29,35,.12)`. See below.
 - Use gradients, glassmorphism as decoration, or decorative grid backgrounds
 - Round a full-bleed dark tile
 - Tighten body leading below 1.44 in Latin or 1.6 in Thai
