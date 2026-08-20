@@ -4020,6 +4020,52 @@ textarea {
 .insempty .iacts {
   margin-top: var(--sp-md);
 }
+
+/**
+ * On the gradient the secondary is a **white pill**, not an outline — asked for
+ * 20 August 2026.
+ *
+ * `.btn-outline` is transparent with a hairline, which is right on a white
+ * sheet: the page shows through and the line is the whole boundary. On a peach
+ * field it is the opposite — the button takes the panel's own colour and reads
+ * as a shape drawn on the gradient rather than a control resting on it, and its
+ * `--hairline` border is a cool grey against a warm ground.
+ *
+ * White fill, no border. The two acts are now the two things this system has:
+ * `--primary` for the one you came for, and the page's own white for the one
+ * beside it. Both are solid, which is what makes them a pair.
+ *
+ * The chevron comes with it. It follows `.btn-outline` through `:has()` a few
+ * rules up, and that rule resolves to a transparent disc with a grey ring — so
+ * without this the pill would go white and the half joined to it would not.
+ *
+ * `--ink` on white is 15.18:1; the seam between the two halves is the ink ramp
+ * rather than `--on-primary` at 24%, which is a white line and invisible here.
+ */
+.insbox .split > .btn-outline,
+.insbox .split:has(> .btn-outline) .splitmore {
+  background: var(--white);
+  border-color: transparent;
+  color: var(--ink);
+}
+.insbox .split:has(> .btn-outline) .splitmore {
+  border-left: 1px solid var(--divider);
+}
+@media (hover: hover) {
+  .insbox .split > .btn-outline:not(:disabled):hover,
+  .insbox .split:has(> .btn-outline) .splitmore:not(:disabled):hover {
+    /* the ramp a white control takes on this surface, not a darkening line */
+    background: #f4f4f4;
+    border-color: transparent;
+  }
+  .insbox .split:has(> .btn-outline) .splitmore:not(:disabled):hover {
+    border-left-color: var(--divider);
+  }
+}
+.insbox .split > .btn-outline:not(:disabled):active,
+.insbox .split:has(> .btn-outline) .splitmore:not(:disabled):active {
+  background: #e9e9e9;
+}
 /**
  * The machine's half — no line at all, 20 August 2026, asked for.
  *
