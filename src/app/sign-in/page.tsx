@@ -44,14 +44,13 @@ export default async function SignIn(props: PageProps<'/sign-in'>) {
          * widely tracked under it, which is a lockup rather than a label over a
          * heading.
          */}
-        <h1 className="sl-lockup">
-          {/* `Designally&rsquo;s Survey Platform` is the product's name, so the
-              possessive belongs in it — the lockup reads as one name across the
-              two lines rather than a company with a product filed under it. A
-              true apostrophe, not the typewriter one. */}
-          <span className="sl-name">Designally&rsquo;s</span>
-          <span className="sl-product">Survey Platform</span>
-        </h1>
+        {/* One line. It was set as a two-tier lockup — the company large, the
+            product small and tracked underneath — which made a name into a
+            heading with a label under it. `Designally&rsquo;s Survey Platform`
+            is the name, so it is one string at one size, and it wraps like a
+            sentence rather than breaking into tiers. A true apostrophe, not the
+            typewriter one. */}
+        <h1 className="sl-lockup">Designally&rsquo;s Survey Platform</h1>
 
         {/**
          * What the platform is for, in the one place the team sees it.

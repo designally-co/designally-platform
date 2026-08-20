@@ -5508,7 +5508,10 @@ body:has(.deck.paper) {
    page became one. A tone-card here would be a grey rectangle floating on a
    colour field: two surfaces arguing on a screen with one thing to say. */
 .signin .card {
-  width: min(460px, 100%);
+  /* 700, not 460. The name is one line of 27 characters now and 460 forced it
+     to wrap at every width — a measure sized for the stacked lockup it used to
+     be. It still wraps on a phone, where nothing would hold it. */
+  width: min(700px, 100%);
   /* Centred, asked for. The seal below already sits on the page's axis, so the
      composition hangs off one line instead of a left edge for the type and a
      centre for the mark. */
@@ -5563,35 +5566,93 @@ html:has(.signin) {
 }
 
 /**
- * The lockup.
+ * The Cut stands up on a wide screen — 20 August 2026.
  *
- * Zalando at its heavy end and tracked in, because a name set large wants the
- * letters closer than a paragraph does. The product line underneath goes the
- * other way — small, tracked wide, and a step back in ink — so the pair reads
- * as one mark rather than as a heading with a caption.
+ * The page was using the questionnaire's *phone* grammar: the rule lying flat
+ * with the Point on it and everything centred beneath. That is what the survey
+ * does below 1080 and it is not what it does above, where the Cut is a
+ * full-height rail down the left edge and the content sits in a column beside
+ * it. The door was opting out of the product's own signature composition, and
+ * this is the one place a sign-in screen can carry it at no cost — there is a
+ * single control and nothing to lay out around.
+ *
+ * Every number here is the questionnaire's own: `--rail-x` for the rule's
+ * distance from the edge, `--eye` for where the Point crosses it, `--cut-width`
+ * for the line. Nothing new is introduced. The boundary is 1080, the same one
+ * `survey-form` switches on, so the two surfaces change shape together.
+ *
+ * `position: fixed` for the rail, as on the survey: it belongs to the window
+ * rather than to the column, and it is the one thing on the page that does not
+ * move.
+ */
+@media (min-width: 1080px) {
+  .signin {
+    /* The same padding the questionnaire's shell takes, and for the same
+       reason. `--rail-x` above 1080 is not a distance from the window edge any
+       more — the survey redefines it from a centred column, so that the *group*
+       a person sees, rail and column together, is what sits in the middle of
+       the screen rather than the column alone. Pad by the rail's lead and let
+       the column centre itself in what is left, and this page composes on that
+       same axis. Setting the padding to `--rail-x + air` instead pinned the
+       column hard against the rail and left two thirds of the window empty. */
+    padding-left: var(--rail-lead);
+    padding-right: 0;
+  }
+  /* `--col` — the questionnaire's measure, not a number of this page's own.
+     It is what a question is set to, and the name is set to the same. */
+  .signin .card {
+    width: var(--col);
+    text-align: left;
+  }
+  /* The rule leaves the flow entirely and becomes the window's own edge. */
+  .sl-cut {
+    position: fixed;
+    inset: 0 auto 0 var(--rail-x);
+    z-index: 4;
+    display: block;
+    width: var(--cut-width);
+    margin: 0;
+    background: var(--cut);
+    pointer-events: none;
+  }
+  .sl-cut::before {
+    content: none;
+  }
+  /* The Point crosses the rail at eye height, centred on the line — the same
+     placement and the same `--eye` the questionnaire uses. */
+  .sl-cut .brandmark {
+    position: absolute;
+    top: var(--eye);
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/**
+ * The name, on one line.
+ *
+ * It was two tiers — the company at 5rem over the product in tracked caps —
+ * which set a name as a heading with a label beneath it. One string at one
+ * size now, tracked in the way a name set large wants rather than the way a
+ * paragraph does.
+ *
+ * The clamp is sized so it holds a single line wherever the column is wide
+ * enough to allow one: 27 characters at 3.1rem is about 680px, and the wide
+ * layout gives it more than 900. On a phone it wraps, and `balance` decides
+ * where — a wrap is a sentence breaking, which is a different thing from the
+ * tiers it used to have.
  */
 .sl-lockup {
-  display: block;
   margin: 0 0 var(--sp-sm);
   font-family: var(--font-display);
-}
-.sl-name {
-  display: block;
-  font-size: clamp(3.1rem, 7vw, 5rem);
+  font-size: clamp(1.85rem, 4.6vw, 3.1rem);
   font-weight: 700;
-  line-height: 0.96;
-  letter-spacing: -0.038em;
+  line-height: 1.04;
+  letter-spacing: -0.034em;
   color: var(--ink);
+  text-wrap: balance;
 }
-.sl-product {
-  display: block;
-  margin-top: 0.62em;
-  font-size: clamp(0.78rem, 1.1vw, 0.86rem);
-  font-weight: 500;
-  letter-spacing: 0.34em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-}
+
 /**
  * What the platform is for. One line, and the last thing read before the
  * button.
