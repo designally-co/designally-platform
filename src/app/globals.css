@@ -6238,6 +6238,25 @@ body:has(.deck.paper) {
   padding: 0 var(--sp-lg) var(--sp-lg);
 }
 /**
+ * The last block ends where the padding does — 20 August 2026, asked for.
+ *
+ * Every `.pd-sec` carries 30px under it to separate it from the next one, and
+ * the last one has no next one — so the gap below the insights panel was that
+ * 30 plus the body's own 24, against 24 at the sides. A container's own padding
+ * is what decides where its content stops; a child's margin reaching past it is
+ * the child deciding, and it never agrees with the three other edges.
+ *
+ * `> :last-child` rather than naming `.pd-sec`, because it is true of whatever
+ * ends up last: this body holds sections on the project sheet, rows on the
+ * answers sheet and a single line on Past projects.
+ *
+ * On a phone the body's foot is 72px by intent — see the note at the narrow
+ * override — so this takes 30px off a deep gap rather than closing it.
+ */
+.sheet-body > :last-child {
+  margin-bottom: 0;
+}
+/**
  * The right padding gives back what the scrollbar took — and the gutter makes
  * sure there is always something to give back to.
  *
@@ -6983,6 +7002,18 @@ html:has(.signin) {
   .page {
     padding: 32px 20px 40px;
   }
+  /**
+   * The phone keeps a deep foot, and that is deliberate — 20 August 2026.
+   *
+   * 72px against 20 at the sides looks like an error on a desktop sheet, which
+   * hugs its content. Here the sheet is the whole screen and behaves like a
+   * page: the last panel needs room under it to be scrolled clear of the
+   * thumb's own reach, and a page that ends exactly at its last pixel is a page
+   * you cannot pull.
+   *
+   * The desktop rule matches its sides instead. Both are right for the shape
+   * they are on.
+   */
   .sheet-body {
     padding: 28px 20px 72px;
   }
