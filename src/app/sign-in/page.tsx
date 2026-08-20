@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 
+import Mark from '../mark';
 import { auth, signIn, ALLOWED_DOMAIN, devSignInEnabled, hasGoogleCredentials } from '@/auth';
 
 export const dynamic = 'force-dynamic';
@@ -17,6 +18,12 @@ export default async function SignIn(props: PageProps<'/sign-in'>) {
        behind it and every sheet in it had inverted. See `.deck.paper`. */
     <main className="signin deck paper">
       <div className="card">
+        {/* The mark is back at the head of the lockup. It had moved to the foot
+            as white ink standing in the orange, which needed no disc because
+            the field was the disc — with the colour gone that seal would have
+            been white on white. */}
+        <Mark size={44} />
+
         {/**
          * The lockup. Company in display, product beneath it.
          *
@@ -27,9 +34,30 @@ export default async function SignIn(props: PageProps<'/sign-in'>) {
          * heading.
          */}
         <h1 className="sl-lockup">
-          <span className="sl-name">Designally</span>
+          {/* `Designally&rsquo;s Survey Platform` is the product's name, so the
+              possessive belongs in it — the lockup reads as one name across the
+              two lines rather than a company with a product filed under it. A
+              true apostrophe, not the typewriter one. */}
+          <span className="sl-name">Designally&rsquo;s</span>
           <span className="sl-product">Survey Platform</span>
         </h1>
+
+        {/**
+         * What the platform is for, in the one place the team sees it.
+         *
+         * Not "instant insights from a lot of responses", which was the first
+         * wording and is untrue twice over: PRODUCT.md records that one
+         * respondent is the normal case rather than the degenerate one, and two
+         * passes of Opus take about three minutes — see `maxDuration` on the
+         * team page. The reading this saves is twenty-one long answers, not
+         * twenty-one people.
+         *
+         * It also stops short of claiming to replace the reading, because
+         * CLAUDE.md's milestone 3 is explicit that the engine "does not read the
+         * answers for them" and the team still sees every answer. A summary read
+         * *before* them is the promise the product actually keeps.
+         */}
+        <p className="sl-line">The summary you read before the answers.</p>
 
         {hasGoogleCredentials && (
           <form
@@ -86,18 +114,6 @@ export default async function SignIn(props: PageProps<'/sign-in'>) {
         )}
       </div>
 
-      {/* The mark stands in the colour, not on the white — white ink on the
-          orange it was drawn for, no disc needed. It anchors the lower half so
-          the field reads as composed rather than as leftover space. */}
-      <span className="sl-seal" aria-hidden="true">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/designally-mark.png" alt="" width={290} height={256} />
-      </span>
-
-      {/* Grain, fixed and inert. A colour field this large bands on an 8-bit
-          panel; a little noise breaks the steps and gives the orange a printed
-          surface rather than a rendered one. */}
-      <span className="sl-grain" aria-hidden="true" />
     </main>
   );
 }

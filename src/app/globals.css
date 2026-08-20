@@ -5495,73 +5495,18 @@ body:has(.deck.paper) {
   position: relative;
   min-height: 100dvh;
   display: grid;
+  place-content: center;
   justify-items: center;
-  align-content: center;
-  padding: var(--sp-lg) var(--sp-lg) 42dvh;
-  isolation: isolate;
-}
-
-/**
- * The canvas: a flat white hold, a long fade, and a bloom sitting inside the
- * colour so it reads as light rather than as fill.
- *
- * Painted by `body` because the app reserves a scrollbar gutter — an element
- * background stops 15px short and a full-bleed canvas with a stripe down one
- * side is not full bleed. Three classes to clear `body:has(.deck.paper)`.
- *
- * `in oklab` on the ramp: white to `#ef6148` in sRGB runs through a chalky pink
- * and bands across 900px. The bloom is a wide, weak ellipse below the fold —
- * it lifts the middle of the field so the orange has a source instead of being
- * evenly poured.
- *
- * **Less of it, 20 August 2026.** White held to 58% and the colour took the
- * bottom four tenths of every screen, which made the page about its gradient.
- * It holds to 74% now: the orange is a hem the composition stands above rather
- * than a field it floats on, and the bloom narrowed with it. A quarter of the
- * height is still hundreds of pixels of ramp, so there is no edge in it.
- *
- * There is headroom either way. The block ends at 43% of a 900px window and
- * 52% of a 560px one — a short window shrinks the space around the content
- * rather than moving it — so 74 clears the worst case by twenty points.
- */
-body:has(.signin.deck.paper) {
-  background:
-    radial-gradient(96% 40% at 50% 112%, rgba(255, 176, 143, 0.4) 0%, transparent 64%),
-    linear-gradient(in oklab, #ffffff 0%, #ffffff 74%, var(--orange-500) 100%);
-  background-attachment: fixed;
-}
-
-/**
- * Grain — fixed, inert, and the reason the field looks like paper.
- *
- * Two jobs: it breaks the 8-bit steps a large ramp shows on an ordinary panel,
- * and it gives the colour a surface. `soft-light` so it darkens and lightens
- * around the mid-tone instead of laying grey over everything, and it is pinned
- * to the viewport so nothing repaints it while the page moves.
- *
- * **Under the content, over the canvas.** It sat on top of everything first and
- * softened the type — a texture meant for a colour field was being applied to
- * a 70px headline, which cost it its edges and a measurable amount of its
- * contrast. `.signin` isolates, so z-index 0 here puts the grain above the
- * body's canvas and below the column, which is exactly the one layer it has
- * business touching.
- */
-.sl-grain {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.42;
-  mix-blend-mode: soft-light;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  /* Centred again. The 42dvh of bottom padding existed to lift the block clear
+     of the colour; with the gradient gone it was holding the composition high
+     on an empty page for no reason. */
+  padding: var(--sp-lg);
 }
 
 /* The column, and nothing else — the card stopped being a surface when the
    page became one. A tone-card here would be a grey rectangle floating on a
    colour field: two surfaces arguing on a screen with one thing to say. */
 .signin .card {
-  position: relative;
-  z-index: 1;
   width: min(460px, 100%);
   /* Centred, asked for. The seal below already sits on the page's axis, so the
      composition hangs off one line instead of a left edge for the type and a
@@ -5579,7 +5524,7 @@ body:has(.signin.deck.paper) {
  */
 .sl-lockup {
   display: block;
-  margin: 0 0 var(--sp-xl);
+  margin: var(--sp-md) 0 var(--sp-sm);
   font-family: var(--font-display);
 }
 .sl-name {
@@ -5599,6 +5544,27 @@ body:has(.signin.deck.paper) {
   text-transform: uppercase;
   color: var(--ink-3);
 }
+/**
+ * What the platform is for. One line, and the last thing read before the
+ * button.
+ *
+ * Poppins rather than the display face, and sentence case rather than the
+ * product line's tracked caps — it is a sentence, and setting it like a label
+ * would make three tiers of lockup out of what is a name and a description.
+ *
+ * `--ink-2` at 8.87:1. The tier above it is `--ink-3` on the product line, so
+ * this reads as the *warmer* of the two rather than as a footnote under a
+ * footnote; it is the only sentence on the page and it should not whisper.
+ */
+.sl-line {
+  margin: 0 0 var(--sp-xl);
+  font-size: clamp(15px, 1.15vw, 16px);
+  line-height: 1.55;
+  letter-spacing: -0.008em;
+  color: var(--ink-2);
+  text-wrap: balance;
+}
+
 /**
  * The control: the accent, as a pill.
  *
@@ -5656,27 +5622,6 @@ body:has(.signin.deck.paper) {
 }
 
 /**
- * The seal, standing in the colour.
- *
- * White ink on the orange it was drawn for, so it needs no disc — the field is
- * the disc. Placed off the content flow entirely and low in the frame, where it
- * closes the composition without asking to be read.
- */
-.sl-seal {
-  position: absolute;
-  left: 50%;
-  bottom: clamp(30px, 6dvh, 58px);
-  z-index: 1;
-  transform: translateX(-50%);
-  opacity: 0.92;
-}
-.sl-seal img {
-  display: block;
-  width: clamp(34px, 3.4vw, 46px);
-  height: auto;
-}
-
-/**
  * Entrance. One movement, staggered, and it starts from *visible* rather than
  * from nothing — a page that flashes empty before it resolves is worse than a
  * page that simply appears.
@@ -5693,21 +5638,23 @@ body:has(.signin.deck.paper) {
     filter: none;
   }
 }
+.brandmark,
 .sl-lockup,
-.signin form,
-.sl-seal {
+.sl-line,
+.signin form {
   animation: sl-rise 0.95s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
-.signin form {
-  animation-delay: 0.12s;
+.sl-line {
+  animation-delay: 0.09s;
 }
-.sl-seal {
-  animation-delay: 0.3s;
+.signin form {
+  animation-delay: 0.18s;
 }
 @media (prefers-reduced-motion: reduce) {
+  .brandmark,
   .sl-lockup,
-  .signin form,
-  .sl-seal {
+  .sl-line,
+  .signin form {
     animation: none;
   }
 }

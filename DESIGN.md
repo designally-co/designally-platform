@@ -1580,8 +1580,7 @@ Recording it because an undocumented borrowing looks like an oversight, and the 
 - Introduce a second accent colour
 - Add a shadow to any card, button, panel or text — there are no shadows in this product,
   with **one exception, added 19 August 2026**: a popover on the paper surface. See below.
-- Use gradients, glassmorphism as decoration, or decorative grid backgrounds — with
-  **one exception, added 20 August 2026**: the sign-in canvas. See below.
+- Use gradients, glassmorphism as decoration, or decorative grid backgrounds
 - Round a full-bleed dark tile
 - Tighten body leading below 1.44 in Latin or 1.6 in Thai
 - Mix radii grammars — 8, 11, 18, pill, and nothing between
@@ -1590,32 +1589,6 @@ Recording it because an undocumented borrowing looks like an oversight, and the 
 - Put two colours in one line of text
 - Use a coloured glyph as a status marker
 - Stripe, fill or rule the project table
-
-### The gradient exception
-
-**One, added 20 August 2026: the sign-in page.** White holds the top 58% and fades to
-Designally Orange at the foot of the window, interpolated `in oklab`, painted by `body`.
-
-**Why this is not the rule collapsing.** "No gradients" is about decoration — a wash laid
-*over* a working surface to make it look richer, which is the thing that dates and the
-thing that competes with content. This is not laid over anything. It is the page: one
-screen, one control, nothing to compete with, and the only place in the product where the
-orange is allowed to be the ground rather than a 44px disc or a pill. The exception is
-scoped to that page and extends to no other surface.
-
-**`in oklab`, not sRGB.** White to `#ef6148` in sRGB runs through a chalky pink around the
-middle and bands visibly across 900px of height. Oklab is perceptually even, so the ramp
-holds its hue and its steps fall below what a screen resolves.
-
-**58% is measured, not chosen.** The content block ends at 43% of a 900px window but at
-**52%** of a 560px one — a short window does not move the content, it shrinks the space
-around it. A stop picked against a laptop would have put the button on a tint on a small
-screen. 58 clears every size checked, 390x667 and 1280x560 included.
-
-**`body` paints it, not the page element.** The app reserves a scrollbar gutter, so an
-element-level background stops 15px short of the edge and a full-bleed canvas gets a white
-stripe down one side. A background on `body` propagates to the viewport canvas and covers
-it whatever the gutter does.
 
 ### The shadow exception
 
