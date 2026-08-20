@@ -4175,21 +4175,42 @@ textarea {
 .insbox .split > .btn-outline,
 .insbox .split:has(> .btn-outline) .splitmore {
   background: var(--white);
-  border-color: transparent;
+  /**
+   * It has an edge — 20 August 2026, asked for: more contrast.
+   *
+   * The fill was doing the whole job and could not: white on this field
+   * measures **1.11:1** at the pale end of the ramp and 1.45 at the hot end, so
+   * the pill had no boundary at all. That is not only a look — a control's
+   * boundary needs 3:1 under WCAG's non-text rule, and this was a quarter of
+   * it. The label was never the problem; ink on white is 16.85.
+   *
+   * `--ink-4` measures 4.13:1 against the pill's own white and 3.9 against the
+   * tint behind it, so the line clears the floor from both sides.
+   *
+   * **Not the accent, though it is the warm choice.** `--primary` as a 1px line
+   * is the accent ladder's *hover* rung — "you are pointing at this" — and a
+   * button wearing it at rest says that permanently. It also measures 2.92
+   * against the tint, under the same floor this rule exists to clear.
+   */
+  border-color: var(--ink-4);
   color: var(--ink);
 }
-.insbox .split:has(> .btn-outline) .splitmore {
-  border-left: 1px solid var(--divider);
+/* One line at the seam, not two. The halves are flush, so the button's right
+   border and the chevron's left would stack into 2px — the chevron's is the one
+   that is kept, and only while there is a chevron to keep it. */
+.insbox .split:has(.splitmore) > .btn-outline {
+  border-right-color: transparent;
 }
 @media (hover: hover) {
   .insbox .split > .btn-outline:not(:disabled):hover,
   .insbox .split:has(> .btn-outline) .splitmore:not(:disabled):hover {
-    /* the ramp a white control takes on this surface, not a darkening line */
+    /* the fill steps and the line darkens with it — a boundary that vanished on
+       hover would make the control less defined the moment it is pointed at */
     background: #f4f4f4;
-    border-color: transparent;
+    border-color: var(--ink-3);
   }
-  .insbox .split:has(> .btn-outline) .splitmore:not(:disabled):hover {
-    border-left-color: var(--divider);
+  .insbox .split:has(.splitmore) > .btn-outline:not(:disabled):hover {
+    border-right-color: transparent;
   }
 }
 .insbox .split > .btn-outline:not(:disabled):active,
