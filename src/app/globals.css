@@ -5497,10 +5497,11 @@ body:has(.deck.paper) {
   display: grid;
   place-content: center;
   justify-items: center;
-  /* Centred again. The 42dvh of bottom padding existed to lift the block clear
-     of the colour; with the gradient gone it was holding the composition high
-     on an empty page for no reason. */
-  padding: var(--sp-lg);
+  /* Above centre, not on it — asked for, the button was sitting too low.
+     A composition centred by arithmetic reads low, because the eye puts the
+     optical centre above the geometric one; 12dvh of bottom padding lifts the
+     block to roughly 44% of the window, which is where it looks centred. */
+  padding: var(--sp-lg) var(--sp-lg) 12dvh;
 }
 
 /* The column, and nothing else — the card stopped being a surface when the
