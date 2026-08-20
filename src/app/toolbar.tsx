@@ -57,7 +57,31 @@ export default function Toolbar({
   return (
     <header className="topbar">
       <div className="inner">
-        <Mark size={30} />
+        {/* 44, the icon discs' own diameter — 20 August 2026, asked for. It was
+            30, which is the size the mark took when it replaced a wordmark on a
+            bar that had a title slot beside it. The slot is gone and the mark's
+            only neighbours are two 44px discs, so a 30px disc between them read
+            as the small one rather than as the identity. */}
+        <Mark size={44} />
+        {/**
+         * The product's name, beside the mark — 20 August 2026, asked for.
+         *
+         * It was the hero's first line, above the question. Structurally that
+         * made it a kicker, which the craft floor bans outright and which this
+         * page only got away with because the words are a name rather than a
+         * category label. In the bar it is not a kicker at all: it is the
+         * identity slot doing its job, which is what the mark beside it is
+         * already doing.
+         *
+         * It also gives the empty title slot something true to hold. The slot
+         * held the date until this morning, then nothing.
+         *
+         * **It leaves the bar below 560px**, where the date left before it and
+         * for the same reason: a 44px mark and two 44px discs take 160 of a
+         * 366px row, and twenty-eight characters do not fit in what is left.
+         * The mark carries the identity there, which is what a mark is for.
+         */}
+        <span className="barname">Designally&rsquo;s Survey Platform</span>
 
         <div className="bartrail">
           {/**

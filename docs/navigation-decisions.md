@@ -9,7 +9,7 @@ work blocked on the team, then a table of everything else — and then briefly o
 list. It is a hero and a sheet now.
 
 **The hero.** A full screen: the product name, one fixed question —
-*"Ready to send the client questionnaires?"* — and **New Survey**. It never
+*"Start a new project?"* — and **New Survey**. It never
 changes. It used to be a status report that read differently every week
 (*"Two things need you this morning"*), and what needs a person moved into the
 bell. PRODUCT.md principle 2 — an empty screen is success — moved with it: the

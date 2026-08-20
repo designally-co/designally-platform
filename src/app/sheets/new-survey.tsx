@@ -118,7 +118,11 @@ export default function NewSurveySheet({
        * at length.
        */}
       <div className="onecol">
-        <h1>New survey</h1>
+        {/* Named for what it makes — a project — from 20 August 2026. It creates
+            a client, a project and the survey on it in one transaction, and the
+            control that opens it says the same word. The file keeps its name;
+            renaming it would be churn in every import for a heading. */}
+        <h1>New project</h1>
         <p className="lede">One link, for everyone who should answer.</p>
 
         <div className="field">

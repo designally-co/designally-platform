@@ -171,15 +171,31 @@ export default function Today({
        * for today, and the one thing to press.
        */}
       <section className="hero">
-        {/* The product name over the invitation. Structurally a kicker, which
-            the craft floor bans outright — and it is not a category label
-            standing in for a heading: it is the name of the thing, the same
-            words the sign-in page sets as its headline, and this is the first
-            screen a person sees after that one. Drawn this way in the mock. */}
-        <p className="heroname">Designally&rsquo;s Survey Platform</p>
-        <h1 className="heroask">Ready to send the client questionnaires?</h1>
+        {/* The product name was here, over the question. It is in the toolbar
+            beside the mark from 20 August 2026 — asked for, and it takes a
+            kicker off the hero on the way: the name is identity, and identity
+            belongs in the identity slot rather than stacked above a heading. */}
+        <h1 className="heroask">Start a new project?</h1>
+        {/**
+         * What pressing the button actually does, in the two facts the sheet
+         * will ask for.
+         *
+         * It says "you get one link to send" rather than "we'll send it",
+         * because the platform sends nothing, ever — CLAUDE.md is explicit that
+         * getting the link to the client is manual and there is no email from
+         * here. A hero that implied otherwise would be the one sentence on the
+         * page that the product cannot keep.
+         */}
+        <p className="herosub">Pick a package and a date. You get one link to send.</p>
+        {/* "New project", not "New survey" — 20 August 2026, asked for.
+            What the press creates is a client, a project and the survey on it,
+            in one transaction, and the headline above it asks about the
+            project. The sheet it opens is named to match. The word *survey*
+            still means the questionnaire everywhere else, which is the point of
+            moving it off this button: it was naming the part rather than the
+            thing being made. */}
         <button className="btn btn-primary herocta" onClick={() => setPanel('new')}>
-          New Survey
+          New project
         </button>
       </section>
 
@@ -213,7 +229,7 @@ export default function Today({
                 id="projsearch"
                 type="search"
                 className="input"
-                placeholder="search"
+                placeholder="search project"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />
