@@ -5636,6 +5636,12 @@ body:has(.deck.paper) {
 .sheet.paper .vermenu,
 .sheet.paper .sharepanel,
 .sheet.paper .dppop,
+/* …and the Generate picker, which was left out of this list when it was
+   written and has been the odd one out since: the card tone where the other
+   four are white, and no shadow where they all have one. It is the same object
+   as the version list two selectors up — a panel hanging off a control in the
+   body of a sheet — and there was never a reason for it to differ. */
+.sheet.paper .splitmenu,
 /**
  * …and the confirmation that *is* a popover.
  *
