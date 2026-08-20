@@ -16,11 +16,22 @@ bell. PRODUCT.md principle 2 — an empty screen is success — moved with it: t
 bell says *"Nothing is waiting"* and carries no badge when there is nothing to
 carry.
 
-**The projects sheet** rides up over the hero as the page scrolls and fills the
-window. `position: sticky` on the hero with the sheet at a higher layer, so the
-browser does the whole interaction — no listener, no transform, nothing that can
-fall out of step with the scroll position. It comes to rest with its top against
-the toolbar rather than at zero, so its own head is never behind the bar.
+**The projects sheet** shows its top half at rest and rides up over the hero as
+the page scrolls until it fills the window. `position: sticky` on the hero with
+the sheet at a higher layer, so the browser does the whole interaction — no
+listener, no transform, nothing that can fall out of step with the scroll
+position. It comes to rest with its top against the toolbar rather than at zero,
+so its own head is never behind the bar.
+
+**Half the screen at rest** — `--sheet-peek: 50svh`, which the hero takes as
+bottom padding so its content centres in the half that is showing. It was 25svh,
+which put the sheet's corners at 84% of the screen: enough to say the sheet was
+there, not enough to say it was the point.
+
+**The toolbar shares the sheet's measure** — `--deck-w: 1144px`, the wireframe's
+own, with the same gutter at the same breakpoints. The bar was capped at 880 and
+the sheet was uncapped, so on a large monitor the mark sat well inside the
+sheet's leading corner while the sheet ran to the window.
 
 **Its head is sticky** under the toolbar: the heading, the search field, and the
 archived disc. Without it the one control that finds a project among thirty went

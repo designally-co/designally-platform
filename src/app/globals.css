@@ -253,6 +253,38 @@
    * DESIGN.md §4's ladder says "do not use values between these". These are not
    * between them; they extend past the top, and §4 is updated to say so.
    */
+  /**
+   * The landing page's measure — the toolbar and the projects sheet share it.
+   *
+   * 1144 is the wireframe's own: its sheet spans 72 to 1216 of a 1280 canvas.
+   * The bar was capped at 880 and the sheet was uncapped, so on a large monitor
+   * the mark sat a long way inside the sheet's left edge while the sheet itself
+   * ran to the window. One token, so the two cannot drift.
+   */
+  --deck-w: 1144px;
+  /**
+   * How much of the projects sheet is showing before anybody scrolls.
+   *
+   * Half the window — asked for, 20 August 2026. It was 25svh, which put the
+   * sheet's top corners at 84% of the screen: enough to say the sheet was
+   * there, not enough to say it was the point. The hero takes the same value as
+   * bottom padding, so its content stays centred in the half that is visible
+   * and the two cannot drift.
+   */
+  --sheet-peek: 50svh;
+  /**
+   * The toolbar's height — measured, not guessed.
+   *
+   * Three things derive from it: the hero's height, the sheet's, and where the
+   * sheet's head parks. It lived on `.projsheet`, which the hero is not inside,
+   * so `min-height: calc(100svh - var(--bar-h))` there was invalid at
+   * computed-value time and silently resolved to zero — the hero collapsed to
+   * its content and the sheet came to rest at 35% of the screen rather than the
+   * half it was asked for.
+   *
+   * It changes once, below 560, where the bar loses its title slot.
+   */
+  --bar-h: 73px;
   --r-card: 26px;
   --r-sheet: 34px;
 
@@ -2032,10 +2064,14 @@ textarea {
 .topbar.past {
   border-bottom-color: var(--divider);
 }
+/* The bar's contents sit on the projects sheet's own edges — same width, same
+   gutter, no padding of its own — so the mark lines up with the sheet's leading
+   corner and the two trailing discs with its other one. */
 .topbar .inner {
-  max-width: 880px;
+  width: calc(100% - var(--sp-lg) * 2);
+  max-width: var(--deck-w);
   margin: 0 auto;
-  padding: 14px 28px;
+  padding: 14px 0;
   display: flex;
   align-items: center;
   gap: 14px;
@@ -2589,12 +2625,20 @@ textarea {
   position: sticky;
   top: 0;
   z-index: 0;
-  min-height: 100svh;
+  /**
+   * The window less the toolbar, so the hero ends exactly at the foot of the
+   * screen rather than a bar's height below it. At a flat `100svh` every
+   * measurement below had to carry `+ --bar-h` around with it, and the sheet's
+   * resting position drifted with the bar.
+   */
+  min-height: calc(100svh - var(--bar-h));
   display: grid;
   align-content: center;
   justify-items: center;
   gap: var(--sp-sm);
-  padding: 96px var(--sp-lg) 25svh;
+  /* the sheet covers the lower half, so the hero's content centres in the
+     upper one — the bottom padding is the sheet's own overlap */
+  padding: var(--sp-lg) var(--sp-lg) var(--sheet-peek);
   text-align: center;
 }
 .heroname {
@@ -2648,18 +2692,25 @@ textarea {
    * only ever covers a card while that card is actually moving past.
    */
   min-height: calc(100svh - var(--bar-h));
-  margin: -25svh var(--sp-lg) 0;
+  /**
+   * Capped and centred — 20 August 2026, asked for: it was too wide.
+   *
+   * It was inset a fixed 24px from each edge, which is the drawing at the width
+   * the drawing was made at and nothing at all on a large monitor: at 1920 the
+   * sheet ran 1872px, the grid went to seven columns, and the cards' own names
+   * sat a metre apart.
+   *
+   * 1144 is the mock's own measure — its sheet spans 72 to 1216 of a 1280
+   * canvas — so the page looks as drawn at 1280 and stops growing after it.
+   * Below that the width rule gives back the 24px inset, so the cap and the
+   * margin are one declaration rather than two that can disagree.
+   */
+  width: calc(100% - var(--sp-lg) * 2);
+  max-width: var(--deck-w);
+  margin: calc(var(--sheet-peek) * -1) auto 0;
   padding: var(--sp-xl) var(--sp-xl) var(--sp-xxl);
   background: var(--canvas);
   border-radius: var(--r-sheet) var(--r-sheet) 0 0;
-  /* the head parks under the toolbar — measured, not guessed. It changes with
-     the bar, and the bar loses its title slot below 560. */
-  --bar-h: 73px;
-}
-@media (max-width: 560px) {
-  .projsheet {
-    --bar-h: 69px;
-  }
 }
 
 /**
@@ -2904,9 +2955,14 @@ textarea {
 
 @media (max-width: 700px) {
   .projsheet {
-    margin-left: 12px;
-    margin-right: 12px;
+    width: calc(100% - 24px);
     padding: var(--sp-lg) var(--sp-lg) var(--sp-xxl);
+  }
+  /* The bar narrows its gutter with the sheet, at the sheet's breakpoint. It
+     had its own at 520, so between 521 and 700 the sheet sat 12px from the edge
+     and the mark above it 24px — the one width where the two disagreed. */
+  .topbar .inner {
+    width: calc(100% - 24px);
   }
   .pshead {
     margin: calc(var(--sp-lg) * -1) calc(var(--sp-lg) * -1) var(--sp-md);
@@ -6152,9 +6208,15 @@ html:has(.signin) {
   font-weight: 600;
 }
 
+@media (max-width: 560px) {
+  :root {
+    --bar-h: 69px;
+  }
+}
+
 @media (max-width: 520px) {
   .topbar .inner {
-    padding: 12px 20px;
+    padding: 12px 0;
     gap: 10px;
   }
   /**

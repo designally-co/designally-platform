@@ -1531,8 +1531,9 @@ The team app is **one landing page**. There are no tabs and no sidebar.
    `docs/navigation-decisions.md` and the header of `app/toolbar.tsx`.
 1. **The hero** — a full screen holding the product name, one fixed question and **New Survey**.
    `position: sticky` at the top, and covered rather than scrolled.
-2. **The projects sheet** — white on the parchment, inset, rounded at the top only, riding up over
-   the hero as the page scrolls and coming to rest against the toolbar. Its head is sticky beneath
+2. **The projects sheet** — white on the parchment, rounded at the top only, showing its top half at
+   rest (`--sheet-peek: 50svh`) and riding up over the hero as the page scrolls until its top meets
+   the toolbar. It and the toolbar share one measure, `--deck-w: 1144px`, and one gutter. Its head is sticky beneath
    the bar and holds the heading, the search pill and the archived disc; under it, a grid of cards,
    four columns at 1280 and one at 390 from `auto-fill` on a 250px floor with no media query.
    Rewritten from a *Needs you* card stack over a three-column table on 20 August 2026 — see
