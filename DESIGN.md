@@ -79,7 +79,7 @@ no decorative colour.
 
 /* line — "The Edge" */
 --hairline         #cecfd3   /* card and input borders */
---divider-soft     #e6e8eb   /* internal dividers, ghost button ring */
+--divider          #e6e8eb   /* internal dividers, ghost button ring */
 --cut              var(--orange-500)  /* The Cut. Never a rule, never a divider. */
 ```
 
@@ -1227,7 +1227,7 @@ It takes the icon disc's own ground, which is what a neutral control is made of 
 
 The ghost pill in ink keeps every sheet that is still parchment.
 
-**Pearl capsule** — quiet secondary actions. `--surface-pearl` fill, `--ink-muted-80` text, `caption` (14px), 3px `--divider-soft` ring, padding `8px 14px`.
+**Pearl capsule** — quiet secondary actions. `--surface-pearl` fill, `--ink-muted-80` text, `caption` (14px), 3px `--divider` ring, padding `8px 14px`.
 
 **Corrected 13 August 2026, twice over.** Its radius was `md` (11px), which contradicts the rule in section 3 that anything reading as an action is a pill — and a quiet secondary action is still an action. It is `pill`.
 
@@ -1281,13 +1281,13 @@ Filled buttons are the exception and deepen their own fill: `--primary` to `--pr
 
 Used for: the worklist container, brief sections, project detail blocks, library panels.
 
-**List container** — utility card with internal rows divided by 1px `--divider-soft`. Rows carry their own padding; the container carries the border and radius.
+**List container** — utility card with internal rows divided by 1px `--divider`. Rows carry their own padding; the container carries the border and radius.
 
 **Dark tile** — `--surface-tile-1` (#272729), white text, radius `none` when full-bleed or `lg` when inset. Reserved for the survey welcome and completion screens, where a moment of drama is appropriate. Links inside use `--primary-on-dark`.
 
 ### Worklist row — needs the team
 
-Inside a white utility card on the parchment page. Row padding `24px`, divided by `--divider-soft`.
+Inside a white utility card on the parchment page. Row padding `24px`, divided by `--divider`.
 
 - 8px Action Blue dot, then client name at `tagline` (21px/600)
 - One sentence at `body` (17px), emphasis in `body-strong`, max 60ch
@@ -1401,7 +1401,7 @@ The calendar is `position: fixed`, Monday-first, with day cells on the chip ladd
 `fine` (12px), `pill` radius, padding `3px 9px`, uppercase with `0.04em` tracking.
 Severity high `--critical-tint`/`--critical` · medium `--caution-tint`/`--caution` · live or decide `#e8f1fb`/`--primary`.
 
-**Correction, 13 August 2026 — the neutral tag.** It was `--divider-soft` under `--ink-muted-48`, which measures **4.45:1**: under this product's own 4.5:1 floor, and 12px is not large text. The neutral tag is now `--canvas` with a 1px `--hairline` and `--ink-muted-48`, which measures **5.07:1**. Any tint checked only against white will fail on the parchment page; this one failed against its own tint.
+**Correction, 13 August 2026 — the neutral tag.** It was `--divider` under `--ink-muted-48`, which measures **4.45:1**: under this product's own 4.5:1 floor, and 12px is not large text. The neutral tag is now `--canvas` with a 1px `--hairline` and `--ink-muted-48`, which measures **5.07:1**. Any tint checked only against white will fail on the parchment page; this one failed against its own tint.
 
 Always accompanied by text — the tag is the label.
 

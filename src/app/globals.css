@@ -2592,9 +2592,39 @@ textarea {
   white-space: normal;
   padding: 11px;
 }
-.barmenu.notes button:not(.btn) + button:not(.btn) {
-  border-top: 1px solid var(--divider-soft);
+/**
+ * A row is square where it meets another row and follows the panel where it
+ * meets the panel's edge.
+ *
+ * It was one rule setting `border-radius: 0` on every row but the first, which
+ * got two things wrong at once. The first row kept `20px 20px 8px 8px` — the
+ * panel's inner radius on top and the menu's default 8 underneath, against a
+ * row it is flush with. And the *last* row went square on all four, so hovering
+ * it painted two hard corners into the panel's own 20px curve and the fill
+ * spilled past it.
+ *
+ * Stated per corner instead. `--r-card` less `--menu-pad` is the panel's inside
+ * curve — the same arithmetic the shared `:first-child` / `:last-child` rules
+ * use, restated here because this panel's own row rule outranks them.
+ */
+.barmenu.notes > button:not(.btn) {
   border-radius: 0;
+}
+.barmenu.notes > button:not(.btn):first-child {
+  border-top-left-radius: calc(var(--r-card) - var(--menu-pad));
+  border-top-right-radius: calc(var(--r-card) - var(--menu-pad));
+}
+.barmenu.notes > button:not(.btn):last-child {
+  border-bottom-left-radius: calc(var(--r-card) - var(--menu-pad));
+  border-bottom-right-radius: calc(var(--r-card) - var(--menu-pad));
+}
+/* `--divider`, not `--divider-soft`. The latter is the name DESIGN.md's token
+   table gives it and it does not exist in the code, so this border has been
+   invalid — and therefore invisible — since the panel was written: the rows
+   have never had a line between them. Second token in two days to be named one
+   thing in the document and another in the stylesheet. */
+.barmenu.notes > button:not(.btn) + button:not(.btn) {
+  border-top: 1px solid var(--divider);
 }
 /* Settings — who this browser is signed in as, and the way out. */
 .setname {
