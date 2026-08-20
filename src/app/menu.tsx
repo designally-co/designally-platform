@@ -82,15 +82,30 @@ export default function MoreMenu({
   children: (close: () => void) => ReactNode;
 }) {
   const [open, setOpen] = useState(false);
+  /**
+   * The panel is still on screen and already on its way out.
+   *
+   * It unmounted in the same tick it was dismissed, so it grew on open and
+   * disappeared between frames on close — the same asymmetry the sheets had,
+   * on a smaller object. The panel is held for one feedback duration while the
+   * exit runs, and only then does the caller hear about it.
+   */
+  const [closing, setClosing] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   /* One way out, so the three that exist — the button, Escape, a click away —
-     cannot each remember to tell the caller and one of them forget. */
+     cannot each remember to tell the caller and one of them forget. Now it is
+     also the one place the exit is timed, which is why a second press during
+     the wait has to be ignored rather than starting a second one. */
   const shut = useCallback(() => {
-    if (!open) return;
-    setOpen(false);
-    onClose?.();
-  }, [open, onClose]);
+    if (!open || closing) return;
+    setClosing(true);
+    window.setTimeout(() => {
+      setClosing(false);
+      setOpen(false);
+      onClose?.();
+    }, 180);
+  }, [open, closing, onClose]);
 
   useEffect(() => {
     if (!open) return;
@@ -119,7 +134,10 @@ export default function MoreMenu({
         className={danger ? 'iconbtn danger' : 'iconbtn'}
         aria-label={label}
         title={label}
-        aria-expanded={open}
+        /* False the instant it is dismissed, not when it finishes leaving. The
+           180ms the exit takes is an animation, and a screen reader should not
+           be told the panel is still expanded through it. */
+        aria-expanded={open && !closing}
         aria-haspopup="true"
         onClick={() => (open ? shut() : setOpen(true))}
       >
@@ -131,7 +149,11 @@ export default function MoreMenu({
         )}
       </button>
       {open && (
-        <div className={menuClass ? `barmenu ${menuClass}` : 'barmenu'}>{children(shut)}</div>
+        <div
+          className={[ 'barmenu', menuClass, closing && 'closing' ].filter(Boolean).join(' ')}
+        >
+          {children(shut)}
+        </div>
       )}
     </div>
   );

@@ -340,6 +340,18 @@
 
   /* motion — calm and mechanical. Nothing overshoots, nothing bounces. */
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  /**
+   * The four durations DESIGN.md §4 has always specified, finally declared.
+   *
+   * They were written into the document on 14 August and typed as literals at
+   * every call site — 0.42s here, 0.3s there, 0.18s in thirty places — so the
+   * system existed on paper and nowhere else. Named, a change to the panel's
+   * pace is one edit rather than a search.
+   */
+  --dur-panel: 0.42s;
+  --dur-state: 0.3s;
+  --dur-feedback: 0.18s;
+  --dur-stagger: 0.07s;
   --ease-standard: cubic-bezier(0.22, 0.61, 0.36, 1);
 
   /* Zalando Sans carries Latin display; it has no Thai, whatever the design
@@ -2295,6 +2307,35 @@ textarea {
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  /**
+   * It grows from the control it hangs off, and shrinks back into it.
+   *
+   * `transform-origin` at the top-trailing corner because every one of these
+   * panels is anchored there — `right: 0` under a disc — so the motion reads as
+   * the panel coming *out of* the button rather than fading in over it.
+   *
+   * `--dur-feedback`, the shortest of the four: a popover is a response to a
+   * press, and DESIGN.md §4 puts feedback at 180ms. The sheets take 420 because
+   * they are a place you go.
+   */
+  animation: popin var(--dur-feedback) var(--ease);
+  transform-origin: top right;
+}
+.barmenu.closing {
+  animation: popout var(--dur-feedback) var(--ease) forwards;
+  pointer-events: none;
+}
+@keyframes popin {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.97);
+  }
+}
+@keyframes popout {
+  to {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.97);
+  }
 }
 
 /**
@@ -2756,6 +2797,38 @@ textarea {
  * sheet down as the reader pulls it up. `svh` is the small viewport and it
  * does not move.
  */
+/**
+ * The hero recedes as the sheet climbs over it — 20 August 2026.
+ *
+ * A scroll-driven animation on the document's own timeline, running exactly the
+ * distance the sheet travels: from rest to the moment it meets the toolbar. The
+ * hero is `sticky`, so without this it sits at full strength behind a sheet
+ * that has covered it — technically hidden, and it reads as a card sliding over
+ * a page that has not noticed.
+ *
+ * It stops at 0.3 rather than 0. Going to nothing makes the last part of the
+ * scroll feel like a light going out, and there is no reason to hide something
+ * that is about to be covered anyway.
+ *
+ * `transform` and `opacity` only — nothing that costs layout — and both guards
+ * from `.pcard`'s reveal apply here for the same two reasons.
+ */
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .hero {
+      animation: herorecede linear both;
+      animation-timeline: scroll();
+      animation-range: 0 calc(100svh - var(--sheet-peek) - var(--bar-h));
+    }
+  }
+}
+@keyframes herorecede {
+  to {
+    opacity: 0.3;
+    transform: translateY(-20px) scale(0.99);
+  }
+}
+
 .hero {
   position: sticky;
   top: 0;
@@ -3097,6 +3170,66 @@ textarea {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: var(--sp-md);
+}
+
+/**
+ * The cards arrive, 70ms apart — DESIGN.md §4's list stagger, finally used.
+ *
+ * `backwards`, never `forwards` or `both`. The fill matters for the same
+ * reason §4 gives it on the survey's question: a transform retained on a card
+ * makes it the containing block for anything `position: fixed` inside it, and
+ * `backwards` holds the *starting* value through the delay and lets go at the
+ * end, which is all this needs.
+ *
+ * `--i` is set inline from the card's index and is zero while a query is
+ * active, so filtering fades the set as one rather than rippling through it on
+ * every keystroke.
+ */
+.pgrid > li {
+  animation: cardin var(--dur-state) var(--ease) backwards;
+  animation-delay: calc(var(--i, 0) * var(--dur-stagger));
+}
+@keyframes cardin {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/**
+ * …and they reveal again as they scroll into the sheet — 20 August 2026.
+ *
+ * A scroll-driven animation on a `view()` timeline, whose scroller is the
+ * nearest ancestor that scrolls: the projects sheet itself, which pins at the
+ * toolbar and moves its cards underneath. No listener, no observer, no
+ * dependency — the browser drives it off the same scroll it is already
+ * compositing.
+ *
+ * It sits on `.pcard` while the arrival above sits on the `<li>`, so the two
+ * never share an element and neither has to be expressed as a list of
+ * timelines. On first paint the cards already in view are at the end of their
+ * range and show at once; only what is genuinely below the fold is held back.
+ *
+ * Guarded twice. `@supports` because Firefox has this behind a flag, and the
+ * fallback is a card that is simply visible — the correct way for motion to be
+ * missing. `prefers-reduced-motion` because the global 0.01ms rule in §4
+ * collapses *durations*, and a scroll-driven animation has no duration to
+ * collapse: its progress is the scrollbar. It has to be turned off by name.
+ */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .pcard {
+      animation: cardreveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+  }
+}
+@keyframes cardreveal {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
 }
 
 /**
@@ -5043,8 +5176,46 @@ dialog {
   align-items: center;
   justify-content: center;
 }
+/**
+ * The scrim fades, both ways — 20 August 2026.
+ *
+ * It was a flat `rgba(0, 0, 0, 0.32)` that appeared and vanished between
+ * frames, so the whole page snapped dark while the sheet inside it glided up
+ * over 420ms. Two halves of one gesture moving at different speeds.
+ *
+ * `@starting-style` gives the open state something to transition *from* — a
+ * backdrop has no previous value to interpolate, being created with the top
+ * layer — and `allow-discrete` on `overlay` and `display` is what holds the
+ * dialog in the top layer long enough for the closing half to run. Without
+ * those two the exit is still instant no matter what is transitioned.
+ *
+ * Chrome 117 and Safari 17.4. Below that both properties are ignored and the
+ * scrim behaves as it did this morning, which is the correct way for this to
+ * fail: nothing breaks, the fade simply is not there.
+ */
 dialog::backdrop {
+  background: rgba(0, 0, 0, 0);
+  transition:
+    background-color var(--dur-panel) var(--ease),
+    overlay var(--dur-panel) allow-discrete,
+    display var(--dur-panel) allow-discrete;
+}
+dialog[open]::backdrop {
   background: rgba(0, 0, 0, 0.32);
+}
+@starting-style {
+  dialog[open]::backdrop {
+    background: rgba(0, 0, 0, 0);
+  }
+}
+/* The dialog itself is never transformed — only held. A transform on this
+   element would make it the containing block for the date picker, which is
+   `position: fixed` by design; see the calendar's note in DESIGN.md. The card
+   inside it does the moving. */
+dialog {
+  transition:
+    overlay var(--dur-panel) allow-discrete,
+    display var(--dur-panel) allow-discrete;
 }
 /**
  * The sheet as a card that floats, not a page that replaces one — 18 August
@@ -5089,7 +5260,36 @@ dialog::backdrop {
    * The scrim is the separation, the way the tone is on the cards inside — same
    * instruction, one level up.
    */
-  animation: slideup 0.42s var(--ease);
+  /**
+   * In and out, not in and gone.
+   *
+   * This was `animation: slideup 0.42s`, which plays once on mount and has
+   * nothing to say when the sheet closes — so it rose over 420ms and vanished
+   * in a single frame. An entrance without an exit is the most conspicuous
+   * thing in an interface, because the eye is following something and the
+   * something stops existing.
+   *
+   * A transition on the open state instead, with `@starting-style` supplying
+   * the value to come *from*. Both directions now run on the same curve and
+   * the same 420ms the panel entrance has always been (DESIGN.md §4).
+   *
+   * `transform` and `opacity` only, so it stays on the compositor.
+   */
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity var(--dur-panel) var(--ease),
+    transform var(--dur-panel) var(--ease);
+}
+dialog[open] > .sheet {
+  opacity: 1;
+  transform: none;
+}
+@starting-style {
+  dialog[open] > .sheet {
+    opacity: 0;
+    transform: translateY(18px);
+  }
 }
 
 /**

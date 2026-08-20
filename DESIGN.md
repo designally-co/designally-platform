@@ -1189,6 +1189,42 @@ button:active { transform: scale(0.95); }
 
 Everything else stays quiet. Panel entrance 420ms, list stagger 70ms, state changes 300ms, feedback 180ms — all on `cubic-bezier(0.22, 1, 0.36, 1)`. No bounce, no spring.
 
+**These four are tokens from 20 August 2026** — `--dur-panel`, `--dur-stagger`,
+`--dur-state`, `--dur-feedback`. They were specified here on 14 August and typed as
+literals at every call site, so the system existed on paper and nowhere else.
+
+### The team app is choreographed — 20 August 2026
+
+**Asked for, and it is a departure from "everything else stays quiet" rather than an
+application of it.** The argument against is on the record and worth keeping: PRODUCT.md
+says the team's screen should feel like a colleague who has already read everything, and
+this is a tool opened in fifteen-second bursts to ask *is there anything for me*. Motion
+that makes a person wait to read is a cost that surface cannot easily afford. The decision
+was taken with that in front of it.
+
+What was built, and the rules it still keeps:
+
+- **Every entrance has an exit.** Sheets and their scrim transition both ways over
+  `--dur-panel`; popovers both ways over `--dur-feedback`. An entrance without an exit was
+  the loudest thing in the app — the eye follows something and the something stops
+  existing. Sheets need `@starting-style` and `transition-behavior: allow-discrete`, *and*
+  a component that holds itself mounted while the exit runs; the CSS alone cannot save an
+  element React has removed. See `sheet.tsx`.
+- **The roster arrives at 70ms apart**, `backwards` fill only — a retained transform makes
+  a card the containing block for anything `position: fixed` inside it, which is the same
+  reason the survey's question uses `backwards`.
+- **Filtering is a cross-fade, not a ripple.** The stagger is zero while a query is active.
+- **Two scroll-driven animations**, on the browser's own timelines rather than a listener
+  or a library: the hero recedes to 0.3 across exactly the distance the sheet climbs, and
+  cards reveal on a `view()` timeline whose scroller is the projects sheet.
+- **`transform` and `opacity` only.** Nothing animated costs layout.
+
+**Scroll-driven animations must be turned off by name.** The blanket rule below collapses
+*durations*, and a scroll-driven animation has none — its progress is the scrollbar, so it
+survives the rule untouched. Both are wrapped in
+`@media (prefers-reduced-motion: no-preference)` as well as `@supports`, and the fallback
+in either case is an element that is simply visible.
+
 **The survey's question change** — a state change, so 300ms on that curve. The content arrives 16px from the direction the survey just moved: forward from below, back from above. Added 13 August 2026 when scrolling stopped being the navigation, and it is not decoration — scrolling used to carry that information for free. On a screen where every question looks like the last one, direction is the only thing telling a respondent whether they went forward or back.
 
 **The controls do not move.** Continue and Back are furniture, anchored to the floor of a phone precisely so that twenty-one advances are not twenty-one small re-aims; a control that slid on every press would undo that. Only the content column animates.

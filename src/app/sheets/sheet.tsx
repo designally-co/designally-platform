@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 
 import { BackMark, CloseMark } from '../icons';
 
@@ -135,15 +135,62 @@ export default function Sheet({
     if (el && !el.open) el.showModal();
   }, []);
 
+  /**
+   * The sheet closes itself, then tells its caller — 20 August 2026.
+   *
+   * The CSS gives the sheet and the scrim a two-way transition with
+   * `@starting-style` and `allow-discrete`, and it did nothing on the way out.
+   * The reason is not CSS: every caller renders a sheet as
+   * `{panel === 'x' && <Sheet…>}`, so pressing back unmounted the whole
+   * `<dialog>` in the same tick. `allow-discrete` holds an element in the top
+   * layer while its transition runs; it cannot hold one React has removed from
+   * the document.
+   *
+   * So the way out is two steps. `close()` drops the `open` attribute — which
+   * is what the transitions key off — and the node stays mounted while they
+   * run. `onClose` fires afterwards and the caller unmounts a sheet that has
+   * already gone.
+   *
+   * **Every path out routes through here**: the back chevron, the Escape key
+   * and the light-dismiss all reach `close()`, and the dialog's own `close`
+   * event is what schedules the caller. Nothing has to remember to call two
+   * things in order.
+   *
+   * `leaving` guards a second press during the wait. Without it, two presses
+   * schedule two `onClose` calls and the second lands after the sheet behind
+   * this one has opened.
+   */
+  const leaving = useRef(false);
+  const leave = useCallback(() => {
+    const el = ref.current;
+    if (!el || leaving.current) return;
+    leaving.current = true;
+    /* `close()` rather than calling back directly: it is what removes `open`,
+       and `open` is what the transition is written against. */
+    if (el.open) el.close();
+    else onClose();
+  }, [onClose]);
+
+  /* The dialog has shut and the exit has run — now the caller may unmount. The
+     delay is the panel duration; read from the element so it cannot drift from
+     `--dur-panel`. */
+  const settle = useCallback(() => {
+    const el = ref.current;
+    const ms = el
+      ? parseFloat(getComputedStyle(el).getPropertyValue('--dur-panel') || '0.42') * 1000
+      : 420;
+    window.setTimeout(onClose, Number.isFinite(ms) && ms > 0 ? ms : 420);
+  }, [onClose]);
+
   return (
-    <dialog ref={ref} onClose={onClose} onCancel={onClose}>
+    <dialog ref={ref} onClose={settle} onCancel={leave}>
       <div
         className={`sheet${narrow ? ' narrow' : ''}${bare ? ' bare' : ''}${
           hideClose ? ' noclose' : ''
         }${width ? ` ${width}` : ''}${surface ? ` ${surface}` : ''}`}
       >
         {bare && !hideClose && (
-          <button className="sheetclose floating" onClick={onClose} aria-label={backLabel}>
+          <button className="sheetclose floating" onClick={leave} aria-label={backLabel}>
             <CloseMark />
           </button>
         )}
@@ -155,14 +202,14 @@ export default function Sheet({
           {!bare && (
             <div className={`sheet-top${dismiss ? ' dismissing' : ''}`}>
               {!dismiss && (
-                <button className="back" onClick={onClose} aria-label={backLabel}>
+                <button className="back" onClick={leave} aria-label={backLabel}>
                   <BackMark />
                 </button>
               )}
               <span className="t">{title}</span>
               <div className="bartrail">{actions}</div>
               {dismiss && (
-                <button className="sheetclose" onClick={onClose} aria-label={backLabel}>
+                <button className="sheetclose" onClick={leave} aria-label={backLabel}>
                   <CloseMark />
                 </button>
               )}

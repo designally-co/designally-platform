@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type CSSProperties } from 'react';
 
 import type { LibraryBlock } from '@/lib/team/library-types';
 import type { ProjectAnswers } from '@/lib/team/answers';
@@ -269,9 +269,22 @@ export default function Today({
             Nothing matches &ldquo;{query.trim()}&rdquo;. {plural(live.length, 'project')} running.
           </p>
         ) : (
-          <ul className="pgrid">
-            {shown.map((p) => (
-              <li key={p.id}>
+          /**
+           * Keyed on the query, so a filter is a cross-fade rather than a pop.
+           *
+           * Without it React keeps the cards that still match and drops the
+           * ones that do not, which means the survivors never move — good — and
+           * the departures vanish between frames — not good. Remounting the
+           * list makes the whole result set one object that fades, which is
+           * what a filter feels like.
+           *
+           * The stagger is switched off while a query is active: 70ms apart is
+           * an arrival, and an arrival on every keystroke is a ripple. Filtered,
+           * every card carries delay zero and the set fades as one.
+           */
+          <ul className="pgrid" key={query.trim() ? `q:${query.trim()}` : 'all'}>
+            {shown.map((p, i) => (
+              <li key={p.id} style={{ '--i': query.trim() ? 0 : i } as CSSProperties}>
                 <button
                   className="pcard"
                   type="button"
