@@ -315,7 +315,12 @@ export default function Today({
                    * projects in sentences — a bare glyph needs one.
                    */}
                   {p.action && <i className="pmark" aria-hidden="true" />}
-                  <span className="pcname">{p.clientName}</span>
+                  {/* `title` for the tail a truncated name loses — the accessible name on
+                      the button already carries it in full, and this is the
+                      pointer's version of the same courtesy. */}
+                  <span className="pcname" title={p.clientName}>
+                    {p.clientName}
+                  </span>
                   <span className="pcpkg">{p.packageLabel}</span>
 
                   {/**

@@ -2812,20 +2812,31 @@ textarea {
  * the part that is visible.
  */
 .projsheet {
-  position: relative;
   z-index: 1;
   /**
-   * A screen tall, less the toolbar — so the scroll ends with the sheet's top
-   * against the bar rather than behind it.
+   * The sheet pins against the toolbar and scrolls inside itself.
    *
-   * At a flat `100svh` the sheet came to rest at `top: 0`, which put its own
-   * head's natural position 73px above where the head sticks: the pinned head
-   * then sat over the first row of cards and clipped their names, permanently,
-   * because there was no scroll left to move them out from under it. Ending
-   * 73px lower makes the head's natural and pinned positions the same, so it
-   * only ever covers a card while that card is actually moving past.
+   * It used to be an ordinary block that scrolled off the top with the page,
+   * and its rounded top corners went with it: the sheet's own white body
+   * continued upward behind the pinned head, filling the corners in from
+   * behind, so the moment you scrolled the sheet squared off. Asked for
+   * 20 August 2026 — the corners are the shape of the thing and they should
+   * still be there when it is covering the screen.
+   *
+   * `sticky` at the bar with a fixed height and its own scroll: the page
+   * carries it up until its top meets the toolbar, and from there the cards
+   * move within it while the top edge — and its corners — stay put. The radius
+   * clips the content because the overflow is no longer visible, which is the
+   * same mechanism that keeps the head's own corners honest.
+   *
+   * `overscroll-behavior: contain` so reaching the last card does not hand the
+   * scroll back to the page and drag the hero into view underneath.
    */
-  min-height: calc(100svh - var(--bar-h));
+  position: sticky;
+  top: var(--bar-h);
+  height: calc(100svh - var(--bar-h));
+  overflow-y: auto;
+  overscroll-behavior: contain;
   /**
    * Capped and centred — 20 August 2026, asked for: it was too wide.
    *
@@ -2859,7 +2870,11 @@ textarea {
   width: calc(100% - var(--sp-lg) * 2);
   max-width: var(--deck-w);
   margin: calc(var(--sheet-peek) * -1) auto 0;
-  padding: var(--sp-xl) var(--sp-xl) var(--sp-xxl);
+  /* No padding at the top: the head carries it, so that the head's containing
+     block starts at the sheet's own edge and `top: 0` pins it exactly there.
+     With the padding here the head stuck 32px low — a sticky element is held
+     inside its containing block, and that block began after the padding. */
+  padding: 0 var(--sp-xl) var(--sp-xxl);
   background: var(--parchment);
   border-radius: var(--r-sheet) var(--r-sheet) 0 0;
   /**
@@ -2903,15 +2918,18 @@ textarea {
  */
 .pshead {
   position: sticky;
-  top: var(--bar-h);
+  /* zero, not `--bar-h`: this sticks inside the sheet's own scroll container
+     now, and that container already starts at the bar. It was measured against
+     the window while the whole page scrolled. */
+  top: 0;
   z-index: 2;
   display: flex;
   align-items: center;
   gap: var(--sp-md);
   flex-wrap: wrap;
-  /* the sheet's own top padding, taken here so the background reaches the
-     sheet's top edge rather than leaving a white gap above a white bar */
-  margin: calc(var(--sp-xl) * -1) calc(var(--sp-xl) * -1) var(--sp-lg);
+  /* the sheet's top padding lives here, so the head reaches the sheet's own
+     edge and pins flush against it — see the note on `.projsheet`'s padding */
+  margin: 0 calc(var(--sp-xl) * -1) var(--sp-lg);
   padding: var(--sp-xl) var(--sp-xl) var(--sp-md);
   background: var(--parchment);
   border-radius: var(--r-sheet) var(--r-sheet) 0 0;
@@ -3131,30 +3149,25 @@ textarea {
   box-shadow: 0 0 0 2px var(--primary-focus);
 }
 /**
- * Two lines, always — whether the name needs them or not.
+ * One line, truncated — asked for, 20 August 2026: most project names are short.
  *
- * A grid row stretches to its tallest card, so with the name free to be one
- * line or two the *rows* came out at different heights: 173px where a client
- * was called "ZZ Fixture — Precision Components" and 132 where one was called
- * "shop". Even within a row, that meant the tallest card set a height the
- * others padded out with nothing.
+ * It reserved and clamped two lines, so that a grid row — which stretches to
+ * its tallest card — could not be thrown out by one long client name. That
+ * worked and cost a line of empty space on every card that did not need it,
+ * which is most of them.
  *
- * Reserving both lines makes every tile identical, which is what a grid is for
- * — and two is the right number to reserve rather than one: real client names
- * here run to thirty characters and Thai company names longer, so one line
- * would clamp most of them.
- *
- * Clamped rather than ellipsised on a single line, so a long name loses its
- * tail and not its middle — and the full name is in the card's `aria-label`
- * either way, and one press away on the project sheet.
+ * One line does the same job better: every card is the same height by
+ * construction rather than by reservation, and nothing is padded out with
+ * nothing. The long names lose their tails instead, which is the trade — and
+ * the full name is on the card's `aria-label`, in the `title` a pointer
+ * reveals, and one press away on the project sheet.
  */
 .pcname {
   position: relative;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  display: block;
+  white-space: nowrap;
   overflow: hidden;
-  min-height: 2.7em;
+  text-overflow: ellipsis;
   font-size: 17px;
   font-weight: 600;
   letter-spacing: 0;
@@ -3205,10 +3218,32 @@ textarea {
   color: var(--ink-3);
 }
 
+/**
+ * A single column asks for nothing back.
+ *
+ * The name reserves two lines and the state reserves two so that every tile in
+ * a *grid row* is the same height — a row stretches to its tallest card, and
+ * without the reserve a wrapped client name made one card taller and padded its
+ * neighbours out with nothing.
+ *
+ * Below 560 there is no row: one card per line, nothing beside it to be uneven
+ * with, and the reserve is simply a dead gap between the package and the rule —
+ * about 23px on every card, which on a six-project phone screen is a whole card
+ * of scrolling spent on empty space.
+ *
+ * The clamp stays. It is not about alignment: it stops a long Thai company name
+ * from turning one card into four lines of heading.
+ */
+@media (max-width: 560px) {
+  .pcstate {
+    min-height: 0;
+  }
+}
+
 @media (max-width: 700px) {
   .projsheet {
     width: calc(100% - 24px);
-    padding: var(--sp-lg) var(--sp-lg) var(--sp-xxl);
+    padding: 0 var(--sp-lg) var(--sp-xxl);
   }
   /* The bar narrows its gutter with the sheet, at the sheet's breakpoint. It
      had its own at 520, so between 521 and 700 the sheet sat 12px from the edge
@@ -3217,7 +3252,7 @@ textarea {
     width: calc(100% - 24px);
   }
   .pshead {
-    margin: calc(var(--sp-lg) * -1) calc(var(--sp-lg) * -1) var(--sp-md);
+    margin: 0 calc(var(--sp-lg) * -1) var(--sp-md);
     padding: var(--sp-lg) var(--sp-lg) var(--sp-sm);
   }
   /* the pill and the disc take the row under the heading rather than
