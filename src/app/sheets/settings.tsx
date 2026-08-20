@@ -3,65 +3,49 @@
 import Sheet from './sheet';
 
 /**
- * Settings — 20 August 2026.
+ * Settings — the address this browser is signed in as, and the way out.
  *
- * **Nothing in this product is configurable, and this sheet says so rather than
- * inventing something to hold.** There are no preferences: the questionnaire is
- * fixed at version 6 and the branding team owns its wording, the survey's
- * default of fourteen days lives in `DEFAULT_DUE_DAYS`, and who may sign in is
- * the designally.co Workspace rather than a list anybody here maintains.
+ * **Two things, from 20 August 2026, asked for.** It had a "Signed in" heading
+ * over the display name and the address, then an "Access" section explaining
+ * that sign-in is Google, restricted to the Workspace, and that no accounts are
+ * kept here. All of it true, none of it actionable: a person opening a gear
+ * wants to know which account they are on and how to leave, and the paragraph
+ * described a policy they cannot change from this screen.
  *
- * What it holds is the one thing a person opens a gear expecting to find and
- * could not: the way out. Sign out was in the toolbar's More menu, and that
- * menu went when Past projects moved onto the projects sheet — leaving one item
- * behind an ellipsis, which is where nobody looks for it.
+ * The display name went with it. Two identities stacked is one more than the
+ * question "which account is this?" needs, and the address is the half that
+ * answers it — it is the part that differs between the two accounts anybody
+ * here is likely to be confused between.
  *
- * The identity above it is not decoration. Team access is Google OAuth
- * restricted to one Workspace and it dies with the account, so *which* account
- * this browser is signed in as is the whole of the access model, and it is
- * worth being able to read it before pressing the button that ends it.
- *
- * The address is shown in full rather than elided. It is the team's own work
- * address, on the team's own screen, and the reason to read it is to check the
- * part after the @.
+ * **Nothing in this product is configurable and this sheet does not pretend
+ * otherwise.** The questionnaire is fixed at version 6, the survey's fourteen
+ * days live in `DEFAULT_DUE_DAYS`, and who may sign in is the Workspace. What
+ * it holds is the one thing a person opens a gear expecting to find and could
+ * not: Sign out was in the toolbar's More menu, and that menu went when Past
+ * projects moved onto the projects sheet.
  */
 export default function SettingsSheet({
-  name,
   email,
   onClose,
   signOut,
 }: {
-  name: string | null;
   email: string | null;
   onClose: () => void;
   signOut: () => Promise<void>;
 }) {
   return (
     <Sheet title="Settings" narrow surface="paper" onClose={onClose}>
-      <div className="pd-sec">
-        <h3 className="pd-h">Signed in</h3>
-        {/* A name the app has never had is not an error state — a Google
-            account can carry an address and no display name. The address is
-            the identity that matters and it is always there. */}
-        {name && <p className="setname">{name}</p>}
-        <p className="setmail">{email ?? 'No address on this session.'}</p>
-      </div>
-
-      <div className="pd-sec">
-        <h3 className="pd-h">Access</h3>
-        <p className="hintline">
-          Sign-in is Google, restricted to the designally.co Workspace. There is no other way in,
-          and no accounts are kept here — removing somebody from the Workspace removes them from
-          this.
-        </p>
-        {/* A form, because signing out is a server action and this has to work
-            without JavaScript for the same reason the sign-in page does. */}
-        <form action={signOut} className="setout">
-          <button className="btn btn-outline" type="submit">
-            Sign out
-          </button>
-        </form>
-      </div>
+      {/* A Google account always carries an address, so this is never the empty
+          case in practice — but a session can outlive the row it was minted
+          from, and a blank line under a heading would say nothing at all. */}
+      <p className="setmail">{email ?? 'No address on this session.'}</p>
+      {/* A form, because signing out is a server action and this has to work
+          without JavaScript for the same reason the sign-in page does. */}
+      <form action={signOut} className="setout">
+        <button className="btn btn-outline" type="submit">
+          Sign out
+        </button>
+      </form>
     </Sheet>
   );
 }

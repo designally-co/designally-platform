@@ -28,8 +28,8 @@ export default function Today({
   origin,
   signOut,
 }: {
-  /** who this browser is signed in as — read in Settings, and nowhere else */
-  user: { name: string | null; email: string | null };
+  /** the address this browser is signed in as — read in Settings, nowhere else */
+  user: { email: string | null };
   live: ProjectView[];
   archived: ProjectView[];
   library: LibraryBlock[];
@@ -391,7 +391,6 @@ export default function Today({
       )}
       {panel === 'settings' && (
         <SettingsSheet
-          name={user.name}
           email={user.email}
           signOut={signOut}
           onClose={() => setPanel(null)}

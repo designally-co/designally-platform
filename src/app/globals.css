@@ -2626,16 +2626,10 @@ textarea {
 .barmenu.notes > button:not(.btn) + button:not(.btn) {
   border-top: 1px solid var(--divider);
 }
-/* Settings — who this browser is signed in as, and the way out. */
-.setname {
-  font-size: 17px;
-  font-weight: 600;
-  letter-spacing: 0;
-  line-height: 1.35;
-}
+/* Settings — the address this browser is signed in as, and the way out.
+   `.setname` went on 20 August 2026 with the display name it styled. */
 .setmail {
-  margin-top: 2px;
-  font-size: 15px;
+  font-size: 17px;
   letter-spacing: 0;
   color: var(--ink-2);
   /* a work address is one string and breaking it mid-domain is worse than a

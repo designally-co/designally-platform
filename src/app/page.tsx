@@ -45,8 +45,10 @@ export default async function Home() {
   return (
     <Today
       /* Read in Settings and nowhere else — the toolbar shows the Designally
-         mark, not the person. See sheets/settings.tsx. */
-      user={{ name: session.user.name ?? null, email: session.user.email ?? null }}
+         mark, not the person. The display name went with the sheet's headings
+         on 20 August 2026; the address is what answers "which account is this?"
+         See sheets/settings.tsx. */
+      user={{ email: session.user.email ?? null }}
       live={live}
       archived={archived}
       library={library}
