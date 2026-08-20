@@ -3980,56 +3980,54 @@ textarea {
  * one would be a second accent competing with the button inside.
  */
 /**
- * Lit from a corner, not washed across a diagonal — 20 August 2026.
+ * The dark Field, and the one surface in this app that stands on it.
  *
- * The first version ramped white to peach at 150°, which is a wash: even, flat,
- * and read as a tinted card rather than as the one object on the sheet that is
- * the product. Two layers instead, and the top one is the whole difference — a
- * radial anchored past the top-trailing corner, so the panel has a *light
- * source* off the edge of itself. Colour that falls off from a point reads as
- * material; colour that slides from corner to corner reads as fill.
+ * Third pass, and the first that changes the structure rather than the values.
+ * Two goes at a pale panel — a diagonal wash, then a corner glow — both ended
+ * as a tinted card among white cards, because that is what a light panel on a
+ * light sheet can be. The problem was never the ramp.
  *
- * It is placed at 88% 6% rather than centred for a plain reason: that is the
- * one region of the panel with nothing in it. The heading and the sentence run
- * from the left and the buttons sit at the foot, so the brightest part of the
- * field lands where no ink ever does, and every word is read against the pale
- * end of the ramp.
+ * **DESIGN.md has specified this Field since 14 August and nothing has ever
+ * used it.** `[data-field="dark"]` remaps every semantic token, each annotated
+ * with its measured contrast, and its user count is zero. §1 also says the pure
+ * CI orange has exactly two places it is legal — the Cut, and the dark Field,
+ * "where it is finally free to be itself" at 5.99:1. The panel that *is* the
+ * product is what earns the only dark tile in the app.
  *
- * `--r-sheet` and not `--r-lg`, so it is a different *class* of object from the
- * neutral 26px cards it sits between rather than the same card in a colour.
+ * It also settles a contrast problem rather than patching one. On peach, white
+ * measured 1.11:1 and the secondary needed a border bolted on to be a shape at
+ * all. Here the ground is near-black and every control on it separates by
+ * construction.
  *
- * Contrast is measured against the darkest point the glow reaches, `#ffcbb4`,
- * not against the average: `--ink` 13.0:1, `--ink-2` 11.1:1. Both clear the
- * floor with the panel at its most saturated.
+ * **The tokens are copied, not inherited.** `[data-field="dark"]` on this
+ * element would remap the whole subtree — including `.splitmenu`, which is a
+ * DOM descendant and must stay light to match the app's other popovers. The
+ * values below are the Field's own, taken from that block with their
+ * measurements, applied only to what this panel draws.
+ *
+ * "Round a full-bleed dark tile" is in §8's Don't list. This one is inset with
+ * a sheet's margin on every side, which is the case that rule excludes.
  */
 .insbox {
   background:
     radial-gradient(
       118% 132% at 88% 6% in oklab,
-      #ffcbb4 0%,
-      rgba(255, 203, 180, 0) 64%
+      rgba(239, 97, 72, 0.34) 0%,
+      rgba(239, 97, 72, 0) 64%
     ),
-    linear-gradient(168deg in oklab, var(--parchment) 0%, var(--primary-tint) 100%);
-  border: 1px solid color-mix(in oklab, var(--primary) 22%, transparent);
+    linear-gradient(168deg in oklab, #16181f 0%, var(--tile) 100%);
+  border: 0;
   border-radius: var(--r-sheet);
   overflow: hidden;
 }
-.inshead {
-  padding: var(--sp-lg);
-}
-/* The panel's name. `--font-display` because this is the one heading on the
-   sheet that is naming a thing rather than labelling a section. */
+
 /**
- * A statement, not a section label.
+ * A statement, and on this ground it can be one without shouting.
  *
- * 19px is the size a heading takes when it is naming one block among several,
- * and that is what it looked like — the panel was coloured and its title was
- * not. `clamp(1.5rem, 3.4vw, 1.75rem)` is 24 to 28: large enough to be the
- * first thing read on the sheet, short of the sheet's own title in the bar
- * above, which is still what names where you are.
- *
- * The tracking tightens with the size, as display type wants — the same
- * -0.032em the hero's question takes at its own scale.
+ * `--warm-white` is the dark Field's own `--ink` and measures 17.51:1 on the
+ * tile — more than the charcoal it replaces managed on white. Nothing about the
+ * size changed; what changed is that it no longer competes with a pale field
+ * for the eye.
  */
 .institle {
   font-family: var(--font-display);
@@ -4040,18 +4038,30 @@ textarea {
      is about the box, not the language, and 1.2 on 28px leaves a tone mark
      nowhere to go if this line is ever translated. */
   line-height: 1.22;
-  color: var(--ink);
+  color: var(--warm-white);
 }
-/* What it is for. A measure, because it is prose and the panel is wide. */
+/* The Field's `--ink-2`, 14.97:1. A measure, because it is prose. */
 .inslede {
   margin-top: 8px;
   max-width: 52ch;
   font-size: 14.5px;
   line-height: 1.6;
   letter-spacing: 0;
-  color: var(--ink-2);
+  color: #e0e2e5;
   text-wrap: pretty;
 }
+/* and the sentence that stands in for it when nobody has answered */
+.insempty .ireads {
+  color: #e0e2e5;
+}
+
+/* The head's padding. It was lost when this block was rewritten for the dark
+   Field — the replacement spanned the rule and did not put it back — and the
+   panel drew its title hard against its own left edge. */
+.inshead {
+  padding: var(--sp-lg);
+}
+
 /* Nothing answered yet: the sentence and the control that is waiting for it. */
 .insempty .iacts {
   margin-top: var(--sp-md);
@@ -4172,28 +4182,27 @@ textarea {
  * `--ink` on white is 15.18:1; the seam between the two halves is the ink ramp
  * rather than `--on-primary` at 24%, which is a white line and invisible here.
  */
+/**
+ * The secondary, raised off the tile rather than cut out of it.
+ *
+ * On the pale panel this was a white pill that measured 1.11:1 against its
+ * ground and needed a `--ink-4` border bolted on to be a shape at all. On the
+ * dark Field the same relationship comes free: `--charcoal-900` is the Field's
+ * own raised surface — the value `--canvas` remaps to there — and it separates
+ * from the tile without a line.
+ *
+ * It keeps one anyway, at the Field's `--ink-4`: 4.53:1 on this ground, so the
+ * control clears WCAG's 3:1 for a boundary from the outside as well as reading
+ * as raised from within. That was the whole argument for the border on the
+ * light version and it did not stop being true.
+ *
+ * `--warm-white` on the fill is 15.8:1.
+ */
 .insbox .split > .btn-outline,
 .insbox .split:has(> .btn-outline) .splitmore {
-  background: var(--white);
-  /**
-   * It has an edge — 20 August 2026, asked for: more contrast.
-   *
-   * The fill was doing the whole job and could not: white on this field
-   * measures **1.11:1** at the pale end of the ramp and 1.45 at the hot end, so
-   * the pill had no boundary at all. That is not only a look — a control's
-   * boundary needs 3:1 under WCAG's non-text rule, and this was a quarter of
-   * it. The label was never the problem; ink on white is 16.85.
-   *
-   * `--ink-4` measures 4.13:1 against the pill's own white and 3.9 against the
-   * tint behind it, so the line clears the floor from both sides.
-   *
-   * **Not the accent, though it is the warm choice.** `--primary` as a 1px line
-   * is the accent ladder's *hover* rung — "you are pointing at this" — and a
-   * button wearing it at rest says that permanently. It also measures 2.92
-   * against the tint, under the same floor this rule exists to clear.
-   */
-  border-color: var(--ink-4);
-  color: var(--ink);
+  background: var(--charcoal-900);
+  border-color: #75777d;
+  color: var(--warm-white);
 }
 /* One line at the seam, not two. The halves are flush, so the button's right
    border and the chevron's left would stack into 2px — the chevron's is the one
@@ -4204,10 +4213,10 @@ textarea {
 @media (hover: hover) {
   .insbox .split > .btn-outline:not(:disabled):hover,
   .insbox .split:has(> .btn-outline) .splitmore:not(:disabled):hover {
-    /* the fill steps and the line darkens with it — a boundary that vanished on
-       hover would make the control less defined the moment it is pointed at */
-    background: #f4f4f4;
-    border-color: var(--ink-3);
+    /* it lifts on this ground rather than darkening — the direction that has
+       always meant "live" here, inverted with the Field */
+    background: #262a30;
+    border-color: #919399;
   }
   .insbox .split:has(.splitmore) > .btn-outline:not(:disabled):hover {
     border-right-color: transparent;
@@ -4215,7 +4224,23 @@ textarea {
 }
 .insbox .split > .btn-outline:not(:disabled):active,
 .insbox .split:has(> .btn-outline) .splitmore:not(:disabled):active {
-  background: #e9e9e9;
+  background: #31363e;
+}
+
+/**
+ * Disabled, on a ground where the usual trick does not work.
+ *
+ * A disabled control here is the empty state's Generate — the shape of what
+ * will happen, waiting for an answer to arrive. The system dims a disabled
+ * button with opacity, and on near-black that is a button fading *into* its
+ * panel rather than standing on it, which reads as absent rather than as
+ * not-yet. It keeps a body and loses its ink instead.
+ */
+.insbox .iacts .btn:disabled {
+  opacity: 1;
+  background: #1f2229;
+  border-color: transparent;
+  color: #75777d;
 }
 /**
  * The machine's half — no line at all, 20 August 2026, asked for.
