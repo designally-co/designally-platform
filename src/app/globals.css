@@ -5484,18 +5484,70 @@ body:has(.deck.paper) {
 }
 
 /* ---- sign in ---- */
+/**
+ * The one gradient in the product — 20 August 2026, asked for.
+ *
+ * DESIGN.md §8 says no gradients, and that rule is about decoration: a wash
+ * laid over a working surface to make it look richer. This is not laid over
+ * anything. It *is* the page — one screen, one control, no content to compete
+ * with — and it is the only place in the product where Designally Orange gets
+ * to be the ground rather than a 44px disc or a pill. Recorded in §8 as an
+ * exception with the case that earned it, not left as a rule quietly broken.
+ *
+ * **Interpolated `in oklab`.** sRGB from white to `#ef6148` runs through a
+ * chalky pink around the middle and bands visibly across 900px of height.
+ * Oklab is perceptually even, so the ramp holds its hue and the steps fall
+ * below what a screen can show.
+ *
+ * White holds the top 40% flat before the ramp begins, which is what makes the
+ * content sit on *white* rather than on a tint that happens to be pale. The
+ * fade has the remaining 60% to travel, so there is no edge anywhere in it.
+ */
 .signin {
   min-height: 100dvh;
   display: grid;
-  place-items: center;
-  padding: var(--sp-lg);
+  justify-items: center;
+  align-content: center;
+  /* The bottom inset lifts the block out of the colour and into the white it
+     was asked to sit in — the content centres in what is left, so it holds its
+     place at any height rather than at one screen size. */
+  padding: var(--sp-lg) var(--sp-lg) 42dvh;
 }
-/* A tone, so not also a line — the rule every card on this surface follows. */
+/**
+ * The gradient is painted by `body`, not by `.signin`, and that is the whole
+ * reason it reaches the edges.
+ *
+ * The page reserves a scrollbar gutter — `scrollbar-gutter: stable`, so a list
+ * growing past the fold never shifts the layout sideways. On a screen with
+ * nothing to scroll that gutter is 15px of body showing past the element, and
+ * a full-bleed canvas with a white stripe down one side is not full bleed. A
+ * background on `body` propagates to the viewport canvas and covers it whatever
+ * the gutter does.
+ *
+ * Three classes so it clears `body:has(.deck.paper)`, which paints this app
+ * white and is (0,2,1). Two would tie and leave the winner to file order.
+ *
+ * White holds the top 58% flat before the ramp starts, and the number comes
+ * from the worst case rather than from the comfortable one. The block ends at
+ * 43% of a 900px window but at **52%** of a 560px one — a short window does not
+ * move the content, it shrinks the space around it — so a stop chosen against
+ * a laptop would have put the button on a tint on a small screen. 58 clears
+ * every size measured: 390x667, 1440x700 and 1280x560 included.
+ *
+ * The fade still has 42% of the height to travel, which at any real window is
+ * hundreds of pixels — there is no edge anywhere in it.
+ */
+body:has(.signin.deck.paper) {
+  background: linear-gradient(in oklab, #ffffff 0%, #ffffff 58%, var(--orange-500) 100%);
+}
+/**
+ * No card. The content stands on the canvas.
+ *
+ * A tone-card here would be a grey rectangle floating on a colour field — two
+ * surfaces arguing, on a screen that has one thing to say. What the card was
+ * doing was holding a measure, so that is all it does now.
+ */
 .signin .card {
-  background: var(--canvas);
-  border: 1px solid transparent;
-  border-radius: var(--r-card);
-  padding: var(--sp-xl);
   width: min(440px, 100%);
 }
 /**
