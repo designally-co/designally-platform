@@ -4060,6 +4060,59 @@ textarea {
   .insbox .splitmore {
     width: 34px;
   }
+
+  /**
+   * They spread to fill the row — asked for 20 August 2026.
+   *
+   * At their natural widths the pair sat left with 42px of slack on a 390
+   * phone, which on a panel whose other elements all run edge to edge read as
+   * two buttons that had been left where they fell. Sharing the row makes them
+   * the panel's own foot.
+   *
+   * `flex: 1 1 0` on both, so the basis is nothing and the space is split
+   * evenly rather than in proportion to how long each label happens to be.
+   * The chevron is exempt — it is a fixed 34px target welded to the pill beside
+   * it, and a chevron that grows with the window is a chevron in a field of
+   * empty orange.
+   *
+   * `min-width: 0` throughout, or a flex item refuses to shrink below its
+   * content and the ellipsis above never gets the chance to do its job.
+   */
+  /**
+   * A grid, not flex, and the reason is worth writing down.
+   *
+   * `flex: 1 1 0` on both halves should split the row evenly, and measured it
+   * did not: 155 against 129 on a 390 phone, with both reporting `1 1 0px` and
+   * `min-width: 0`. Whatever the flex algorithm was resolving against — the
+   * split button inside the second half is itself a flex container with its own
+   * intrinsic width — the outcome did not match the declaration, which is not a
+   * thing to leave in the file and hope about.
+   *
+   * `grid-auto-flow: column` with `grid-auto-columns: 1fr` states the intent
+   * directly: as many equal columns as there are children. It also handles the
+   * one-button states for free — a single child gets a single full-width
+   * column, where `1fr 1fr` would have left it holding half a row.
+   */
+  .insbox .iacts {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+  }
+  .insbox .iacts > .btn,
+  .insbox .iacts > .splitwrap {
+    min-width: 0;
+  }
+  .insbox .splitwrap .split {
+    display: flex;
+    width: 100%;
+  }
+  .insbox .split > .btn {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  .insbox .splitmore {
+    flex: 0 0 34px;
+  }
 }
 
 /**
