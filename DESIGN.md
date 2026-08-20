@@ -1609,8 +1609,9 @@ Recording it because an undocumented borrowing looks like an oversight, and the 
   with **two exceptions**, both on surfaces where a border cannot do the job:
   a popover on the paper surface (19 August 2026), and the landing page's projects
   sheet (20 August 2026), which slides over a hero of the same near-white and whose
-  only visible edge is its top — so its shadow is cast **upward**,
-  `0 -1px 2px rgba(27,29,35,.04), 0 -14px 34px -8px rgba(27,29,35,.12)`. See below.
+  only visible edge is its top — so its shadow is cast **upward**, and is one very
+  diffuse layer rather than the popovers' two: `0 -24px 56px -20px rgba(27,29,35,.035)`.
+  See below.
 - Use gradients, glassmorphism as decoration, or decorative grid backgrounds
 - Round a full-bleed dark tile
 - Tighten body leading below 1.44 in Latin or 1.6 in Thai

@@ -2830,9 +2830,11 @@ textarea {
    * same ink: a 2px contact shadow for the edge itself, and a wide soft one
    * carrying the lift.
    */
-  box-shadow:
-    0 -1px 2px rgba(27, 29, 35, 0.015),
-    0 -20px 44px -14px rgba(27, 29, 35, 0.055);
+  /* One layer, and barely there — softened twice on 20 August 2026. The 2px
+     contact shadow went with the second pass: it was the half that drew an
+     *edge*, and an edge is what a hairline would have done if a hairline could
+     work here. What is left is only the lift. */
+  box-shadow: 0 -24px 56px -20px rgba(27, 29, 35, 0.035);
 }
 
 /**
@@ -5091,7 +5093,23 @@ body:has(.deck.paper) {
   .sheet.paper .sheetclose:hover,
   .sheet.paper .sheet-top .back:hover,
   .projsheet .iconbtn:hover {
-    border-color: transparent;
+    /**
+     * The outline comes back, on hover only — 20 August 2026, asked for.
+     *
+     * The ring went on 19 August because it "read hard" at rest: a dark hoop
+     * drawn around a fill that is the page's near-neighbour, on a 44px circle,
+     * permanently. That argument is about the resting state and it still holds
+     * — nothing is drawn there.
+     *
+     * Under the pointer it is the opposite: a line appearing is what every
+     * other control on this surface now does to say it is being pointed at, and
+     * the search field beside these discs does exactly this and nothing else.
+     * `--ink-4` rather than the `--ink-3` the parchment discs use, for the same
+     * reason it was too hard before: this fill is close to its ground, so the
+     * softer of the two neutrals is the one that reads as an edge rather than
+     * as a hoop.
+     */
+    border-color: var(--ink-4);
     background: #dedede;
     color: var(--ink);
   }
@@ -7964,9 +7982,34 @@ html:has(.signin) {
   font-size: clamp(1.05rem, 1.9vw, 1.22rem);
   line-height: 1.6;
   color: var(--ink);
-  /* caret, transition, hover, focus and selection are `.input`'s own — see the
-     base rule. What is left here is what the survey actually changes: size,
-     leading, and the 62px a paragraph answer needs. */
+  /* caret, transition, hover and selection are `.input`'s own — see the base
+     rule. What is left here is what the survey actually changes: size, leading,
+     and the 62px a paragraph answer needs. Focus is restated below, because it
+     could not be inherited. */
+}
+/**
+ * The accent on focus — restated here, 20 August 2026.
+ *
+ * The comment above used to claim focus among the things inherited from the
+ * base rule, and it was not: `.textarea:focus` is (0,2,0) and so is
+ * `.slide .textarea`, which comes seven thousand lines later — so the tie broke
+ * on file order and this rule's `border: 1px solid var(--hairline)`, a
+ * shorthand that sets the colour too, won. The client's answer field took the
+ * tint ring on focus, because nothing here sets `box-shadow`, and kept a grey
+ * hairline inside it.
+ *
+ * A ring with no line in it is the one state in this product that says *you are
+ * typing here*, on the surface where it matters most: a twenty-minute
+ * questionnaire answered on a phone, where the field is the whole screen.
+ *
+ * Hover was never affected — `.input:hover:not(:focus)` is (0,3,0), because
+ * `:not()` takes the specificity of its argument, and outranks this rule
+ * already.
+ */
+.slide .input:focus,
+.slide .textarea:focus {
+  border-color: var(--primary-mark);
+  box-shadow: 0 0 0 3px var(--primary-tint);
 }
 /* Grows with its content (useAutosize) to about half the screen, then scrolls
    inside itself so the question above and OK below stop moving. field-sizing
