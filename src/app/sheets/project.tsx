@@ -1073,8 +1073,7 @@ export default function ProjectSheet({
              */}
             <h3 className="institle">AI insights</h3>
             <p className="inslede">
-              One page from the answers: what your client has settled, where they contradict
-              themselves, and what is still open. It reports — reading it is still the job.
+              What your client has settled, where they differ, and what is still open.
             </p>
 
             {/**
@@ -1228,68 +1227,40 @@ export default function ProjectSheet({
                  * answered, never a fraction of an expected number and never a
                  * proportion of anything.
                  */}
+                {/**
+                 * What this run will read, in a sentence — 20 August 2026.
+                 *
+                 * The tally beside it went: one tick per person who answered,
+                 * ink for the ones being read and hairline for the rest, with a
+                 * wave passing left to right while the analysis ran. It was the
+                 * only thing in the app that looked like a machine working, and
+                 * it was carrying a fact the sentence beside it already states
+                 * in words — how many, and by subtraction whose.
+                 *
+                 * The sentence is the accessible version and always was: the
+                 * marks needed a `role="img"` and a label listing who was being
+                 * left out, which is the sentence again in a second place. One
+                 * place now.
+                 *
+                 * Rules 3 and 7 stay safe either way — this counts the people
+                 * who actually answered, never a fraction of an expected number.
+                 */}
                 <div className="insreads">
-                  {/**
-                   * One mark per person, and each one knows whose it is.
-                   *
-                   * **It reported only how many, which is the number the
-                   * sentence beside it already reads out** — and withheld the
-                   * one thing only it could carry, which is *whose*. Every mark
-                   * names its person now, so the row answers the question the
-                   * sentence cannot, and a pointer and a screen reader get the
-                   * same answer: `role="img"` with a label naming who is being
-                   * left out, because that is the short list and the surprising
-                   * one.
-                   *
-                   * **Nothing below two respondents.** PRODUCT.md: usually one
-                   * person answers. A single mark beside a sentence is a stray
-                   * pipe character next to the words that already say it, and
-                   * the normal case was the case it read worst in.
-                   */}
-                  {p.people.length > 1 && (
-                    <span
-                      className="meter"
-                      data-running={genPending || undefined}
-                      role="img"
-                      aria-label={
-                        chosen === p.people.length
-                          ? 'Reading everyone who answered.'
-                          : `Not reading ${p.people
-                              .filter((x) => only !== null && !only.includes(x.id))
-                              .map((x) => x.name)
-                              .join(', ')}.`
-                      }
-                    >
-                      {p.people.map((person, i) => {
-                        const on = only === null || only.includes(person.id);
-                        return (
-                          <i
-                            key={person.id}
-                            data-on={on ? '' : undefined}
-                            title={on ? person.name : `${person.name} — not read`}
-                            style={{ animationDelay: `${i * 0.11}s` }}
-                          />
-                        );
-                      })}
-                    </span>
-                  )}
                   <p className="ireads">
                     {genPending
                       ? `Reading ${chosen} ${chosen === 1 ? 'answer' : 'answers'}. This usually takes a minute or two.`
                       : chosen === p.people.length
                         ? `Reads all ${p.answers} ${p.answers === 1 ? 'answer' : 'answers'}.`
                         : `Reads ${chosen} of the ${p.people.length} answers.`}{' '}
-                    {/* Kept during the run, where it used to be deleted. It is
-                        the one sentence answering *am I about to lose a good
-                        analysis*, and it was on screen while nobody was anxious
-                        and gone the moment the anxious minute began. */}
+                    {/* Kept during the run. It is the one sentence answering
+                        *am I about to lose a good analysis*, and it used to be
+                        deleted exactly when the anxious minute began. */}
                     Every run is kept as a version, so this replaces nothing.
                   </p>
                 </div>
 
-                {/* Said out loud. The meter is a picture and the sentence above
-                    it does not take focus, so a screen reader got silence for
-                    the length of the call. */}
+                {/* Said out loud. The sentence above does not take focus, so a
+                    screen reader got silence for the length of the call. */}
                 <p className="visually-hidden" role="status">
                   {genPending ? `Reading ${chosen} answers. This usually takes a minute or two.` : ''}
                 </p>

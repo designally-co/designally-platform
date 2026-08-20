@@ -4021,19 +4021,19 @@ textarea {
   margin-top: var(--sp-md);
 }
 /**
- * The machine's half — a line now, not a recess.
+ * The machine's half — no line at all, 20 August 2026, asked for.
  *
- * It stood on `--recess` so the split read as depth. On a panel that is a
- * gradient, a flat band across the bottom cuts the ramp in half and turns one
- * object into two stacked ones. The hairline does the same work here, because
- * the gradient itself already tells the eye which end of the panel it is at.
+ * It stood on `--recess` so the split read as depth, then on a hairline when
+ * the recess would have cut the gradient in half. Both were drawing a boundary
+ * inside one object: the ramp already tells the eye which end of the panel it
+ * is at, and the two bands were never two things — they are a sentence and the
+ * buttons that act on it.
  *
- * The rule takes the accent at a tenth, for the reason the border does: a
- * neutral divider on a warm field reads as borrowed.
+ * No top padding either. With the rule gone, `--sp-lg` on both sides of a line
+ * that is not there is a gap where a divider used to be.
  */
 .insfoot {
-  padding: var(--sp-lg);
-  border-top: 1px solid color-mix(in oklab, var(--primary) 14%, transparent);
+  padding: 0 var(--sp-lg) var(--sp-lg);
 }
 /* `.insopen` went on 20 August 2026 with the button it spaced — *Read insights*
    sits in the actions row beside Generate now, not under the head. */
@@ -4052,116 +4052,21 @@ textarea {
  * same statement twice, once countable and once in words, and stacking them
  * would read as two facts.
  */
+/* One child now that the tally is gone — kept as the block that spaces the
+   sentence off the buttons under it. */
 .insreads {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--sp-sm);
-  margin-bottom: var(--sp-sm);
+  margin-bottom: var(--sp-md);
 }
 .insreads .ireads {
   margin-bottom: 0;
 }
 
-/**
- * A run that failed, in the panel that ran it.
- *
- * The message used to render as the last child of the whole sheet, below the
- * fold, in `--caution` with no role. Somebody who waited ninety seconds looking
- * at this panel saw the button return to rest and nothing else — and the
- * likeliest next move is pressing it again, which is a second paid call for a
- * failure the first one had already diagnosed.
- *
- * `--critical` and not `--caution`: this is a thing that did not happen, not a
- * thing to be careful about. On the recessed ground it measures 4.60:1.
- */
-.insfail {
-  display: flex;
-  gap: var(--sp-xs);
-  margin-top: var(--sp-sm);
-  font-size: 13.5px;
-  line-height: 1.6;
-  color: var(--critical);
-  text-wrap: pretty;
-}
-.insfail b {
-  font-weight: 600;
-}
-.meter {
-  flex: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  /* aligned to the first line's cap height rather than its box, so the marks
-     stand with the type and not above it */
-  padding-top: 4px;
-}
-.meter i {
-  width: 3px;
-  height: 15px;
-  /* `pill`, not the 2px this had. A 3px-wide mark cannot take 8 without
-     becoming a lozenge, and 2 is not a step in the scale — a fully rounded bar
-     is, and at this width that is what it draws. */
-  border-radius: var(--r-pill);
-  /**
-   * Not read on this run: present, and plainly not counted.
-   *
-   * **This was `--ink-4` at `opacity: 0.45` and the comment here claimed 4.61:1
-   * for it.** That figure is the solid colour on the page; the opacity lands
-   * after it, compositing to `#bcbec2` — **1.68:1** against this panel's foot,
-   * against a 3:1 floor for a graphical object. The mark that carries the whole
-   * point of the meter could not be seen, and the note beside it would have
-   * survived the next person's check.
-   *
-   * Solid, and measured where it actually sits: `--ink-4` on `--parchment` is
-   * **3.72:1**. Opacity is the running animation's alone now.
-   */
-  background: var(--ink-4);
-  /* No transition. The colour used to cross-fade over 240ms, which is
-     imperceptible on a 3px mark tied to a checkbox — and it is a *paint*
-     property, so the change only advances while the page is compositing. A
-     tab that is not painting leaves the mark stuck at the colour it started
-     on, which is the one state this element must not have. Instant, and the
-     only thing that animates here is opacity. */
-}
-.meter i[data-on] {
-  background: var(--ink);
-  opacity: 1;
-}
+/* `.meter`, `@keyframes reading` and the reduced-motion rule that stopped it
+   went on 20 August 2026 with the tally they drew — one tick per answer, with a
+   wave passing through them while the analysis ran. It was the only thing in
+   the app that looked like a machine working, and it reported a number the
+   sentence beside it already read out in words. */
 
-/**
- * Reading, one after another.
- *
- * The only animation in the team app, and it is the marks that were already
- * there changing opacity — nothing appears in order to say *AI*. Each tick is
- * delayed by its own index (see the inline `animationDelay`), so the wave
- * travels the way the reading does.
- *
- * Opacity only: DESIGN.md's motion floor and the GPU one agree here, and a wave
- * built on `width` or `background` would repaint a row of marks sixty times a
- * second for the length of an API call.
- */
-.meter[data-running] i {
-  animation: reading 1.5s var(--ease) infinite;
-}
-/* The trough was 0.28, which put `--ink` at 1.80:1 on this ground — the one
-   signal that the machine is working faded to invisible twice a second. 0.55
-   measures 3.71:1, which is the floor for a graphical object and, by
-   coincidence worth keeping, the same contrast the resting off-mark holds. */
-@keyframes reading {
-  0%,
-  100% {
-    opacity: 0.55;
-  }
-  45% {
-    opacity: 1;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .meter[data-running] i {
-    animation: none;
-    opacity: 1;
-  }
-}
 
 /**
  * The new survey's code, under the link it encodes.
