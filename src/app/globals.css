@@ -4019,6 +4019,27 @@ textarea {
   border: 0;
   border-radius: var(--r-sheet);
   overflow: hidden;
+  /**
+   * One row, not four stacked blocks — 20 August 2026, asked for: as small as
+   * it can be and still stand out.
+   *
+   * It was a heading, a sentence and a row of buttons under them: 207px of a
+   * sheet for two short lines and two controls. Side by side it is about 130,
+   * and nothing was removed to get there — what is on it is what was on it.
+   *
+   * **Standing out is the tile's job now, not the size's.** That is the value
+   * of the dark Field: a near-black panel between white cards does not need to
+   * be tall to be found, so the height was only ever paying for attention the
+   * colour already buys.
+   *
+   * `align-items: center`, so the two columns hang off one axis — the text is
+   * two lines and the buttons are one, and aligning either edge would leave the
+   * shorter of them adrift.
+   */
+  display: flex;
+  align-items: center;
+  gap: var(--sp-lg);
+  padding: var(--sp-md) var(--sp-lg);
 }
 
 /**
@@ -4031,9 +4052,12 @@ textarea {
  */
 .institle {
   font-family: var(--font-display);
-  font-size: clamp(1.5rem, 3.4vw, 1.75rem);
+  /* 20, down from 24–28. On a near-black tile between white cards the panel is
+     already what the eye lands on, so the type can stop doing that job too —
+     and a 28px line over a 14.5px one was most of the height. */
+  font-size: 20px;
   font-weight: 700;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.024em;
   /* 1.25 clips Thai and this heading is English by construction — but the rule
      is about the box, not the language, and 1.2 on 28px leaves a tone mark
      nowhere to go if this line is ever translated. */
@@ -4042,9 +4066,11 @@ textarea {
 }
 /* The Field's `--ink-2`, 14.97:1. A measure, because it is prose. */
 .inslede {
-  margin-top: 8px;
-  max-width: 52ch;
-  font-size: 14.5px;
+  margin-top: 3px;
+  /* 68ch, not 52 — the sentence is 71 characters and 52 forced a second line at
+     every width. Beside the buttons it fits on one on a laptop. */
+  max-width: 68ch;
+  font-size: 14px;
   line-height: 1.6;
   letter-spacing: 0;
   color: #e0e2e5;
@@ -4055,16 +4081,27 @@ textarea {
   color: #e0e2e5;
 }
 
-/* The head's padding. It was lost when this block was rewritten for the dark
-   Field — the replacement spanned the rule and did not put it back — and the
-   panel drew its title hard against its own left edge. */
+/* The panel carries the padding now that it is the flex container, so neither
+   column holds any of its own. */
 .inshead {
-  padding: var(--sp-lg);
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+}
+.insfoot {
+  flex: none;
+  padding: 0;
 }
 
-/* Nothing answered yet: the sentence and the control that is waiting for it. */
-.insempty .iacts {
-  margin-top: var(--sp-md);
+/* Nothing answered yet: the control that is waiting, and why, under it. */
+.insnote {
+  margin-top: 7px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  letter-spacing: 0;
+  /* the Field's own `--ink-3`, 6.33:1 on the tile */
+  color: #919399;
+  text-align: center;
 }
 
 /**
@@ -4081,6 +4118,25 @@ textarea {
  * step less on type. The 44px minimum height is untouched: what shrinks is the
  * air either side of the words, never the target.
  */
+/**
+ * Below 760 it stacks again.
+ *
+ * The row needs the text column to hold its sentence and the actions column to
+ * hold two pills and a chevron, and under about 760 of sheet both cannot be
+ * true — the sentence starts breaking into four lines to make room for buttons
+ * that will not shrink. Stacked, the actions spread across the full width,
+ * which is the arrangement a phone already had.
+ */
+@media (max-width: 760px) {
+  .insbox {
+    display: block;
+    padding: var(--sp-lg);
+  }
+  .insbox .insfoot {
+    margin-top: var(--sp-md);
+  }
+}
+
 .insbox .iacts {
   flex-wrap: nowrap;
 }

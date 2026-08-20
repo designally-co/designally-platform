@@ -1121,16 +1121,18 @@ export default function ProjectSheet({
            * No chevron on it either. There is nobody to choose between.
            */
           <div className="insempty">
-            <p className="ireads">
-              {p.token
-                ? 'Nobody has answered yet. The analysis reads the answers, so it has nothing to read.'
-                : 'No link has been issued for this project yet.'}
-            </p>
             <div className="iacts">
               <button className="btn btn-primary" disabled>
                 Generate insights
               </button>
             </div>
+            {/* Four words under the control rather than a sentence above it.
+                It read "Nobody has answered yet. The analysis reads the answers,
+                so it has nothing to read" — two clauses explaining a mechanism,
+                stacked over a second sentence that already explains the panel,
+                to say the one thing the greyed-out button says by being greyed
+                out. What is left is the reason, in the place a caption goes. */}
+            <p className="insnote">{p.token ? 'No answers yet.' : 'No link issued yet.'}</p>
           </div>
         ) : (
           <>
