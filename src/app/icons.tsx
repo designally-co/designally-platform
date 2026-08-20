@@ -34,6 +34,7 @@ import {
   Archive,
   Bell,
   Calendar,
+  CalendarClock,
   Check,
   ChevronLeft,
   ChevronDown,
@@ -41,9 +42,9 @@ import {
   Download,
   FileText,
   History,
+  Inbox,
   Link as LinkIcon,
   Lock,
-  MessageSquare,
   MoreHorizontal,
   Printer,
   RotateCcw,
@@ -103,11 +104,25 @@ function smallMark(Icon: LucideIcon) {
   return Mark;
 }
 
-/** Answers arriving — a reply, not a document: what came back is somebody's words. */
-export const AnswersMark = smallMark(MessageSquare);
+/**
+ * Answers arriving.
+ *
+ * The tray, not the speech bubble — changed 20 August 2026. A bubble is one
+ * person saying one thing, and this line counts what has *come back*: five
+ * completed questionnaires, or none yet. The tray is the only mark in this set
+ * that means received rather than sent, said or written.
+ */
+export const AnswersMark = smallMark(Inbox);
 
-/** The day the survey stops taking answers. */
-export const DueMark = smallMark(Calendar);
+/**
+ * The day the survey stops taking answers.
+ *
+ * The calendar with a clock on it, not the bare calendar — changed the same
+ * day. A plain calendar is a date, and this is a *deadline*: the day the link
+ * stops serving and the client is turned away (rule 1). The clock is the half
+ * of the mark that says the date does something when it arrives.
+ */
+export const DueMark = smallMark(CalendarClock);
 
 /**
  * Settings.

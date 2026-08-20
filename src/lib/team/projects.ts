@@ -148,7 +148,7 @@ export type ProjectView = {
   action: ProjectAction | null;
   /**
    * A project card's two facts: how many answers came back, and when the link
-   * shuts. "5 answers" and "closes 2 Sept".
+   * shuts. "5 answers" and "closes on 2 Sept".
    *
    * It was `latest: [string, string]`, two cells of a three-column table. The
    * table went on 20 August 2026 because PRODUCT.md names it by name as an
@@ -355,9 +355,13 @@ function buildStanding(v: {
   /* `closedOn` when a person pressed the button, the date when the date did it.
      Rule 1: the client meets the same screen either way, and so does whoever
      reads this line. */
-  if (v.shut) return { arrived, due: nbsp(`closed ${v.closedOn ?? v.dueOn}`) };
+  /* "closed **on** 18 Aug", with the preposition — asked for, 20 August 2026.
+     Without it the verb and the date collide into something that reads as a
+     label rather than as a statement: "closes 3 Sept" is a column heading's
+     grammar, and this is a sentence on a card. */
+  if (v.shut) return { arrived, due: nbsp(`closed on ${v.closedOn ?? v.dueOn}`) };
 
-  return { arrived, due: v.dueOn ? nbsp(`closes ${v.dueOn}`) : null };
+  return { arrived, due: v.dueOn ? nbsp(`closes on ${v.dueOn}`) : null };
 }
 
 export async function loadProjects({ archived = false } = {}): Promise<ProjectView[]> {
