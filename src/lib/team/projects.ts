@@ -73,25 +73,8 @@ function nbsp(text: string) {
   return text.replace(/ /g, '\u00a0');
 }
 
-/**
- * Whole days from today to a survey's closing day, in Bangkok.
- *
- * Counted in calendar days rather than in milliseconds, because "3 days" is a
- * statement about dates and not about elapsed time: a survey closing tomorrow
- * morning and one closing tomorrow night are both "1 day", and a subtraction on
- * timestamps calls the first of those 0 and the second 1. `dayIn` already gives
- * the Bangkok day for a date, so the difference between two of those strings is
- * the answer, and it cannot drift over a midnight or a timezone.
- *
- * Negative once the day has passed; the caller only asks while the survey is
- * still open.
- */
-function daysUntilDay(day: string | null): number | null {
-  if (!day) return null;
-  const from = Date.parse(`${dayIn(new Date())}T00:00:00Z`);
-  const to = Date.parse(`${day}T00:00:00Z`);
-  return Math.round((to - from) / 86_400_000);
-}
+/* `daysUntilDay` went on 20 August 2026 with the countdown it fed. The card
+   says the date and nothing else now. */
 
 function agoText(days: number) {
   if (days === 0) return 'today';
@@ -164,8 +147,8 @@ export type ProjectView = {
 
   action: ProjectAction | null;
   /**
-   * The second line of a project's row in *Moving on their own* — everything
-   * about its state in one sentence.
+   * A project card's two facts: how many answers came back, and when the link
+   * shuts. "5 answers" and "closes 2 Sept".
    *
    * It was `latest: [string, string]`, two cells of a three-column table. The
    * table went on 20 August 2026 because PRODUCT.md names it by name as an
@@ -173,11 +156,11 @@ export type ProjectView = {
    * CRM… it needs a short list of sentences" — and a `<thead>` with three
    * column headers is exactly that shape.
    *
-   * Two parts rather than one string, so the line can break *between* the
-   * clauses and never inside one. As a single string it wrapped to
-   * "5 answers, last one 12 days ago · closes" / "30 September" on a phone,
-   * which orphans the verb from its date; `text-wrap: pretty` balances a
-   * ragged edge and has no idea the tail is one phrase.
+   * Two parts rather than one string, because the card draws them as two lines
+   * with a mark in front of each. It was one sentence joined by a middot for
+   * half a day, and on a 250px tile that wrapped to three lines on some
+   * projects and two on others, which is a grid that looks misaligned rather
+   * than one that looks full.
    */
   standing: { arrived: string; due: string | null };
 };
@@ -342,61 +325,39 @@ function buildAction(v: {
 function buildStanding(v: {
   sentOn: string | null;
   dueOn: string | null;
-  /** the same day as YYYY-MM-DD in Bangkok, for counting the days left */
-  dueDay: string | null;
   closedOn: string | null;
   /** closed by a person, or past its date — see `buildAction` */
   shut: boolean;
   answers: number;
-  quietDays: number | null;
 }): { arrived: string; due: string | null } {
   if (!v.sentOn) return { arrived: 'Not sent yet', due: null };
 
-  if (v.shut) {
-    return {
-      arrived: v.answers === 0 ? 'No answers' : plural(v.answers, 'answer'),
-      /* `closedOn` when a person pressed the button, the date when the date did
-         it. Rule 1: the client meets the same screen either way, and so does
-         whoever reads this line. */
-      due: nbsp(`closed ${v.closedOn ?? v.dueOn}`),
-    };
-  }
-
-  /* The recency phrase is bound with non-breaking spaces so the clause can
-     only break at its comma. Left loose it wrapped to "5 answers, last one 12
-     days" / "ago" on a phone — `text-wrap: pretty` evens a ragged edge and has
-     no notion that "12 days ago" is one thing. The longest this ever gets is
-     "last one 365 days ago", which is well inside the column. */
-  const ago = nbsp(agoText(v.quietDays ?? 0));
+  /**
+   * How many came back, and nothing about when.
+   *
+   * "5 answers, last one 1 day ago" until 20 August 2026, when the recency went
+   * — asked for, along with the countdown that had been running beside the
+   * date. Both were true and both were answers to a question the card is not
+   * being asked: on a tile scanned in a second, *how many* and *until when* are
+   * the two facts, and each extra clause made the line long enough to wrap and
+   * the grid uneven with it.
+   *
+   * Neither is lost. Recency is what puts a project in the notification panel
+   * once a survey goes quiet, and the project sheet dates every single answer.
+   */
   const arrived =
     v.answers === 0
-      ? 'No answers yet'
-      : v.answers === 1
-        ? `1 answer, ${ago}`
-        : `${plural(v.answers, 'answer')}, ${nbsp('last one')}\u00a0${ago}`;
+      ? v.shut
+        ? 'No answers'
+        : 'No answers yet'
+      : plural(v.answers, 'answer');
 
-  if (!v.dueOn) return { arrived, due: null };
+  /* `closedOn` when a person pressed the button, the date when the date did it.
+     Rule 1: the client meets the same screen either way, and so does whoever
+     reads this line. */
+  if (v.shut) return { arrived, due: nbsp(`closed ${v.closedOn ?? v.dueOn}`) };
 
-  /**
-   * The date *and* the days left — asked for, 20 August 2026.
-   *
-   * The date alone is unambiguous and needs no arithmetic; the countdown is the
-   * form the decision is actually made in. Saying both costs one clause on a
-   * line that has the whole card to itself, and neither has to be inferred from
-   * the other.
-   *
-   * Each half is bound with non-breaking spaces and the middot between them is
-   * a real character, so if the line ever has to break it breaks there and not
-   * through a date.
-   */
-  const left = daysUntilDay(v.dueDay);
-  const tail =
-    left === null || left < 0 ? null : left === 0 ? 'today' : plural(left, 'day');
-
-  return {
-    arrived,
-    due: nbsp(`closes ${v.dueOn}`) + (tail ? ` · ${nbsp(tail)}` : ''),
-  };
+  return { arrived, due: v.dueOn ? nbsp(`closes ${v.dueOn}`) : null };
 }
 
 export async function loadProjects({ archived = false } = {}): Promise<ProjectView[]> {
@@ -568,11 +529,9 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
       standing: buildStanding({
         sentOn,
         dueOn,
-        dueDay,
         closedOn,
         shut: Boolean(closedOn) || (overdueDays !== null && overdueDays > 0),
         answers,
-        quietDays,
       }),
     };
   });
