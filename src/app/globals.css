@@ -3075,6 +3075,8 @@ textarea {
  * do not line up is a grid that looks broken.
  */
 .pcard {
+  /* the mark hangs in the top-trailing corner — see `.pmark` */
+  position: relative;
   display: grid;
   grid-template-rows: auto auto 1fr auto;
   gap: 2px;
@@ -3085,7 +3087,15 @@ textarea {
      different floors — and the state sentence, which is pinned to the card's
      last grid row, sat at two different heights across one line of the grid. */
   height: 100%;
-  min-height: 210px;
+  /**
+   * 132, down from 210 — the height was the respondents' list and the list is
+   * gone. What is left is a name, a package and a sentence, and a card sized
+   * for content it no longer holds is a card with a hole in it.
+   *
+   * A floor rather than a fixed height, and `height: 100%` above it, so a name
+   * that wraps to two lines still lines its foot up with the rest of its row.
+   */
+  min-height: 132px;
   text-align: left;
   padding: 18px;
   /* A tone, not a line. The sheet under it is white, and DESIGN.md's rule for
@@ -3120,8 +3130,31 @@ textarea {
   outline: none;
   box-shadow: 0 0 0 2px var(--primary-focus);
 }
+/**
+ * Two lines, always — whether the name needs them or not.
+ *
+ * A grid row stretches to its tallest card, so with the name free to be one
+ * line or two the *rows* came out at different heights: 173px where a client
+ * was called "ZZ Fixture — Precision Components" and 132 where one was called
+ * "shop". Even within a row, that meant the tallest card set a height the
+ * others padded out with nothing.
+ *
+ * Reserving both lines makes every tile identical, which is what a grid is for
+ * — and two is the right number to reserve rather than one: real client names
+ * here run to thirty characters and Thai company names longer, so one line
+ * would clamp most of them.
+ *
+ * Clamped rather than ellipsised on a single line, so a long name loses its
+ * tail and not its middle — and the full name is in the card's `aria-label`
+ * either way, and one press away on the project sheet.
+ */
 .pcname {
   position: relative;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.7em;
   font-size: 17px;
   font-weight: 600;
   letter-spacing: 0;
@@ -3133,36 +3166,23 @@ textarea {
   color: var(--ink-3);
 }
 
-/* The people, newest first. Names only — the date each arrived is in the
-   project, and four dates down a card is a table trying to get back in. */
-.pcwho {
-  list-style: none;
-  align-self: start;
-  margin-top: 14px;
-  font-size: 14px;
-  line-height: 1.55;
-  letter-spacing: 0;
-  color: var(--ink-2);
-}
-.pcwho li {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.pcwho .pcmore {
-  color: var(--ink-3);
-}
-/* Nobody yet. Not an error and not empty space — the sentence that is true. */
-.pcwait {
-  align-self: start;
-  margin-top: 14px;
-  font-size: 14px;
-  line-height: 1.55;
-  letter-spacing: 0;
-  color: var(--ink-3);
-}
-/* the card's floor: what has arrived, and when the link shuts */
+/* `.pcwho`, `.pcmore` and `.pcwait` — the respondents' names and their empty
+   state — went on 20 August 2026 with the card body they filled. See the note
+   at the deleted markup in `today.tsx`. */
+
+/**
+ * The card's floor: what has arrived, and when the link shuts.
+ *
+ * Two lines reserved here for the same reason the name reserves two — "5
+ * answers, last one 1 day ago · closes 2 Sept" wraps in a 250px column and "No
+ * answers yet · closes 3 Sept" does not, and a grid whose tiles differ by a
+ * line is a grid that looks misaligned rather than one that looks full.
+ *
+ * With both the name and this fixed, every card in the grid is the same height
+ * by construction and `height: 100%` has nothing left to correct.
+ */
 .pcstate {
+  min-height: 3em;
   margin-top: 14px;
   padding-top: 12px;
   /* the divider sits on a toned card, so it is the hairline rather than the
@@ -4801,16 +4821,18 @@ textarea {
  * Accent, and it is the accent's own meaning — DESIGN.md: it means "a person is
  * needed here", which is precisely and only what this dot says.
  *
- * It hangs in the name's left margin rather than pushing it across, so every
- * client name on the grid starts on the same vertical. `top`, not
- * `align-items: center` — the name wraps to two lines on a narrow card and the
- * mark belongs beside the first, level with the capitals. Half the line box
- * less half the dot lands it there without a magic number.
+ * The card's top-trailing corner, on the card's own padding. It hung in the
+ * name's left margin until 20 August 2026, which put it inside the element that
+ * `-webkit-line-clamp` forces `overflow: hidden` onto — so it was clipped away
+ * the moment the name was clamped to two lines, present in the DOM and drawn
+ * nowhere. Out here it cannot be clipped, and it indents nothing: every client
+ * name in the grid starts on the same vertical, which is what the margin was
+ * for.
  */
 .pmark {
   position: absolute;
-  left: -14px;
-  top: calc(0.675em - 4px);
+  top: 18px;
+  right: 18px;
   width: 8px;
   height: 8px;
   border-radius: 50%;
@@ -4856,19 +4878,22 @@ textarea {
   margin: 0 0.32em 0 0;
 }
 /**
- * "closes 26 Aug" — one phrase, and it breaks away from the clause before it
- * rather than through itself.
+ * "closes 26 Aug", on its own line.
  *
- * The middot is drawn here for the same reason `.ppkg` draws its own. What
- * keeps the phrase whole is not a rule here but the non-breaking spaces
- * `buildStanding` builds it with — one mechanism for both clauses of the
- * sentence, and one that holds wherever the string goes rather than only where
- * this stylesheet reaches.
+ * It ran on from the clause before it, joined by a drawn middot, which is right
+ * in a row of a list and wrong in a 250px card: the two clauses wrapped into
+ * three short lines on some projects and two on others, so cards that were
+ * otherwise identical came out thirteen pixels apart.
+ *
+ * A block each makes it two lines on every card, always — and it reads better
+ * for it. What arrived and when the door shuts are two facts, not one sentence,
+ * and the card has the width to say so.
+ *
+ * The non-breaking spaces `buildStanding` builds both clauses with still matter:
+ * they are what stops either one breaking through its own middle at 250px.
  */
-.pdue::before {
-  content: "·";
-  color: var(--ink-4);
-  margin: 0 0.36em;
+.pdue {
+  display: block;
 }
 
 

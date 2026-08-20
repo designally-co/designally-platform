@@ -296,34 +296,48 @@ export default function Today({
                     .join(' ')}
                   onClick={() => setOpenProject(p.id)}
                 >
-                  <span className="pcname">
-                    {/* The mark, on the cards with something waiting. Its
-                        legend is the notification panel, which names the same
-                        projects in sentences — a bare glyph needs one. */}
-                    {p.action && <i className="pmark" aria-hidden="true" />}
-                    {p.clientName}
-                  </span>
+                  {/**
+                   * The mark, on the cards with something waiting.
+                   *
+                   * A child of the card, not of the name — 20 August 2026. It
+                   * hung in the name's left margin, which worked until the name
+                   * was clamped to two lines: `-webkit-line-clamp` needs
+                   * `overflow: hidden`, and the dot was outside that box, so it
+                   * was still in the DOM and invisible on every card.
+                   *
+                   * The card's own top-trailing corner instead. It is out of
+                   * the text flow, so it cannot be clipped and it does not
+                   * indent a name that most cards do not have a dot beside —
+                   * every client name in the grid starts on the same vertical,
+                   * which was the point of the margin in the first place.
+                   *
+                   * Its legend is the notification panel, which names the same
+                   * projects in sentences — a bare glyph needs one.
+                   */}
+                  {p.action && <i className="pmark" aria-hidden="true" />}
+                  <span className="pcname">{p.clientName}</span>
                   <span className="pcpkg">{p.packageLabel}</span>
 
-                  {/* The people, newest first — the card's whole reason for
-                      being taller than a line. Four at most: five respondents
-                      is already the top of this product's range and a card that
-                      grows with the list stops being a grid. */}
-                  {p.people.length > 0 ? (
-                    <ul className="pcwho">
-                      {[...p.people]
-                        .reverse()
-                        .slice(0, 4)
-                        .map((who) => (
-                          <li key={who.id}>{who.name}</li>
-                        ))}
-                      {p.people.length > 4 && (
-                        <li className="pcmore">and {p.people.length - 4} more</li>
-                      )}
-                    </ul>
-                  ) : (
-                    <p className="pcwait">Waiting for the first answer.</p>
-                  )}
+                  {/**
+                   * The respondents' names were the card's body until
+                   * 20 August 2026, and they are gone — asked for, so that every
+                   * card looks the same.
+                   *
+                   * They were the reason the card was tall, and they were worth
+                   * it one card at a time: this product's subject is answers
+                   * arriving, and a name says more than the digit beside it. In
+                   * a grid they were the opposite. One project showed four
+                   * names, its neighbour said "Waiting for the first answer",
+                   * and a third showed one — so eight tiles of the same size
+                   * held wildly different amounts of ink, and the grid read as
+                   * broken rather than as varied. Consistency is what a grid is
+                   * *for*; a list is where things are allowed to differ.
+                   *
+                   * Nothing is lost that is more than one press away: the
+                   * project sheet lists every respondent with the date each
+                   * answered, which is the fuller version of this and always
+                   * was. The count and the recency stay on the card below.
+                   */}
 
                   <span className="pcstate">
                     {p.standing.arrived}
