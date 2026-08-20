@@ -232,23 +232,11 @@ export default function ProjectSheet({
    */
   const [reopening, setReopening] = useState(false);
 
-  /**
-   * The prompt this panel can actually answer.
-   *
-   * `p.action` is the *project's* outstanding thing, and the insights panel wore
-   * the accent for all of them. On a project whose analysis is written that
-   * produced NEEDS YOUR TEAM over "Archive the project once your team has what
-   * it needs" — with two buttons underneath, neither of which archives anything.
-   * Archiving is in the toolbar menu. Same for `close-collection`, whose control
-   * is the Collection bar above.
-   *
-   * DESIGN.md §1 and PRODUCT.md principle 3 both make the accent mean *a person
-   * is needed **here***. An accent on a container that cannot answer its own
-   * prompt teaches the reader it means "somewhere on this sheet", and then it
-   * stops working where it is used correctly. So the banner appears for the one
-   * kind this panel answers, and the others stay with their own control.
-   */
-  const mine = p.action?.kind === 'write-insights';
+  /* `mine` went on 20 August 2026 with the last thing that read it. It marked
+     the one action kind this panel could answer — `write-insights` — so that
+     the accent eyebrow and the action's `when` line appeared here and not for
+     the kinds another control resolves. Both are gone: the panel is the accent
+     now, at all times, and it no longer reports state at all. */
 
   /**
    * The analysis gets its own pending flag.
@@ -1077,49 +1065,21 @@ export default function ProjectSheet({
             </p>
 
             {/**
-             * When it was written, and how many runs are kept — now always,
-             * where it used to be structurally unreachable.
+             * The provenance line went on 20 August 2026, asked for — "Written
+             * 19 Aug · 3 runs kept", and the action's `when` in its other arm.
              *
-             * This was one arm of a ternary against `p.action`, and
-             * `buildAction` returns a `review-insights` action for *every*
-             * unarchived project that has insights. Both came off the same
-             * boolean, so the arm could only render on an archived project: a
-             * live one was never told when its analysis was written or how many
-             * versions existed. That is the fact somebody opens this sheet for,
-             * and its absence made "every run is kept as a version" a promise
-             * the panel gave no way to check.
+             * *Read insights* opens the newest run, which is what somebody
+             * pressing it wants; the date it was written, the number of runs
+             * kept and the version list are all one press further in, on the
+             * sheet that shows them. This panel says what the insights are and
+             * offers the two acts, and it stops there.
+             *
+             * **What went with it, and is worth knowing:** the clause warning
+             * that the newest run had been overtaken — "read 3 of the 5 answers
+             * now in" — lived in the same paragraph. It is a real fact and it is
+             * now unsaid here. The insights sheet still records whose answers
+             * each version read, so it is not lost, only moved further away.
              */}
-            {p.insights ? (
-              <p className="iwhen">
-                Written {p.insightsWrittenOn}
-                {p.insightsVersions.length > 1 ? ` · ${p.insightsVersions.length} runs kept` : ''}
-                {/**
-                 * Whether the newest run has been overtaken.
-                 *
-                 * The analysis can be run on an open survey now, which means a
-                 * version can go out of date while it sits here — somebody
-                 * reads two answers on Tuesday and three more arrive on
-                 * Thursday. That is the whole reason the old rule existed, and
-                 * the answer to it is to say so rather than to forbid the early
-                 * read: every run records whose answers it read, so the gap
-                 * between that and the count now in is a fact this line can
-                 * state.
-                 *
-                 * Silent when they match, which is every closed survey and
-                 * every project nobody has answered since. `sources` is null on
-                 * runs written before it was stored, and null is not zero — it
-                 * means unknown, so it says nothing.
-                 */}
-                {(() => {
-                  const newest = p.insightsVersions.find((v) => v.isNewest);
-                  const read = newest?.sources?.length;
-                  if (read === undefined || read >= p.answers) return null;
-                  return ` · read ${read} of the ${p.answers} answers now in`;
-                })()}
-              </p>
-            ) : mine ? (
-              <p className="iwhen">{p.action!.when}</p>
-            ) : null}
 
             {/* The way in moved down beside Generate on 20 August 2026, asked
                 for: where there is an analysis the panel offers two acts, and
@@ -1245,19 +1205,28 @@ export default function ProjectSheet({
                  * Rules 3 and 7 stay safe either way — this counts the people
                  * who actually answered, never a fraction of an expected number.
                  */}
-                <div className="insreads">
-                  <p className="ireads">
-                    {genPending
-                      ? `Reading ${chosen} ${chosen === 1 ? 'answer' : 'answers'}. This usually takes a minute or two.`
-                      : chosen === p.people.length
-                        ? `Reads all ${p.answers} ${p.answers === 1 ? 'answer' : 'answers'}.`
-                        : `Reads ${chosen} of the ${p.people.length} answers.`}{' '}
-                    {/* Kept during the run. It is the one sentence answering
-                        *am I about to lose a good analysis*, and it used to be
-                        deleted exactly when the anxious minute began. */}
-                    Every run is kept as a version, so this replaces nothing.
-                  </p>
-                </div>
+                {/**
+                 * Only while it is running — 20 August 2026, asked for.
+                 *
+                 * At rest this said "Reads all 5 answers. Every run is kept as
+                 * a version, so this replaces nothing." Both halves were
+                 * answering questions nobody had asked yet: how many it will
+                 * read is the button's own label the moment the default is
+                 * changed, and *nothing will be lost* is a reassurance offered
+                 * to somebody who has not yet decided to press anything.
+                 *
+                 * During the run it is the only thing on the panel that says
+                 * how long this takes, and the run is two minutes. The button
+                 * beside it reads "Reading…" and nothing else would say why.
+                 */}
+                {genPending && (
+                  <div className="insreads">
+                    <p className="ireads">
+                      Reading {chosen} {chosen === 1 ? 'answer' : 'answers'}. This usually takes a
+                      minute or two.
+                    </p>
+                  </div>
+                )}
 
                 {/* Said out loud. The sentence above does not take focus, so a
                     screen reader got silence for the length of the call. */}
