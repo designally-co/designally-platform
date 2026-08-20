@@ -18,11 +18,22 @@ export default async function SignIn(props: PageProps<'/sign-in'>) {
        behind it and every sheet in it had inverted. See `.deck.paper`. */
     <main className="signin deck paper">
       <div className="card">
-        {/* The mark is back at the head of the lockup. It had moved to the foot
-            as white ink standing in the orange, which needed no disc because
-            the field was the disc — with the colour gone that seal would have
-            been white on white. */}
-        <Mark size={44} />
+        {/**
+         * The Cut, with the Point on it.
+         *
+         * The page had a mark floating over centred type and read as a form
+         * with a logo above it. This is the brand's own graphic instead of
+         * decoration: the same rule and the same disc the questionnaire is
+         * built on, laid horizontally and running the full width of the
+         * window. The door and the survey now rhyme, which is the one thing a
+         * sign-in screen for *this* product should do.
+         *
+         * The line is the same orange as the disc, so it reads as coming out of
+         * it rather than passing behind it.
+         */}
+        <div className="sl-cut">
+          <Mark size={60} />
+        </div>
 
         {/**
          * The lockup. Company in display, product beneath it.

@@ -5515,6 +5515,53 @@ body:has(.deck.paper) {
 }
 
 /**
+ * No reserved gutter on this page.
+ *
+ * The app holds one always, so a list growing past the fold never shifts the
+ * layout sideways. This screen has one control and nothing to scroll, so the
+ * gutter is dead space — and it is dead space the Cut has to stop 15px short
+ * of, which on a rule that is supposed to leave the window is the only part
+ * anybody would notice. It also pulls the whole composition 7px off the true
+ * centre.
+ */
+html:has(.signin) {
+  scrollbar-gutter: auto;
+}
+
+/**
+ * The Cut, laid down and running past the column.
+ *
+ * `100vw` and centred on the page's axis rather than `100%` of the card, so the
+ * rule leaves the 460px measure and crosses the whole window — a line that
+ * stops at the text is a divider, and the Cut is not a divider. `vw` and not
+ * `dvw` because this is horizontal: no mobile chrome collapses sideways, and
+ * the scrollbar gutter is the one thing that would make them differ.
+ *
+ * The disc sits on it in the same orange, so the rule reads as coming out of
+ * the Point rather than passing behind it — which is how the questionnaire
+ * draws the pair, vertically.
+ */
+.sl-cut {
+  position: relative;
+  display: grid;
+  place-items: center;
+  margin-bottom: var(--sp-xl);
+}
+.sl-cut::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100vw;
+  height: var(--cut-width);
+  background: var(--cut);
+  transform: translate(-50%, -50%);
+}
+.sl-cut .brandmark {
+  position: relative;
+}
+
+/**
  * The lockup.
  *
  * Zalando at its heavy end and tracked in, because a name set large wants the
@@ -5524,12 +5571,12 @@ body:has(.deck.paper) {
  */
 .sl-lockup {
   display: block;
-  margin: var(--sp-md) 0 var(--sp-sm);
+  margin: 0 0 var(--sp-sm);
   font-family: var(--font-display);
 }
 .sl-name {
   display: block;
-  font-size: clamp(2.9rem, 6.4vw, 4.4rem);
+  font-size: clamp(3.1rem, 7vw, 5rem);
   font-weight: 700;
   line-height: 0.96;
   letter-spacing: -0.038em;
@@ -5638,7 +5685,7 @@ body:has(.deck.paper) {
     filter: none;
   }
 }
-.brandmark,
+.sl-cut,
 .sl-lockup,
 .sl-line,
 .signin form {
@@ -5651,7 +5698,7 @@ body:has(.deck.paper) {
   animation-delay: 0.18s;
 }
 @media (prefers-reduced-motion: reduce) {
-  .brandmark,
+  .sl-cut,
   .sl-lockup,
   .sl-line,
   .signin form {
