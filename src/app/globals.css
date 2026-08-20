@@ -2215,6 +2215,36 @@ textarea {
   }
 }
 
+/**
+ * The bar's discs carry no ring at rest — 20 August 2026, asked for.
+ *
+ * `.iconbtn` is white with a `--hairline` ring, which is right where it was
+ * written: inside a sheet, where a disc sits among other bordered things and
+ * the ring is one of several. On the toolbar it is the only ring on the page —
+ * two dark hoops on the parchment, beside a mark that has no container at all
+ * since it lost its disc.
+ *
+ * The fill does the work instead, which is the rule the whole app moved to
+ * today: white on parchment reads as a raised disc without being drawn a line,
+ * and the line arrives when you point at it.
+ *
+ * **Hover is scoped too, so that nothing here rests on file order.**
+ * `.iconbtn:hover` and this resting rule are both (0,2,0), and which of them
+ * wins is decided purely by which comes last — today the base hover does, and
+ * moving either block would silently take the disc's only state away. Stated at
+ * (0,3,0) the outcome is a decision. Three defects today came from that tie
+ * (the search pill, the survey's answer field, and the delete popover), so it
+ * is worth the extra selector every time.
+ */
+.topbar .iconbtn {
+  border-color: transparent;
+}
+@media (hover: hover) {
+  .topbar .iconbtn:hover {
+    border-color: var(--ink-3);
+  }
+}
+
 .bartrail {
   position: relative;
   margin-left: auto;
