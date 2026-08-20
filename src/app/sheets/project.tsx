@@ -1325,21 +1325,45 @@ export default function ProjectSheet({
                         aria-label="Whose answers to read"
                         style={{ top: at.top, left: at.left, width: at.width }}
                       >
-                        <p className="hintline">Read the answers of:</p>
-                        {/* Unticking nineteen of twenty people was nineteen
-                            presses. Everyone is also the default, and a row
-                            saying so is the only place the panel admits it. */}
+                        {/**
+                         * Everyone / Nobody, and which one is currently true.
+                         *
+                         * `aria-pressed`, not `disabled` — 20 August 2026.
+                         * Being the current state was expressed by greying the
+                         * button out, which is the same picture as "you cannot
+                         * use this": the state a person had chosen looked like
+                         * the one thing on the panel that had been taken away.
+                         * It also killed the hover on whichever one was true,
+                         * so half the control stopped responding.
+                         *
+                         * Pressed is the accent ladder's *selected* rung — pale
+                         * orange field, orange line, ink label, exactly what a
+                         * chosen day in the date picker wears. Both stay
+                         * pressable; pressing the one that is already true is a
+                         * no-op rather than an error.
+                         *
+                         * Neither is pressed when a subset is ticked, which is
+                         * a state these two shortcuts cannot express and
+                         * `aria-pressed` reports honestly.
+                         *
+                         * The "Read the answers of:" line above them went the
+                         * same day. The panel opens from a control labelled
+                         * "Choose whose answers to read" and holds nothing but
+                         * names with checkboxes — a heading to say so was the
+                         * panel introducing itself to somebody already reading
+                         * it.
+                         */}
                         <div className="pickall">
                           <button
                             type="button"
-                            disabled={only === null}
+                            aria-pressed={only === null}
                             onClick={() => setOnly(null)}
                           >
                             Everyone
                           </button>
                           <button
                             type="button"
-                            disabled={chosen === 0}
+                            aria-pressed={chosen === 0}
                             onClick={() => setOnly([])}
                           >
                             Nobody
