@@ -5498,11 +5498,29 @@ body:has(.deck.paper) {
   padding: var(--sp-xl);
   width: min(440px, 100%);
 }
+/**
+ * Two lines, one heading: the company, then what it opens.
+ *
+ * Not a kicker. `Designally` is the same size and the same weight as `Survey
+ * Platform` and sits *in* the heading rather than over it — DESIGN.md's floor
+ * bans the small label above a title, and this is a headline that happens to
+ * take two lines.
+ *
+ * The second line steps back in ink rather than in size. The company is the
+ * fixed half and the product is the half that could one day be something else,
+ * so they read as one lockup with the emphasis on the name that never changes.
+ * 1.2 leading because two display lines at 28px want closing up.
+ */
 .signin h1 {
   font-size: 28px;
   font-weight: 600;
+  line-height: 1.2;
   letter-spacing: -0.02em;
   margin: var(--sp-md) 0 var(--sp-xs);
+}
+.signin h1 span {
+  display: block;
+  color: var(--ink-3);
 }
 .signin p {
   color: var(--ink-2);

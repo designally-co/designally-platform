@@ -19,11 +19,30 @@ export default async function SignIn(props: PageProps<'/sign-in'>) {
     <main className="signin deck paper">
       <div className="card">
         <Mark size={44} />
-        <h1>Sign in</h1>
-        <p>
-          The team app is for {ALLOWED_DOMAIN} accounts. Client questionnaires need no sign-in —
-          they open straight from their link.
-        </p>
+        {/**
+         * The product, not the act — 20 August 2026, asked for.
+         *
+         * It read `Sign in` over a paragraph, which is the button's own word
+         * used as a heading: the only control on the card already says
+         * *Continue with Google*, so the largest type on the page was spending
+         * itself on something nobody could mistake. What a door should say is
+         * which building it opens, and it never did.
+         *
+         * One heading rather than a small `Designally` above a larger `Survey
+         * Platform`. That arrangement is a kicker, and DESIGN.md's floor bans
+         * it outright — the heading carries its own weight. The two lines are
+         * one object here: the company sets the line, the product answers it,
+         * and neither is a label on the other.
+         */}
+        <h1>
+          Designally
+          <span>Survey Platform</span>
+        </h1>
+        {/* The half of the old paragraph that still does something. Which
+            accounts may pass is a fact somebody needs *before* they press a
+            Google button and get refused; that clients need no sign-in was
+            true and told to the one audience that never reads this screen. */}
+        <p>For {ALLOWED_DOMAIN} accounts.</p>
 
         {hasGoogleCredentials && (
           <form
