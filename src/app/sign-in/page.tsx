@@ -1,5 +1,4 @@
 import { redirect } from 'next/navigation';
-import Mark from '../mark';
 
 import { auth, signIn, ALLOWED_DOMAIN, devSignInEnabled, hasGoogleCredentials } from '@/auth';
 
