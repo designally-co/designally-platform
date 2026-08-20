@@ -17,6 +17,7 @@ import { answersToMarkdown, exportFilename, printableHtml } from '@/lib/team/exp
 import {
   ArchiveMark,
   DocMark,
+  LockMark,
   DownMark,
   PrevMark,
   PrintMark,
@@ -482,11 +483,64 @@ export default function ProjectSheet({
                 )}
               </>
             )}
-            {/* Closing and reopening left this menu on 18 August 2026 — they
-                are in the Collection section with the date, which is the other
-                control over whether the link is taking answers. What is left
-                here is the pair that finish with a project rather than govern
-                it. */}
+            {/**
+             * Closing, back in this menu — 20 August 2026, asked for.
+             *
+             * **It left on 18 August, and the reason it left was sound.** It sat
+             * on the Collection bar with the date because the date is the other
+             * control over whether the link takes answers, and the two belonged
+             * together. What that reasoning missed is that they are not the same
+             * *kind* of thing: the date is a value somebody edits and saves, and
+             * closing is one of rule 2's two human gates. Standing them shoulder
+             * to shoulder made the date look like the button's argument, which
+             * is what the bar was rebuilt this morning to undo.
+             *
+             * Here it is with the other gate. Archive is a press with a
+             * consequence and a confirmation, and so is this; they read as one
+             * class of act because they are one. It confirms in place exactly as
+             * Archive does, so the menu never hands the question to a surface
+             * behind it.
+             *
+             * **Reopen did not come with it, and the asymmetry is the point.**
+             * Reopening requires a new date — rule 1, because every shut survey
+             * is past its own — so it is a question about the field, and it
+             * stays beside the field it asks about. On a closed bar the pairing
+             * that was wrong above is the correct one: Reopen is what hands the
+             * date back.
+             */}
+            {!shut && p.surveyId ? (
+              confirming === 'close' ? (
+                <div className="delconfirm">
+                  {/* Four words of consequence, and they differ:
+                      `closeCollection` runs the analysis on the way out, unless
+                      there is nothing to read — then it returns a warning and
+                      writes none. Promising an analysis and delivering a warning
+                      is how a person learns to stop reading the line. */}
+                  <p>{p.answers > 0 ? 'The analysis runs.' : 'Nothing to analyse yet.'}</p>
+                  <div className="iacts">
+                    <button
+                      className="btn btn-ink"
+                      disabled={pending}
+                      onClick={() => {
+                        close();
+                        run(() => closeCollection(p.surveyId!), 'Collection closed.');
+                      }}
+                    >
+                      {pending ? 'Closing…' : 'Close now'}
+                    </button>
+                    <button className="btn btn-outline" onClick={() => setConfirming(null)}>
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button onClick={() => setConfirming('close')}>
+                  <LockMark />
+                  <span>Close collection</span>
+                </button>
+              )
+            ) : null}
+
             {confirming === 'archive' ? (
               /* One line, then the two answers to it. The sentence used to sit
                  *between* the buttons, which put the reason for the decision
@@ -820,46 +874,6 @@ export default function ProjectSheet({
                 </button>
               )}
 
-              {/**
-               * Filled, where the panel this replaces had it outlined.
-               *
-               * Closing is still available rather than urged — the app asks
-               * through *Needs you* when it has a reason to — but on a
-               * near-black bar the outline pill is the quiet form and the
-               * filled one is simply the action. `.btn-ink` inverts by itself
-               * here: `--ink` is the warm white and `--canvas` the charcoal, so
-               * it lands as the reference's white pill without a rule of its
-               * own. The lock glyph went with the reference's own bare label —
-               * the row is tight and "Close now" is not ambiguous.
-               *
-               * It is not here once the survey is shut, and does not need to
-               * be: the date closed it as firmly as the button would have, and
-               * the analysis reads it either way.
-               *
-               * **It is here for every open survey, answered or not** — the
-               * answer-count guard went on 19 August 2026. It was written when
-               * closing was the only thing that produced an analysis, so a
-               * survey with nothing to read had nothing to close *for*. The
-               * date closes those too, and closing one by hand is the same act:
-               * this is over, nobody is going to answer. Keeping the guard
-               * meant a survey reopened for a straggler who never came could
-               * not be shut again by the person who reopened it.
-               *
-               * **It stands down while its own confirmation is open**, the way
-               * Reopen does. The button is what asked the question; leaving it
-               * lit beside the row answering it offers a second press that does
-               * nothing, and puts *Close now* and *Close* on screen together
-               * looking like two different amounts of closing.
-               */}
-              {!shut && p.surveyId && confirming !== 'close' && (
-                <button
-                  className="btn btn-ink collnow"
-                  disabled={pending}
-                  onClick={() => setConfirming('close')}
-                >
-                  Close now
-                </button>
-              )}
             </div>
 
             {/**
@@ -960,41 +974,6 @@ export default function ProjectSheet({
               </div>
             )}
 
-            {confirming === 'close' && (
-              <div className="collask">
-                {/* Four words of consequence, and they differ: `closeCollection`
-                    runs the analysis on the way out, unless there is nothing to
-                    read — then it returns a warning and writes none. Promising
-                    an analysis and delivering a warning is how a person learns
-                    to stop reading the line.
-
-                    What went: that the link stops serving, which is what
-                    *close* means, and that it can be reopened afterwards, which
-                    is a reassurance about a button sitting on the bar behind
-                    this row. */}
-                <p>
-                  <b>Close it now?</b>{' '}
-                  <span className="why">
-                    {p.answers > 0 ? 'The analysis runs.' : 'Nothing to analyse yet.'}
-                  </span>
-                </p>
-                <div className="iacts">
-                  <button
-                    className="btn btn-ink"
-                    disabled={pending}
-                    onClick={() => {
-                      setConfirming(null);
-                      run(() => closeCollection(p.surveyId!), 'Collection closed.');
-                    }}
-                  >
-                    {pending ? 'Closing…' : 'Close'}
-                  </button>
-                  <button className="btn btn-outline" onClick={() => setConfirming(null)}>
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       )}
