@@ -7,7 +7,7 @@ import type { ProjectAnswers } from '@/lib/team/answers';
 import type { ProjectView } from '@/lib/team/projects';
 import { plural } from '@/lib/team/words';
 import { readAnswers } from '@/lib/team/actions';
-import { ArchiveMark, SearchMark } from './icons';
+import { AnswersMark, ArchiveMark, DueMark, SearchMark } from './icons';
 import NewSurveySheet from './sheets/new-survey';
 import SurveyMadeSheet from './sheets/survey-made';
 import ProjectSheet from './sheets/project';
@@ -339,9 +339,22 @@ export default function Today({
                    * was. The count and the recency stay on the card below.
                    */}
 
+                  {/* Two facts, each with its mark: what has come back, and
+                      when the door shuts. They were two grey sentences stacked
+                      on a tile, which is the one place in this app where a
+                      glyph earns its place — a card is scanned, not read, and
+                      at a glance the mark is what separates the two lines. */}
                   <span className="pcstate">
-                    {p.standing.arrived}
-                    {p.standing.due && <span className="pdue">{p.standing.due}</span>}
+                    <span className="pcline">
+                      <AnswersMark />
+                      <span>{p.standing.arrived}</span>
+                    </span>
+                    {p.standing.due && (
+                      <span className="pcline">
+                        <DueMark />
+                        <span>{p.standing.due}</span>
+                      </span>
+                    )}
                   </span>
                 </button>
               </li>

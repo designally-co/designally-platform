@@ -4878,22 +4878,33 @@ textarea {
   margin: 0 0.32em 0 0;
 }
 /**
- * "closes 26 Aug", on its own line.
+ * A fact and its mark, one per line.
  *
- * It ran on from the clause before it, joined by a drawn middot, which is right
- * in a row of a list and wrong in a 250px card: the two clauses wrapped into
- * three short lines on some projects and two on others, so cards that were
- * otherwise identical came out thirteen pixels apart.
+ * The two clauses ran on as one sentence joined by a drawn middot, which is
+ * right in a row of a list and wrong on a 250px card: they wrapped into three
+ * short lines on some projects and two on others, so cards that were otherwise
+ * identical came out thirteen pixels apart. A line each makes it two on every
+ * card, always — and it reads better, because what arrived and when the door
+ * shuts are two facts rather than one sentence.
  *
- * A block each makes it two lines on every card, always — and it reads better
- * for it. What arrived and when the door shuts are two facts, not one sentence,
- * and the card has the width to say so.
+ * `flex-start` and not `center`: the text wraps to two lines on the longest
+ * client names and the mark belongs beside the first, not floating in the
+ * middle of the pair. The 2px lifts it onto the cap line rather than the box's.
  *
- * The non-breaking spaces `buildStanding` builds both clauses with still matter:
- * they are what stops either one breaking through its own middle at 250px.
+ * The non-breaking spaces `buildStanding` builds both clauses with still
+ * matter — they are what stops either breaking through its own middle here.
  */
-.pdue {
-  display: block;
+.pcline {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+}
+.pcline > svg {
+  flex: none;
+  margin-top: 2px;
+  /* a shade back from the words, so the mark labels the line without competing
+     with it — 7.26:1 on the card, which is text-legal even though it is not text */
+  color: var(--ink-4);
 }
 
 

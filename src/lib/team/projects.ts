@@ -73,6 +73,26 @@ function nbsp(text: string) {
   return text.replace(/ /g, '\u00a0');
 }
 
+/**
+ * Whole days from today to a survey's closing day, in Bangkok.
+ *
+ * Counted in calendar days rather than in milliseconds, because "3 days" is a
+ * statement about dates and not about elapsed time: a survey closing tomorrow
+ * morning and one closing tomorrow night are both "1 day", and a subtraction on
+ * timestamps calls the first of those 0 and the second 1. `dayIn` already gives
+ * the Bangkok day for a date, so the difference between two of those strings is
+ * the answer, and it cannot drift over a midnight or a timezone.
+ *
+ * Negative once the day has passed; the caller only asks while the survey is
+ * still open.
+ */
+function daysUntilDay(day: string | null): number | null {
+  if (!day) return null;
+  const from = Date.parse(`${dayIn(new Date())}T00:00:00Z`);
+  const to = Date.parse(`${day}T00:00:00Z`);
+  return Math.round((to - from) / 86_400_000);
+}
+
 function agoText(days: number) {
   if (days === 0) return 'today';
   return `${plural(days, 'day')} ago`;
@@ -322,6 +342,8 @@ function buildAction(v: {
 function buildStanding(v: {
   sentOn: string | null;
   dueOn: string | null;
+  /** the same day as YYYY-MM-DD in Bangkok, for counting the days left */
+  dueDay: string | null;
   closedOn: string | null;
   /** closed by a person, or past its date — see `buildAction` */
   shut: boolean;
@@ -353,7 +375,28 @@ function buildStanding(v: {
         ? `1 answer, ${ago}`
         : `${plural(v.answers, 'answer')}, ${nbsp('last one')}\u00a0${ago}`;
 
-  return { arrived, due: v.dueOn ? nbsp(`closes ${v.dueOn}`) : null };
+  if (!v.dueOn) return { arrived, due: null };
+
+  /**
+   * The date *and* the days left — asked for, 20 August 2026.
+   *
+   * The date alone is unambiguous and needs no arithmetic; the countdown is the
+   * form the decision is actually made in. Saying both costs one clause on a
+   * line that has the whole card to itself, and neither has to be inferred from
+   * the other.
+   *
+   * Each half is bound with non-breaking spaces and the middot between them is
+   * a real character, so if the line ever has to break it breaks there and not
+   * through a date.
+   */
+  const left = daysUntilDay(v.dueDay);
+  const tail =
+    left === null || left < 0 ? null : left === 0 ? 'today' : plural(left, 'day');
+
+  return {
+    arrived,
+    due: nbsp(`closes ${v.dueOn}`) + (tail ? ` · ${nbsp(tail)}` : ''),
+  };
 }
 
 export async function loadProjects({ archived = false } = {}): Promise<ProjectView[]> {
@@ -525,6 +568,7 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
       standing: buildStanding({
         sentOn,
         dueOn,
+        dueDay,
         closedOn,
         shut: Boolean(closedOn) || (overdueDays !== null && overdueDays > 0),
         answers,

@@ -43,6 +43,7 @@ import {
   History,
   Link as LinkIcon,
   Lock,
+  MessageSquare,
   MoreHorizontal,
   Printer,
   RotateCcw,
@@ -82,6 +83,31 @@ function mark(Icon: LucideIcon) {
  * you" is now behind this, so the mark carries a job rather than decorating one.
  */
 export const BellMark = mark(Bell);
+
+/**
+ * The two marks on a project card, at 16px.
+ *
+ * Everything else in this app is 20px on a 24 grid at `strokeWidth 1.9`, which
+ * renders a 1.583px stroke. A 20px glyph beside a 13px line is a glyph with a
+ * caption, so these are 16 — and the weight is corrected so the *drawn* stroke
+ * does not change: `1.9 x 20 / 16`, the same arithmetic `PrevMark` and
+ * `BackMark` use to stay in the family at their own sizes. One stroke across
+ * every mark in the product, at four sizes.
+ *
+ * They label two facts that are otherwise two grey sentences stacked on a tile:
+ * what has come back, and when the door shuts.
+ */
+function smallMark(Icon: LucideIcon) {
+  const Mark = () => <Icon size={16} strokeWidth={2.375} aria-hidden="true" />;
+  Mark.displayName = `SmallMark(${Icon.displayName ?? 'icon'})`;
+  return Mark;
+}
+
+/** Answers arriving — a reply, not a document: what came back is somebody's words. */
+export const AnswersMark = smallMark(MessageSquare);
+
+/** The day the survey stops taking answers. */
+export const DueMark = smallMark(Calendar);
 
 /**
  * Settings.
