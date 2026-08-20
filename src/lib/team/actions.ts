@@ -178,26 +178,41 @@ export async function createSurvey(formData: FormData): Promise<CreateSurveyResu
     };
   }
 
-  const [client] = await db.insert(clients).values({ name }).returning();
-  const [project] = await db
-    .insert(projects)
-    .values({ clientId: client.id, package: pkg })
-    .returning();
+  /**
+   * One transaction, from 20 August 2026.
+   *
+   * These were three separate inserts, so a failure on the third left a real
+   * project, with a real client, and no survey — a row on the landing page
+   * that can never be sent, never answered and never closed, and which the
+   * page had no way to describe because every sentence it writes is about a
+   * survey. It is the one state in this schema that nothing downstream can
+   * recover from, and it is cheaper to make impossible than to design a screen
+   * for: a partial failure now rolls back to no project at all, and the team
+   * presses Create again.
+   */
+  const survey = await db.transaction(async (tx) => {
+    const [client] = await tx.insert(clients).values({ name }).returning();
+    const [project] = await tx
+      .insert(projects)
+      .values({ clientId: client.id, package: pkg })
+      .returning();
 
-  const [survey] = await db
-    .insert(surveys)
-    .values({
-      projectId: project.id,
-      kind: 'discovery',
-      token: makeToken(),
-      /* Rule 5 — frozen now. Editing a template later cannot reach this survey. */
-      questionVersion: CURRENT_QUESTION_VERSION,
-      blockKeys,
-      /* The date the client is shown and the team is prompted by. It closes
-         nothing on its own (rule 1), and stays editable on the project. */
-      dueAt,
-    })
-    .returning();
+    const [row] = await tx
+      .insert(surveys)
+      .values({
+        projectId: project.id,
+        kind: 'discovery',
+        token: makeToken(),
+        /* Rule 5 — frozen now. Editing a template later cannot reach this survey. */
+        questionVersion: CURRENT_QUESTION_VERSION,
+        blockKeys,
+        /* The date the client is shown and the team is prompted by. It closes
+           nothing on its own (rule 1), and stays editable on the project. */
+        dueAt,
+      })
+      .returning();
+    return row;
+  });
 
   revalidatePath('/');
   return { ok: true, link: `/s/${survey.token}`, token: survey.token };

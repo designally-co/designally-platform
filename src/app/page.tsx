@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 
 import { auth, signOut } from '@/auth';
 import { loadQuestionLibrary } from '@/lib/team/library';
-import { formatToday, loadProjects } from '@/lib/team/projects';
+import { formatToday, loadProjects, partOfDay } from '@/lib/team/projects';
 import { surveyOrigin } from '@/lib/survey/origin';
 import Today from './today';
 
@@ -45,6 +45,7 @@ export default async function Home() {
   return (
     <Today
       today={formatToday()}
+      partOfDay={partOfDay()}
       live={live}
       archived={archived}
       library={library}

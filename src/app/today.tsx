@@ -5,6 +5,7 @@ import { useMemo, useState, useTransition } from 'react';
 import type { LibraryBlock } from '@/lib/team/library-types';
 import type { ProjectAnswers } from '@/lib/team/answers';
 import type { ProjectView } from '@/lib/team/projects';
+import { plural } from '@/lib/team/words';
 import { readAnswers } from '@/lib/team/actions';
 import NewSurveySheet from './sheets/new-survey';
 import SurveyMadeSheet from './sheets/survey-made';
@@ -22,6 +23,7 @@ type Panel = 'new' | 'past' | null;
 
 export default function Today({
   today,
+  partOfDay,
   live,
   archived,
   library,
@@ -29,6 +31,8 @@ export default function Today({
   signOut,
 }: {
   today: string;
+  /** "this morning" / "this afternoon" / "this evening" — see lib/team/projects */
+  partOfDay: string;
   live: ProjectView[];
   archived: ProjectView[];
   library: LibraryBlock[];
@@ -77,10 +81,20 @@ export default function Today({
   const [writing, startWriting] = useTransition();
 
   const needs = useMemo(() => live.filter((p) => p.action), [live]);
-  const ordered = useMemo(
-    () => [...needs, ...live.filter((p) => !p.action)],
-    [live, needs],
-  );
+  /**
+   * Everything else — and *only* everything else, from 20 August 2026.
+   *
+   * This was `[...needs, ...live.filter(p => !p.action)]`: every project that
+   * needed somebody appeared twice, once as a card and again as the first row
+   * of the list beneath, wearing a dot to say what the card above had already
+   * said in a whole sentence. The line over it claimed "everything not listed
+   * below is moving on its own" while the list below opened with the two
+   * projects that were not.
+   *
+   * One project, one place. The dot went with the duplication: nothing down
+   * here needs marking, because everything down here is fine.
+   */
+  const resting = useMemo(() => live.filter((p) => !p.action), [live]);
 
   const project = openProject ? live.find((p) => p.id === openProject) : null;
   const insightsProject = openInsights ? live.find((p) => p.id === openInsights) : null;
@@ -94,16 +108,30 @@ export default function Today({
     ) : (
       <>
         {WORDS[needs.length] ?? `${needs.length} things`} need{needs.length === 1 ? 's' : ''} you{' '}
-        <em>this morning</em>.
+        {/* The hour, not the word "morning". It said morning at every hour of
+            the day — the one sentence on a page of plain fact that could be
+            read at four in the afternoon and be wrong. See `partOfDay`. */}
+        <em>{partOfDay}</em>.
       </>
     );
 
+  /**
+   * The sub-line counts the same two groups the page is now split into.
+   *
+   * It said "everything not listed below is moving on its own" while the list
+   * below opened with the projects that were not. With the duplication gone
+   * the sentence can simply be true: this many running, that many fine.
+   */
   const sub =
     needs.length === 0
-      ? live.length === 1
-        ? '1 project is moving on its own. Close the laptop.'
-        : `${live.length} projects are moving on their own. Close the laptop.`
-      : `${live.length} ${live.length === 1 ? 'project' : 'projects'} running. Everything not listed below is moving on its own.`;
+      ? live.length === 0
+        ? 'Nothing is running.'
+        : `${plural(live.length, 'project')} moving on their own. Close the laptop.`
+      : resting.length === 0
+        ? `${plural(live.length, 'project')} running, and every one of them is here.`
+        : resting.length === 1
+          ? `${plural(live.length, 'project')} running · the other one is moving on its own.`
+          : `${plural(live.length, 'project')} running · the other ${resting.length} are moving on their own.`;
 
   return (
     /**
@@ -181,85 +209,129 @@ export default function Today({
           </div>
         ) : (
           <div className="calm">
+            {/* "We'll tell you when a survey goes quiet" went on 20 August
+                2026. The platform sends nothing, ever — no email, no
+                notification, by design — so the one promise the empty state
+                made was the one thing on the page that was not true. What is
+                true is that a survey going quiet shows up here, next time
+                somebody opens the page. */}
             <p>
-              All clear. We&apos;ll tell you when a survey goes quiet. <em>Have a good one.</em>
+              All clear. A survey that goes quiet will be waiting here.{' '}
+              <em>Have a good one.</em>
             </p>
           </div>
         )}
 
         <div className="sec">
-          <h2>All projects</h2>
-          <span className="count">{live.length}</span>
-          <span className="hint">click any project to open it</span>
+          {/**
+           * Not "All projects" any more, because it is not all of them.
+           *
+           * The name is the sub-line's own words, so the heading and the
+           * sentence three lines above it stop being two vocabularies for one
+           * idea. It says why these are down here rather than what they are:
+           * nothing about them needs a person today.
+           */}
+          <h2>Moving on their own</h2>
+          <span className="count">{resting.length}</span>
         </div>
 
-        {live.length ? (
-          <table className="ptable">
-            <thead>
-              <tr>
-                <th scope="col">Project</th>
-                <th scope="col">Answers</th>
-                <th scope="col">Latest</th>
-              </tr>
-            </thead>
-            {/* one shared description for every row */}
-            <caption id="row-hint" className="vh">
-              Every row opens that project. Press Enter or Space on a focused row.
-            </caption>
-            <tbody>
-              {ordered.map((p) => (
-                /* The row is focusable and opens on Enter or Space, but a
-                   screen reader announces a table row and nothing says it is
-                   activatable. A role would replace the row semantics and an
-                   aria-label would replace the cells a reader needs, so the
-                   affordance is described alongside instead of over them. */
-                <tr
-                  key={p.id}
-                  tabIndex={0}
-                  aria-describedby="row-hint"
-                  onClick={() => setOpenProject(p.id)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      setOpenProject(p.id);
-                    }
-                  }}
-                >
-                  <td data-label="Project">
-                    <div className="c-name">
-                      {p.action && <i className="pdot" aria-label="needs you" />}
-                      {p.clientName}
-                    </div>
-                    <div className="c-sub">{p.packageLabel}</div>
-                  </td>
-                  <td data-label="Answers">
-                    {p.answers ? (
-                      <>
-                        <div className="c-main">
-                          {p.answers} answer{p.answers === 1 ? '' : 's'}
-                        </div>
-                        <div className="c-when">
-                          {/* words, never a coloured glyph — docs/navigation-decisions.md */}
-                          {p.answeredBy ?? 'nobody named'}
-                        </div>
-                      </>
-                    ) : (
-                      <div className="c-when">none yet</div>
-                    )}
-                  </td>
-                  <td className="c-when" data-label="Latest">
-                    {p.latest[0]}
-                    <br />
-                    {p.latest[1]}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
+        {/**
+         * A short list of sentences — 20 August 2026.
+         *
+         * This was a three-column table with a `<thead>`, a `data-label`
+         * pseudo-element hack to survive a phone, a visually-hidden `<caption>`
+         * explaining that rows could be pressed, and a "click any project to
+         * open it" hint in the section head. PRODUCT.md names that shape by
+         * name in its anti-references: the team's screens "must not resemble a
+         * project-management dashboard, a CRM, or an analytics tool… it needs
+         * a short list of sentences."
+         *
+         * Every one of those four pieces of scaffolding existed to make a
+         * table behave like a list of buttons. A list of buttons needs none of
+         * them: `<button>` carries Enter, Space, focus and the announcement
+         * that this thing activates, for free and in every reader, and one
+         * column cannot break on a narrow screen.
+         *
+         * No chevron on the row, and no dot. DESIGN.md's first principle is
+         * that priority is expressed as form and that the absence of a
+         * container is the demotion — a glyph on every row would promote the
+         * quiet list back up beside the cards it is meant to sit below.
+         */}
+        {live.length === 0 ? (
           <div className="calm">
             <p>No projects yet. Create the first survey when a deal is signed.</p>
           </div>
+        ) : resting.length === 0 ? (
+          /**
+           * Every live project is in Needs you.
+           *
+           * Not `.calm`, which is the bordered card the section above uses when
+           * *it* is empty. This is the demoted group, and DESIGN.md's first
+           * principle is that the absence of a container is the demotion — a
+           * 44px card, centred, drawing a border around one short sentence,
+           * would make the quiet half of the page the heaviest thing on it.
+           * It sits where the list would sit and reads like the lines it
+           * replaces.
+           *
+           * It is also not an empty state in the usual sense: nothing is
+           * missing and nothing has gone wrong, so it states the fact and does
+           * not apologise or offer a way to fix it.
+           */
+          <p className="pnone">Every project is in the list above.</p>
+        ) : (
+          <ul className="plist">
+            {resting.map((p) => (
+              <li key={p.id}>
+                <button
+                  className="prow"
+                  type="button"
+                  /**
+                   * Named outright rather than left to be computed.
+                   *
+                   * The row's text is four runs across two blocks and an inline
+                   * span, and how a browser joins those into one announced
+                   * string is not something to find out from a client. Stated
+                   * here it is the same in every reader, it carries every fact
+                   * the row shows rather than only the name, and it ends with
+                   * what pressing does — which the visible row says by being a
+                   * button and the label otherwise would not say at all.
+                   *
+                   * The middot becomes a comma on the way: it is punctuation
+                   * for the eye, and read aloud it is either "middle dot" or
+                   * nothing.
+                   */
+                  aria-label={[
+                    `${p.clientName}, ${p.packageLabel}.`,
+                    `${p.standing.arrived}.`,
+                    p.standing.due ? `It ${p.standing.due}.` : null,
+                    'Open the project.',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                  onClick={() => setOpenProject(p.id)}
+                >
+                  <span className="pname">
+                    {/* The package sits with the name because it identifies the
+                        project rather than describing its state — a Brand and a
+                        Design job for the same client are two rows.
+
+                        The space between them is real and in the markup, and it
+                        is the only thing separating the two for a screen
+                        reader: the middot is drawn by CSS so it cannot be
+                        selected or copied into a client's name, and what CSS
+                        draws is not in the accessible name. Without it the row
+                        announced "Siam Piwat Retail GroupDesign". */}
+                    {p.clientName}{' '}
+                    <span className="ppkg">{p.packageLabel}</span>
+                  </span>
+                  <span className="pstate">
+                    {p.standing.arrived}
+                    {p.standing.due && <span className="pdue">{p.standing.due}</span>}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
         )}
 
       </main>

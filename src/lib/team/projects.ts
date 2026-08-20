@@ -13,6 +13,7 @@ import {
 
 import { PACKAGE_LABEL, packageLabel } from '@/lib/team/labels';
 import { DEFAULT_DUE_DAYS, TZ, dayIn } from '@/lib/team/due';
+import { plural } from '@/lib/team/words';
 
 export { PACKAGE_LABEL, DEFAULT_DUE_DAYS };
 
@@ -37,12 +38,39 @@ export function formatToday(): string {
   }).format(new Date());
 }
 
-export function plural(n: number, word: string) {
-  return `${n} ${word}${n === 1 ? '' : 's'}`;
+/**
+ * "this morning", and only when it is.
+ *
+ * The greeting has said *"Two things need you this morning"* at every hour
+ * since it was written, which on a screen whose whole voice is plain-spoken
+ * fact is the one sentence on the page that can be read at 4pm and be wrong.
+ *
+ * Computed here rather than in the browser, and in Bangkok rather than in the
+ * viewer's zone, for the same reason `formatToday` is: the greeting is
+ * server-rendered, and an hour read from the client would differ from the one
+ * that came down the wire and take the whole page's hydration with it. The
+ * team is in Bangkok, which is the zone the rest of this file already assumes.
+ */
+export function partOfDay(): string {
+  const hour = Number(
+    new Intl.DateTimeFormat('en-GB', { hour: 'numeric', hour12: false, timeZone: TZ }).format(
+      new Date(),
+    ),
+  );
+  if (hour < 12) return 'this morning';
+  if (hour < 17) return 'this afternoon';
+  return 'this evening';
 }
+
+export { plural };
 
 export function daysBetween(from: Date, to = new Date()) {
   return Math.max(0, Math.floor((to.getTime() - from.getTime()) / 86_400_000));
+}
+
+/** every space held, so a phrase wraps as one thing or not at all */
+function nbsp(text: string) {
+  return text.replace(/ /g, '\u00a0');
 }
 
 function agoText(days: number) {
@@ -115,8 +143,23 @@ export type ProjectView = {
   }[];
 
   action: ProjectAction | null;
-  /** the two lines of the Latest column */
-  latest: [string, string];
+  /**
+   * The second line of a project's row in *Moving on their own* — everything
+   * about its state in one sentence.
+   *
+   * It was `latest: [string, string]`, two cells of a three-column table. The
+   * table went on 20 August 2026 because PRODUCT.md names it by name as an
+   * anti-reference — "must not resemble a project-management dashboard, a
+   * CRM… it needs a short list of sentences" — and a `<thead>` with three
+   * column headers is exactly that shape.
+   *
+   * Two parts rather than one string, so the line can break *between* the
+   * clauses and never inside one. As a single string it wrapped to
+   * "5 answers, last one 12 days ago · closes" / "30 September" on a phone,
+   * which orphans the verb from its date; `text-wrap: pretty` balances a
+   * ragged edge and has no idea the tail is one phrase.
+   */
+  standing: { arrived: string; due: string | null };
 };
 
 
@@ -251,18 +294,50 @@ function buildAction(v: {
   return null;
 }
 
-function buildLatest(v: {
+/**
+ * A project's whole state, in one sentence.
+ *
+ * Two clauses joined by a middot: what has arrived, and when the link shuts.
+ * Commas separate inside a clause and the middot separates clauses, so the
+ * line has one reading and not two.
+ *
+ * **The date is always on it — 20 August 2026, asked for.** It has been the
+ * thing that shuts the link since rule 1 settled, and the one place it was
+ * never shown was the page a person actually scans; you had to open a project
+ * to learn when its survey stops. Surveys sent before the field existed have
+ * no date and the clause is simply absent — nothing backfills them, and an
+ * invented "no date" would be a fact about the software rather than about the
+ * project.
+ *
+ * Only projects with nothing pending reach this line. Every shut survey has an
+ * action of some kind — see `buildAction`, where all three branches test
+ * `shut` — so the survey behind this sentence is always open and its date is
+ * always ahead. `Closed …` cannot be reached from here, and is not written.
+ *
+ * The sent date went with the table. It was only ever read as recency, which
+ * the answer clause states directly and in the words a person would use.
+ */
+function buildStanding(v: {
   sentOn: string | null;
-  closedOn: string | null;
+  dueOn: string | null;
   answers: number;
   quietDays: number | null;
-}): [string, string] {
-  if (!v.sentOn) return ['Not sent yet', 'no link issued'];
-  if (v.closedOn) {
-    return [`Closed with ${plural(v.answers, 'answer')}`, 'insights written'];
-  }
-  if (v.answers === 0) return [`Sent ${v.sentOn}`, 'no answers yet'];
-  return [`Sent ${v.sentOn}`, `last answer ${agoText(v.quietDays ?? 0)}`];
+}): { arrived: string; due: string | null } {
+  /* The recency phrase is bound with non-breaking spaces so the clause can
+     only break at its comma. Left loose it wrapped to "5 answers, last one 12
+     days" / "ago" on a phone — `text-wrap: pretty` evens a ragged edge and has
+     no notion that "12 days ago" is one thing. The longest this ever gets is
+     "last one 365 days ago", which is well inside the column. */
+  const ago = nbsp(agoText(v.quietDays ?? 0));
+  const arrived = !v.sentOn
+    ? 'Not sent yet'
+    : v.answers === 0
+      ? 'No answers yet'
+      : v.answers === 1
+        ? `1 answer, ${ago}`
+        : `${plural(v.answers, 'answer')}, ${nbsp('last one')}\u00a0${ago}`;
+
+  return { arrived, due: v.dueOn ? nbsp(`closes ${v.dueOn}`) : null };
 }
 
 export async function loadProjects({ archived = false } = {}): Promise<ProjectView[]> {
@@ -428,7 +503,7 @@ export async function loadProjects({ archived = false } = {}): Promise<ProjectVi
         archived: project.archived,
         conflicts: insights?.unsettled.length ?? 0,
       }),
-      latest: buildLatest({ sentOn, closedOn, answers, quietDays }),
+      standing: buildStanding({ sentOn, dueOn, answers, quietDays }),
     };
   });
 }

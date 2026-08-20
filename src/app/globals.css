@@ -2467,13 +2467,10 @@ textarea {
   font-size: 13px;
   color: var(--ink-3);
 }
-.sec .hint {
-  margin-left: auto;
-  /* `fine`. It was 12.5px — a size that is on no ramp in DESIGN.md §2, which
-     runs 14 for `caption` and 12 for `fine` and has nothing between them. */
-  font-size: 12px;
-  color: var(--ink-3);
-}
+/* `.sec .hint` went on 20 August 2026 with its only occupant, "click any
+   project to open it". The hint existed because a table row does not look
+   like something you press; a `<button>` does, so the instruction had nothing
+   left to explain. */
 
 /* ---- Needs you ---- */
 .worklist {
@@ -4126,98 +4123,139 @@ textarea {
 
 
 
-/* ---- All projects ---- */
-.ptable {
-  width: 100%;
-  border-collapse: collapse;
+/* ---- Moving on their own ---- */
+/**
+ * A short list of sentences, not a table — 20 August 2026.
+ *
+ * `.ptable` and its sixteen rules are gone: three column headers, a hover
+ * fill, a `c-name`/`c-sub`/`c-main`/`c-when` cell vocabulary, an orange dot
+ * for rows that needed attention, and a whole `max-width: 820px` block that
+ * unpicked the table back into blocks and re-labelled every cell with a
+ * `::before`. PRODUCT.md names the shape it was building in its
+ * anti-references, and half of that CSS existed only to undo it on a phone.
+ *
+ * What is left is a list. One column cannot collapse, so there is no media
+ * query here at all.
+ *
+ * The row is a full-width `<button>`: the hairline runs edge to edge so the
+ * row reads as an object the width of the page, while the type sits in a
+ * measure at the left where a list is read. No card and no fill at rest —
+ * DESIGN.md's first principle is that the absence of a container is the
+ * demotion, and these are the projects that need nobody.
+ */
+.plist {
+  list-style: none;
   margin-bottom: var(--sp-xxl);
+  border-top: 1px solid var(--hairline);
 }
-.ptable thead th {
+.prow {
+  display: block;
+  width: 100%;
   text-align: left;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--ink-3);
-  letter-spacing: 0;
-  padding: 0 12px 10px;
+  padding: 16px 12px;
+  border: 0;
   border-bottom: 1px solid var(--hairline);
-  white-space: nowrap;
-}
-.ptable tbody tr {
-  border-bottom: 1px solid var(--hairline);
+  border-radius: 0;
+  background: transparent;
   cursor: pointer;
-  transition: background 0.18s;
+  font: inherit;
+  color: inherit;
+  transition: background 0.18s var(--ease);
 }
-/* the same white-on-parchment lift used everywhere else — no zebra, no fills */
+/* `--canvas`, which under `.paper` is the parchment and the page is the white
+   — so the lift steps *down* here rather than up. That is the inversion doing
+   its job rather than a value left unexamined: the token still names the
+   raised surface, and on this deck the raised surface is the darker one. No
+   zebra, no fill at rest, and nothing that survives the pointer leaving. */
 @media (hover: hover) {
-  .ptable tbody tr:hover {
+  .prow:hover {
     background: var(--canvas);
   }
 }
-.ptable td {
-  padding: 18px 12px;
-  vertical-align: top;
+.prow:focus-visible {
+  /* inset, because the row's own border is the page's hairline and an outset
+     ring on a full-bleed row would be clipped by the column's padding */
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--primary-focus);
+  background: var(--canvas);
 }
-.ptable .c-name {
+.pname {
+  display: block;
   font-size: 17px;
   font-weight: 600;
   letter-spacing: 0;
-  display: flex;
-  align-items: center;
-  gap: 9px;
+  /* 1.19 clips Thai: the tallest stack inks past a Latin-tuned line box, and
+     client names are Thai more often than not. Same value `.work .name` uses
+     and for the same measurement — see DESIGN.md §2. */
+  line-height: 1.35;
 }
-.ptable .pdot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--primary-mark);
-  flex-shrink: 0;
-}
-.ptable .c-sub {
-  font-size: 14px;
+/**
+ * The package, beside the name rather than under it.
+ *
+ * It was a second row in its own cell. It is an identifier, not a state — two
+ * jobs for one client are two rows and this is what tells them apart — so it
+ * belongs to the name, quieter and on the same line, with the middot drawn
+ * rather than typed so it cannot be selected, read aloud, or copied into a
+ * client's name.
+ */
+.ppkg {
   color: var(--ink-3);
-  letter-spacing: 0;
-  margin-top: 2px;
+  font-weight: 400;
+  /* The package moves to the next line whole or not at all. "Brand Strategy +
+     Identity" was breaking after "Brand" on a phone, which reads for a moment
+     as the other package. The client name beside it stays breakable, and it is
+     the long half. */
+  white-space: nowrap;
 }
-.ptable .c-main {
-  font-size: 14px;
-  color: var(--ink-2);
-  letter-spacing: 0;
+.ppkg::before {
+  content: "·";
+  /* the separator is the ink of neither side; it belongs to the gap */
+  color: var(--ink-4);
+  /* Right only. A real space precedes this in the markup — the reader's one
+     separator, see `.pname` — and 0.32em lands within half a pixel of that
+     space's own width at 17px, so the dot sits evenly between the two words
+     rather than being pushed off centre by a gap CSS cannot see. */
+  margin: 0 0.32em 0 0;
 }
-.ptable .c-when {
-  font-size: 14px;
-  color: var(--ink-3);
-  letter-spacing: 0;
-  line-height: 1.43;
+/**
+ * "closes 26 Aug" — one phrase, and it breaks away from the clause before it
+ * rather than through itself.
+ *
+ * The middot is drawn here for the same reason `.ppkg` draws its own. What
+ * keeps the phrase whole is not a rule here but the non-breaking spaces
+ * `buildStanding` builds it with — one mechanism for both clauses of the
+ * sentence, and one that holds wherever the string goes rather than only where
+ * this stylesheet reaches.
+ */
+.pdue::before {
+  content: "·";
+  color: var(--ink-4);
+  margin: 0 0.36em;
 }
 
-@media (max-width: 820px) {
-  .ptable thead {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-  }
-  .ptable tbody tr {
-    display: block;
-    padding: 18px 12px;
-  }
-  .ptable td {
-    display: block;
-    padding: 0;
-  }
-  .ptable td + td {
-    margin-top: 8px;
-  }
-  .ptable td[data-label]::before {
-    content: attr(data-label);
-    display: block;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--ink-3);
-    letter-spacing: 0;
-    margin-bottom: 2px;
-  }
+/* Nothing down here, because everything is up there. Set as one of the lines
+   it stands in for — same ink, same size, same left edge — rather than as a
+   card. See the note at its use in `today.tsx`. */
+.pnone {
+  margin-bottom: var(--sp-xxl);
+  padding: 16px 12px;
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+  font-size: 14px;
+  line-height: 1.5;
+  letter-spacing: 0;
+  color: var(--ink-3);
+}
+
+/* Everything about its state, in one sentence — see `buildStanding`. */
+.pstate {
+  display: block;
+  margin-top: 3px;
+  font-size: 14px;
+  line-height: 1.5;
+  letter-spacing: 0;
+  color: var(--ink-3);
+  text-wrap: pretty;
 }
 
 /* ============================================================
