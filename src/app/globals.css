@@ -2916,7 +2916,16 @@ textarea {
   max-width: 42vw;
   height: 44px;
   padding: 0 16px 0 41px;
-  border: 0;
+  /**
+   * A transparent line, not no line.
+   *
+   * At rest the fill is the boundary and nothing is drawn — the surface's own
+   * rule, the one the discs and cards on it follow. But hover and focus both
+   * want an edge, and a border appearing from nothing moves the text inside it
+   * by a pixel. Reserved and colourless, it costs nothing and the states are
+   * only a colour change.
+   */
+  border: 1px solid transparent;
   border-radius: 999px;
   /**
    * The sheet's tone, not `--fill`.
@@ -2936,30 +2945,43 @@ textarea {
   color: var(--glyph);
 }
 /**
- * Hover and focus — 20 August 2026, asked for: the field had neither, and beside
- * a disc that lit under the pointer it read as decoration rather than as a
- * control.
+ * Hover draws a line; the fill does not move — 20 August 2026, asked for.
  *
- * It takes the **disc's** ramp rather than the card's, unlike `.pcard`. The two
- * of them are one cluster on the sheet's head and the hand moves between them,
- * so a field that stepped less than the button 12px away would read as the
- * lesser of the two — and it is the one you actually use.
+ * It deepened the fill to `#dedede`, which is the ramp the discs beside it run
+ * on. On a 44px circle a fill step is the only thing there is to change; on a
+ * 220px field it is a large area of the sheet shifting tone because a pointer
+ * crossed it, and the field is the one control here somebody's pointer crosses
+ * on the way to everything else.
  *
- * Focus keeps the system's single shadow, the accent tint at three pixels, but
- * draws no border: the base `.input` puts that ring *outside* a 1px hairline,
- * and this pill has no hairline to put it outside of. The fill deepens at the
- * same time so the state is carried twice — which matters here because the ring
- * is the accent, and the accent means a person is needed, not a person is
- * typing.
+ * `--ink-4` and not the accent. DESIGN.md is explicit: "Hover never uses the
+ * accent. The accent means this needs you, or you chose this. Pointing at
+ * something is neither." The line is the ordinary boundary a control gets when
+ * you point at it, and the orange one below is a different statement.
  */
 @media (hover: hover) {
   .pssearch .input:hover {
-    background: #dedede;
+    border-color: var(--ink-4);
   }
 }
+/**
+ * Focus is the orange border — asked for, and it is the app's own.
+ *
+ * `.input:focus` already draws exactly this on every other field in the
+ * product — `--primary-mark` on the border and the system's one shadow, three
+ * pixels of the accent's tint, as a ring rather than a glow — and this restates
+ * it rather than inheriting it, because it cannot inherit it.
+ *
+ * **`.input:focus` and `.pssearch .input` are both (0,2,0)**, and the pill's
+ * rule comes two thousand lines later, so on a tie decided by file order the
+ * resting `border-color: transparent` wins and the orange never appears. That
+ * is the same trap this stylesheet has recorded twice already. Stated at
+ * (0,3,0) it is a decision instead of an accident.
+ *
+ * The fill stays put through both states, so the only thing that ever changes
+ * on this control is its edge.
+ */
 .pssearch .input:focus {
-  border: 0;
-  background: #dedede;
+  border-color: var(--primary-mark);
   box-shadow: 0 0 0 3px var(--primary-tint);
 }
 /* Safari draws its own clear button and it lands on the fill's right curve */
