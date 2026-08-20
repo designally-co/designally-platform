@@ -871,21 +871,22 @@ export default function SurveyForm({ survey }: { survey: SurveyPayload }) {
         {/* The disc carries the mark wherever it has no number — see `Disc`. */}
         <Rail n={railAt} total={counts.total} />
         {/**
-         * The masthead sits here, outside the keyed <section>, and the reason
-         * is the Cut.
+         * The masthead sits here, outside the keyed <section>.
          *
-         * The sticky bar it replaced is gone, so the Cut is the only thing
-         * measuring progress and it has to survive a long card — hence pinned.
-         * But it also has to *grow*, and that needs this exact position: the
-         * section carries `key={step}`, so React tears it down and builds it
-         * again on every advance. A freshly mounted element has no previous
-         * width to transition from, so inside the section the Cut would jump to
-         * its new length rather than run to it. Out here the element persists,
-         * only `--cut-progress` changes, and the CI's own `--transition-cut`
-         * finally does what it was written for.
+         * The section carries `key={step}`, so React tears it down and builds
+         * it again on every advance. Out here the element persists, which is
+         * what lets it stay pinned across a long card and hold still while the
+         * question animates under it — it is also outside `.slidemain` for that
+         * second reason.
          *
-         * It is also outside `.slidemain`, so it holds still while the question
-         * animates under it.
+         * **The Cut does not grow, and the note that said it did went on
+         * 20 August 2026.** It described `--cut-progress` transitioning on an
+         * element that persists across the key change, which was true of the
+         * mechanism and not of the app: the `.qrule` that carried it was never
+         * rendered by any component. What a client sees is `.qrail` on a wide
+         * screen and the masthead's own bottom edge on a phone, and neither
+         * measures anything — the count on the disc is the progress. See the
+         * note where `.qrule` was deleted in `globals.css`.
          */}
         {card && (
           <Masthead

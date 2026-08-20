@@ -7167,8 +7167,7 @@ html:has(.signin) {
      would run the first field under it */
   padding-block: env(safe-area-inset-top, 0px) 0;
 }
-.qmast .qhead,
-.qmast .qrule {
+.qmast .qhead {
   max-width: 660px;
   margin-inline: auto;
 }
@@ -8006,142 +8005,19 @@ html:has(.signin) {
   margin-top: 0.5em;
 }
 
-/**
- * The Cut, sitting on the Edge.
- *
- * This was a plain hairline, on the reasoning that an orange rule here would
- * be a fourth accent and would spend what the Cut is saved for. That objection
- * was to an orange *divider*, which the CI does forbid — "rules are never
- * orange, because an orange line is the Cut, and the Cut means something."
- *
- * It does not apply to the Cut itself, because the Cut is not a rule: it is a
- * segment, 88px by 2px, left-aligned, and it closes nothing. So both are here,
- * doing the two different jobs they are each for — the Edge runs the full width
- * and gives the masthead its floor, and the Cut sits on its left end and says
- * the card begins. One per layout, which is one per question.
- *
- * The Cut keeps the pure CI orange rather than the measured action orange.
- * Nothing sits on it, nothing is read from it, and it is not a control, so it
- * carries no contrast obligation — only weight.
- */
-.qrule {
-  position: relative;
-  display: block;
-  height: var(--cut-width);
-  margin-bottom: 17px;
-}
-.qrule::before {
-  content: '';
-  position: absolute;
-  inset-inline: 0;
-  top: 50%;
-  height: 1px;
-  transform: translateY(-50%);
-  background: var(--hairline);
-}
-/**
- * …and the Cut is how far in you are.
- *
- * The CI's motion tokens define `--transition-cut: width …`, which is the
- * system saying that a line otherwise fixed at 88px was always meant to grow.
- * So this replaced the separate bar at the top of the viewport: one mark
- * instead of two, sitting where the card begins rather than floating above it,
- * and it is the brand's own object rather than borrowed chrome.
- *
- * **It is the fraction, and nothing added to it.** It was not: the Cut started
- * at `--cut-length` and grew across what was left, so `1/5` drew at 38% of the
- * track and read as nearly half a questionnaire nobody had started.
- *
- * That offset was right for what it was written against. The survey then ran
- * one question per screen, twenty-one of them, and a truthful bar put question
- * one at a 16px stub that reads as a rendering fault rather than a beginning —
- * while clamping to `max(88px, …)` was worse, freezing the Cut for the first
- * five questions so a quarter of the survey gave no feedback at all.
- *
- * The premise expired when the branding team asked for two to four questions
- * per screen. There are five to nine screens now, so the first one is a fifth
- * or a ninth of the track — 73px at the narrowest, within a few pixels of the
- * 88px the CI gives the Cut at rest. Nothing has to be added to make it read as
- * a line, and adding it made the figure and the mark disagree: `1/5` beside a
- * bar at 38% is the bar calling the numeral a liar.
- */
-.qrule::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: var(--cut-width);
-  /**
-   * Full width, scaled — not a computed width.
-   *
-   * It animated `width` on every advance, which is a layout property: each
-   * frame of a 380ms transition re-laid the masthead out, twenty-one times a
-   * survey, on a phone on a poor connection. `scaleX` from the left edge draws
-   * exactly the same line and never leaves the compositor.
-   *
-   * The CI's own token is `--transition-cut: width …`; this is the one place
-   * it is not followed, and the mark it produces is identical.
-   */
-  width: 100%;
-  transform: scaleX(var(--cut-progress, 1));
-  transform-origin: left center;
-  background: var(--cut);
-  transition: transform var(--dur-slow, 380ms) var(--ease);
-}
+/* `.qrule` and its five rules went on 20 August 2026 — about 120 lines drawing
+   a Cut that grows with the survey's progress, for an element no component has
+   ever rendered. It is where both of the stylesheet's two undeclared custom
+   properties lived, `--cut-progress` and `--dur-slow`, each written with a
+   fallback so nothing ever failed loudly.
 
-/**
- * The point at the Cut's head — the CI's *Point & line*, which is its whole
- * graphic system and which `PointRule.jsx` calls "the brand's connector".
- *
- * The Cut alone ended in a fade: a bar stops somewhere and you read *about*
- * there. A line terminated by a point says exactly where, which is what a
- * progress mark is for, and it is the brand's own object rather than a cap
- * invented for the job.
- *
- * **Measured orange, not the CI's.** `#ef6148` is what the CI draws its points
- * in, and DESIGN.md §1 measured it at 2.92:1 on warm white — the Cut carries it
- * because nothing is read *from* the Cut, only weight. A point that says where
- * you are is read from, so it takes `--primary-mark` at 4.54:1. The two marks
- * are a hair apart in hue and the difference is invisible; the difference in
- * whether they can carry meaning is not.
- *
- * Positioned by `translateX` on a full-width carrier, not by `left`. A
- * percentage in `translateX` resolves against the element's own width, so a
- * carrier the width of the track moves the point exactly `progress` across it,
- * on the compositor — the same reason the Cut scales rather than growing.
- *
- * The carrier hangs its point on its **right** edge and is translated by
- * `progress − 1`, so it travels from fully left-of-track to exactly overlaying
- * it. Hung on the left and translated by `progress`, the arithmetic is the
- * same but at full progress the carrier extends a whole track-width past the
- * right edge — which is a horizontal scrollbar on every screen, and was.
- * Overflow to the left of the origin does not scroll; overflow to the right
- * does.
- */
-.qrule i {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  width: 100%;
-  height: 0;
-  transform: translateX(calc((var(--cut-progress, 1) - 1) * 100%));
-  transition: transform var(--dur-slow, 380ms) var(--ease);
-}
-.qrule i::before {
-  content: '';
-  position: absolute;
-  right: -4px;
-  top: -4px;
-  width: 8px;
-  height: 8px;
-  border-radius: var(--r-pill);
-  background: var(--primary-mark);
-}
-@media (prefers-reduced-motion: reduce) {
-  .qrule::after {
-    transition: none;
-  }
-}
+   The Cut a client actually sees is drawn twice, and neither one measures
+   anything: `.qrail`, the fixed full-height rail on a wide screen, and the
+   masthead's own `border-bottom` on a phone. If the Cut should ever become the
+   progress again, that is a decision to take on those two rather than a block
+   to revive — the progress it was written against counted questions, and the
+   survey has counted screens since 17 August. */
+
 .slide .qhelp {
   display: block;
   margin-top: 12px;
