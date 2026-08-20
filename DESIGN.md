@@ -1658,7 +1658,10 @@ Recording it because an undocumented borrowing looks like an oversight, and the 
   **The insights panel is the only surface in this product that stands on the dark Field**,
   and it took two passes on a pale one to get there. §1 gives the pure CI orange exactly two
   places it is legal — the Cut, and this Field, "where it is finally free to be itself"; on the
-  panel its fill measures **5.99:1** against the tile, which is that figure exactly. It also
+  panel its fill measures **5.19:1** against `--tile-raised`, which is the value the panel
+  actually stands on. It was `--tile` at 5.99 for a few hours — the Field's *floor* — and a
+  panel sitting on the floor of a Field it is the only occupant of read as a hole in the sheet
+  rather than as a surface, so it moved up a step on 20 August. It also
   settles a contrast problem rather than patching one: on peach, a white secondary measured
   1.11:1 and needed a border bolted on to be a shape. Here every control separates by
   construction. The tokens are *copied* from `[data-field="dark"]` rather than inherited from

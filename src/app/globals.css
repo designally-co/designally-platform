@@ -4015,7 +4015,21 @@ textarea {
       rgba(239, 97, 72, 0.34) 0%,
       rgba(239, 97, 72, 0) 64%
     ),
-    linear-gradient(168deg in oklab, #16181f 0%, var(--tile) 100%);
+    /**
+     * `--tile-raised`, not `--tile` — 20 August 2026, asked for: less dark.
+     *
+     * The base was `--tile` at `#0b0d12`, the CI's near-black. That is the
+     * Field's *floor*, and a panel sitting on the floor of a Field it is the
+     * only occupant of has nothing below it to be dark against — it just read
+     * as a hole in the sheet. `--tile-raised` is `--charcoal-900`, the value
+     * the Field itself calls its raised surface, and it is where a panel on
+     * that Field belongs.
+     *
+     * Worth naming because it comes up: this is not `--ink`. It reads as ink
+     * because `--ink` *is* `--charcoal-900` on the light Field — the same
+     * value, doing the opposite job. Here it is a ground rather than a mark.
+     */
+    linear-gradient(168deg in oklab, #262a30 0%, var(--tile-raised) 100%);
   border: 0;
   border-radius: var(--r-sheet);
   overflow: hidden;
