@@ -990,23 +990,13 @@ none 0 · sm 8 · md 11 · lg 18 · card 26 · sheet 34 · pill 9999
 - **Inputs came off this list on 18 August 2026**, and the rule above is why: a
   box you type into is not an action, and a pill field reads as a button that
   happens to hold text.
-- **One field is a pill anyway: the Collection bar's date, from 19 August 2026.**
-  The rule protects a field from looking like the action *on a form of fields* —
-  three inputs down a column with one Create under them, which is the New survey
-  sheet and is untouched. The bar is not that shape: one line, exactly two
-  controls on it, and the other is a pill. Scoped to `.collbanner .dpfield`, with
-  the 20px of padding a pill needs to clear its own curve, and both at 44 — two
-  pills of different heights on one line is the only thing you can see.
-- **The pair it matched is gone, and the exception is now on its own — 20 August
-  2026.** Close and Reopen both moved into the sheet’s More menu, where the
-  other gate already was, so the bar holds one control in either state: the date.
-  Nothing survives of the reasoning above except the shape it produced. It is
-  kept because it was asked for and because a segmented date behind a calendar
-  glyph does not, in practice, read as something to press — but it is now a
-  preference rather than an argument, and it is the one input in the product that
-  breaks the rule two bullets up. **If it ever reads as a button, revert it**: it
-  is `border-radius` and `padding-left` on `.collbanner .dpfield`, and the field
-  falls back to the team app’s `md` like every other.
+- **There was one exception and it is gone — 20 August 2026.** The Collection
+  bar's date was a pill from 19 August, on the argument that the bar was one line
+  with exactly two controls on it and the other was a pill, so matching its
+  neighbour made them read as one object. Both halves of that went in a day: the
+  neighbour moved into the More menu, and then the field followed it. The project
+  sheet's due date is a fact on the bar now, and the two acts that set it open a
+  calendar in the menu. **No input in this product is a pill.**
 - **The two surfaces then split, later the same day.** The survey keeps `lg`: a
   field there *is* a card on a page of cards, sized to be answered on a phone. The
   team app went to `md` — 18px on a 44px box curves through most of its own

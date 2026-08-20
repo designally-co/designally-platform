@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useAnchored, useDismiss } from './anchored';
-import { CalendarMark, NextMark, PrevMark } from './icons';
+import { CalendarMark } from './icons';
+import Calendar, { daysIn } from './calendar';
 
 /**
  * A date, as three boxes you can type in and a month you can point at.
@@ -25,34 +26,9 @@ import { CalendarMark, NextMark, PrevMark } from './icons';
  * wrong once a year and nobody can say when.
  */
 
-const MONTHS = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
-
-/** Monday first. Bangkok and en-GB both start the week there; the US does not. */
-const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-
 type Parts = { d: string; m: string; y: string };
 
 const EMPTY: Parts = { d: '', m: '', y: '' };
-
-/** Local, never UTC: `toISOString` is a day out for every Bangkok evening. */
-function dayString(date: Date) {
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
-  return `${date.getFullYear()}-${m}-${d}`;
-}
 
 function toParts(value: string): Parts {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
@@ -73,16 +49,6 @@ function toValue(p: Parts): string {
   const d = Number(p.d);
   if (mo < 1 || mo > 12 || d < 1 || d > daysIn(y, mo)) return '';
   return `${p.y}-${p.m}-${p.d}`;
-}
-
-/** Day 0 of the next month is the last day of this one, leap years included. */
-function daysIn(year: number, month: number) {
-  return new Date(year, month, 0).getDate();
-}
-
-/** Monday-first offset: JS puts Sunday at 0, and Sunday is the last column. */
-function leadingBlanks(year: number, month: number) {
-  return (new Date(year, month - 1, 1).getDay() + 6) % 7;
 }
 
 /**
@@ -179,20 +145,9 @@ export default function DateField({
     [onChange],
   );
 
-  /** Which month the calendar is looking at — the chosen one, else this one. */
-  const chosen = toParts(value);
-  const [view, setView] = useState(() => {
-    const base = chosen.y ? new Date(Number(chosen.y), Number(chosen.m) - 1, 1) : new Date();
-    return { y: base.getFullYear(), m: base.getMonth() + 1 };
-  });
-
-  /* Opening should land on the month the value is in, not wherever the calendar
-     was left last time. */
-  useEffect(() => {
-    if (!open) return;
-    const p = toParts(value);
-    if (p.y) setView({ y: Number(p.y), m: Number(p.m) });
-  }, [open, value]);
+  /* Which month it opens on is `Calendar`'s own now. The popup unmounts when
+     it closes, so the grid remounts on every open and derives the month from
+     `value` — which is what the effect that used to sit here did by hand. */
 
   useDismiss(open, wrap, useCallback(() => setOpen(false), []));
 
@@ -269,15 +224,6 @@ export default function DateField({
     );
   };
 
-  const daysThisView = daysIn(view.y, view.m);
-  const blanks = leadingBlanks(view.y, view.m);
-  const today = dayString(new Date());
-
-  const shift = (by: number) => {
-    const d = new Date(view.y, view.m - 1 + by, 1);
-    setView({ y: d.getFullYear(), m: d.getMonth() + 1 });
-  };
-
   return (
     <div className="dpwrap" ref={wrap}>
       <div
@@ -324,57 +270,20 @@ export default function DateField({
         <div
           className="dppop"
           role="dialog"
-          aria-label={`${MONTHS[view.m - 1]} ${view.y}`}
+          aria-label="Choose a date"
           style={{ top: at.top, left: at.left, width: at.width }}
         >
-          <div className="dphead">
-            <button type="button" className="dpnav" aria-label="Previous month" onClick={() => shift(-1)}>
-              <PrevMark />
-            </button>
-            <span className="dpmonth" aria-live="polite">
-              {MONTHS[view.m - 1]} {view.y}
-            </span>
-            <button type="button" className="dpnav" aria-label="Next month" onClick={() => shift(1)}>
-              <NextMark />
-            </button>
-          </div>
-
-          <div className="dpdow" aria-hidden="true">
-            {WEEKDAYS.map((d) => (
-              <span key={d}>{d}</span>
-            ))}
-          </div>
-
-          <div className="dpgrid" role="grid">
-            {Array.from({ length: blanks }, (_, i) => (
-              <span key={`b${i}`} className="dpblank" />
-            ))}
-            {Array.from({ length: daysThisView }, (_, i) => {
-              const day = i + 1;
-              const iso = `${view.y}-${String(view.m).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-              /* Shown and refused rather than hidden: a date already gone is a
-                 slip, not an intention, and `createSurvey` says the same thing
-                 on the server. A missing row would read as a broken calendar. */
-              const tooEarly = !!min && iso < min;
-              return (
-                <button
-                  key={day}
-                  type="button"
-                  className="dpday"
-                  disabled={tooEarly}
-                  aria-current={iso === today ? 'date' : undefined}
-                  aria-pressed={iso === value}
-                  data-today={iso === today || undefined}
-                  onClick={() => {
-                    commit(toParts(iso));
-                    setOpen(false);
-                  }}
-                >
-                  {day}
-                </button>
-              );
-            })}
-          </div>
+          {/* The grid is `calendar.tsx`, shared with the project sheet's More
+              menu — see the note there. What stays here is the popup around it:
+              where it opens, and that picking a day closes it. */}
+          <Calendar
+            value={value}
+            min={min}
+            onPick={(iso) => {
+              commit(toParts(iso));
+              setOpen(false);
+            }}
+          />
         </div>
       )}
     </div>

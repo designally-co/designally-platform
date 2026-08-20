@@ -2523,7 +2523,12 @@ textarea {
  * fixes it once, at the source, rather than restating every variant at a higher
  * specificity for each place a confirmation can appear.
  */
-.barmenu button:not(.btn) {
+/* The calendar's own buttons are exempt. `.barmenu button:not(.btn)` is the
+   menu *row* — full width, one line, icon then label — and a month grid inside
+   an opened row is thirty-one buttons that are none of those things. Named
+   rather than scoped to `> button`, because `.stepback` is nested too and does
+   want the row's shape. */
+.barmenu button:not(.btn):not(.dpnav):not(.dpday) {
   display: flex;
   align-items: center;
   /* A menu item is one line. `Download as Markdown` broke over two beside a
@@ -2546,16 +2551,33 @@ textarea {
   cursor: pointer;
 }
 /* the words, which take the space the mark does not */
-.barmenu button:not(.btn) > span {
+.barmenu button:not(.btn):not(.dpnav):not(.dpday) > span {
   flex: 1;
   min-width: 0;
 }
-.barmenu button:not(.btn) > svg {
+.barmenu button:not(.btn):not(.dpnav):not(.dpday) > svg {
   flex: none;
   width: 20px;
   height: 20px;
   color: var(--ink-3);
 }
+/* The calendar's own spacing. Its width is set where the popover decides it is
+   the confirmation rather than a menu — see `:has(> .delconfirm:only-child)`. */
+.datepick .dpcal {
+  margin-top: var(--sp-xs);
+}
+/* The answers sit under the grid with the gap the grid's own rows have, not
+   flush against it — a Save butted up to 31 buttons is a 32nd. */
+.datepick .iacts {
+  margin-top: var(--sp-sm);
+}
+/* One line, and it is a question rather than a heading — `.delconfirm p` already
+   sets the tone; this only stops a long month name from wrapping under the
+   grid's left edge. */
+.datepick > .why {
+  margin-top: 2px;
+}
+
 /* destructive rows carry it through to the mark, the way the label does */
 .barmenu button.danger > svg {
   color: var(--critical);
@@ -4890,30 +4912,26 @@ textarea {
 }
 
 /**
- * The same discipline as the insights panel, and none of its volume —
- * 20 August 2026, asked for.
+ * Two lines and one padding — 20 August 2026, asked for.
  *
- * Structurally it was already this: text left, controls right, one row. What
- * it did not have was one number. The padding was `12 12 12 17` — four values
- * — and the box was sized by its *text* rather than by its controls, which is
- * the opposite way round from the panel below it: two lines of explanation set
- * an 89px bar around a 44px control, leaving 23 above and below it against 13
- * at the right.
+ * It went through both halves of this in a day. It began as text left,
+ * controls right, with the padding written `12 12 12 17`: four values, and a
+ * box sized by its *text* rather than by its controls, so two lines of
+ * explanation set an 89px bar around a 44px control and left 23 above and
+ * below it against 13 at the right. One padding fixed that and took it to 80.
  *
- * One padding now, and the sentence shortened by five words so it sits beside
- * the controls on one line. The bar is its controls plus its padding, which is
- * as small as it goes.
+ * Then the controls left — the date field into the More menu behind *Change
+ * due date*, following the two buttons that went before it — and what is left
+ * is a statement. It is the same 77px, because the text was always the taller
+ * half; what changed is that nothing on it can be pressed.
  *
- * **It stays light, and that is the point of doing it here.** This is an
- * option, not the product: it says when the link shuts and offers one way to
- * shut it sooner. The insights panel earns the dark Field by being the only
- * thing the platform makes; a second dark tile on the same sheet would make
- * neither of them mean anything. Same geometry, opposite volume.
+ * **It stays light, and that is the point of doing it here.** The insights
+ * panel earns the dark Field by being the only thing the platform makes. This
+ * says whether the link is open and until when, which is a fact somebody
+ * reads on the way past — a second dark tile on the same sheet would make
+ * neither of them mean anything.
  */
 .collbanner {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-md);
   padding: var(--sp-md);
 }
 
@@ -4948,105 +4966,6 @@ textarea {
   line-height: 1.6;
   color: var(--ink-3);
   text-wrap: pretty;
-}
-
-/**
- * The date field is a pill here, and nowhere else — 19 August 2026, asked for.
- *
- * **This is an exception to the radius rule and it is worth naming as one.**
- * DESIGN.md took inputs off `pill` on 18 August because a box you type into is
- * not an action and a pill field reads as a button holding text — and the date
- * field on the New survey sheet is the example the rule names. That sheet is
- * untouched: three fields down a column with one Create button under them, and
- * a pill among them would still be the loudest thing on it pretending to be
- * pressable.
- *
- * This row is not that shape. It is one line with exactly two controls on it,
- * side by side, and the other one is a pill. The rule protects a field from
- * looking like the action *on a form of fields*; here the field is half of a
- * pair, and matching its neighbour is what makes them read as one object rather
- * than as a control and a button that happened to land next to each other.
- *
- * 20px of padding, not the rectangle's 14: DESIGN.md's own note under Inputs —
- * a pill needs the extra to clear its own curve before the text starts.
- */
-.collbanner .dpfield {
-  border-radius: var(--r-pill);
-  padding-left: 20px;
-}
-
-/**
- * A row asking a question.
- *
- * Parchment, which is this system's recessed ground — the same one
- * `.delconfirm` stands on — with the Edge's own divider above it. It is a row
- * rather than a block floating inside the bar: the question is *about* the row
- * above it, and a card inside a card is the thing that made the response
- * confirmation look wrong.
- */
-.collask {
-  display: block;
-  background: var(--recess);
-  border-top: 1px solid var(--divider);
-  padding: var(--sp-sm) var(--sp-md);
-  /* Centred, where the bar above it is a row read left to right.
-     The bar is three things side by side and the eye runs along it; this is one
-     question and two answers, and it is the only thing being asked. Centring is
-     what says the row has stopped being a row — the same move the sheet's own
-     confirmations make. */
-  text-align: center;
-}
-.collask p {
-  /* A little more air under the question than the `--sp-xs` a left-aligned
-     block wanted: centred text and centred buttons share an axis, so the gap
-     between them is the only thing separating the question from its answers. */
-  margin: 0 0 var(--sp-sm);
-  font-size: 13px;
-  /* Thai never below 1.6 on a line that can carry a client's name */
-  line-height: 1.6;
-  /* `balance` rather than `pretty` now it is centred. Pretty only protects the
-     last line from being a single word, which is a left-aligned concern; a
-     centred block wants its lines the same length or the shape reads as a
-     mistake. It is two or three short lines, well inside the limit browsers
-     stop balancing at. */
-  text-wrap: balance;
-  color: var(--ink-2);
-}
-.collask p b {
-  font-weight: 600;
-  color: var(--ink);
-}
-.collask .why {
-  color: var(--ink-3);
-}
-.collask .iacts {
-  justify-content: center;
-}
-.collask .iacts .btn {
-  min-height: 36px;
-  padding: 6px 16px;
-  font-size: 14.5px;
-}
-
-/**
- * Below 620 the bar stops fitting on one line and wraps into two: the disc and
- * the two lines of text keep the first, the date and the action take the
- * second. The text is given the whole of its row less the disc, which is what
- * pushes the date down — `flex-wrap` alone would leave it squeezed beside a
- * two-word column.
- */
-@media (max-width: 620px) {
-  .collbanner {
-    flex-wrap: wrap;
-    padding: var(--sp-md);
-  }
-  .colltext {
-    flex: 1 1 100%;
-  }
-  .collbanner .dpwrap {
-    flex: 1 1 auto;
-    min-width: 0;
-  }
 }
 
 /* ---- The date field ----------------------------------------------------
@@ -9885,6 +9804,18 @@ html:has(.signin) {
   padding: 0;
   background: none;
   border: 0;
+}
+/**
+ * Wider still when what it holds is a month — 20 August 2026.
+ *
+ * 268 is a sentence and two buttons. A week is seven columns, and at 268 they
+ * come out 34 wide by 40 tall, which is a grid of upright rectangles pretending
+ * to be days. 316 is the width the same grid takes in its popup on the New
+ * survey sheet, so the two are one calendar at one size rather than two that
+ * happen to share markup.
+ */
+.barmenu:has(> .datepick:only-child) {
+  min-width: 316px;
 }
 .barmenu > .delconfirm:only-child {
   margin-top: 0;
