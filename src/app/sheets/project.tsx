@@ -318,7 +318,11 @@ export default function ProjectSheet({
    * the app deciding they are done when they are not.
    */
   const runStay = (
-    fn: () => Promise<{ ok: boolean; error?: string }>,
+    /* `warning` for the same reason `run` takes one: `closeCollection` returns
+       success with a caveat when there was nothing to analyse, and a generic
+       "Collection closed." over the top of it is how somebody learns to stop
+       reading the toast. */
+    fn: () => Promise<{ ok: boolean; error?: string; warning?: string }>,
     message: string,
     /* Only on success. Reopening leaves the field showing the date somebody
        chose, and a failure that reset it would take their answer away along
@@ -333,7 +337,7 @@ export default function ProjectSheet({
         return;
       }
       after?.();
-      onToast(message);
+      onToast(result.warning ?? message);
     });
 
   /**
@@ -707,13 +711,37 @@ export default function ProjectSheet({
                          * one action here that spends money.
                          *
                          * Leaving the menu up costs nothing: `pending` already
-                         * disables every row in it, the label already says
-                         * "Closing…", and `onActed` takes the whole sheet away
-                         * on success. The insights panel has said this for two
+                         * disables every row in it and the label already says
+                         * "Closing…". The insights panel has said this for two
                          * days; this is the same run and now says the same
                          * thing.
                          */
-                        run(() => closeCollection(p.surveyId!), 'Collection closed.');
+                        /**
+                         * `runStay`, so the sheet stays — 21 August 2026, asked
+                         * for.
+                         *
+                         * It used `run`, which is the "finished with this
+                         * project" path: Archive and Delete take the project out
+                         * of the list somebody is looking at, so the sheet has
+                         * to go with it. Closing does not. The project is still
+                         * there, still open in front of you, and closing it is
+                         * the moment its insights become worth reading — so
+                         * throwing the sheet away was taking the screen from
+                         * somebody at the exact point they had a reason to stay
+                         * on it.
+                         *
+                         * Everything behind the menu tells the truth on its own:
+                         * the title's second line reads `p.dueOn`, the panel
+                         * reads the insights, and the action revalidates `/`,
+                         * which is where this sheet's project comes from.
+                         * `close()` is what dismisses the menu, and `onClose`
+                         * clears `confirming` behind it.
+                         */
+                        runStay(
+                          () => closeCollection(p.surveyId!),
+                          'Collection closed.',
+                          () => close(),
+                        );
                       }}
                     >
                       {pending ? 'Closing…' : 'Close now'}
