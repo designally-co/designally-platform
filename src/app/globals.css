@@ -3908,6 +3908,20 @@ textarea {
 .iversions li.on .pick b {
   color: var(--ink);
 }
+/**
+ * The mark stays 20px; the target it sits in reaches 44 — 21 August 2026.
+ *
+ * Measured on a phone profile: 32 x 32, against the 44 every other control in
+ * this app clears. It is the only interactive thing on the versions panel that
+ * did not, and it sits immediately beside a 53px row that selects a run — so
+ * the small one is not the safe one, it is the one you miss and hit the row
+ * instead.
+ *
+ * Safe to enlarge because it *asks*: the row folds into "Delete 21 Aug 2026,
+ * 15:49?" with its own two buttons, so a stray thumb spends a question, never a
+ * version. Grown by padding rather than by a width, so the glyph does not move
+ * and the row's own height still sets the rhythm.
+ */
 .iversions .drop {
   border: 0;
   background: none;
@@ -3916,6 +3930,10 @@ textarea {
   color: var(--ink-3);
   cursor: pointer;
   padding: 8px 4px;
+  min-width: 44px;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
 }
 @media (hover: hover) {
   .iversions .drop:hover {
@@ -7126,6 +7144,36 @@ html:has(.signin) {
   /* Moves the scroller's reservation with it: both read `--bar-pad`. */
   .sheet {
     --bar-pad: 12px;
+  }
+  /**
+   * No reserved gutter — 21 August 2026.
+   *
+   * `scrollbar-gutter: stable` holds 8px open whether a scrollbar is there or
+   * not, so the compensation that pairs with it — `padding-right: calc(--sp-lg
+   * - --scrollbar)` on `.sheet-body` — is always compensating for something
+   * real. That pair is correct on a desktop and cannot reach here: this rule
+   * gives the body a flat symmetric `20px`, so the gutter went on being
+   * reserved with nothing subtracted for it.
+   *
+   * Measured on a phone profile at 375 with `hover: none` and `pointer:
+   * coarse`: content 20 from the left edge and 28 from the right.
+   *
+   * **Releasing the gutter is not enough on its own**, and the measurement said
+   * so: `auto` left the 8px exactly where it was, because the `@supports
+   * selector(::-webkit-scrollbar)` block gives the bar a width and that makes it
+   * a classic scrollbar which takes space, not an overlay which does not. So the
+   * bar goes too — the same thing the projects sheet was asked for on a phone,
+   * for the same reason. Nothing about scrolling changes: `overflow: hidden
+   * auto` and `overscroll-behavior` are untouched, and a touch platform draws
+   * its own transient bar over the top while a finger is moving.
+   */
+  .sheetscroll {
+    scrollbar-gutter: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .sheetscroll::-webkit-scrollbar {
+    display: none;
   }
   .sheet-top {
     padding: var(--bar-pad) 20px;
