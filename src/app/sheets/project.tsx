@@ -405,6 +405,20 @@ export default function ProjectSheet({
           and a red panel waiting behind a button they pressed for something
           else. */}
       <MoreMenu
+        /**
+         * Floated free of the sheet — 21 August 2026, reported.
+         *
+         * `.sheet` hides its overflow so its corners stay round, and an
+         * absolutely-positioned menu inside its toolbar is cut off by it. Four
+         * rows always fitted; a month does not. On a project with no answers
+         * the sheet is 331px and the calendar is 373, so the last row of days
+         * and both buttons were simply gone.
+         *
+         * The width is passed because right-aligned placement subtracts it from
+         * the button's edge — 316 while the calendar is up, matching the CSS
+         * that widens the panel for it, and the menu's own 240 otherwise.
+         */
+        anchoredWidth={confirming === 'due' || confirming === 'reopen' ? 316 : 240}
         onClose={() => {
           setConfirming(null);
           setTyped('');

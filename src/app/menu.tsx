@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 
 import { MoreMark } from './icons';
+import { useAnchored } from './anchored';
 
 /**
  * The More menu, on the trailing edge of a toolbar.
@@ -32,6 +33,7 @@ export default function MoreMenu({
   danger = false,
   badge,
   menuClass,
+  anchoredWidth,
   onClose,
   children,
 }: {
@@ -68,6 +70,28 @@ export default function MoreMenu({
    */
   menuClass?: string;
   /**
+   * Hang the panel off the button with `position: fixed`, placed in JS.
+   *
+   * **The default is `absolute`, and it is clipped by anything that hides its
+   * overflow.** A sheet does: `.sheet` has `overflow: hidden` so its corners
+   * stay round, and the panel is inside its toolbar. Four short rows fit under
+   * any sheet worth opening, which is why this went unnoticed — until the
+   * calendar moved in. A month is 373px tall, a project with no answers makes a
+   * 331px sheet, and 118px of it was cut off: the last row of days and both
+   * buttons, on a panel whose whole job is to be pressed.
+   *
+   * `useAnchored` is what `.dppop`, `.splitmenu` and the share panel already
+   * use for the same reason — the share panel hangs 500px off this very
+   * toolbar. It walks for a transformed ancestor before measuring, which the
+   * sheet has for the 420ms of its entrance, and re-places on scroll and
+   * resize.
+   *
+   * The width has to be passed rather than measured: right-aligned placement is
+   * `anchor.right - width`, so a panel that turns out wider than the number
+   * given lands that far off its button.
+   */
+  anchoredWidth?: number;
+  /**
    * The menu has shut — by the button, by Escape, or by a click away.
    *
    * A caller holding state *inside* the menu needs this, and the project sheet
@@ -92,6 +116,22 @@ export default function MoreMenu({
    */
   const [closing, setClosing] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  /* Measured once it exists, so a panel that grows — a row unfolding into a
+     confirmation, or into a month — is re-placed at its real height rather
+     than the estimate below. */
+  const panel = useRef<HTMLDivElement>(null);
+  const at = useAnchored(
+    open && !!anchoredWidth,
+    ref,
+    anchoredWidth ?? 240,
+    /* an estimate, replaced by the measurement the moment the panel mounts;
+       only used to decide whether there is room to open downward */
+    380,
+    /* it hangs off a disc on a toolbar's trailing edge, so it opens back into
+       the sheet rather than off the side of it — the share panel's reasoning */
+    'right',
+    panel,
+  );
 
   /* One way out, so the three that exist — the button, Escape, a click away —
      cannot each remember to tell the caller and one of them forget. Now it is
@@ -148,9 +188,18 @@ export default function MoreMenu({
           </span>
         )}
       </button>
-      {open && (
+      {open && (!anchoredWidth || at) && (
         <div
-          className={[ 'barmenu', menuClass, closing && 'closing' ].filter(Boolean).join(' ')}
+          ref={panel}
+          className={[
+            'barmenu',
+            anchoredWidth && 'floating',
+            menuClass,
+            closing && 'closing',
+          ]
+            .filter(Boolean)
+            .join(' ')}
+          style={at && anchoredWidth ? { top: at.top, left: at.left, width: at.width } : undefined}
         >
           {children(shut)}
         </div>

@@ -531,13 +531,48 @@ export async function setDueDate(projectId: string, day: string): Promise<Action
   const dueAt = endOfDay(day);
   if (Number.isNaN(dueAt.getTime())) return { ok: false, error: 'That is not a date.' };
 
+  /**
+   * Two conditions beyond the project, and both were missing — 21 August 2026.
+   *
+   * **`kind`, because a project may hold more than one survey.** The schema
+   * models it as `many` and puts no unique constraint on it, and everything
+   * that *reads* a project's survey already narrows to the discovery one —
+   * `loadProjects` and `reanalyse` both do. This did not, so on a project with
+   * a retired content survey beside the live one it moved the date on both, and
+   * `[row]` reported whichever came back first. Latent rather than live:
+   * `createSurvey` makes the client, the project and its one survey together,
+   * so nothing in the database today has a second. The filter costs nothing and
+   * matches what the readers do.
+   *
+   * **`closedAt`, because a closed survey's date is a fact about the past.**
+   * Rule 1 is one date, one meaning: closing moves `due_at` to the moment it
+   * closed, precisely so a shut survey stops advertising a date the team no
+   * longer means. Setting a future date without clearing the gate puts that
+   * contradiction back — a survey reading "Closed 21 Aug" whose `due_at` says
+   * the fourth of September, invisible on screen and wrong in the record. The
+   * sheet hides *Change due date* once a survey is shut, so this is reachable
+   * only with stale props: a colleague closes it while somebody has the project
+   * open. They now get told, instead of writing it. Reopening is the way back
+   * and it has a date of its own.
+   */
   const [row] = await db
     .update(surveys)
     .set({ dueAt })
-    .where(eq(surveys.projectId, projectId))
+    .where(
+      and(
+        eq(surveys.projectId, projectId),
+        eq(surveys.kind, 'discovery'),
+        isNull(surveys.closedAt),
+      ),
+    )
     .returning();
 
-  if (!row) return { ok: false, error: 'That project has no survey.' };
+  if (!row) {
+    return {
+      ok: false,
+      error: 'That survey is closed. Reopen it to give it a new date.',
+    };
+  }
 
   revalidatePath('/');
   return { ok: true };
@@ -582,6 +617,9 @@ export async function reopenCollection(projectId: string, day: string): Promise<
     .where(
       and(
         eq(surveys.projectId, projectId),
+        /* the discovery survey, as `loadProjects` and `reanalyse` both read —
+           see the note in `setDueDate` */
+        eq(surveys.kind, 'discovery'),
         or(isNotNull(surveys.closedAt), lt(surveys.dueAt, new Date())),
       ),
     )

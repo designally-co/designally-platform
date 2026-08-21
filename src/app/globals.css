@@ -2275,6 +2275,21 @@ textarea {
  *
  * It was briefly on glass and is not: see `.sheet-top`.
  */
+/**
+ * Off the flow and out of the sheet's clip — see `anchoredWidth` in menu.tsx.
+ *
+ * `top` and `left` arrive as an inline style from `useAnchored`, so both of the
+ * absolute rule's own offsets have to stand down: `right: 0` would drag a fixed
+ * panel back to the viewport's edge, and `top: calc(100% + 8px)` means nothing
+ * once the containing block is the viewport.
+ */
+.barmenu.floating {
+  position: fixed;
+  top: auto;
+  right: auto;
+  z-index: 90;
+}
+
 .barmenu {
   position: absolute;
   top: calc(100% + 8px);
