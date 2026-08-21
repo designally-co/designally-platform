@@ -351,20 +351,11 @@ export default function ProjectSheet({
       ? `Open until ${p.dueOn}`
       : 'Open for answers';
 
-  /**
-   * Which of the two closed it — the half that would not fit above.
-   *
-   * Rule 2's distinction is real and worth keeping visible: a person leaves a
-   * name in `closed_by`, and a date leaves nothing. It hangs under *Reopen
-   * collection* in the menu, which is where somebody asking "who shut this?"
-   * is already looking, and it costs no width on a line that is read at a
-   * glance a hundred times more often than that question is asked.
-   */
-  const closedBy = p.closedOn
-    ? p.closedByName
-      ? `Closed by ${p.closedByName}`
-      : 'Closed by hand'
-    : 'Closed on its date';
+  /* Who closed it is not drawn anywhere — 21 August 2026, asked for. It hung
+     under *Reopen collection* for a few hours. `closed_by` still records the
+     person, which is what rule 2 asks for; showing it under the way back was
+     answering a question nobody had while they were on their way to press
+     something else. */
 
   const link = p.token ? `${origin}/s/${p.token}` : null;
 
@@ -661,10 +652,7 @@ export default function ProjectSheet({
                 }}
               >
                 <UndoMark />
-                <span>
-                  Reopen collection
-                  <small>{closedBy}</small>
-                </span>
+                <span>Reopen collection</span>
               </button>
             ) : p.surveyId ? (
               <button

@@ -114,6 +114,23 @@ export function useAnchored(
     setAt({ top: top - origin.y, left: left - origin.x, width: w });
   }, [anchor, align]);
 
+  /**
+   * `width` and `height` are dependencies, and leaving them out was a bug —
+   * 21 August 2026, reported as a calendar hanging off the side of a phone.
+   *
+   * `place` is memoised on the anchor and the side only, so a panel that
+   * *changes size while it is open* was never re-placed. The project sheet's
+   * menu does exactly that: 240 wide as a list of rows, 316 once a row unfolds
+   * into a month. Right-aligned placement is `anchor.right - width`, so the
+   * panel went on sitting at the 240 offset while rendering 316 wide, and hung
+   * 76px off the right of the screen with Sunday and Cancel past the edge.
+   *
+   * It looked fine on a desktop because it did not stay wrong: any hover
+   * transition anywhere in the document fires the `transitionend` listener
+   * below, which re-places it with the width it has now. That is the sideways
+   * jump the panel had on opening a calendar, reported in the same breath. A
+   * touch device has no hover, so there was nothing to correct it.
+   */
   useEffect(() => {
     if (!open) return;
     place();
@@ -135,7 +152,7 @@ export function useAnchored(
       document.removeEventListener('animationend', place, true);
       document.removeEventListener('transitionend', place, true);
     };
-  }, [open, place]);
+  }, [open, place, width, height]);
 
   return at;
 }
