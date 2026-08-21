@@ -300,6 +300,9 @@
    * card in every sheet sat inside the ramp and came up soft.
    */
   --bar-ramp: 26px;
+  /* the padding around a sheet toolbar's 44px controls, and the number the
+     scroller reserves space from — see `.sheetscroll` */
+  --bar-pad: var(--sp-lg);
 
   /**
    * The sheet scrollbar's width, and the amount the body's right padding gives
@@ -5898,10 +5901,20 @@ body:has(.deck.paper) {
    */
   overflow: hidden auto;
   overscroll-behavior: contain;
-  /* clears the bar laid over it *and* the ramp beneath it — the bar's own three
-     numbers plus `--bar-ramp`, so none of the three can drift apart. Without
-     the ramp in this sum the first card sat in the blur and came up soft. */
-  padding-top: calc(var(--sp-lg) + 44px + var(--sp-lg) + var(--bar-ramp));
+  /**
+   * Clears the bar laid over it *and* the ramp beneath it — the bar's own three
+   * numbers plus `--bar-ramp`. Without the ramp in this sum the first card sat
+   * in the blur and came up soft.
+   *
+   * **`--bar-pad` rather than `--sp-lg` twice, from 21 August 2026, because the
+   * three did drift.** The sum was written to stop exactly that and then named
+   * the value instead of sharing it: the phone rule takes `.sheet-top` down to
+   * 12px of padding and could not reach this line, so every sheet on a phone
+   * reserved 118px for a 68px bar and opened with 24px of dead space above its
+   * first heading. One variable now, overridden once, and the bar and the space
+   * it is given cannot disagree again.
+   */
+  padding-top: calc(var(--bar-pad) + 44px + var(--bar-pad) + var(--bar-ramp));
 }
 
 /**
@@ -6140,7 +6153,7 @@ body:has(.deck.paper) {
      body's fields did to theirs, which is the one alignment a header cannot get
      wrong: it is the first thing above them and the eye reads a single margin
      down the side of a sheet. */
-  padding: var(--sp-lg);
+  padding: var(--bar-pad);
 }
 
 /**
@@ -7110,8 +7123,12 @@ html:has(.signin) {
   .sheet-body {
     padding: 28px 20px 72px;
   }
+  /* Moves the scroller's reservation with it: both read `--bar-pad`. */
+  .sheet {
+    --bar-pad: 12px;
+  }
   .sheet-top {
-    padding: 12px 20px;
+    padding: var(--bar-pad) 20px;
   }
   /**
    * The back control matches the other two — 21 August 2026, asked for.
