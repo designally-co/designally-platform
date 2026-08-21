@@ -2963,14 +2963,30 @@ textarea {
    * clips the content because the overflow is no longer visible, which is the
    * same mechanism that keeps the head's own corners honest.
    *
-   * `overscroll-behavior: contain` so reaching the last card does not hand the
-   * scroll back to the page and drag the hero into view underneath.
+   * **The scroll chains, and `overscroll-behavior` is deliberately absent —
+   * 21 August 2026, reported.** It was `contain`, which is the property whose
+   * whole job is to stop a nested scroller handing the gesture back. That is
+   * the wrong job here. There are two scrollers by construction — the page
+   * carries the hero, the sheet carries the cards — and to a person there is
+   * one gesture, so the seam between them has to be invisible.
+   *
+   * With `contain` it was not. Measured at 390x700: the page scrolls to its
+   * maximum of 281 to pin the sheet, the sheet then scrolls its own 0-485, and
+   * arriving back at 0 the page is *still* at 281 with nothing willing to move
+   * it. Keep scrolling up at the first card and the hero never comes back —
+   * the sheet swallows the gesture and the page under it is stuck where the
+   * pinning left it.
+   *
+   * Letting it chain is what makes the pair read as one scroll: at the first
+   * card the sheet has nothing left to give, so the page takes over and pulls
+   * the sheet back down over the hero. At the last card the page is already at
+   * its maximum, so downward chaining moves nothing — which is why removing
+   * this costs the behaviour it was added for.
    */
   position: sticky;
   top: var(--bar-h);
   height: calc(100svh - var(--bar-h));
   overflow-y: auto;
-  overscroll-behavior: contain;
   /**
    * Capped and centred — 20 August 2026, asked for: it was too wide.
    *
