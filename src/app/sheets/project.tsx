@@ -672,19 +672,55 @@ export default function ProjectSheet({
                       there is nothing to read — then it returns a warning and
                       writes none. Promising an analysis and delivering a warning
                       is how a person learns to stop reading the line. */}
-                  <p>{p.answers > 0 ? 'The analysis runs.' : 'Nothing to analyse yet.'}</p>
+                  <p>
+                    {pending
+                      ? `Reading ${p.answers} ${p.answers === 1 ? 'answer' : 'answers'}. This usually takes a minute or two.`
+                      : p.answers > 0
+                        ? 'The analysis runs.'
+                        : 'Nothing to analyse yet.'}
+                  </p>
+                  {/* Said out loud, the way the insights panel says it — the
+                      line above does not take focus, so a screen reader got
+                      silence for the length of the call. */}
+                  <p className="visually-hidden" role="status">
+                    {pending ? 'Closing collection and reading the answers.' : ''}
+                  </p>
                   <div className="iacts">
                     <button
                       className="btn btn-ink"
                       disabled={pending}
                       onClick={() => {
-                        close();
+                        /**
+                         * The menu stays open until this finishes — 21 August
+                         * 2026, and it is the whole point of the change.
+                         *
+                         * It used to `close()` first, which unmounted the only
+                         * thing on screen that says anything is happening.
+                         * `closeCollection` runs the analysis inline: measured
+                         * at **93 seconds on a two-answer survey**, and the
+                         * ceiling for the request is 300. For all of that the
+                         * sheet sat looking idle with *Generate insights* still
+                         * live beside it, so the honest reading of the screen
+                         * was "nothing happened, press something else" — on the
+                         * one action here that spends money.
+                         *
+                         * Leaving the menu up costs nothing: `pending` already
+                         * disables every row in it, the label already says
+                         * "Closing…", and `onActed` takes the whole sheet away
+                         * on success. The insights panel has said this for two
+                         * days; this is the same run and now says the same
+                         * thing.
+                         */
                         run(() => closeCollection(p.surveyId!), 'Collection closed.');
                       }}
                     >
                       {pending ? 'Closing…' : 'Close now'}
                     </button>
-                    <button className="btn btn-outline" onClick={() => setConfirming(null)}>
+                    <button
+                      className="btn btn-outline"
+                      disabled={pending}
+                      onClick={() => setConfirming(null)}
+                    >
                       Cancel
                     </button>
                   </div>

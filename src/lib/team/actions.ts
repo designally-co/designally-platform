@@ -1,6 +1,6 @@
 'use server';
 
-import { and, count, desc, eq, inArray, isNotNull, isNull, lt, or } from 'drizzle-orm';
+import { and, count, desc, eq, gte, inArray, isNotNull, isNull, lt, or } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 
 import { auth, upsertUser } from '@/auth';
@@ -297,11 +297,45 @@ export async function closeCollection(surveyId: string, only?: string[]): Promis
     return { ok: true, warning: `Collection is closed, but the insights were not written. ${result.error}` };
   }
 
-  await db.insert(insights).values({
-    sources,
-    projectId: survey.projectId,
-    content: result.insights,
-  });
+  /**
+   * Written only if nothing arrived while this was running — 21 August 2026.
+   *
+   * The same check `/api/cron/lapsed` makes, and for a stronger reason here.
+   * This call holds the request open for the length of the analysis — measured
+   * at **93 seconds on a two-answer survey** — and in that window the daily
+   * cron can pick the same survey up, or somebody can press *Generate* on the
+   * panel a few inches below the button they just used. The close itself is
+   * safe either way: `isNull(closedAt)` above means only the first press writes
+   * the gate. Nothing protected the insert, so the loser of that race appended a
+   * second analysis of the same answers, minutes apart, to a version list that
+   * is meant to record what was actually run.
+   *
+   * The analysis is still paid for. There is no way around that from here —
+   * the money is spent by the time this line runs — but a duplicate row is the
+   * part a person has to untangle afterwards.
+   *
+   * **`generatedAt >= closedAt`, not "are there any insights".** A project is
+   * *expected* to already have them: the panel has run on an open survey since
+   * 19 August, so a team that read three answers early and then closed on five
+   * has one row and wants a second. Skipping on existence would throw away the
+   * final read — the one taken on the whole set — and leave the early partial
+   * standing as the record. Only a row that appeared *after this close began*
+   * is the race this guards.
+   */
+  const [already] = await db
+    .select({ id: insights.id })
+    .from(insights)
+    .where(and(eq(insights.projectId, survey.projectId), gte(insights.generatedAt, closedAt)))
+    .orderBy(desc(insights.generatedAt))
+    .limit(1);
+
+  if (!already) {
+    await db.insert(insights).values({
+      sources,
+      projectId: survey.projectId,
+      content: result.insights,
+    });
+  }
 
   revalidatePath('/');
   return { ok: true };
