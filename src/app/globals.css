@@ -3483,9 +3483,29 @@ textarea {
 }
 
 @media (max-width: 700px) {
+  /**
+   * A step tighter on a phone — 21 August 2026, asked for.
+   *
+   * `lg` down to `md`, and the grid to `xs`. A card sat 36px from the screen —
+   * 12 of sheet margin and 24 of padding — on a 390px screen, which is a tenth
+   * of the width spent twice over on the same edge. The gap between cards came
+   * down with it: 17px of air between two bordered cards reads as generous at
+   * three columns and as slack in one, where the only thing it separates is a
+   * card from the identical card under it.
+   *
+   * **17 rather than the 16 asked for.** The scale is Apple's — 4 · 8 · 12 · 17
+   * · 24 · 32 · 48 — and DESIGN.md §3 defends `md` at 17 rather than 16 because
+   * it matches the body size. A pixel nobody can see is not worth a value off
+   * the scale, and every other edge in the team app is already on it.
+   */
   .projsheet {
     width: calc(100% - 24px);
-    padding: 0 var(--sp-lg) var(--sp-xxl);
+    padding: 0 var(--sp-md) var(--sp-xxl);
+  }
+  /* 8px, and only here. The desktop grid is three columns wide where the gap
+     is doing two jobs; a single column has only the one. */
+  .pgrid {
+    gap: var(--sp-xs);
   }
   /* The bar narrows its gutter with the sheet, at the sheet's breakpoint. It
      had its own at 520, so between 521 and 700 the sheet sat 12px from the edge
@@ -3493,14 +3513,28 @@ textarea {
   .topbar .inner {
     width: calc(100% - 24px);
   }
+  /* The head bleeds to the sheet's edge by cancelling its padding, so both
+     numbers move together — leave the margin at `lg` and it hangs 7px over the
+     side. */
   .pshead {
-    margin: 0 calc(var(--sp-lg) * -1) var(--sp-md);
-    padding: var(--sp-lg) var(--sp-lg) var(--sp-sm);
+    margin: 0 calc(var(--sp-md) * -1) var(--sp-md);
+    padding: var(--sp-md) var(--sp-md) var(--sp-sm);
   }
-  /* the pill and the disc take the row under the heading rather than
-     squeezing a 220px field into what is left beside it */
+  /**
+   * The heading takes the row and centres in it — 21 August 2026, asked for.
+   *
+   * `flex: 1 0 100%` is what puts the search field and the archived disc on a
+   * row of their own rather than squeezing a 220px field into what is left
+   * beside a heading. Centring is what that full width is for: on a phone the
+   * sheet is the page, and its title sits over the two controls under it
+   * instead of leaning on one end of a row it has to itself.
+   *
+   * Desktop keeps it at the leading edge, where it shares the row with them and
+   * a centred title would be adrift in the middle of its own controls.
+   */
   .pshead h2 {
     flex: 1 0 100%;
+    text-align: center;
   }
   .pssearch .input {
     width: 100%;
