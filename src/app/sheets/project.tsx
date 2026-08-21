@@ -336,6 +336,36 @@ export default function ProjectSheet({
       onToast(message);
     });
 
+  /**
+   * The collection state as one clause, for the bar's second line.
+   *
+   * **The date and nothing else, and that is a width decision.** It shares a
+   * line with the package inside a title that is already truncating a client's
+   * name, and on a 390px phone that line is 170px. "Design · Closed 21 Aug"
+   * measures 138 and fits; add who closed it and it is 220, so the name a
+   * colleague left on the record would be the half that ellipsised away.
+   */
+  const collectionSay = shut
+    ? `Closed ${p.closedOn ?? p.dueOn}`
+    : p.dueOn
+      ? `Open until ${p.dueOn}`
+      : 'Open for answers';
+
+  /**
+   * Which of the two closed it — the half that would not fit above.
+   *
+   * Rule 2's distinction is real and worth keeping visible: a person leaves a
+   * name in `closed_by`, and a date leaves nothing. It hangs under *Reopen
+   * collection* in the menu, which is where somebody asking "who shut this?"
+   * is already looking, and it costs no width on a line that is read at a
+   * glance a hundred times more often than that question is asked.
+   */
+  const closedBy = p.closedOn
+    ? p.closedByName
+      ? `Closed by ${p.closedByName}`
+      : 'Closed by hand'
+    : 'Closed on its date';
+
   const link = p.token ? `${origin}/s/${p.token}` : null;
 
   /**
@@ -617,7 +647,10 @@ export default function ProjectSheet({
                 }}
               >
                 <UndoMark />
-                <span>Reopen collection</span>
+                <span>
+                  Reopen collection
+                  <small>{closedBy}</small>
+                </span>
               </button>
             ) : p.surveyId ? (
               <button
@@ -819,7 +852,34 @@ export default function ProjectSheet({
       title={
         <>
           <b>{p.clientName}</b>
-          <i>{p.packageLabel}</i>
+          {/**
+           * The package, and whether anybody can still answer — 20 August 2026,
+           * asked for.
+           *
+           * The collection state had a section of its own: a bordered card
+           * holding two lines of text and, until this morning, a date field and
+           * a button. The controls left for the More menu one at a time, and
+           * what was under them turned out to be a fact — *open until the
+           * second, or closed on the twentieth* — sitting in a card sized for
+           * something you could press.
+           *
+           * A fact about the project belongs on the line that already carries
+           * one. This is the same slot as the package, and it is the bar rather
+           * than the body, which matters here: the bar is sticky, so *can
+           * anybody still answer* stays on screen while somebody scrolls
+           * through the answers. In a card it scrolled away.
+           *
+           * **Who closed it survives, and the wording is what carries rule 2's
+           * distinction.** A person leaves a name in `closed_by`; a date leaves
+           * nothing. So it is "by Nan" or "on its date", never a bare "closed"
+           * that hides which of the two happened. The sentence that used to
+           * follow — that nobody can answer until you reopen it — is gone: it
+           * explained the word *closed*, and the way back is a menu row.
+           */}
+          <i>
+            {p.packageLabel}
+            {p.token ? ` · ${collectionSay}` : ''}
+          </i>
         </>
       }
       actions={actions}
@@ -867,99 +927,6 @@ export default function ProjectSheet({
         )}
       </div>
 
-      {/**
-       * The date, and no longer the link.
-       *
-       * "The link" headed this section with the URL in a box beneath it, and
-       * both are in the share panel on the toolbar now — the link and the way
-       * to send it belong to one control, and this section is about *when* the
-       * answers are wanted rather than where they go.
-       */}
-      {/**
-       * Collection — everything that decides whether the link takes answers.
-       *
-       * The date and closing were in two places: a section of its own for the
-       * date, and a row in the toolbar's More menu for the close. They govern
-       * the same thing and they had drifted apart, which was easy to miss while
-       * the date closed nothing. It shuts the link now, so the two are a soft
-       * shutter and a hard one and they belong side by side — you set a date to
-       * stop answers *later*, and you close to stop them *now*.
-       *
-       * The difference is worth keeping visible, and the section keeps it: the
-       * date writes nothing and moving it forward undoes it, while closing is
-       * gate 1, puts a name on the record and runs the analysis. So they are two
-       * controls in one section rather than one control with a switch.
-       *
-       * Reopening came with the close, being its inverse.
-       */}
-      {p.token && (
-        <div className="pd-sec">
-          {/* No heading — 19 August 2026. "Collection" sat over a bar whose own
-              first line is *Open for answers* or *Closed 17 Aug*, which is the
-              same fact in words somebody reads rather than a filing label. The
-              other sections keep theirs because their contents do not introduce
-              themselves. */}
-          {/**
-           * One bar, both states — the reference the team brought in, and the
-           * meaning they confirmed on 19 August 2026.
-           *
-           * **Closed means no answer is accepted, and there are two ways in:**
-           * somebody presses Close collection, or the date arrives. The client
-           * meets the same screen either way, so the bar says the same word
-           * either way. It used to call one of them closed and merely describe
-           * the other, which left a survey that had been refusing people for a
-           * week reading as *open* — with the analysis, a few inches below,
-           * telling the team to close it first.
-           *
-           * **It is a statement now, and holds no control at all — 20 August
-           * 2026, asked for.** It carried the date as a three-box field, and
-           * before this morning a button beside it. Both are gone: the field
-           * followed the buttons into the More menu, where all four of this
-           * sheet's acts now live.
-           *
-           * The field was the harder of the two to see. A due date is *read*
-           * every time somebody opens a project and *changed* about twice in a
-           * survey's life, and an always-live spinbutton sitting in a reading
-           * context is a client's link one arrow key from moving. Rule 6 makes
-           * that date client-facing; it should take a deliberate act, and now it
-           * does — the menu, then a calendar, then Save.
-           *
-           * What is left is the two things a person came here to read: whether
-           * it is taking answers, and until when.
-           */}
-          <div className="collbox">
-            <div className="collbanner">
-              <span className="colltext">
-                {/* The date is in the state line in both faces, because *when
-                    did this stop, or when will it* is the same question either
-                    side of the moment it stops. A survey sent before the date
-                    existed has none to name — rule 1 backfills nothing — and
-                    says only that it is open. */}
-                <b>
-                  {shut
-                    ? `Closed ${p.closedOn ?? p.dueOn}`
-                    : p.dueOn
-                      ? `Open until ${p.dueOn}`
-                      : 'Open for answers'}
-                </b>
-                <span>
-                  {/* Which of the two closed it, and it is worth a line. A
-                      person leaves a name in `closed_by` and a date leaves
-                      nothing — rule 2's whole distinction, said in the one
-                      place somebody reads it. */}
-                  {!shut
-                    ? p.dueOn
-                      ? 'The client sees this date. After it, the link closes.'
-                      : 'No date is set, so the link stays open until somebody closes it.'
-                    : p.closedOn
-                      ? `${p.closedByName ? `by ${p.closedByName}. ` : ''}Nobody can answer until you reopen it.`
-                      : 'The date arrived. Nobody can answer until you reopen it.'}
-                </span>
-              </span>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/**
        * The insights, and the one place they are made.

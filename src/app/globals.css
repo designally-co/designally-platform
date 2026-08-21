@@ -4875,99 +4875,6 @@ textarea {
   margin-top: var(--sp-lg);
 }
 
-/* ---- The Collection bar ------------------------------------------------
-   Whether the survey is taking answers, when it stops or stopped, and the one
-   thing to do about it — as a single bar.
-
-   The shape came from a promotional banner the team brought in on 19 August
-   2026: an icon disc, a title over a line of explanation, a segmented counter,
-   an action pill, a dismiss. Four of the five are here. The counter is what
-   made it the right reference rather than a borrowed look — it is three joined
-   boxes holding a time, and the date field is already three joined boxes
-   holding a date, so the counter *is* this control and not a drawing of it.
-   The dismiss is not here: a promotional bar is something you make go away,
-   and a section of a project is not.
-
-   **It was built on the dark Field first, and that was wrong.** Near-black in
-   a warm-white sheet is the loudest thing on the page, and this is not the
-   page's action — the analysis is, two sections down, and it is the only thing
-   here wearing the accent. A bar that shouts louder than the CTA beneath it is
-   a bar arguing for itself. So it is built the way every other container in
-   this sheet is built: canvas inside the Edge at `--r-lg`, the same
-   construction as `.linkbox`, the response cards and the version menu.
-
-   The date field is the stock one, with no variant of its own. It is the
-   control the New survey sheet uses, at the size it uses, so the two screens
-   that set this date set it with the same object.
-
-   `[data-field="dark"]` goes back to being applied nowhere — see the token
-   block at the top of this file, and the note there for what it is kept for.
-   ------------------------------------------------------------------------ */
-.collbox {
-  background: var(--canvas);
-  border: 1px solid var(--hairline);
-  border-radius: var(--r-lg);
-  /* so a row's own ground stops at the curve rather than squaring it off */
-  overflow: hidden;
-}
-
-/**
- * Two lines and one padding — 20 August 2026, asked for.
- *
- * It went through both halves of this in a day. It began as text left,
- * controls right, with the padding written `12 12 12 17`: four values, and a
- * box sized by its *text* rather than by its controls, so two lines of
- * explanation set an 89px bar around a 44px control and left 23 above and
- * below it against 13 at the right. One padding fixed that and took it to 80.
- *
- * Then the controls left — the date field into the More menu behind *Change
- * due date*, following the two buttons that went before it — and what is left
- * is a statement. It is the same 77px, because the text was always the taller
- * half; what changed is that nothing on it can be pressed.
- *
- * **It stays light, and that is the point of doing it here.** The insights
- * panel earns the dark Field by being the only thing the platform makes. This
- * says whether the link is open and until when, which is a fact somebody
- * reads on the way past — a second dark tile on the same sheet would make
- * neither of them mean anything.
- */
-.collbanner {
-  padding: var(--sp-md);
-}
-
-/* No icon disc — 19 August 2026. The reference had one and it was the first
-   thing built; on the light bar it was a warm grey circle carrying a calendar
-   next to a line reading "Open for answers", which is the sentence saying it
-   already. A glyph that repeats the words beside it is decoration, and this
-   system does not decorate a container. What is left is what the bar is for:
-   what state it is in, when it stops, and the one thing to do. */
-
-.colltext {
-  flex: 1;
-  min-width: 0;
-}
-/* The state. One line, and it stands alone — DESIGN.md §2's 1.25 rather than
-   the 1.6 a wrapping line takes. */
-.colltext b {
-  display: block;
-  font-family: var(--font-display);
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 1.25;
-  letter-spacing: -0.01em;
-  color: var(--ink);
-}
-/* The explanation, and on the closed bar the record — which carries a
-   colleague's name and a client's, so 1.6 is not optional here. */
-.colltext > span {
-  display: block;
-  margin-top: 3px;
-  font-size: 13px;
-  line-height: 1.6;
-  color: var(--ink-3);
-  text-wrap: pretty;
-}
-
 /* ---- The date field ----------------------------------------------------
    A date, as three boxes and a month you can point at. It replaces
    `<input type="date">`, which drew its own segment highlight, its own glyph
@@ -5539,7 +5446,9 @@ body:has(.deck.paper) {
  * standing on, and on a grey card their white fill is a step *up*, which is the
  * direction that has always meant "this one is live".
  */
-.sheet.paper .collbox,
+/* `.collbox` left this list later the same day, with the card itself: the
+   collection state is a clause on the sheet's own title bar now, not a
+   container on the page. */
 /* `.insbox` left this list on 20 August 2026. The rule is "a card that is a
    tone is not also drawn a line", and the insights panel stopped being a tone
    the day it became a gradient — the one thing on the sheet that is a colour
