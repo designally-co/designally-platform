@@ -6989,11 +6989,25 @@ html:has(.signin) {
   .sheet-top {
     padding: 12px 20px;
   }
-  /* a thumb uses it here — DESIGN.md's 52px, the survey's own size */
-  .sheet-top .back {
-    width: 52px;
-    height: 52px;
-  }
+  /**
+   * The back control matches the other two — 21 August 2026, asked for.
+   *
+   * It was 52 here against their 44, on the argument that a thumb uses it and
+   * 52 is DESIGN.md's disc, the size the survey's own back control takes. The
+   * argument is sound and was applied to one control on a bar where all three
+   * are thumb targets, which is what made it read as a mistake rather than as
+   * emphasis.
+   *
+   * It comes down rather than the others going up, for two reasons. The
+   * survey's 52 is one disc on a single-column form answered by a stranger;
+   * this bar is three controls and a title that already truncates. And every
+   * pixel the discs take comes off the title: `.t` is shrink-to-fit with
+   * `min-width: 0`, so the bar spends what is left on the client's name, and
+   * the name is the part that ellipsises. Eight pixels of disc is eight pixels
+   * of somebody's client.
+   *
+   * 44 is the floor for a touch target, not a compromise below one.
+   */
 }
 
 /* ============================================================
