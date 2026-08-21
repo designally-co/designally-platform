@@ -3493,14 +3493,40 @@ textarea {
    * three columns and as slack in one, where the only thing it separates is a
    * card from the identical card under it.
    *
-   * **17 rather than the 16 asked for.** The scale is Apple's — 4 · 8 · 12 · 17
-   * · 24 · 32 · 48 — and DESIGN.md §3 defends `md` at 17 rather than 16 because
-   * it matches the body size. A pixel nobody can see is not worth a value off
-   * the scale, and every other edge in the team app is already on it.
+   * **16, off the scale, asked for twice.** The scale is Apple's — 4 · 8 · 12 ·
+   * 17 · 24 · 32 · 48 — and DESIGN.md §3 defends `md` at 17 because it matches
+   * the body size. This is the one place that does not take it. Recorded in
+   * §3 rather than left as a stray number, and held in `--edge` so the sheet
+   * and the head that bleeds across it cannot drift apart: the head cancels
+   * this padding with a negative margin, and two literals a few lines apart is
+   * how that stops being true.
+   *
+   * Horizontal only. The vertical rhythm above and below the head is still `md`
+   * and `sm` — what was asked for is the edge a card stands against, not the
+   * spacing of the rows inside it.
    */
   .projsheet {
+    --edge: 16px;
     width: calc(100% - 24px);
-    padding: 0 var(--sp-md) var(--sp-xxl);
+    padding: 0 var(--edge) var(--sp-xxl);
+    /**
+     * No scrollbar — 21 August 2026, asked for.
+     *
+     * The sheet scrolls inside itself, so on any platform that reserves a
+     * gutter for the bar it takes width out of a 390px screen and draws a rail
+     * down the inside of a rounded corner. Touch platforms overlay a transient
+     * bar of their own while a finger is moving, which is the affordance this
+     * removes and does not need to replace.
+     *
+     * It scrolls exactly as it did — nothing here touches `overflow-y: auto`,
+     * so the wheel, the keyboard and `overscroll-behavior: contain` are all
+     * untouched. Only the drawing goes.
+     */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .projsheet::-webkit-scrollbar {
+    display: none;
   }
   /* 8px, and only here. The desktop grid is three columns wide where the gap
      is doing two jobs; a single column has only the one. */
@@ -3517,8 +3543,8 @@ textarea {
      numbers move together — leave the margin at `lg` and it hangs 7px over the
      side. */
   .pshead {
-    margin: 0 calc(var(--sp-md) * -1) var(--sp-md);
-    padding: var(--sp-md) var(--sp-md) var(--sp-sm);
+    margin: 0 calc(var(--edge) * -1) var(--sp-md);
+    padding: var(--sp-md) var(--edge) var(--sp-sm);
   }
   /**
    * The heading takes the row and centres in it — 21 August 2026, asked for.

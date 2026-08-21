@@ -980,6 +980,14 @@ xxs 4 · xs 8 · sm 12 · md 17 · lg 24 · xl 32 · xxl 48 · section 80
 
 The `md` value of 17px is not a mistake: it matches the body font size and shows up throughout Apple's own layouts.
 
+**One value is off the scale: the projects sheet's horizontal edge on a phone, at
+16px** — asked for directly on 21 August 2026, after `md` was tried and reported
+as too wide. It is the gutter a project card stands against below 700px, and
+nothing else takes it. It lives in `--edge` on `.projsheet` rather than as a
+literal, because `.pshead` bleeds to the sheet's edge by cancelling that padding
+with a negative margin, and the two have to be one number or the head hangs over
+the side. Vertical rhythm in that sheet is still `md` and `sm`.
+
 ### Radii
 
 ```
