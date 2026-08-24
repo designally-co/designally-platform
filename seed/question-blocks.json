@@ -1,7 +1,7 @@
 {
   "version": 7,
   "updated": "2026-08-21",
-  "note": "Version 7. Question 14 of the Brand package is the celebrity question — \"If your brand were a celebrity or well-known person, who would it be?\" — replacing the brand-voice question that stood there through version 6. Asked for on 21 August 2026. Same block, same order, same type and the same count, so the survey is still twenty-one questions and every other number on it is unchanged. Version 6 rows stay in the database for the surveys already sent (rule 5); this reaches the next client only.",
+  "note": "Version 7. Question 14 of the Brand package is the celebrity question — \"If your brand were a celebrity or well-known person, who would it be?\" — replacing the brand-voice question that stood there through version 6. Asked for on 21 August 2026, along with the Thai on question 5's ten personality scales — six of the ten pole pairs were reworded by the branding team; the English is untouched. Same block, same order, same type and the same count, so the survey is still twenty-one questions and every other number on it is unchanged. Version 6 rows stay in the database for the surveys already sent (rule 5); this reaches the next client only.",
   "packages": {
     "brand": [
       "identity",
@@ -127,7 +127,7 @@
               },
               {
                 "left_en": "Exclusive",
-                "left_th": "เฉพาะกลุ่ม",
+                "left_th": "เข้าถึงยาก",
                 "right_en": "Accessible",
                 "right_th": "เข้าถึงง่าย"
               },
@@ -135,7 +135,7 @@
                 "left_en": "Serious",
                 "left_th": "จริงจัง",
                 "right_en": "Fun",
-                "right_th": "สนุก"
+                "right_th": "สนุกสนาน"
               },
               {
                 "left_en": "Corporate",
@@ -147,25 +147,25 @@
                 "left_en": "Simple",
                 "left_th": "เรียบง่าย",
                 "right_en": "Sophisticated",
-                "right_th": "ซับซ้อนมีระดับ"
+                "right_th": "มีรสนิยม"
               },
               {
                 "left_en": "Subtle",
-                "left_th": "นุ่มนวล",
+                "left_th": "สุขุม / ไม่โดดเด่น",
                 "right_en": "Bold",
-                "right_th": "โดดเด่น"
+                "right_th": "กล้าแสดงออก / โดดเด่น"
               },
               {
                 "left_en": "Cosmopolitan",
-                "left_th": "เมืองสากล",
+                "left_th": "มีความเป็นสากล",
                 "right_en": "Natural",
-                "right_th": "ธรรมชาติ"
+                "right_th": "เป็นธรรมชาติ"
               },
               {
                 "left_en": "Calm",
-                "left_th": "สงบ",
+                "left_th": "สงบนิ่ง",
                 "right_en": "Dynamic",
-                "right_th": "มีพลัง"
+                "right_th": "กระตือรือร้น"
               },
               {
                 "left_en": "Familiar",
@@ -175,9 +175,9 @@
               },
               {
                 "left_en": "Realistic",
-                "left_th": "สมจริง",
+                "left_th": "มองโลกตามความเป็นจริง",
                 "right_en": "Idealistic",
-                "right_th": "อุดมคติ"
+                "right_th": "มองโลกตามอุดมคติ"
               }
             ]
           }
