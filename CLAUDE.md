@@ -279,6 +279,24 @@ optional min/max), `linear_scale` (with pole labels, point count, and an optiona
 run **1–5**. Version 2 briefly ran them 0–10; `start` and the wide rendering stay for the surveys
 sent while that was true.
 
+**Question version 7, 21 August 2026 — and it is the first version to change what
+is asked, not how.** Brand question 14, the last of the `strategy` block, is the
+celebrity question: *"If your brand were a celebrity or well-known person, who would
+it be?"* / *ถ้าเปรียบแบรนด์คุณเป็นคนมีชื่อเสียงสักคนหนึ่ง เขาจะเป็นใคร?* It replaces the
+brand-voice question — what tone to use with customers and inside the team — which
+stood there through version 6.
+
+Same block, same order, same `paragraph` type, still required, so the count does not
+move: **twenty-one questions**, and the disc, the send screen's grid and the analysis
+all count what they counted before. **Answers to the two are not comparable**, which
+every earlier version could claim and this one cannot: a version-6 respondent
+described a tone, a version-7 one names a person. Anything reading across versions
+has to treat question 14 as two questions sharing a number.
+
+The Thai arrived with a space inside `มีชื่อเสียง` — *"famous"* split into *"name"* and
+*"sound"*. Closed on the way in; Thai does not space within a word, and the two halves
+mean something else apart.
+
 **Question version 6, 17 August 2026.** Same twenty-one questions, same order, same types,
 same answers — only the words in front of them. Seven of the visual questions opened with the
 label their own screen heading already said (*"Mood and Personality — choose 3 words…"* under a
@@ -335,7 +353,7 @@ Each one ends with something usable. Do not start the next before the previous h
    whichever answers you choose.
 5. ~~The website track~~ — retired 11 August 2026 with the website package.
 6. ~~The template editor~~ — retired 17 August 2026 with the *Question templates* panel. The
-   questionnaire is fixed at version 6, the branding team owns its wording, and the questions
+   questionnaire is fixed at version 7, the branding team owns its wording, and the questions
    live in `seed/question-blocks.json`. Rule 5 still holds if that ever changes.
 
 ## Working conventions

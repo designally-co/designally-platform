@@ -33,8 +33,23 @@ export const PACKAGE_BLOCKS: Record<Package, readonly BlockKey[]> = {
  * Nothing about the questionnaire's *content* changed — same twenty-one
  * questions, same order, same types, same answers comparable across both
  * versions. Only the words in front of them.
+ *
+ * **7, from 21 August 2026, and this one does change the content.** Question 14
+ * of the Brand package — the last of the strategy block — is the celebrity
+ * question now: *"If your brand were a celebrity or well-known person, who
+ * would it be?"* It replaces the brand-voice question that stood there through
+ * version 6, which asked what voice to use with customers and inside the team.
+ *
+ * Same block, same order, same `paragraph` type, still required, so the count
+ * is untouched: twenty-one questions, and every other number the client sees —
+ * the disc, the send screen's grid, the analysis — is unchanged.
+ *
+ * **Answers to the two are not comparable, and that is the difference from
+ * version 6.** A version-6 respondent described a tone of voice; a version-7
+ * one names a person. Anything reading across versions has to treat question 14
+ * as two different questions that share a number.
  */
-export const CURRENT_QUESTION_VERSION = 6;
+export const CURRENT_QUESTION_VERSION = 7;
 
 export function blocksFor(_kind: SurveyKind, pkg: Package): BlockKey[] {
   return [...PACKAGE_BLOCKS[pkg]];
