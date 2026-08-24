@@ -407,11 +407,11 @@
         {
           "order": 3,
           "type": "paragraph",
-          "text_en": "Select visual references you like and explain why, focusing on mood, layout, feeling and visual style.",
-          "text_th": "กรุณาเลือกภาพ reference ที่ชอบ พร้อมอธิบายว่า “ชอบเพราะอะไร” โดยเน้นอธิบายในเชิง Mood, Layout, Feeling, Visual Style",
+          "text_en": "Please describe the kind of visual style you like, focusing on Mood, Layout, Feeling, and Visual Style. Avoid answers like “because it looks nice.”",
+          "text_th": "กรุณาอธิบายว่าคุณชอบงาน Visual แบบไหน โดยเน้นอธิบายในเชิง Mood, Layout, Feeling และ Visual Style หลีกเลี่ยงการตอบเพียงว่า “สวย”",
           "required": true,
-          "help_en": "Avoid answers like “because it looks nice”. For example: warm, calm, premium mood · clean and easy-to-read layout · trustworthy but approachable feeling · use of imagery, colour, typography, space.",
-          "help_th": "หลีกเลี่ยงการตอบเพียงว่า “สวย” เช่น ชอบ mood ที่ดูอบอุ่น สงบ พรีเมียม · ชอบ layout ที่ดู clean และอ่านง่าย · ชอบ feeling ที่ดูน่าเชื่อถือแต่ไม่แข็งเกินไป · ชอบการใช้ภาพ สี typography space"
+          "help_en": "For example:\n– Warm, calm, premium mood.\n– Clean and easy-to-read layout.\n– Trustworthy but approachable feeling.\n– Use of imagery, color, typography, space.",
+          "help_th": "ตัวอย่างเช่น\n– ชอบ mood ที่ดูอบอุ่น, สงบ, พรีเมียม\n– ชอบ layout ที่ดู clean และอ่านง่าย\n– ชอบ feeling ที่ดูน่าเชื่อถือแต่ไม่แข็งเกินไป\n– ชอบการใช้ภาพ, สี, typography, space"
         },
         {
           "order": 4,

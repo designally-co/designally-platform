@@ -1628,6 +1628,11 @@ textarea {
   font-size: 13.5px;
   color: var(--ink-3);
   line-height: 1.7;
+  /* The same string as `.slide .qhelp`, in the other language, so it breaks the
+     same way — see the note there. Missing it meant the examples were a list to
+     whichever half of the room read the language the survey opened in, and a
+     run-on sentence to the other half. */
+  white-space: pre-line;
 }
 
 .sendslide .okrow {
@@ -8526,6 +8531,22 @@ html:has(.signin) {
   line-height: 1.7;
   color: var(--ink-3);
   max-width: 60ch;
+  /**
+   * Newlines are honoured here, and only here — 21 August 2026.
+   *
+   * Every help line in the seed is one sentence, and one is not: the visual
+   * reference question carries four worked examples, which arrived as a list
+   * and read as a list. Without this they collapse into a single run-on line
+   * with dashes in the middle of it, which is what the question was reworded to
+   * stop somebody writing.
+   *
+   * `pre-line` and not `pre`: runs of spaces still collapse, so the seed cannot
+   * accidentally hold indentation, and a paragraph with no newlines in it wraps
+   * exactly as it did. The send screen's copy of the same string keeps the old
+   * behaviour — `.sq .qhelp` is a scan of what is left blank, not a place to
+   * re-read the examples.
+   */
+  white-space: pre-line;
 }
 
 /* the answer — a rule, not a box */
