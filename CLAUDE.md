@@ -280,15 +280,37 @@ run **1–5**. Version 2 briefly ran them 0–10; `start` and the wide rendering
 sent while that was true.
 
 **Question version 7, 21 August 2026 — and it is the first version to change what
-is asked, not how.** Brand question 14, the last of the `strategy` block, is the
-celebrity question: *"If your brand were a celebrity or well-known person, who would
+is asked, not how.** The celebrity question — *"If your brand were a celebrity or
+well-known person, who would it be?"* / *ถ้าเปรียบแบรนด์คุณเป็นคนมีชื่อเสียงสักคนหนึ่ง
+เขาจะเป็นใคร?* — is now in **both** packages, and they are **two separate rows**:
+`strategy.14` for Brand and `project.3` for Design. Only the `visual` block is
+shared between packages, so wording changes have to be made twice.
+
+**Design gained a question rather than trading one: 11 numbered questions to 12**,
+on a new screen of its own headed *Brand persona* between *The brand today* and
+*The job ahead*. Naming a person the brand resembles is neither where the brand
+came from nor what this piece of work has to do, and filed under either heading
+the heading stops being true. The welcome counts six screens where it counted
+five, and the send screen counts twelve.
+
+**Brand traded one**, and the question it replaced took a heading with it. Brand
+question 14, the last of the `strategy` block, is the celebrity question: *"If your brand were a celebrity or well-known person, who would
 it be?"* / *ถ้าเปรียบแบรนด์คุณเป็นคนมีชื่อเสียงสักคนหนึ่ง เขาจะเป็นใคร?* It replaces the
 brand-voice question — what tone to use with customers and inside the team — which
 stood there through version 6.
 
-Same block, same order, same `paragraph` type, still required, so the count does not
-move: **twenty-one questions**, and the disc, the send screen's grid and the analysis
-all count what they counted before. **Answers to the two are not comparable**, which
+Same block, same order, same `paragraph` type, still required, so the Brand count
+does not move: **twenty-one questions**, and the disc, the send screen's grid and the
+analysis all count what they counted before.
+
+**It changed screens on 21 August**, which the swap should have done on the way in
+and did not. `strategy.14` sat under *How it speaks* — a heading, and a Thai line,
+about how the brand talks to customers and how the team talks about it — which
+described the brand-voice question exactly and describes a celebrity not at all. It
+is with the personality scales now: *what would they be like* and *who would they be*
+are one question asked twice, and somebody who has just placed ten dots has the
+answer in mind. *How it speaks* keeps `strategy.11` and `strategy.13`, which are both
+about the team. **Answers to the two are not comparable**, which
 every earlier version could claim and this one cannot: a version-6 respondent
 described a tone, a version-7 one names a person. Anything reading across versions
 has to treat question 14 as two questions sharing a number.
@@ -311,7 +333,7 @@ replaced the questionnaire. A client buys Brand **or** Design, never both.
 | Package | Blocks | Questions |
 |---|---|---|
 | **Brand** — Brand Strategy + Brand Identity | identity · strategy · visual | 22 |
-| **Design** | identity · project · visual | 12 |
+| **Design** | identity · project · visual | 12 numbered, from question version 7 |
 
 Part 2 of the new questionnaire is identical in both packages, word for word, in both languages —
 so `visual` is one shared block. See `docs/questionnaire-architecture.md`.

@@ -277,6 +277,13 @@
         {
           "order": 3,
           "type": "paragraph",
+          "text_en": "If your brand were a celebrity or well-known person, who would it be?",
+          "text_th": "ถ้าเปรียบแบรนด์คุณเป็นคนมีชื่อเสียงสักคนหนึ่ง เขาจะเป็นใคร?",
+          "required": true
+        },
+        {
+          "order": 4,
+          "type": "paragraph",
           "text_en": "What is the main objective of this project?",
           "text_th": "เป้าหมายหลักของงานชิ้นนี้คืออะไร",
           "required": true,
@@ -284,7 +291,7 @@
           "help_th": "เช่น สร้างความน่าเชื่อถือ เพิ่มยอดขาย เปิดตัวสินค้าใหม่ รีแบรนด์ สื่อสารข้อมูลให้ชัดเจนขึ้น สร้างภาพลักษณ์ใหม่ให้แบรนด์"
         },
         {
-          "order": 4,
+          "order": 5,
           "type": "checkboxes",
           "text_en": "Where will this work be used?",
           "text_th": "งานชิ้นนี้จะถูกนำไปใช้ที่ไหนบ้าง",

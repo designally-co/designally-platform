@@ -165,20 +165,39 @@ const BRAND_STEPS: StepDef[] = [
   {
     ...INFO,
     headingEn: 'Brand personality',
-    descTh: 'แตะจุดที่ตรงกับความรู้สึกของคุณ จุดกลางหมายถึงอยู่ตรงกลางระหว่างสองด้าน',
-    /* alone: ten pairs is a screenful, and nothing shares that breath */
-    questions: ['strategy.5'],
+    descTh: 'ถ้าแบรนด์เป็นคน จะเป็นคนแบบไหน และเป็นใคร',
+    /**
+     * The scales, and the celebrity question after them — 21 August 2026.
+     *
+     * It sat alone, on the note that ten pairs is a screenful and nothing
+     * shares that breath. `strategy.14` does: *"If your brand were a person,
+     * what would they be like?"* and *"If your brand were a celebrity, who
+     * would it be?"* are one question asked twice, once as a set of dials and
+     * once in a name, and somebody who has just placed ten dots has the answer
+     * already in mind.
+     *
+     * It is here because it had to leave *How it speaks*, whose heading — and
+     * whose Thai, "how the brand talks to customers and how the team talks
+     * about it" — described the brand-voice question that stood at
+     * `strategy.14` until this morning. Swapping the question and leaving it
+     * under that heading broke the rule the file is built on: the heading over
+     * a screen has to be true of everything under it.
+     */
+    questions: ['strategy.5', 'strategy.14'],
   },
   {
     ...INFO,
     headingEn: 'How it speaks',
-    descTh: 'แบรนด์พูดกับลูกค้าอย่างไร และทีมพูดถึงแบรนด์อย่างไร',
-    questions: ['strategy.14', 'strategy.11', 'strategy.13'],
+    /* Both of these are about the team — what they can say with confidence and
+       the one thing they should carry. The customer half of this heading went
+       with the voice question. */
+    descTh: 'ทีมพูดถึงแบรนด์อย่างไร และอยากให้เขาจดจำอะไร',
+    questions: ['strategy.11', 'strategy.13'],
   },
   ...VISUAL_STEPS,
 ];
 
-/** Design — identity, two project screens, the same three visual screens. */
+/** Design — identity, three project screens, the same three visual screens. */
 const DESIGN_STEPS: StepDef[] = [
   IDENTITY,
   {
@@ -189,9 +208,33 @@ const DESIGN_STEPS: StepDef[] = [
   },
   {
     ...INFO,
+    headingEn: 'Brand persona',
+    /**
+     * Its own screen, and the count is not the reason — 21 August 2026, asked
+     * for as question 3 of the Design package.
+     *
+     * One question on a screen looks thin beside the three- and four-question
+     * screens either side, and this file's rule is that a screen holds what
+     * somebody answers in one breath. Naming a person the brand resembles is
+     * that breath: it is neither *the brand today* — where it came from and who
+     * buys it — nor *the job ahead*, which is what this piece of work has to do.
+     * Filed under either, the heading above it stops being true.
+     *
+     * Brand asks the same question at `strategy.14`, where it follows the
+     * personality scales. Design has no scales, so here it stands on its own.
+     * **The two are separate rows and both have to be edited** — only the
+     * `visual` block is shared between the packages.
+     */
+    questions: ['project.3'],
+  },
+  {
+    ...INFO,
     headingEn: 'The job ahead',
     descTh: 'งานชิ้นนี้ต้องทำหน้าที่อะไร และจะถูกใช้ที่ไหน',
-    questions: ['project.3', 'project.4'],
+    /* 4 and 5 since the persona question took 3 — the refs are `block.order`,
+       and `stepsFor` only checks that the *block* exists, so an order left out
+       of this list disappears from the survey without an error anywhere. */
+    questions: ['project.4', 'project.5'],
   },
   ...VISUAL_STEPS,
 ];
