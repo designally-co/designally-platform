@@ -279,6 +279,13 @@ optional min/max), `linear_scale` (with pole labels, point count, and an optiona
 run **1–5**. Version 2 briefly ran them 0–10; `start` and the wide rendering stay for the surveys
 sent while that was true.
 
+**A version bump is two changes.** The code half is this file's number and
+`seed/question-blocks.json`; the other half is `npm run db:seed` against *every*
+database the app runs on, production included. Ship one without the other and the
+deployed app reads zero questions at the new version and refuses to create a
+survey at all — which is what happened on 21 August 2026 between pushing version 7
+and seeding Neon. See the note at `CURRENT_QUESTION_VERSION`.
+
 **Question version 7, 21 August 2026 — and it is the first version to change what
 is asked, not how.** The celebrity question — *"If your brand were a celebrity or
 well-known person, who would it be?"* / *ถ้าเปรียบแบรนด์คุณเป็นคนมีชื่อเสียงสักคนหนึ่ง

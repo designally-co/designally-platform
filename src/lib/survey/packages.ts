@@ -49,6 +49,28 @@ export const PACKAGE_BLOCKS: Record<Package, readonly BlockKey[]> = {
  * one names a person. Anything reading across versions has to treat question 14
  * as two different questions that share a number.
  */
+/**
+ * **Bumping this is two changes, and the second one is not in git.**
+ *
+ * Raising the number here and editing `seed/question-blocks.json` is the code
+ * half. The other half is importing that version into every database the app
+ * runs against — `npm run db:seed` locally, and again with `DATABASE_URL` set
+ * to Neon for production. Until that is done the deployed app reads zero
+ * questions at this version, and the New project sheet offers "Brand · 0
+ * questions" for a package that has twenty-one.
+ *
+ * This happened on 21 August 2026: version 7 shipped to Vercel while Neon still
+ * held only version 6, and creating a survey stopped working until the seed was
+ * run. Nothing reached a client — `createSurvey` counts the questions before it
+ * writes anything and refuses rather than minting a link to an empty
+ * questionnaire — but the team could not send anything for as long as it took
+ * to notice.
+ *
+ * The seed is safe to run against production: it imports one version, leaves
+ * earlier ones alone so sent surveys still resolve, refuses to replace a
+ * question anybody has answered, and skips the example project on any database
+ * that is not the local one.
+ */
 export const CURRENT_QUESTION_VERSION = 7;
 
 export function blocksFor(_kind: SurveyKind, pkg: Package): BlockKey[] {
