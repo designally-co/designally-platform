@@ -263,15 +263,15 @@
         {
           "order": 1,
           "type": "paragraph",
-          "text_en": "Please briefly tell us your brand story: what was the beginning, what was the key turning point, where is the brand today and where is it heading?",
-          "text_th": "กรุณาเล่าเรื่องแบรนด์สั้น ๆ จุดเริ่มต้นของแบรนด์คืออะไร จุดเปลี่ยนสำคัญของแบรนด์คืออะไร ปัจจุบันแบรนด์อยู่ในจุดไหน และกำลังมุ่งไปทางไหน",
+          "text_en": "Please briefly tell us your brand story:\nWhat was the beginning?\nWhat was the key turning point?\nWhere is the brand today, and where is it heading?",
+          "text_th": "กรุณาเล่าเรื่องแบรนด์สั้น ๆ\nจุดเริ่มต้นของแบรนด์คืออะไร\nจุดเปลี่ยนสำคัญของแบรนด์คืออะไร\nปัจจุบันแบรนด์อยู่ในจุดไหน และกำลังมุ่งไปทางไหน",
           "required": true
         },
         {
           "order": 2,
           "type": "paragraph",
-          "text_en": "Who are your core customers? How do they buy or make decisions? What do they need to feel confident before choosing a brand like yours?",
-          "text_th": "ลูกค้าหลักเป็นใคร มีพฤติกรรมการซื้อหรือการตัดสินใจอย่างไร เมื่อลูกค้ากำลังพิจารณาแบรนด์ในลักษณะเดียวกับคุณ อะไรคือสิ่งสำคัญที่เขาอยากมั่นใจก่อนตัดสินใจ",
+          "text_en": "Who are your core customers?\nHow do they buy or make decisions?\nWhat do they need to feel confident before choosing a brand like yours?",
+          "text_th": "ลูกค้าหลักเป็นใคร\nมีพฤติกรรมการซื้อหรือการตัดสินใจอย่างไร\nเมื่อลูกค้ากำลังพิจารณาแบรนด์ในลักษณะเดียวกับคุณ อะไรคือสิ่งสำคัญที่เขาอยากมั่นใจก่อนตัดสินใจ",
           "required": true
         },
         {

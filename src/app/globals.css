@@ -1622,6 +1622,10 @@ textarea {
   /* Thai never below 1.6 — DESIGN.md §2 */
   line-height: 1.7;
 }
+/* the same question in the other language, broken the same way */
+.qaltbody span {
+  white-space: pre-line;
+}
 .qaltbody small {
   display: block;
   margin-top: 5px;
@@ -7572,6 +7576,25 @@ html:has(.signin) {
 }
 .slide .qq {
   display: block;
+  /**
+   * Newlines are honoured — 22 August 2026, asked for.
+   *
+   * A question that asks three things in one breath reads as a wall at 2rem:
+   * "tell us your brand story: what was the beginning, what was the key
+   * turning point, where is the brand today and where is it heading?" is one
+   * paragraph the eye has to take apart before it can start answering. With the
+   * parts on their own lines it is a list of three small things.
+   *
+   * **The text in the database is unchanged except for whitespace**, which is
+   * why this needs no new question version: the words a client is asked are the
+   * same words. Only this surface and its other-language twin opt out of
+   * collapsing them. Everything else — the send screen, the team's reading of
+   * the answers, the printable sheet — leaves `white-space` alone and so goes on
+   * showing one continuous line. The two places that are *not* HTML, the
+   * Markdown export and the analysis transcript, collapse it in code; see
+   * `oneLine`.
+   */
+  white-space: pre-line;
   font-size: clamp(1.4rem, 3.1vw, 2.05rem);
   font-weight: 400;
   letter-spacing: -0.02em;

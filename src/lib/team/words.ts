@@ -13,3 +13,20 @@
 export function plural(n: number, word: string) {
   return `${n} ${word}${n === 1 ? '' : 's'}`;
 }
+
+/**
+ * The question as one line, wherever a line is what the format has.
+ *
+ * Some question texts carry newlines so the *client* can read a multi-part
+ * question one part per line — see `white-space: pre-line` on `.slide .qq`.
+ * Nothing else wants them. The Markdown export puts the text inside a `###`
+ * heading, where a newline ends the heading and drops the rest into the body,
+ * and the analysis transcript is line-based `Q: …` / `A: …`, where a newline
+ * inside the question makes the answer look like it belongs to something else.
+ *
+ * The team's screens need no help: HTML collapses whitespace on its own, and
+ * only the two client rules opt out of that.
+ */
+export function oneLine(s: string) {
+  return s.replace(/\s*\n\s*/g, ' ').trim();
+}

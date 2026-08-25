@@ -1,6 +1,7 @@
 import { and, asc, eq, inArray } from 'drizzle-orm';
 
 import { getDb } from '@/lib/db';
+import { oneLine } from '@/lib/team/words';
 import {
   answers,
   questionBlocks,
@@ -120,7 +121,7 @@ export async function buildTranscript(surveyId: string, only?: string[]) {
     const lines = ordered.map((q) => {
       const value = given.get(q.id);
       const rendered = value ? renderAnswer(value, q.config as QuestionConfig) : '(left blank)';
-      return `Q: ${q.textEn}\nA: ${rendered}`;
+      return `Q: ${oneLine(q.textEn)}\nA: ${rendered}`;
     });
 
     /**

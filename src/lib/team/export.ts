@@ -1,5 +1,6 @@
 import type { AnswerValue } from '@/lib/db/schema';
 import type { ProjectAnswers, ReadableAnswer, RespondentAnswers } from './answers';
+import { oneLine } from './words';
 
 /**
  * The answers as a file somebody can keep.
@@ -94,10 +95,10 @@ function valueToMd(value: AnswerValue, pairs: ReadableAnswer['pairs']): string {
 }
 
 function answerToMd(a: ReadableAnswer): string {
-  const head = `### ${a.number !== null ? `${a.number}. ` : ''}${esc(a.textEn)}`;
+  const head = `### ${a.number !== null ? `${a.number}. ` : ''}${esc(oneLine(a.textEn))}`;
   /* the Thai on its own line under the English, italic — it is the same
      question, not a second one */
-  const th = a.textTh ? `\n*${esc(a.textTh)}*` : '';
+  const th = a.textTh ? `\n*${esc(oneLine(a.textTh))}*` : '';
   const body = a.value ? valueToMd(a.value, a.pairs) : '*Left blank.*';
   return `${head}${th}\n\n${body}`;
 }
