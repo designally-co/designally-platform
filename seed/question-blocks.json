@@ -185,8 +185,8 @@
         {
           "order": 6,
           "type": "paragraph",
-          "text_en": "Choose 3 things your brand would always protect to maintain customer trust, even at a higher cost, time, or effort. Give 1 real example for each.",
-          "text_th": "เลือก 3 สิ่งที่แบรนด์ของคุณจะรักษาไว้เสมอ เพราะเป็นสิ่งที่ทำให้ลูกค้าไว้วางใจ แม้การรักษาสิ่งนั้นจะใช้ต้นทุน เวลา หรือความพยายามมากขึ้น พร้อมยกตัวอย่างเหตุการณ์จริง 1 เหตุการณ์ที่สะท้อนสิ่งนี้",
+          "text_en": "Choose 3 things your brand would always protect to maintain customer trust, even at a higher cost, time, or effort.\nGive 1 real example for each.",
+          "text_th": "เลือก 3 สิ่งที่แบรนด์ของคุณจะรักษาไว้เสมอ เพราะเป็นสิ่งที่ทำให้ลูกค้าไว้วางใจ แม้การรักษาสิ่งนั้นจะใช้ต้นทุน เวลา หรือความพยายามมากขึ้น\nพร้อมยกตัวอย่างเหตุการณ์จริง 1 เหตุการณ์ที่สะท้อนสิ่งนี้",
           "required": true
         },
         {
@@ -217,8 +217,8 @@
         {
           "order": 10,
           "type": "paragraph",
-          "text_en": "Describe your core customers: who are they, how do they buy, and what concerns them most when choosing a brand like yours?",
-          "text_th": "อธิบายกลุ่มลูกค้าหลัก เป็นใคร มีพฤติกรรมการซื้ออย่างไร และเวลาจะเลือกแบรนด์แบบคุณ เขากังวลเรื่องอะไรที่สุด",
+          "text_en": "Describe your core customers:\nWho are they?\nHow do they buy?\nWhat concerns them most when choosing a brand like yours?",
+          "text_th": "อธิบายกลุ่มลูกค้าหลัก\nเป็นใคร\nมีพฤติกรรมการซื้ออย่างไร\nเวลาจะเลือกแบรนด์แบบคุณ เขากังวลเรื่องอะไรที่สุด",
           "required": true
         },
         {

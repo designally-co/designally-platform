@@ -7585,9 +7585,18 @@ html:has(.signin) {
    * paragraph the eye has to take apart before it can start answering. With the
    * parts on their own lines it is a list of three small things.
    *
-   * **The text in the database is unchanged except for whitespace**, which is
-   * why this needs no new question version: the words a client is asked are the
-   * same words. Only this surface and its other-language twin opt out of
+   * **It is not whitespace alone, and the first note here said it was.** Cutting
+   * a clause list into lines takes punctuation with it: "…what was the
+   * beginning, what was the key turning point…" becomes two sentences with
+   * capitals and question marks, because a line that still ends in a comma
+   * reads as a broken paragraph rather than as an item. So this is an edit to
+   * what is asked, not only to how it is set.
+   *
+   * It needs no new version anyway, and for a different reason: version 7 has
+   * never been sent. Once one goes out, the same change would need version 8 —
+   * rule 5 is about what a client was asked, and this changes it.
+   *
+   * Only this surface and its other-language twin opt out of
    * collapsing them. Everything else — the send screen, the team's reading of
    * the answers, the printable sheet — leaves `white-space` alone and so goes on
    * showing one continuous line. The two places that are *not* HTML, the
