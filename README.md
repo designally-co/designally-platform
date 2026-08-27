@@ -191,3 +191,4 @@ claude
 ```
 
 Then paste the readiness check from `docs/first-session-brief.md` before asking for any code.
+
