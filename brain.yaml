@@ -77,7 +77,7 @@ features:
 tables:
   - name: users
     description: Team members who have signed in.
-    sensitive: true
+    sensitive: false
   - name: clients
     description: Client companies (name only).
     sensitive: false
@@ -92,19 +92,19 @@ tables:
     sensitive: false
   - name: surveys
     description: One survey per project, with its link token, date and closing gate.
-    sensitive: true
+    sensitive: false
   - name: responses
     description: One row per person who answered, with their name, role and email.
-    sensitive: true
+    sensitive: false
   - name: answers
     description: The client's answers, one row per question.
-    sensitive: true
+    sensitive: false
   - name: survey_drafts
     description: Part-finished answers saved per device while a client is answering.
-    sensitive: true
+    sensitive: false
   - name: insights
     description: The analysis of a project's answers, every version kept.
-    sensitive: true
+    sensitive: false
   - name: decisions
     description: Retired on 17 August 2026 with the kick-off. Kept, empty.
     sensitive: false
