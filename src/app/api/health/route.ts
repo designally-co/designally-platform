@@ -69,12 +69,31 @@ async function checkAnthropic(): Promise<ProviderCheck> {
   return result;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   const started = Date.now();
 
   // A container image carries its commit as APP_COMMIT_SHA, set by the
   // Dockerfile from a build argument; Vercel supplies its own.
   const commitSha = process.env.APP_COMMIT_SHA || process.env.VERCEL_GIT_COMMIT_SHA || undefined;
+
+  /**
+   * `?live` — the container's own health check: is the server up and serving?
+   *
+   * It touches neither the database nor Anthropic, on purpose. Docker asks every
+   * 30 seconds, and a query that often keeps Neon's compute from ever
+   * suspending: on the free plan that spends the month's compute hours by
+   * about the middle of the month, and the database then stops until the next
+   * one, which is every survey link dead with nobody told. The health check
+   * restarts nothing, so it loses little by not asking the database; the full
+   * check below stays for people and for CI. Decided 8 October 2026, see
+   * `decisions/health-check-does-not-wake-the-database.md`.
+   */
+  if (new URL(request.url).searchParams.has('live')) {
+    return Response.json(
+      { ok: true, live: true, commit: commitSha?.slice(0, 7) ?? 'local' },
+      { headers: { 'cache-control': 'no-store' } },
+    );
+  }
 
   // Presence only. Never the value, and never a length — a length is a hint.
   const env = {
