@@ -43,7 +43,8 @@ services:
     networks:
       - caddy_default
     healthcheck:
-      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:3000/api/health']
+      # ?live: the server is up, without waking Neon every 30 seconds (see the route).
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:3000/api/health?live']
       interval: 30s
       timeout: 5s
       start_period: 20s

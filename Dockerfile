@@ -57,6 +57,8 @@ COPY --from=builder /app/node_modules/drizzle-orm ./node_modules/drizzle-orm
 
 USER nextjs
 EXPOSE 3000
+# ?live answers without touching the database: a query every 30 seconds would
+# keep Neon awake all month (see the route).
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-  CMD wget -qO- http://127.0.0.1:3000/api/health >/dev/null || exit 1
+  CMD wget -qO- 'http://127.0.0.1:3000/api/health?live' >/dev/null || exit 1
 CMD ["node", "server.js"]

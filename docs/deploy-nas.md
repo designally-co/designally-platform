@@ -49,7 +49,7 @@ the `.vercel.app` address stop working when the project is retired.
 the note in the workflow), the production build and the type check. It then
 builds the image and checks it:
 
-- the image is `linux/amd64` and has a `HEALTHCHECK`;
+- the image is `linux/amd64` and has a `HEALTHCHECK` (it calls `/api/health?live`, which answers without touching the database, so Neon can suspend between visits; see `decisions/health-check-does-not-wake-the-database.md`);
 - no credential-shaped string is in its layer history;
 - `scripts/migrate-deploy.ts`, run inside the image, applies every migration to
   a throwaway Postgres 17;
