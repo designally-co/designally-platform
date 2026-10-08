@@ -1,0 +1,125 @@
+# Spec: https://github.com/designally-co/designally-brain/blob/main/docs/brain-yaml.md
+
+format_version: 1
+slug: survey
+name: Survey (Designally Platform)
+kind: internal_tool
+status: live
+
+purpose: >
+  Replaces the manual work between a signed deal and the start of the work.
+  Clients answer a branded bilingual questionnaire, and the platform turns the
+  answers into one page that says what the client has settled, where people
+  contradict themselves or each other, and what is still undecided.
+summary: >
+  One Next.js app with two surfaces. The public survey (/s/<token>) needs no
+  login, works on a phone and in Thai, shows two to four questions per screen,
+  and saves the client's progress as they type. The team app is behind Google
+  sign-in for designally.co accounts, in English, and lists every live client
+  project. A client buys one of two packages, Brand or Design, each with a
+  fixed, versioned questionnaire. When collection closes (by a person or when
+  the survey's date passes), the analysis writes the insights with Claude. The
+  platform's job ends at the insights. Sending the link is manual; the platform
+  never emails anyone.
+
+stack:
+  - Next.js
+  - Drizzle ORM
+  - PostgreSQL (Neon)
+  - Auth.js (Google sign-in)
+  - Claude API
+  - Tailwind CSS
+  - Docker (Designally NAS)
+  - Cloudflare Workers
+
+live_url: https://survey.designally.co
+repo_url: https://github.com/designally-co/survey
+supabase_project_ref:
+
+features:
+  - name: Client questionnaire
+    description: >
+      Public bilingual survey at /s/<token>. No login. Two to four questions
+      per screen, grouped by subject. Progress is saved as the client types,
+      per device. One link can be shared with several people at the client.
+  - name: Two packages
+    description: >
+      Brand (Brand Strategy and Brand Identity) or Design, never both. The
+      questions live in a seed file, are versioned, and a sent survey keeps the
+      version it was sent with.
+  - name: Projects list
+    description: >
+      The team app's home: every client project, whether it is collecting
+      answers or has insights. Shows "3 answers so far", never an expected
+      count.
+  - name: Survey link and QR code
+    description: The team copies the survey link or shows it as a QR code. Sending it is manual.
+  - name: Collection date and closing
+    description: >
+      Every survey has a date to answer by, prefilled at 14 days. The link
+      stops taking answers when a person presses Close now or the date passes.
+      Reopening needs a new date. Who closed it and when is recorded.
+  - name: Insights
+    description: >
+      Claude reads the answers and writes the insights: conflicts, clarity
+      gaps and flags. Never percentages or sentiment scores. Every run is kept
+      as a version, and it can be written again on chosen answers. The
+      client's email is never sent to the analysis.
+  - name: Automatic analysis after the date
+    description: >
+      Once a day, surveys past their date with answers and no analysis get one
+      written automatically.
+  - name: Archive project
+    description: A person archives a finished project by hand. Archiving an open survey closes collection first.
+  - name: Google sign-in
+    description: Sign-in with Google, limited to designally.co accounts. No other sign-in method.
+
+tables:
+  - name: users
+    description: Team members who have signed in.
+    sensitive: true
+  - name: clients
+    description: Client companies (name only).
+    sensitive: false
+  - name: projects
+    description: One row per client project, with its package and archive gate.
+    sensitive: false
+  - name: question_blocks
+    description: Groups of questions (identity, strategy, project, visual; some retired).
+    sensitive: false
+  - name: questions
+    description: Every question in English and Thai, with its type, settings and version.
+    sensitive: false
+  - name: surveys
+    description: One survey per project, with its link token, date and closing gate.
+    sensitive: true
+  - name: responses
+    description: One row per person who answered, with their name, role and email.
+    sensitive: true
+  - name: answers
+    description: The client's answers, one row per question.
+    sensitive: true
+  - name: survey_drafts
+    description: Part-finished answers saved per device while a client is answering.
+    sensitive: true
+  - name: insights
+    description: The analysis of a project's answers, every version kept.
+    sensitive: true
+  - name: decisions
+    description: Retired on 17 August 2026 with the kick-off. Kept, empty.
+    sensitive: false
+
+connections: []
+
+docs:
+  - PRODUCT.md
+  - CLAUDE.md
+  - docs/insight-engine-spec.md
+  - docs/questionnaire-architecture.md
+  - docs/deploy-nas.md
+
+generated:
+  by: ai
+  at: "2026-10-08"
+  from_commit: 8138b0e
+  checked_by:
